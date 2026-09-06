@@ -37,6 +37,7 @@ ob_start();
                         <option value="<?= $sub['id'] ?>" <?= ((int)$sub['id'] === (int)($subjectId ?? 0)) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($sub['code'] . ' - ' . $sub['name']) ?>
                         </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
 
