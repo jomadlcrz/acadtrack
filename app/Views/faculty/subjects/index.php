@@ -82,6 +82,7 @@ ob_start();
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow">
                     <form method="POST" action="<?= url('/faculty/subjects/' . $subject['id'] . '/setup') ?>">
+                        <?= csrf_field() ?>
                         <div class="modal-header border-bottom">
                             <h5 class="modal-title h6 fw-semibold mb-0" id="setupModalLabel<?= $subject['id'] ?>">
                                 Subject Setup: <?= htmlspecialchars($subject['code']) ?>
