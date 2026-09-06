@@ -34,7 +34,7 @@ class FacultyRepository
     public function assignSubject(int $facultyId, int $subjectId, int $academicTermId): int
     {
         $stmt = \App\Core\Database::getConnection()->prepare("
-            INSERT INTO faculty_subjects (faculty_id, subject_id, academic_term_id, assigned_at)
+            INSERT IGNORE INTO faculty_subjects (faculty_id, subject_id, academic_term_id, assigned_at)
             VALUES (:faculty_id, :subject_id, :academic_term_id, NOW())
         ");
         $stmt->execute([

@@ -34,21 +34,30 @@ class Grade extends Model
     {
         if ($academicTermId > 0) {
             $stmt = self::db()->prepare("
-                SELECT g.*, s.code as subject_code, s.name as subject_name, gp.name as period_name
+                SELECT g.*, s.code as subject_code, s.name as subject_name, gp.name as period_name, gs.status as sheet_status
                 FROM grades g
                 JOIN subjects s ON g.subject_id = s.id
                 JOIN grading_periods gp ON g.grading_period_id = gp.id
-                WHERE g.student_id = :student_id AND g.academic_term_id = :academic_term_id
+                LEFT JOIN grading_sheets gs ON gs.subject_id = g.subject_id 
+                                           AND gs.grading_period_id = g.grading_period_id 
+                                           AND gs.academic_term_id = g.academic_term_id
+                WHERE g.student_id = :student_id 
+                  AND g.academic_term_id = :academic_term_id
+                  AND (gs.status IN ('APPROVED', 'FINALIZED') OR gs.id IS NULL)
                 ORDER BY gp.order_num, s.code
             ");
             $stmt->execute(['student_id' => $studentId, 'academic_term_id' => $academicTermId]);
         } else {
             $stmt = self::db()->prepare("
-                SELECT g.*, s.code as subject_code, s.name as subject_name, gp.name as period_name
+                SELECT g.*, s.code as subject_code, s.name as subject_name, gp.name as period_name, gs.status as sheet_status
                 FROM grades g
                 JOIN subjects s ON g.subject_id = s.id
                 JOIN grading_periods gp ON g.grading_period_id = gp.id
+                LEFT JOIN grading_sheets gs ON gs.subject_id = g.subject_id 
+                                           AND gs.grading_period_id = g.grading_period_id 
+                                           AND gs.academic_term_id = g.academic_term_id
                 WHERE g.student_id = :student_id
+                  AND (gs.status IN ('APPROVED', 'FINALIZED') OR gs.id IS NULL)
                 ORDER BY g.academic_term_id, gp.order_num, s.code
             ");
             $stmt->execute(['student_id' => $studentId]);

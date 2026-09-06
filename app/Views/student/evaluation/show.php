@@ -34,6 +34,42 @@ ob_start();
             <p class="text-muted small mb-0">Finalized course evaluations will appear here once term grading is officially concluded.</p>
         </div>
     <?php else: ?>
+        <?php
+            $totalSum = 0;
+            $count = 0;
+            $passedCount = 0;
+            foreach ($evaluations as $e) {
+                $avg = (float)($e['average'] ?? 0);
+                if ($avg > 0) {
+                    $totalSum += $avg;
+                    $count++;
+                    if ($avg >= 75.0 && !in_array(strtoupper($e['status'] ?? ''), ['FAILING', 'NO GRADES', 'NEEDS IMPROVEMENT'])) {
+                        $passedCount++;
+                    }
+                }
+            }
+            $overallGwa = $count > 0 ? round($totalSum / $count, 2) : 0.0;
+        ?>
+
+        <div class="card-body bg-light border-bottom py-3 px-4">
+            <div class="row g-3 text-center">
+                <div class="col-md-4">
+                    <span class="text-muted small d-block">Evaluated subjects</span>
+                    <span class="h5 fw-semibold text-dark mb-0"><?= $count ?></span>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block">General Weighted Average (GWA)</span>
+                    <span class="h5 fw-semibold text-primary mb-0 font-monospace"><?= number_format($overallGwa, 2) ?></span>
+                </div>
+                <div class="col-md-4">
+                    <span class="text-muted small d-block">Academic status</span>
+                    <span class="badge <?= ($overallGwa >= 75.0 && $passedCount === $count) ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning-emphasis border border-warning-subtle' ?> fs-6 fw-semibold py-1 px-3">
+                        <?= ($overallGwa >= 75.0 && $passedCount === $count) ? 'Good Academic Standing' : 'Academic Warning' ?>
+                    </span>
+                </div>
+            </div>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light border-bottom">
@@ -48,7 +84,8 @@ ob_start();
                     <?php foreach ($evaluations as $subjectCode => $eval): ?>
                     <?php 
                         $status = strtoupper($eval['status'] ?? '');
-                        $isPassed = $status === 'PASSED';
+                        $average = (float)($eval['average'] ?? 0);
+                        $isPassed = !in_array($status, ['FAILING', 'NO GRADES', 'NEEDS IMPROVEMENT']) && $average >= 75.0;
                     ?>
                     <tr>
                         <td class="px-3">
@@ -63,7 +100,7 @@ ob_start();
                             <?= number_format((float)$eval['average'], 2) ?>
                         </td>
                         <td class="px-3 text-center">
-                            <span class="badge badge-<?= $isPassed ? 'approved' : 'returned' ?>">
+                            <span class="badge <?= $isPassed ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle' ?>">
                                 <i class="bi bi-<?= $isPassed ? 'check-circle' : 'x-circle' ?> me-1"></i>
                                 <?= htmlspecialchars($eval['status']) ?>
                             </span>
