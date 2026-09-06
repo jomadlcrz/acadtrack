@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($pageTitle ?? 'Dashboard') ?> - GWC Grading System</title>
+    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="/assets/css/pages/dashboard.css">
+</head>
+<body>
+    <?php include __DIR__ . '/../components/navbar.php'; ?>
+
+    <div class="app-container">
+        <?php include __DIR__ . '/../components/sidebar.php'; ?>
+
+        <main class="main-content">
+            <?php include __DIR__ . '/../components/alert.php'; ?>
+
+            <div class="dashboard-header">
+                <h1><?= htmlspecialchars($pageTitle ?? 'Dashboard') ?></h1>
+                <?php if (!empty($subtitle)): ?>
+                    <p><?= htmlspecialchars($subtitle) ?></p>
+                <?php endif; ?>
+            </div>
+
+            <div class="dashboard-content">
+                <?= $content ?>
+            </div>
+        </main>
+    </div>
+
+    <script src="/assets/js/app.js"></script>
+</body>
+</html>

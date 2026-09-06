@@ -1,0 +1,9 @@
+/* Grading Pages */
+
+.grading-table .form-control {
+    max-width: 100px;
+}
+
+.grading-table td input[type="number"] {
+    text-align: center;
+}
