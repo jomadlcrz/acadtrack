@@ -57,6 +57,8 @@ class StudentController
         $lastName = trim((string) $request->post('last_name', ''));
         $email = trim((string) $request->post('email', ''));
         $studentNumber = trim((string) $request->post('student_number', ''));
+        $studentNumber = $studentNumber !== '' ? $studentNumber : null;
+
         $yearLevel = (int) $request->post('year_level', 1);
         $status = in_array($request->post('status'), ['Regular', 'Irregular'], true) ? $request->post('status') : 'Regular';
         $inputPassword = trim((string) $request->post('password', ''));
@@ -67,8 +69,14 @@ class StudentController
         $semester = (string) $request->post('semester', '');
         $semQuery = $semester !== '' ? "&semester={$semester}" : '';
 
-        if (empty($firstName) || empty($lastName) || empty($email) || empty($studentNumber)) {
-            $session->flash('error', 'All student details (name, email, student number) are required.');
+        if (empty($firstName) || empty($lastName) || empty($email)) {
+            $session->flash('error', 'Student first name, last name, and email are required.');
+            redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
+            return;
+        }
+
+        if ($studentNumber !== null && \App\Models\User::where('student_number', $studentNumber)->exists()) {
+            $session->flash('error', "Student ID number '{$studentNumber}' is already registered to another student. Student numbers must be unique.");
             redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
             return;
         }
@@ -109,7 +117,7 @@ class StudentController
 
             $session->flash('success', "Student {$firstName} {$lastName} added with temporary credentials and enrolled successfully.");
         } catch (\Throwable $e) {
-            if (str_contains($e->getMessage(), '1062') || str_contains($e->getMessage(), 'email')) {
+            if (str_contains($e->getMessage(), '1062') || str_contains($e->getMessage(), 'student_number') || str_contains($e->getMessage(), 'email')) {
                 $session->flash('error', 'A student with this email address or student number already exists.');
             } else {
                 $session->flash('error', 'Unable to add student: ' . $e->getMessage());

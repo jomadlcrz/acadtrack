@@ -26,8 +26,15 @@ class StudentValidator
             $this->errors['email'] = 'Invalid email format.';
         }
 
-        if (empty($data['student_number'])) {
-            $this->errors['student_number'] = 'Student number is required.';
+        if (!empty($data['student_number'])) {
+            $studentNumber = trim((string) $data['student_number']);
+            $query = \App\Models\User::where('student_number', $studentNumber);
+            if (!empty($data['id'])) {
+                $query->where('id', '!=', $data['id']);
+            }
+            if ($query->exists()) {
+                $this->errors['student_number'] = 'Student number is already taken.';
+            }
         }
 
         if (empty($data['section_id'])) {

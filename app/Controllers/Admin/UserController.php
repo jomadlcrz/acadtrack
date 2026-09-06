@@ -49,11 +49,18 @@ class UserController
             $plainPassword = \App\Models\User::generateRandomPassword();
         }
 
+        $studentNumber = trim((string) ($data['student_number'] ?? '')) ?: null;
+        if ($studentNumber !== null && \App\Models\User::where('student_number', $studentNumber)->exists()) {
+            $session->flash('error', "Student ID number '{$studentNumber}' is already registered to another user.");
+            redirect('/admin/users/create');
+            return;
+        }
+
         $user = \App\Models\User::create([
             'first_name' => $data['first_name'] ?? '',
             'last_name' => $data['last_name'] ?? '',
             'email' => $data['email'] ?? '',
-            'student_number' => !empty($data['student_number']) ? $data['student_number'] : null,
+            'student_number' => $studentNumber,
             'password' => password_hash($plainPassword, PASSWORD_BCRYPT),
             'role' => $role,
             'status' => $data['status'] ?? 'active',
@@ -107,7 +114,13 @@ class UserController
         ];
 
         if (isset($data['student_number'])) {
-            $updateData['student_number'] = !empty($data['student_number']) ? $data['student_number'] : null;
+            $studentNumber = trim((string) $data['student_number']) ?: null;
+            if ($studentNumber !== null && \App\Models\User::where('student_number', $studentNumber)->where('id', '!=', $user->id)->exists()) {
+                $session->flash('error', "Student ID number '{$studentNumber}' is already registered to another user.");
+                redirect('/admin/users/' . $id . '/edit');
+                return;
+            }
+            $updateData['student_number'] = $studentNumber;
         }
 
         if (!empty($data['password'])) {

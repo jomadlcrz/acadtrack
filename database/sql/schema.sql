@@ -29,7 +29,7 @@ CREATE TABLE academic_terms (
 -- Users
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    student_number VARCHAR(20) NULL,
+    student_number VARCHAR(50) NULL UNIQUE,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,

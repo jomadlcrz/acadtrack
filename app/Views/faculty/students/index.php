@@ -150,8 +150,9 @@ ob_start();
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="student_number" class="form-label">Student ID number <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="student_number" name="student_number" required placeholder="e.g. 2026-0045">
+                        <label for="student_number" class="form-label">Student ID number <span class="text-muted">(Optional / Late ID)</span></label>
+                        <input type="text" class="form-control" id="student_number" name="student_number" placeholder="e.g. 2026-0045 (leave blank if pending/late ID)">
+                        <div class="form-text">Optional. If the student does not have an ID yet, leave blank. If provided, it must be unique.</div>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email address <span class="text-danger">*</span></label>

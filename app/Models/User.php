@@ -61,8 +61,11 @@ class User extends Model
         return $user ? $user->toArray() : null;
     }
 
-    public static function findByStudentNumber(string $studentNumber): ?array
+    public static function findByStudentNumber(?string $studentNumber): ?array
     {
+        if (empty($studentNumber)) {
+            return null;
+        }
         $user = self::where('student_number', $studentNumber)->first();
         return $user ? $user->toArray() : null;
     }
