@@ -2,7 +2,8 @@
 
 **Document Version:** 1.0  
 **Effective Date:** 2026-09-06  
-**Applies to:** `Acadtrack` (Web Desktop, Tablet, & Mobile Viewports)
+**Applies to:** `Acadtrack` (Web Desktop, Tablet, & Mobile Viewports)  
+**Related Standards:** [BOOTSTRAP_GUIDE.md](file:///C:/xampp/htdocs/acadtrack/docs/BOOTSTRAP_GUIDE.md) | [Official Bootstrap Documentation](https://getbootstrap.com/docs/5.3/)
 
 ---
 

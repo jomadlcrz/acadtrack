@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle ?? 'Acadtrack — Golden West Colleges, Inc.') ?></title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="icon" type="image/x-icon" href="<?= url('favicon.ico') ?>">
+    <link rel="shortcut icon" type="image/x-icon" href="<?= url('favicon.ico') ?>">
+    <link rel="stylesheet" href="<?= asset('vendor/bootstrap/css/bootstrap.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('vendor/bootstrap-icons/bootstrap-icons.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
     <?php if (!empty($additionalCss)): ?>
         <?php foreach ($additionalCss as $css): ?>
             <link rel="stylesheet" href="<?= $css ?>">
@@ -33,8 +33,8 @@
     <?php include __DIR__ . '/../components/modal.php'; ?>
     <?php include __DIR__ . '/../components/toast.php'; ?>
 
-    <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/app.js"></script>
+    <script src="<?= asset('vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+    <script src="<?= asset('js/app.js') ?>"></script>
     <?php if (!empty($additionalJs)): ?>
         <?php foreach ($additionalJs as $js): ?>
             <script src="<?= $js ?>"></script>

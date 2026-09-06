@@ -3,9 +3,10 @@
 > **Project:** Golden West Colleges, Inc. (GWC) Grading & Academic Evaluation System  
 > **Tech Stack:** Vanilla PHP 8.2 MVC, MySQL 10.4+, Bootstrap 5.3.3, Bootstrap Icons 1.11.3, Vanilla JavaScript  
 > **Related Documents:**
-> * [Workflow Architecture](file:///C:/xampp/htdocs/grading-system/grading_system_workflow.md)
-> * [Anti-Generic Design Standards](file:///C:/xampp/htdocs/grading-system/docs/ANTI_GENERIC_DESIGN.md)
-> * [System Architecture](file:///C:/xampp/htdocs/grading-system/docs/ARCHITECTURE.md)
+> * [Bootstrap 5 Component & Form Guidelines](file:///C:/xampp/htdocs/acadtrack/docs/BOOTSTRAP_GUIDE.md)
+> * [Casing & Typography Guidelines](file:///C:/xampp/htdocs/acadtrack/CASING_GUIDELINES.md)
+> * [Anti-Generic Design Standards](file:///C:/xampp/htdocs/acadtrack/docs/ANTI_GENERIC_DESIGN.md)
+> * [System Architecture](file:///C:/xampp/htdocs/acadtrack/docs/ARCHITECTURE.md)
 
 ---
 
@@ -52,10 +53,13 @@ public/
 
 ### Layout Inclusion Cascading Order
 Every application view includes styles in a strictly governed order to maintain predictable cascade overrides:
-1. `bootstrap.min.css` (Base responsive grid & component framework)
-2. `bootstrap-icons.min.css` (Vector iconography)
+1. `bootstrap.min.css` (Base responsive grid & component framework — [Official Bootstrap Documentation](https://getbootstrap.com/docs/5.3/))
+2. `bootstrap-icons.min.css` (Vector iconography — [Official Bootstrap Icons Catalog](https://icons.getbootstrap.com/))
 3. `app.css` (GWC tokens, typography, `.table-academic`, `.tabular-nums`, and academic badges)
 4. `pages/{page}.css` (Page-specific overrides for grading, dashboard, or authentication)
+
+> [!TIP]
+> For complete form control specifications (`.form-control`, `.form-select`, `.mb-3`, `.row g-3`), card components, and table patterns, consult the dedicated [Bootstrap 5 Component & Form Guidelines](file:///C:/xampp/htdocs/acadtrack/docs/BOOTSTRAP_GUIDE.md).
 
 ---
 

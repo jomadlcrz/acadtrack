@@ -93,11 +93,15 @@
             <?php endif; ?>
 
             <div class="error-actions">
-                <button type="button" onclick="window.history.back()" class="btn btn-primary">Go Back</button>
-                <a href="/dashboard" class="btn">Return to Dashboard</a>
+                <button type="button" onclick="window.history.back()" class="btn btn-primary d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-arrow-left"></i> Go back
+                </button>
+                <a href="<?= url('/dashboard') ?>" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-house"></i> Return to dashboard
+                </a>
             </div>
         </div>
     </div>
-    <script src="/assets/js/app.js"></script>
+    <script src="<?= asset('js/app.js') ?>"></script>
 </body>
 </html>
