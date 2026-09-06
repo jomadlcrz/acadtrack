@@ -1,6 +1,6 @@
 {
-    "name": "gwc/grading-system",
-    "description": "GWC Grading System - MVC Architecture",
+    "name": "gwc/acadtrack",
+    "description": "Golden West Colleges, Inc. - Acadtrack",
     "type": "project",
     "require": {
         "php": "^8.2",

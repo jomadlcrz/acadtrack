@@ -15,7 +15,7 @@ class HomeController
     {
         $view = new View();
         $html = $view->render('home.index', [
-            'pageTitle' => 'Academic Grading & Evaluation Platform',
+            'pageTitle' => 'Acadtrack',
         ]);
         $response->html($html);
     }

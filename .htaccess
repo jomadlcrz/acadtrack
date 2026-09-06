@@ -1,6 +1,5 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /grading-system/
 
     # Security: Block direct browser access to sensitive files and source code directories
     RewriteRule ^(\.env|\.git|composer\.(json|lock)|phpunit\.xml) - [F,L,NC]
@@ -10,9 +9,10 @@
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
 
-    # 1. External redirect: redirect direct /public/* requests to clean /* (e.g. /grading-system/public/login -> /grading-system/login)
+    # 1. External redirect: redirect direct /public/* requests to clean /*
     RewriteCond %{ENV:REDIRECT_STATUS} ^$
-    RewriteRule ^public/(.*)$ /grading-system/$1 [R=301,L]
+    RewriteCond %{REQUEST_URI} ^/([^/]+)/public/(.*)$
+    RewriteRule ^public/(.*)$ /%1/$1 [R=301,L]
 
     # 2. Static files & assets: map /assets/... to public/assets/...
     RewriteRule ^assets/(.*)$ public/assets/$1 [L]

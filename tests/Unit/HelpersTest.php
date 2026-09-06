@@ -43,4 +43,19 @@ class HelpersTest extends TestCase
         $this->assertSame('/grading-system/assets/css/app.css', $assetUrl);
         $this->assertStringNotContainsString('/public', $assetUrl);
     }
+
+    public function testBasePathSupportsAcadtrack(): void
+    {
+        $_SERVER['SCRIPT_NAME'] = '/acadtrack/public/index.php';
+        $_SERVER['REQUEST_URI'] = '/acadtrack/login';
+
+        $base = base_path_url();
+        $this->assertSame('/acadtrack', $base);
+
+        $loginUrl = url('/login');
+        $this->assertSame('/acadtrack/login', $loginUrl);
+
+        $assetUrl = asset('css/app.css');
+        $this->assertSame('/acadtrack/assets/css/app.css', $assetUrl);
+    }
 }

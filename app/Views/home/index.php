@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Golden West Colleges, Inc. — Official Academic Grading &amp; Curriculum Evaluation System">
-    <title>Academic Grading &amp; Evaluation Platform &mdash; Golden West Colleges, Inc.</title>
+    <meta name="description" content="Golden West Colleges, Inc. — Acadtrack">
+    <title>Acadtrack &mdash; Golden West Colleges, Inc.</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
@@ -21,14 +21,12 @@
                 <img src="/assets/images/gwc.png" alt="Golden West Colleges Logo" class="landing-logo">
                 <div class="landing-brand-text">
                     <span class="landing-college-name">Golden West Colleges, Inc.</span>
-                    <span class="landing-system-tag">Academic Grading &amp; Evaluation System</span>
+                    <span class="landing-system-tag">Acadtrack</span>
                 </div>
             </a>
 
             <nav aria-label="Main Navigation">
                 <ul class="landing-nav-links">
-                    <li><a href="#roles" class="landing-nav-link">Portals &amp; Roles</a></li>
-                    <li><a href="#grading-standards" class="landing-nav-link">Grading Standards</a></li>
                     <li><a href="#lifecycle" class="landing-nav-link">Workflow Lifecycle</a></li>
                     <li>
                         <a href="/login" class="btn-nav-login">
@@ -54,8 +52,8 @@
                         <a href="/login" class="btn-hero-primary">
                             <span>Log In to Portal</span>
                         </a>
-                        <a href="#roles" class="btn-hero-outline">
-                            <span>Explore Stakeholder Roles</span>
+                        <a href="#lifecycle" class="btn-hero-outline">
+                            <span>Workflow Lifecycle</span>
                         </a>
                     </div>
                 </div>
@@ -63,239 +61,7 @@
         </div>
     </section>
 
-    <!-- 3. Stakeholder Portals (Role Grid) -->
-    <section id="roles" class="landing-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag">Role-Governed Architecture</span>
-                <h2 class="section-title">Dedicated Portals for Every Academic Stakeholder</h2>
-                <p class="section-lead">
-                    Every user accesses a role-tailored environment designed for their exact academic and administrative responsibilities.
-                </p>
-            </div>
-
-            <div class="row g-4">
-                <!-- Dean Portal -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="role-card">
-                        <div>
-                            <div class="role-card-header">
-                                <div class="role-icon-box" aria-hidden="true">
-                                    <i class="bi bi-mortarboard-fill"></i>
-                                </div>
-                                <div>
-                                    <h3 class="role-title">College Dean</h3>
-                                    <span class="badge bg-warning text-dark role-badge"><i class="bi bi-shield-check me-1" aria-hidden="true"></i>Academic Audit</span>
-                                </div>
-                            </div>
-                            <p class="role-description">
-                                Oversees curriculum subjects, assigns qualified faculty to course sections, audits grade distributions, and certifies submissions.
-                            </p>
-                            <ul class="role-features">
-                                <li><i class="bi bi-check2"></i> Assign faculty to subjects</li>
-                                <li><i class="bi bi-check2"></i> Review grade distributions</li>
-                                <li><i class="bi bi-check2"></i> Approve or return sheets with remarks</li>
-                            </ul>
-                        </div>
-                        <a href="/login" class="btn-role-action">
-                            <span>Dean Portal</span>
-                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Faculty Portal -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="role-card">
-                        <div>
-                            <div class="role-card-header">
-                                <div class="role-icon-box" aria-hidden="true">
-                                    <i class="bi bi-person-video3"></i>
-                                </div>
-                                <div>
-                                    <h3 class="role-title">Faculty Member</h3>
-                                    <span class="badge bg-success text-white role-badge"><i class="bi bi-pencil-square me-1" aria-hidden="true"></i>Grade Entry</span>
-                                </div>
-                            </div>
-                            <p class="role-description">
-                                Manages enrolled student class rosters, encodes period scores, autosaves working drafts, and submits final sheets for Dean review.
-                            </p>
-                            <ul class="role-features">
-                                <li><i class="bi bi-check2"></i> High-density grade encoding sheet</li>
-                                <li><i class="bi bi-check2"></i> Real-time equivalent calculation</li>
-                                <li><i class="bi bi-check2"></i> Safe draft save &amp; submission locks</li>
-                            </ul>
-                        </div>
-                        <a href="/login" class="btn-role-action">
-                            <span>Faculty Portal</span>
-                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Student Portal -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="role-card">
-                        <div>
-                            <div class="role-card-header">
-                                <div class="role-icon-box" aria-hidden="true">
-                                    <i class="bi bi-backpack-fill"></i>
-                                </div>
-                                <div>
-                                    <h3 class="role-title">Student</h3>
-                                    <span class="badge bg-primary text-white role-badge"><i class="bi bi-journal-text me-1" aria-hidden="true"></i>Academic Records</span>
-                                </div>
-                            </div>
-                            <p class="role-description">
-                                Views certified semester grades, tracks overall Grade Point Average (GPA), and monitors academic evaluation standings.
-                            </p>
-                            <ul class="role-features">
-                                <li><i class="bi bi-check2"></i> Period-by-period score transparency</li>
-                                <li><i class="bi bi-check2"></i> Cumulative weighted GPA tracking</li>
-                                <li><i class="bi bi-check2"></i> Official performance remarks</li>
-                            </ul>
-                        </div>
-                        <a href="/login" class="btn-role-action">
-                            <span>Student Portal</span>
-                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Administrator Portal -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="role-card">
-                        <div>
-                            <div class="role-card-header">
-                                <div class="role-icon-box" aria-hidden="true">
-                                    <i class="bi bi-sliders"></i>
-                                </div>
-                                <div>
-                                    <h3 class="role-title">Administrator</h3>
-                                    <span class="badge bg-dark text-white role-badge"><i class="bi bi-gear-fill me-1" aria-hidden="true"></i>Governance</span>
-                                </div>
-                            </div>
-                            <p class="role-description">
-                                Manages academic term activations, provisions user credentials, configures grading scales, and ensures database integrity.
-                            </p>
-                            <ul class="role-features">
-                                <li><i class="bi bi-check2"></i> Academic term &amp; year activation</li>
-                                <li><i class="bi bi-check2"></i> User account &amp; role administration</li>
-                                <li><i class="bi bi-check2"></i> Grading baseline configuration</li>
-                            </ul>
-                        </div>
-                        <a href="/login" class="btn-role-action">
-                            <span>Admin Portal</span>
-                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. Academic Grading Standards & Scale -->
-    <section id="grading-standards" class="landing-section bg-white border-top border-bottom">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag">GWC Evaluative Framework</span>
-                <h2 class="section-title">Official Grading Scale &amp; Period Weights</h2>
-                <p class="section-lead">
-                    Structured in full alignment with Golden West Colleges, Inc. academic policies.
-                </p>
-            </div>
-
-            <!-- Period Weights -->
-            <div class="row g-3 mb-5">
-                <div class="col-6 col-md-3">
-                    <div class="weight-card">
-                        <div class="weight-period">Prelim Period</div>
-                        <div class="weight-percent">20%</div>
-                        <p class="weight-desc">Preliminary assessments &amp; exams</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="weight-card">
-                        <div class="weight-period">Midterm Period</div>
-                        <div class="weight-percent">20%</div>
-                        <p class="weight-desc">Mid-semester assessments &amp; exams</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="weight-card">
-                        <div class="weight-period">Semi-Final Period</div>
-                        <div class="weight-percent">20%</div>
-                        <p class="weight-desc">Pre-final assessments &amp; coursework</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="weight-card">
-                        <div class="weight-period">Final Period</div>
-                        <div class="weight-percent">40%</div>
-                        <p class="weight-desc">Comprehensive final term evaluation</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Evaluation Scale Table -->
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="table-scale-wrap">
-                        <table class="table-scale table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="width: 28%;">Percentage Range</th>
-                                    <th style="width: 22%;">Equivalent Grade</th>
-                                    <th style="width: 25%;">Academic Performance</th>
-                                    <th style="width: 25%;">Official Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>90.00% &ndash; 100.00%</strong></td>
-                                    <td><code>1.00 &ndash; 1.25</code></td>
-                                    <td><span class="text-success fw-bold">Excellent</span></td>
-                                    <td><span class="badge badge-approved"><i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>Passed (Honor)</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>80.00% &ndash; 89.99%</strong></td>
-                                    <td><code>1.50 &ndash; 1.75</code></td>
-                                    <td><span class="text-success fw-semibold">Very Good</span></td>
-                                    <td><span class="badge badge-approved"><i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>Passed</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>70.00% &ndash; 79.99%</strong></td>
-                                    <td><code>2.00 &ndash; 2.25</code></td>
-                                    <td><span class="text-primary fw-semibold">Good</span></td>
-                                    <td><span class="badge badge-approved"><i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>Passed</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>60.00% &ndash; 69.99%</strong></td>
-                                    <td><code>2.50 &ndash; 2.75</code></td>
-                                    <td><span class="text-secondary fw-semibold">Satisfactory</span></td>
-                                    <td><span class="badge badge-submitted"><i class="bi bi-check-circle me-1" aria-hidden="true"></i>Passed</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>50.00% &ndash; 59.99%</strong></td>
-                                    <td><code>3.00</code></td>
-                                    <td><span class="text-warning fw-semibold">Needs Improvement</span></td>
-                                    <td><span class="badge badge-under-review"><i class="bi bi-clock-history me-1" aria-hidden="true"></i>Conditional Pass</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Below 50.00%</strong></td>
-                                    <td><code>5.00</code></td>
-                                    <td><span class="text-danger fw-bold">Failing</span></td>
-                                    <td><span class="badge badge-returned"><i class="bi bi-x-circle-fill me-1" aria-hidden="true"></i>Failed</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. Grading Sheet Lifecycle Workflow -->
+    <!-- 3. Grading Sheet Lifecycle Workflow -->
     <section id="lifecycle" class="landing-section">
         <div class="container">
             <div class="section-header">
@@ -356,7 +122,7 @@
         </div>
     </section>
 
-    <!-- 6. Institutional Footer -->
+    <!-- 4. Institutional Footer -->
     <footer class="landing-footer">
         <div class="container">
             <div class="row g-4">
@@ -366,7 +132,7 @@
                         <h3 class="footer-title">Golden West Colleges, Inc.</h3>
                     </div>
                     <p class="footer-desc">
-                        Academic Grading &amp; Evaluation Platform &mdash; Providing dependable, transparent, and accurate grade computation and curriculum tracking for the academic community of Golden West Colleges, Inc.
+                        Acadtrack &mdash; Providing dependable, transparent, and accurate grade computation and curriculum tracking for the academic community of Golden West Colleges, Inc.
                     </p>
                 </div>
                 <div class="col-6 col-lg-3 offset-lg-1">
@@ -381,9 +147,7 @@
                 <div class="col-6 col-lg-3">
                     <h4 class="footer-heading">Academic System</h4>
                     <ul class="footer-links">
-                        <li><a href="#grading-standards"><i class="bi bi-chevron-right me-1"></i> Grading Period Weights</a></li>
-                        <li><a href="#grading-standards"><i class="bi bi-chevron-right me-1"></i> Evaluation Scale</a></li>
-                        <li><a href="#lifecycle"><i class="bi bi-chevron-right me-1"></i> Lifecycle State Machine</a></li>
+                        <li><a href="#lifecycle"><i class="bi bi-chevron-right me-1"></i> Workflow Lifecycle</a></li>
                         <li><a href="/login"><i class="bi bi-chevron-right me-1"></i> Log In to Portal</a></li>
                     </ul>
                 </div>

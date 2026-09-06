@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Golden West Colleges, Inc. — Academic Grading &amp; Evaluation System">
+    <meta name="description" content="Golden West Colleges, Inc. — Acadtrack">
     <title><?= htmlspecialchars($pageTitle ?? 'Log In') ?> &mdash; Golden West Colleges, Inc.</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
@@ -22,7 +22,7 @@
                     </a>
                 </div>
                 <h1 class="auth-title">Golden West Colleges, Inc.</h1>
-                <p class="auth-subtitle">Academic Grading &amp; Evaluation Portal</p>
+                <p class="auth-subtitle">Acadtrack</p>
             </div>
 
             <?php if (!empty($error)): ?>
