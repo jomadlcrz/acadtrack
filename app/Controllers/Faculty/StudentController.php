@@ -59,7 +59,10 @@ class StudentController
         $studentNumber = trim((string) $request->post('student_number', ''));
         $yearLevel = (int) $request->post('year_level', 1);
         $status = in_array($request->post('status'), ['Regular', 'Irregular'], true) ? $request->post('status') : 'Regular';
-        $password = (string) $request->post('password', 'student123');
+        $inputPassword = trim((string) $request->post('password', ''));
+        $password = (empty($inputPassword) || $inputPassword === 'student123') 
+            ? \App\Models\User::generateRandomPassword() 
+            : $inputPassword;
 
         $semester = (string) $request->post('semester', '');
         $semQuery = $semester !== '' ? "&semester={$semester}" : '';
@@ -77,19 +80,20 @@ class StudentController
         }
 
         try {
-            // 1. Create User
-            $userRepo = new \App\Repositories\UserRepository();
-            $userId = $userRepo->create([
+            // 1. Create User via Eloquent ORM
+            $user = \App\Models\User::create([
                 'first_name' => $firstName,
                 'last_name' => $lastName,
                 'email' => $email,
                 'student_number' => $studentNumber,
-                'password' => $password,
+                'password' => password_hash($password, PASSWORD_BCRYPT),
                 'role' => 'Student',
                 'status' => 'active',
+                'force_password_change' => true,
             ]);
+            $userId = (int) $user->id;
 
-            // 2. Create Student
+            // 2. Create Student via Eloquent ORM
             $createdStudent = \App\Models\Student::create([
                 'user_id' => $userId,
                 'year_level' => $yearLevel,
@@ -100,14 +104,11 @@ class StudentController
             // 3. Enroll into subject
             \App\Models\Student::enroll($studentId, $subjectId, $termId);
 
-            // 4. Send email notification
-            $createdUser = $userRepo->findById($userId);
-            if ($createdUser) {
-                (new \App\Services\NotificationService())->sendStudentCredentials($createdUser, $password);
-            }
+            // 4. Send email notification with generated temporary password
+            (new \App\Services\NotificationService())->sendStudentCredentials($user->toArray(), $password);
 
-            $session->flash('success', "Student {$firstName} {$lastName} added and enrolled successfully.");
-        } catch (\PDOException $e) {
+            $session->flash('success', "Student {$firstName} {$lastName} added with temporary credentials and enrolled successfully.");
+        } catch (\Throwable $e) {
             if (str_contains($e->getMessage(), '1062') || str_contains($e->getMessage(), 'email')) {
                 $session->flash('error', 'A student with this email address or student number already exists.');
             } else {

@@ -22,7 +22,7 @@ class NotificationService
         $email = $user['email'] ?? '';
         $name = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
         $title = 'Your GWC Acadtrack Account Credentials';
-        $message = "Dear {$name},\n\nYour student account on the GWC Acadtrack Academic Platform has been provisioned.\n\nLogin Email: {$email}\nTemporary Password: {$plainPassword}\n\nPlease log in at your earliest convenience to access your grades and academic evaluation.\n\nGolden West Colleges, Inc.";
+        $message = "Dear {$name},\n\nYour student account on the GWC Acadtrack Academic Platform has been provisioned.\n\nLogin Email: {$email}\nTemporary Password: {$plainPassword}\n\nFor security reasons, you will be required to change this temporary password upon your first sign in.\n\nGolden West Colleges, Inc.";
 
         Notification::create([
             'user_id' => (int) ($user['id'] ?? 0),
@@ -38,8 +38,8 @@ class NotificationService
             . "<p>Your student account on the <strong>GWC Acadtrack</strong> platform has been provisioned.</p>"
             . "<ul><li><strong>Login Email:</strong> " . htmlspecialchars($email) . "</li>"
             . "<li><strong>Temporary Password:</strong> " . htmlspecialchars($plainPassword) . "</li></ul>"
-            . "<p>Please log in to view your semester grades and whole curriculum evaluation.</p>"
-            . "<p><em>Golden West Colleges, Inc.</em></p>";
+            . "<p><em>Note: For security reasons, you will be required to set a new password upon your first sign in.</em></p>"
+            . "<p>Golden West Colleges, Inc.</p>";
 
         return $this->emailService->send($email, $title, $htmlBody);
     }

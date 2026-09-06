@@ -156,7 +156,7 @@ ob_start();
                     <div class="mb-3">
                         <label for="email" class="form-label">Email address <span class="text-danger">*</span></label>
                         <input type="email" class="form-control" id="email" name="email" required placeholder="student@gwc.edu">
-                        <div class="form-text">Account credentials will be emailed to this address.</div>
+                        <div class="form-text">A secure temporary password will be auto-generated and emailed to this address. The student will be required to create their own password upon first sign in.</div>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6">

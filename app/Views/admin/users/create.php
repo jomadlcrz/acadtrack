@@ -40,12 +40,19 @@ ob_start();
             </div>
 
             <div class="mb-3">
-                <label for="password" class="form-label">Initial password <span class="text-danger">*</span></label>
+                <label for="password" class="form-label">Initial password</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-key"></i></span>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Minimum 6 characters" required>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank to auto-generate a random secure password">
                 </div>
-                <div class="form-text">The user can change this password after initial sign in.</div>
+                <div class="form-text">If left blank, a strong temporary password will be randomly generated and emailed.</div>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" value="1" id="force_password_change" name="force_password_change" checked>
+                <label class="form-check-label text-dark" for="force_password_change">
+                    Require user to set a new password upon first sign in
+                </label>
             </div>
 
             <div class="row g-3">

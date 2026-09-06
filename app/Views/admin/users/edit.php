@@ -49,6 +49,13 @@ ob_start();
                 <div class="form-text">Enter a new password only if you wish to reset this user's sign-in credentials.</div>
             </div>
 
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" value="1" id="force_password_change" name="force_password_change" <?= !empty($user['force_password_change']) ? 'checked' : '' ?>>
+                <label class="form-check-label text-dark" for="force_password_change">
+                    Require user to set a new password upon next sign in
+                </label>
+            </div>
+
             <div class="mb-3">
                 <label for="role" class="form-label">System role <span class="text-danger">*</span></label>
                 <select class="form-select" id="role" name="role" required>

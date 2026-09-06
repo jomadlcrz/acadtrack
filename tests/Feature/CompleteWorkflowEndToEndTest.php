@@ -157,6 +157,12 @@ class CompleteWorkflowEndToEndTest extends TestCase
         // -------------------------------------------------------------
         // STEP 7: SAVE AND REVIEW (DRAFT STATE)
         // -------------------------------------------------------------
+        GradingSheet::where('faculty_id', (int) $facultyUser->id)
+            ->where('subject_id', $subjectId)
+            ->where('grading_period_id', $periodId)
+            ->where('academic_term_id', $termId)
+            ->delete();
+
         $gradingService->saveGrades(
             (int) $facultyUser->id,
             $subjectId,

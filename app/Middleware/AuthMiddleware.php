@@ -18,6 +18,15 @@ class AuthMiddleware
             return false;
         }
 
+        if (!empty($_SESSION['user']['force_password_change'])) {
+            $path = $request->path();
+            if ($path !== '/change-password' && $path !== '/logout') {
+                $session->flash('info', 'Please set a new password before continuing.');
+                $response->redirect('/change-password');
+                return false;
+            }
+        }
+
         return true;
     }
 }

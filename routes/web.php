@@ -27,6 +27,8 @@ $router->get('/', [HomeController::class, 'index']);
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login'], [new CsrfMiddleware()]);
 $router->post('/logout', [AuthController::class, 'logout']);
+$router->get('/change-password', [AuthController::class, 'showChangePassword'], [new AuthMiddleware()]);
+$router->post('/change-password', [AuthController::class, 'changePassword'], [new AuthMiddleware(), new CsrfMiddleware()]);
 
 // Dashboard
 $router->get('/dashboard', [DashboardController::class, 'index'], [new AuthMiddleware()]);

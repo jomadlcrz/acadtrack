@@ -36,6 +36,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     role ENUM('Admin', 'Dean', 'Faculty', 'Student') NOT NULL DEFAULT 'Student',
     status ENUM('active', 'inactive') DEFAULT 'active',
+    force_password_change TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_role (role),

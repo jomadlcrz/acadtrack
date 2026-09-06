@@ -40,10 +40,8 @@ Open your browser at:
 | **Admin** | System Admin | `admin@gwc.edu` | `admin123` |
 | **Dean** | College Dean | `dean@gwc.edu` | `dean123` |
 | **Faculty** | John Teacher | `faculty@gwc.edu` | `faculty123` |
-| **Faculty** | Sarah Connor | `sarah.connor@gwc.edu` | `faculty123` |
-| **Student** | Jane Student | `student@gwc.edu` | `student123` |
-| **Student** | Mark Reyes | `mark.reyes@gwc.edu` | `student123` |
-| **Student** | Anna Gomez | `anna.gomez@gwc.edu` | `student123` |
+| **Student** | Jane Student | `student@gwc.edu` | `student123` *(Prompts to set new password)* |
+| **Student** | New Students | *(Provisioned email)* | *Auto-generated temporary password (sent via email; forced change upon login)* |
 
 ---
 

@@ -34,7 +34,11 @@ if (!function_exists('url')) {
 if (!function_exists('asset')) {
     function asset(string $path): string
     {
-        return url('assets/' . ltrim($path, '/'));
+        $clean = ltrim($path, '/');
+        if (str_starts_with($clean, 'assets/')) {
+            $clean = substr($clean, 7);
+        }
+        return url('assets/' . $clean);
     }
 }
 
@@ -61,7 +65,9 @@ if (!function_exists('redirect')) {
             $url = $base . $url;
         }
         header("Location: {$url}");
-        exit;
+        if (php_sapi_name() !== 'cli' && !defined('PHPUNIT_RUNNING')) {
+            exit;
+        }
     }
 }
 

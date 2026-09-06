@@ -41,14 +41,36 @@ class UserController
     public function store(Request $request, Response $response, Session $session): void
     {
         $data = $request->all();
-        $plainPassword = $data['password'] ?? '';
-        $userId = $this->userRepository->create($data);
+        $plainPassword = trim((string) ($data['password'] ?? ''));
+        $role = (string) ($data['role'] ?? 'Student');
+        $forceChange = !empty($request->post('force_password_change')) || $role === 'Student' || empty($plainPassword);
 
-        if ($userId > 0 && !empty($plainPassword)) {
-            $createdUser = $this->userRepository->findById($userId);
-            if ($createdUser) {
-                (new \App\Services\NotificationService())->sendStudentCredentials($createdUser, $plainPassword);
+        if (empty($plainPassword) || $plainPassword === 'student123') {
+            $plainPassword = \App\Models\User::generateRandomPassword();
+        }
+
+        $user = \App\Models\User::create([
+            'first_name' => $data['first_name'] ?? '',
+            'last_name' => $data['last_name'] ?? '',
+            'email' => $data['email'] ?? '',
+            'student_number' => !empty($data['student_number']) ? $data['student_number'] : null,
+            'password' => password_hash($plainPassword, PASSWORD_BCRYPT),
+            'role' => $role,
+            'status' => $data['status'] ?? 'active',
+            'force_password_change' => $forceChange,
+        ]);
+
+        if ($user && $user->id) {
+            if ($role === 'Student') {
+                \App\Models\Student::firstOrCreate([
+                    'user_id' => (int) $user->id,
+                ], [
+                    'year_level' => 1,
+                    'status' => 'Regular',
+                ]);
             }
+
+            (new \App\Services\NotificationService())->sendStudentCredentials($user->toArray(), $plainPassword);
         }
 
         $session->flash('success', 'User created successfully.');
@@ -57,27 +79,46 @@ class UserController
 
     public function edit(Request $request, Response $response, Session $session, string $id): void
     {
-        $user = $this->userRepository->findById((int) $id);
+        $user = \App\Models\User::find((int) $id);
         if (!$user) {
             $response->statusCode(404)->html('User not found');
             return;
         }
 
-        $html = (new View())->render('admin.users.edit', ['user' => $user]);
+        $html = (new View())->render('admin.users.edit', ['user' => $user->toArray()]);
         $response->html($html);
     }
 
     public function update(Request $request, Response $response, Session $session, string $id): void
     {
-        $data = $request->all();
-        unset($data['password']);
-        if (!empty($data['password'])) {
-            $data['password'] = $data['password'];
-        } else {
-            unset($data['password']);
+        $user = \App\Models\User::find((int) $id);
+        if (!$user) {
+            $response->statusCode(404)->html('User not found');
+            return;
         }
 
-        $this->userRepository->update((int) $id, $data);
+        $data = $request->all();
+        $updateData = [
+            'first_name' => $data['first_name'] ?? $user->first_name,
+            'last_name' => $data['last_name'] ?? $user->last_name,
+            'email' => $data['email'] ?? $user->email,
+            'role' => $data['role'] ?? $user->role,
+            'status' => $data['status'] ?? $user->status,
+        ];
+
+        if (isset($data['student_number'])) {
+            $updateData['student_number'] = !empty($data['student_number']) ? $data['student_number'] : null;
+        }
+
+        if (!empty($data['password'])) {
+            $updateData['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+        }
+
+        if ($request->has('force_password_change')) {
+            $updateData['force_password_change'] = (bool) $request->post('force_password_change');
+        }
+
+        $user->update($updateData);
         $session->flash('success', 'User updated successfully.');
         redirect('/admin/users');
     }

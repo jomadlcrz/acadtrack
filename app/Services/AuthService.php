@@ -37,10 +37,23 @@ class AuthService
             'last_name' => $user['last_name'],
             'role' => $user['role'],
             'student_number' => $user['student_number'] ?? null,
+            'force_password_change' => !empty($user['force_password_change']),
         ]);
 
         $session->regenerate();
         return true;
+    }
+
+    public function updatePassword(int $userId, string $newPassword): bool
+    {
+        $user = \App\Models\User::find($userId);
+        if (!$user) {
+            return false;
+        }
+
+        $user->password = password_hash($newPassword, PASSWORD_BCRYPT);
+        $user->force_password_change = false;
+        return (bool) $user->save();
     }
 
     public function logout(Session $session): void
