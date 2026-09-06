@@ -25,16 +25,6 @@
                 </div>
             </a>
 
-            <nav aria-label="Main Navigation">
-                <ul class="landing-nav-links">
-                    <li><a href="#lifecycle" class="landing-nav-link">Workflow Lifecycle</a></li>
-                    <li>
-                        <a href="/login" class="btn-nav-login">
-                            <span>Log In</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
         </div>
     </header>
 
