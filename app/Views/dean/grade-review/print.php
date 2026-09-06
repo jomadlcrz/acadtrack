@@ -29,7 +29,7 @@
         }
         .institution-title {
             font-size: 18px;
-            font-weight: 700;
+            font-weight: 600;
             letter-spacing: 0.5px;
             color: #0f172a;
             margin: 0;
@@ -232,7 +232,7 @@
                             <?= $pGrade !== null ? number_format((float)$pGrade, 2) : '—' ?>
                         </td>
                     <?php endforeach; ?>
-                    <td class="text-end font-monospace fw-bold">
+                    <td class="text-end font-monospace fw-semibold">
                         <?= $hasAnyGrade ? number_format($finalRating, 2) : '—' ?>
                     </td>
                     <td class="text-center fw-semibold <?= $hasAnyGrade ? ($isPassed ? 'text-success' : 'text-danger') : 'text-muted' ?>">

@@ -5,17 +5,30 @@ ob_start();
 ?>
 
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+    <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div>
             <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
                 <i class="bi bi-person-badge text-primary"></i> Assign Instructor to Course
             </h3>
-            <small class="text-muted">Select an accredited faculty member and designate an active curricular course offering.</small>
+            <small class="text-muted">Select an accredited faculty member and designate an active curricular course offering &bull; <?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-muted small fw-semibold">Semester:</span>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Semester selection">
+                <a href="<?= url('/dean/faculty-assignments?semester=1') ?>" class="btn <?= ($selectedSemester ?? '1') === '1' ? 'btn-primary' : 'btn-outline-secondary' ?>">
+                    1st Semester
+                </a>
+                <a href="<?= url('/dean/faculty-assignments?semester=2') ?>" class="btn <?= ($selectedSemester ?? '1') === '2' ? 'btn-primary' : 'btn-outline-secondary' ?>">
+                    2nd Semester
+                </a>
+            </div>
         </div>
     </div>
 
     <form method="POST" action="<?= url('/dean/faculty-assignments/assign') ?>" novalidate>
         <?= csrf_field() ?>
+        <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
+        <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
 
         <div class="card-body p-4">
             <div class="row g-3">
@@ -99,6 +112,8 @@ ob_start();
                                 <form method="POST" action="<?= url('/dean/faculty-assignments/remove') ?>" class="d-inline" onsubmit="return confirm('Remove faculty assignment for <?= htmlspecialchars($subject['code']) ?>?');">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="subject_id" value="<?= $subject['id'] ?>">
+                                    <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
+                                    <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
                                     <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2 d-inline-flex align-items-center gap-1">
                                         <i class="bi bi-person-x"></i> Remove assignment
                                     </button>

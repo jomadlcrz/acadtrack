@@ -19,6 +19,16 @@ ob_start();
     <div class="card-body py-3 px-4">
         <form method="GET" action="<?= url('/faculty/students') ?>" class="row g-3 align-items-center">
             <div class="col-auto d-flex align-items-center gap-2">
+                <label for="semester_select" class="form-label mb-0 fw-semibold small text-muted d-flex align-items-center gap-1">
+                    <i class="bi bi-calendar3 text-primary"></i> Semester:
+                </label>
+                <select id="semester_select" name="semester" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="1" <?= ($selectedSemester ?? '1') === '1' ? 'selected' : '' ?>>1st Semester</option>
+                    <option value="2" <?= ($selectedSemester ?? '1') === '2' ? 'selected' : '' ?>>2nd Semester</option>
+                </select>
+            </div>
+
+            <div class="col-auto d-flex align-items-center gap-2">
                 <label for="subject_id_select" class="form-label mb-0 fw-semibold small text-muted d-flex align-items-center gap-1">
                     <i class="bi bi-book text-primary"></i> Active subject:
                 </label>
@@ -98,6 +108,8 @@ ob_start();
                                 <?= csrf_field() ?>
                                 <input type="hidden" name="student_id" value="<?= $student['id'] ?>">
                                 <input type="hidden" name="subject_id" value="<?= $subjectId ?>">
+                                <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
+                                <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
                                 <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2" title="Remove from class">
                                     <i class="bi bi-trash"></i> Remove
                                 </button>
@@ -124,6 +136,8 @@ ob_start();
             <form method="POST" action="<?= url('/faculty/students/add') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="subject_id" value="<?= $subjectId ?>">
+                <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
+                <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
                 <div class="modal-body p-4">
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
@@ -187,6 +201,8 @@ ob_start();
             <form method="POST" action="<?= url('/faculty/students/enroll') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="subject_id" value="<?= $subjectId ?>">
+                <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
+                <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label for="student_id" class="form-label">Select student <span class="text-danger">*</span></label>

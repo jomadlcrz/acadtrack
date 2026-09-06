@@ -6,11 +6,23 @@ ob_start();
 ?>
 
 <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
-    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+    <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
         <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
             <i class="bi bi-award text-primary"></i> Curriculum Evaluation Matrix
         </h3>
-        <span class="badge badge-student">Academic standing audit</span>
+        <div class="d-flex align-items-center gap-2">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Semester selection">
+                <a href="<?= url('/student/evaluation') ?>" class="btn <?= empty($selectedSemester) ? 'btn-primary' : 'btn-outline-secondary' ?>">
+                    Whole Evaluation
+                </a>
+                <a href="<?= url('/student/evaluation?semester=1') ?>" class="btn <?= ($selectedSemester ?? '') === '1' ? 'btn-primary' : 'btn-outline-secondary' ?>">
+                    1st Semester
+                </a>
+                <a href="<?= url('/student/evaluation?semester=2') ?>" class="btn <?= ($selectedSemester ?? '') === '2' ? 'btn-primary' : 'btn-outline-secondary' ?>">
+                    2nd Semester
+                </a>
+            </div>
+        </div>
     </div>
 
     <?php if (empty($evaluations)): ?>

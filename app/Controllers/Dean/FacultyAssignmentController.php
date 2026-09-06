@@ -24,14 +24,22 @@ class FacultyAssignmentController
 
     public function index(Request $request, Response $response, Session $session): void
     {
-        $academicTerm = (new \App\Models\AcademicTerm())->getActive();
-        $subjects = $this->subjectRepository->getByDean($academicTerm['id'] ?? 0);
+        $selectedSem = (string) $request->get('semester', '');
+        if ($selectedSem === '1' || $selectedSem === '2') {
+            $academicTerm = \App\Models\AcademicTerm::getBySemester($selectedSem);
+        } else {
+            $academicTerm = \App\Models\AcademicTerm::getActive();
+        }
+
+        $termId = (int) ($academicTerm['id'] ?? 0);
+        $subjects = $this->subjectRepository->getByDean($termId);
         $faculty = (new \App\Models\User())->getFaculty();
 
         $html = (new View())->render('dean.faculty-assignments.index', [
             'subjects' => $subjects,
             'faculty' => $faculty,
             'academicTerm' => $academicTerm,
+            'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
         ]);
         $response->html($html);
     }
@@ -40,21 +48,35 @@ class FacultyAssignmentController
     {
         $facultyId = (int) $request->post('faculty_id');
         $subjectId = (int) $request->post('subject_id');
-        $academicTerm = (new \App\Models\AcademicTerm())->getActive();
+        $termId = (int) $request->post('academic_term_id', 0);
+        $semester = (string) $request->post('semester', '');
+        $semQuery = $semester !== '' ? "?semester={$semester}" : '';
 
-        $this->facultyRepository->assignSubject($facultyId, $subjectId, $academicTerm['id']);
+        if ($termId === 0) {
+            $academicTerm = \App\Models\AcademicTerm::getActive();
+            $termId = (int) ($academicTerm['id'] ?? 1);
+        }
+
+        $this->facultyRepository->assignSubject($facultyId, $subjectId, $termId);
         $session->flash('success', 'Faculty assigned successfully.');
-        redirect('/dean/faculty-assignments');
+        redirect("/dean/faculty-assignments{$semQuery}");
     }
 
     public function remove(Request $request, Response $response, Session $session): void
     {
         $facultyId = (int) $request->post('faculty_id');
         $subjectId = (int) $request->post('subject_id');
-        $academicTerm = (new \App\Models\AcademicTerm())->getActive();
+        $termId = (int) $request->post('academic_term_id', 0);
+        $semester = (string) $request->post('semester', '');
+        $semQuery = $semester !== '' ? "?semester={$semester}" : '';
 
-        $this->facultyRepository->removeAssignment($facultyId, $subjectId, $academicTerm['id']);
+        if ($termId === 0) {
+            $academicTerm = \App\Models\AcademicTerm::getActive();
+            $termId = (int) ($academicTerm['id'] ?? 1);
+        }
+
+        $this->facultyRepository->removeAssignment($facultyId, $subjectId, $termId);
         $session->flash('success', 'Assignment removed.');
-        redirect('/dean/faculty-assignments');
+        redirect("/dean/faculty-assignments{$semQuery}");
     }
 }

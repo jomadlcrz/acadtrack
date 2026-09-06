@@ -30,17 +30,29 @@ class Grade extends Model
         return $this->belongsTo(AcademicTerm::class, 'academic_term_id');
     }
 
-    public static function getByStudent(int $studentId, int $academicTermId): array
+    public static function getByStudent(int $studentId, int $academicTermId = 0): array
     {
-        $stmt = self::db()->prepare("
-            SELECT g.*, s.code as subject_code, s.name as subject_name, gp.name as period_name
-            FROM grades g
-            JOIN subjects s ON g.subject_id = s.id
-            JOIN grading_periods gp ON g.grading_period_id = gp.id
-            WHERE g.student_id = :student_id AND g.academic_term_id = :academic_term_id
-            ORDER BY gp.order_num, s.code
-        ");
-        $stmt->execute(['student_id' => $studentId, 'academic_term_id' => $academicTermId]);
+        if ($academicTermId > 0) {
+            $stmt = self::db()->prepare("
+                SELECT g.*, s.code as subject_code, s.name as subject_name, gp.name as period_name
+                FROM grades g
+                JOIN subjects s ON g.subject_id = s.id
+                JOIN grading_periods gp ON g.grading_period_id = gp.id
+                WHERE g.student_id = :student_id AND g.academic_term_id = :academic_term_id
+                ORDER BY gp.order_num, s.code
+            ");
+            $stmt->execute(['student_id' => $studentId, 'academic_term_id' => $academicTermId]);
+        } else {
+            $stmt = self::db()->prepare("
+                SELECT g.*, s.code as subject_code, s.name as subject_name, gp.name as period_name
+                FROM grades g
+                JOIN subjects s ON g.subject_id = s.id
+                JOIN grading_periods gp ON g.grading_period_id = gp.id
+                WHERE g.student_id = :student_id
+                ORDER BY g.academic_term_id, gp.order_num, s.code
+            ");
+            $stmt->execute(['student_id' => $studentId]);
+        }
         return $stmt->fetchAll();
     }
 

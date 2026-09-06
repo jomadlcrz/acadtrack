@@ -27,10 +27,19 @@ class EvaluationController
     public function show(Request $request, Response $response, Session $session): void
     {
         $user = $session->get('user');
-        $student = Student::findByUserId($user['id']);
-        $academicTerm = AcademicTerm::getActive();
+        $student = Student::findByUserId((int) ($user['id'] ?? 0));
+        
+        $selectedSem = (string) $request->get('semester', '');
+        $termId = 0;
+        $academicTerm = null;
+        if ($selectedSem === '1' || $selectedSem === '2') {
+            $academicTerm = AcademicTerm::getBySemester($selectedSem);
+            $termId = (int) ($academicTerm['id'] ?? 0);
+        } else {
+            $academicTerm = AcademicTerm::getActive();
+        }
 
-        $summary = $this->gradeService->getGradeSummary($student['id'] ?? 0, $academicTerm['id'] ?? 0);
+        $summary = $this->gradeService->getGradeSummary((int) ($student['id'] ?? 0), $termId);
 
         $evaluations = [];
         foreach ($summary as $subjectCode => $subjectGrades) {
@@ -41,6 +50,7 @@ class EvaluationController
         $html = (new View())->render('student.evaluation.show', [
             'evaluations' => $evaluations,
             'academicTerm' => $academicTerm,
+            'selectedSemester' => $selectedSem,
         ]);
         $response->html($html);
     }

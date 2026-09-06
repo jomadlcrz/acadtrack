@@ -22,7 +22,12 @@ class StudentController
     public function index(Request $request, Response $response, Session $session): void
     {
         $user = $session->get('user');
-        $academicTerm = \App\Models\AcademicTerm::getActive();
+        $selectedSem = (string) $request->get('semester', '');
+        if ($selectedSem === '1' || $selectedSem === '2') {
+            $academicTerm = \App\Models\AcademicTerm::getBySemester($selectedSem);
+        } else {
+            $academicTerm = \App\Models\AcademicTerm::getActive();
+        }
         $termId = (int) ($academicTerm['id'] ?? 0);
         $facultyId = (int) ($user['id'] ?? 0);
 
@@ -40,6 +45,7 @@ class StudentController
             'currentSubject' => $currentSubject,
             'assignedSubjects' => $assignedSubjects,
             'academicTerm' => $academicTerm,
+            'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
         ]);
         $response->html($html);
     }
@@ -55,14 +61,20 @@ class StudentController
         $status = in_array($request->post('status'), ['Regular', 'Irregular'], true) ? $request->post('status') : 'Regular';
         $password = (string) $request->post('password', 'student123');
 
+        $semester = (string) $request->post('semester', '');
+        $semQuery = $semester !== '' ? "&semester={$semester}" : '';
+
         if (empty($firstName) || empty($lastName) || empty($email) || empty($studentNumber)) {
             $session->flash('error', 'All student details (name, email, student number) are required.');
-            redirect("/faculty/students?subject_id={$subjectId}");
+            redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
             return;
         }
 
-        $academicTerm = \App\Models\AcademicTerm::getActive();
-        $termId = (int) ($academicTerm['id'] ?? 1);
+        $termId = (int) $request->post('academic_term_id', 0);
+        if ($termId === 0) {
+            $academicTerm = \App\Models\AcademicTerm::getActive();
+            $termId = (int) ($academicTerm['id'] ?? 1);
+        }
 
         try {
             // 1. Create User
@@ -103,7 +115,10 @@ class StudentController
             }
         }
 
-        redirect("/faculty/students?subject_id={$subjectId}");
+        $semester = (string) $request->post('semester', '');
+        $semQuery = $semester !== '' ? "&semester={$semester}" : '';
+
+        redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
     }
 
     public function enrollExisting(Request $request, Response $response, Session $session): void
@@ -113,8 +128,14 @@ class StudentController
         $yearLevel = (int) $request->post('year_level', 0);
         $status = $request->post('status', '');
 
-        $academicTerm = \App\Models\AcademicTerm::getActive();
-        $termId = (int) ($academicTerm['id'] ?? 1);
+        $semester = (string) $request->post('semester', '');
+        $semQuery = $semester !== '' ? "&semester={$semester}" : '';
+
+        $termId = (int) $request->post('academic_term_id', 0);
+        if ($termId === 0) {
+            $academicTerm = \App\Models\AcademicTerm::getActive();
+            $termId = (int) ($academicTerm['id'] ?? 1);
+        }
 
         if ($studentId > 0 && $subjectId > 0) {
             if ($yearLevel > 0 || in_array($status, ['Regular', 'Irregular'], true)) {
@@ -134,21 +155,29 @@ class StudentController
             $session->flash('error', 'Please select a valid student to enroll.');
         }
 
-        redirect("/faculty/students?subject_id={$subjectId}");
+        redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
     }
 
     public function remove(Request $request, Response $response, Session $session): void
     {
         $subjectId = (int) $request->post('subject_id');
         $studentId = (int) $request->post('student_id');
-        $academicTerm = \App\Models\AcademicTerm::getActive();
-        $termId = (int) ($academicTerm['id'] ?? 1);
 
-        $pdo = \App\Core\Database::getConnection();
-        $stmt = $pdo->prepare("DELETE FROM enrollments WHERE student_id = :sid AND subject_id = :subid AND academic_term_id = :tid");
-        $stmt->execute(['sid' => $studentId, 'subid' => $subjectId, 'tid' => $termId]);
+        $semester = (string) $request->post('semester', '');
+        $semQuery = $semester !== '' ? "&semester={$semester}" : '';
+
+        $termId = (int) $request->post('academic_term_id', 0);
+        if ($termId === 0) {
+            $academicTerm = \App\Models\AcademicTerm::getActive();
+            $termId = (int) ($academicTerm['id'] ?? 1);
+        }
+
+        \App\Models\Enrollment::where('student_id', $studentId)
+            ->where('subject_id', $subjectId)
+            ->where('academic_term_id', $termId)
+            ->delete();
 
         $session->flash('success', 'Student removed from this course roster.');
-        redirect("/faculty/students?subject_id={$subjectId}");
+        redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
     }
 }
