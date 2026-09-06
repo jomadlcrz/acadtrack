@@ -25,6 +25,18 @@ class Application
 
     public function run(): void
     {
+        // Enforce clean URL: redirect any direct /public access to clean URL
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        if (str_contains($requestUri, '/public/')) {
+            $cleanUri = preg_replace('#/public/#', '/', $requestUri, 1);
+            header("Location: {$cleanUri}", true, 301);
+            exit;
+        } elseif (str_ends_with($requestUri, '/public')) {
+            $cleanUri = substr($requestUri, 0, -7) ?: '/';
+            header("Location: {$cleanUri}", true, 301);
+            exit;
+        }
+
         try {
             $method = $this->request->method();
             $path = $this->request->path();

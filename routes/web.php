@@ -20,6 +20,7 @@ use App\Middleware\RoleMiddleware;
 use App\Middleware\CsrfMiddleware;
 
 // Auth routes
+$router->get('/', [AuthController::class, 'showLogin']);
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login'], [new CsrfMiddleware()]);
 $router->post('/logout', [AuthController::class, 'logout']);

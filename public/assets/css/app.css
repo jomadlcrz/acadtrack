@@ -243,26 +243,65 @@ select.form-control {
     color: inherit;
 }
 
+/* Tabular Numerics & Academic Typography */
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+}
+
+/* Academic Table */
+.table-academic {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13.5px;
+}
+
+.table-academic th {
+    background-color: #1e3a8a;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 8px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table-academic td {
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: middle;
+    font-variant-numeric: tabular-nums;
+}
+
+.table-academic tbody tr:hover {
+    background-color: var(--gray-100);
+}
+
 /* Badges */
 .badge {
     display: inline-block;
     padding: 2px 8px;
-    border-radius: 12px;
+    border-radius: 4px;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.02em;
 }
 
-.badge-admin { background: #dbeafe; color: #1e40af; }
-.badge-dean { background: #fef3c7; color: #92400e; }
-.badge-faculty { background: #dcfce7; color: #166534; }
-.badge-student { background: #e0e7ff; color: #3730a3; }
-.badge-draft { background: var(--gray-100); color: var(--gray-600); }
-.badge-submitted { background: #dbeafe; color: #1e40af; }
-.badge-under_review { background: #fef3c7; color: #92400e; }
-.badge-approved { background: #dcfce7; color: #166534; }
-.badge-finalized { background: #d1fae5; color: #065f46; }
-.badge-returned { background: #fee2e2; color: #991b1b; }
+.badge-admin { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+.badge-dean { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.badge-faculty { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.badge-student { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+.badge-draft { background: var(--gray-100); color: var(--gray-600); border: 1px solid var(--gray-300); }
+.badge-submitted { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+.badge-under_review, .badge-under-review { background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe; }
+.badge-approved { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.badge-finalized { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+.badge-returned { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
 /* Empty State */
 .empty-state {

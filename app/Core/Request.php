@@ -13,16 +13,28 @@ class Request
 
     public function path(): string
     {
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
         if ($uri === false || $uri === '') {
             return '/';
         }
 
-        $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+        $base = function_exists('base_path_url') ? base_path_url() : '';
+        if ($base === '') {
+            $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+            if (str_ends_with($scriptDir, '/public') && !str_contains($uri, '/public')) {
+                $scriptDir = substr($scriptDir, 0, -7);
+            }
+            $base = ($scriptDir === '/' || $scriptDir === '.') ? '' : rtrim($scriptDir, '/');
+        }
+
         $path = rtrim($uri, '/');
 
-        if ($scriptDir !== '' && str_starts_with($path, $scriptDir)) {
-            $path = substr($path, strlen($scriptDir));
+        if ($base !== '' && str_starts_with($path, $base)) {
+            $path = substr($path, strlen($base));
+        }
+
+        if (str_starts_with($path, '/public')) {
+            $path = substr($path, 7);
         }
 
         return $path === '' ? '/' : $path;

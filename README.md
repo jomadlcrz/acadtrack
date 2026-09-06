@@ -29,7 +29,7 @@ A lightweight, server-rendered academic grading and evaluation system built with
 
 ### Accessing the Web Application
 Open your browser at:
-**[http://localhost/grading-system/public/login](http://localhost/grading-system/public/login)**
+**[http://localhost/grading-system/login](http://localhost/grading-system/login)** (or simply **[http://localhost/grading-system/](http://localhost/grading-system/)**)
 
 ---
 
@@ -99,9 +99,12 @@ OK (17 tests, 34 assertions)
 
 ---
 
-## 5. Architectural Principles
-
-Detailed architecture and design rules can be found under `docs/`:
+## 5. Architectural & Design Documentation
+ 
+Detailed architecture, workflows, and UI specifications can be found under `docs/` and root documentation:
+* [grading_system_workflow.md](file:///C:/xampp/htdocs/grading-system/grading_system_workflow.md) / [docs/WORKFLOW.md](file:///C:/xampp/htdocs/grading-system/docs/WORKFLOW.md) - End-to-end 12-step grading workflow & lifecycle state machine
+* [Web-Designing.md](file:///C:/xampp/htdocs/grading-system/Web-Designing.md) / [docs/WEB_DESIGN_GUIDE.md](file:///C:/xampp/htdocs/grading-system/docs/WEB_DESIGN_GUIDE.md) - UI/UX design architecture, Bootstrap 5.3 integration & component specifications
+* [docs/ANTI_GENERIC_DESIGN.md](file:///C:/xampp/htdocs/grading-system/docs/ANTI_GENERIC_DESIGN.md) - The 6 core pillars of Anti-Generic Academic Design (high density, tabular nums, institutional identity)
 * [docs/ARCHITECTURE.md](file:///C:/xampp/htdocs/grading-system/docs/ARCHITECTURE.md) - System architecture, routing, and error design
-* [docs/DESIGN_PRINCIPLES.md](file:///C:/xampp/htdocs/grading-system/docs/DESIGN_PRINCIPLES.md) - UI design, alert design, and error messaging standards
+* [docs/DESIGN_PRINCIPLES.md](file:///C:/xampp/htdocs/grading-system/docs/DESIGN_PRINCIPLES.md) - Role-oriented UI and notification standards
 * [docs/CODING_PRINCIPLES.md](file:///C:/xampp/htdocs/grading-system/docs/CODING_PRINCIPLES.md) - Clean code and strict typing guidelines

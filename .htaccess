@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /grading-system/
+
+    # 1. External redirect: redirect direct /public/* requests to clean /* (e.g. /grading-system/public/login -> /grading-system/login)
+    RewriteCond %{ENV:REDIRECT_STATUS} ^$
+    RewriteRule ^public/(.*)$ /grading-system/$1 [R=301,L]
+
+    # 2. Static files & assets: serve directly from public/ if file or directory exists
+    RewriteCond %{DOCUMENT_ROOT}/grading-system/public/$1 -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/grading-system/public/$1 -d
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # 3. Dynamic routes: send all other requests to public/index.php
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
+</IfModule>
