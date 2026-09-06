@@ -1,0 +1,633 @@
+/* ==========================================================================
+   Golden West Colleges, Inc. — Institutional Landing Page Styles
+   Strictly adheres to: docs/ANTI_GENERIC_DESIGN.md & docs/WEB_DESIGN_GUIDE.md
+   - Authentic collegiate authority (Deep Navy #1e3a8a, Slate Neutral #f8fafc)
+   - High information density over artificial whitespace
+   - Structured 6px border radii & crisp 1px borders
+   - Tabular numeric alignment for grading metrics
+   - Fully responsive, accessible, zero-CDN
+   ========================================================================== */
+
+:root {
+    --gwc-navy: #1e3a8a;
+    --gwc-navy-dark: #0f172a;
+    --gwc-blue: #2563eb;
+    --gwc-blue-hover: #1d4ed8;
+    --gwc-gold: #d97706;
+    --gwc-gold-hover: #b45309;
+    --gwc-slate-bg: #f8fafc;
+    --gwc-border: #cbd5e1;
+    --gwc-border-light: #e2e8f0;
+    --gwc-text-primary: #0f172a;
+    --gwc-text-secondary: #334155;
+    --gwc-text-muted: #64748b;
+}
+
+body.landing-body {
+    background-color: var(--gwc-slate-bg);
+    color: var(--gwc-text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+}
+
+/* ==========================================================================
+   1. Institutional Navigation Header
+   ========================================================================== */
+.landing-nav {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--gwc-border);
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.landing-nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.landing-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--gwc-text-primary);
+}
+
+.landing-brand:hover {
+    text-decoration: none;
+    color: var(--gwc-text-primary);
+}
+
+.landing-logo {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+
+.landing-brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.landing-college-name {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--gwc-navy);
+    line-height: 1.2;
+}
+
+.landing-system-tag {
+    font-size: 12px;
+    color: var(--gwc-text-muted);
+    font-weight: 500;
+}
+
+.landing-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.landing-nav-link {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--gwc-text-secondary);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.landing-nav-link:hover {
+    color: var(--gwc-blue);
+    text-decoration: none;
+}
+
+.btn-nav-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--gwc-navy);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--gwc-navy);
+    text-decoration: none;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-nav-login:hover {
+    background-color: var(--gwc-blue);
+    border-color: var(--gwc-blue);
+    color: #ffffff;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2);
+}
+
+/* ==========================================================================
+   2. Institutional Hero Section
+   ========================================================================== */
+.landing-hero {
+    background-color: var(--gwc-navy);
+    background-image: 
+        linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.6) 100%),
+        linear-gradient(90deg, #1e3a8a 0%, #172554 100%);
+    color: #ffffff;
+    padding: 64px 0 56px 0;
+    border-bottom: 3px solid #3b82f6;
+}
+
+.hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin-bottom: 16px;
+    color: #dbeafe;
+}
+
+.hero-title {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin-bottom: 16px;
+}
+
+.hero-lead {
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: #e2e8f0;
+    max-width: 640px;
+    margin-bottom: 28px;
+}
+
+.hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-hero-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #ffffff;
+    color: var(--gwc-navy);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 22px;
+    border-radius: 6px;
+    border: 1px solid #ffffff;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.btn-hero-primary:hover {
+    background-color: #eff6ff;
+    color: var(--gwc-blue);
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-hero-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: transparent;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.btn-hero-outline:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* ==========================================================================
+   3. Metric Strip (Institutional KPI Bar)
+   ========================================================================== */
+.landing-metrics {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--gwc-border);
+    padding: 18px 0;
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px;
+}
+
+.metric-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: #eff6ff;
+    color: var(--gwc-blue);
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.metric-value {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--gwc-text-primary);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: var(--gwc-text-muted);
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   4. Section Containers & Typography
+   ========================================================================== */
+.landing-section {
+    padding: 56px 0;
+}
+
+.section-header {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 40px auto;
+}
+
+.section-tag {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gwc-blue);
+    margin-bottom: 6px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--gwc-text-primary);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+}
+
+.section-lead {
+    font-size: 14.5px;
+    color: var(--gwc-text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* ==========================================================================
+   5. Stakeholder Role Grid (High Information Density)
+   ========================================================================== */
+.role-card {
+    background-color: #ffffff;
+    border: 1px solid var(--gwc-border);
+    border-radius: 6px;
+    padding: 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.role-card:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.08);
+    transform: translateY(-2px);
+}
+
+.role-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.role-icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 6px;
+    background-color: #eff6ff;
+    color: var(--gwc-navy);
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.role-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gwc-text-primary);
+    margin: 0;
+}
+
+.role-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.role-description {
+    font-size: 13.5px;
+    color: var(--gwc-text-secondary);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    flex-grow: 1;
+}
+
+.role-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 18px 0;
+    font-size: 12.5px;
+    color: var(--gwc-text-secondary);
+}
+
+.role-features li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.role-features li i {
+    color: #16a34a;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.btn-role-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--gwc-navy);
+    background-color: #f8fafc;
+    border: 1px solid var(--gwc-border);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.btn-role-action:hover {
+    background-color: var(--gwc-navy);
+    color: #ffffff;
+    border-color: var(--gwc-navy);
+    text-decoration: none;
+}
+
+/* ==========================================================================
+   6. Academic Grading Standards Table (Strict Tabular Nums)
+   ========================================================================== */
+.table-scale-wrap {
+    background-color: #ffffff;
+    border: 1px solid var(--gwc-border);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.table-scale {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 13px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-scale th {
+    background-color: var(--gwc-navy);
+    color: #ffffff;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 10px 14px;
+    border-bottom: 2px solid #1d4ed8;
+}
+
+.table-scale td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--gwc-border-light);
+    vertical-align: middle;
+    font-variant-numeric: tabular-nums;
+}
+
+.table-scale tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+.weight-card {
+    background-color: #ffffff;
+    border: 1px solid var(--gwc-border);
+    border-radius: 6px;
+    padding: 16px;
+    text-align: center;
+    height: 100%;
+}
+
+.weight-period {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gwc-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 4px;
+}
+
+.weight-percent {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--gwc-navy);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.weight-desc {
+    font-size: 11.5px;
+    color: var(--gwc-text-muted);
+    margin: 0;
+}
+
+/* ==========================================================================
+   7. Operational Workflow Flow
+   ========================================================================== */
+.workflow-step-card {
+    background-color: #ffffff;
+    border: 1px solid var(--gwc-border);
+    border-radius: 6px;
+    padding: 18px 16px;
+    height: 100%;
+    position: relative;
+}
+
+.workflow-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: var(--gwc-navy);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.workflow-step-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gwc-text-primary);
+    margin-bottom: 6px;
+}
+
+.workflow-step-desc {
+    font-size: 12.5px;
+    color: var(--gwc-text-secondary);
+    line-height: 1.45;
+    margin: 0;
+}
+
+/* ==========================================================================
+   8. Institutional Footer
+   ========================================================================== */
+.landing-footer {
+    background-color: var(--gwc-navy-dark);
+    color: #94a3b8;
+    padding: 48px 0 24px 0;
+    border-top: 1px solid #334155;
+    font-size: 13px;
+}
+
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.footer-logo {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+}
+
+.footer-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.footer-desc {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: #94a3b8;
+    margin-bottom: 16px;
+}
+
+.footer-heading {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 8px;
+}
+
+.footer-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.footer-bottom {
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .landing-nav-links {
+        display: none;
+    }
+
+    .hero-title {
+        font-size: 24px;
+    }
+
+    .landing-hero {
+        padding: 40px 0;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+}

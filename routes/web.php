@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Controllers\HomeController;
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\Admin\UserController;
@@ -19,8 +20,10 @@ use App\Middleware\AuthMiddleware;
 use App\Middleware\RoleMiddleware;
 use App\Middleware\CsrfMiddleware;
 
+// Home / Landing
+$router->get('/', [HomeController::class, 'index']);
+
 // Auth routes
-$router->get('/', [AuthController::class, 'showLogin']);
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login'], [new CsrfMiddleware()]);
 $router->post('/logout', [AuthController::class, 'logout']);

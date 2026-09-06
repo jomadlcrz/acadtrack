@@ -6,9 +6,8 @@
     RewriteRule ^(\.env|\.git|composer\.(json|lock)|phpunit\.xml) - [F,L,NC]
     RewriteRule ^(app|bootstrap|config|database|docs|routes|skills|tests|vendor)(/.*)?$ - [F,L,NC]
 
-    # If the target file or directory physically exists, serve it directly and stop rewriting
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
+    # If the target file physically exists, serve it directly and stop rewriting
+    RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
 
     # 1. External redirect: redirect direct /public/* requests to clean /* (e.g. /grading-system/public/login -> /grading-system/login)
