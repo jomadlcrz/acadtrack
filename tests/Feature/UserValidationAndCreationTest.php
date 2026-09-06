@@ -1,0 +1,195 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use PHPUnit\Framework\TestCase;
+use App\Models\User;
+use App\Models\Faculty;
+use App\Models\Student;
+use App\Models\Department;
+use App\Models\Section;
+use App\Validators\UserValidator;
+
+class UserValidationAndCreationTest extends TestCase
+{
+    private static array $createdUserIds = [];
+    private static ?int $deptId = null;
+    private static ?int $sectionId = null;
+
+    public static function setUpBeforeClass(): void
+    {
+        $dotenv = \Dotenv\Dotenv::createImmutable(dirname(__DIR__, 2));
+        $dotenv->load();
+        new \App\Core\Database(
+            env('DB_HOST'),
+            env('DB_DATABASE'),
+            env('DB_USERNAME'),
+            (string) env('DB_PASSWORD', '')
+        );
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $dept = Department::first();
+        self::$deptId = $dept ? (int) $dept->id : null;
+
+        $section = Section::first();
+        self::$sectionId = $section ? (int) $section->id : null;
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        foreach (self::$createdUserIds as $uid) {
+            Student::where('user_id', $uid)->delete();
+            Faculty::where('user_id', $uid)->delete();
+            User::where('id', $uid)->delete();
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        $_SESSION = [];
+        $_POST = [];
+        $_GET = [];
+    }
+
+    public function testValidatorRejectsCompletelyEmptyData(): void
+    {
+        $validator = new UserValidator();
+        $valid = $validator->validate([]);
+
+        $this->assertFalse($valid);
+        $errors = $validator->errors();
+        $this->assertArrayHasKey('first_name', $errors);
+        $this->assertArrayHasKey('last_name', $errors);
+        $this->assertArrayHasKey('email', $errors);
+        $this->assertArrayHasKey('role', $errors);
+    }
+
+    public function testValidatorRejectsInvalidEmail(): void
+    {
+        $validator = new UserValidator();
+        $valid = $validator->validate([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'invalid-email',
+            'role' => 'Admin',
+        ]);
+
+        $this->assertFalse($valid);
+        $this->assertArrayHasKey('email', $validator->errors());
+    }
+
+    public function testValidatorRejectsStudentWithoutSection(): void
+    {
+        $validator = new UserValidator();
+        $valid = $validator->validate([
+            'first_name' => 'Student',
+            'last_name' => 'Test',
+            'email' => 'student_test_' . time() . '@gwc.edu',
+            'role' => 'Student',
+            'section_id' => '',
+        ]);
+
+        $this->assertFalse($valid);
+        $this->assertArrayHasKey('section_id', $validator->errors());
+    }
+
+    public function testValidatorRejectsFacultyWithoutDepartment(): void
+    {
+        $validator = new UserValidator();
+        $valid = $validator->validate([
+            'first_name' => 'Prof',
+            'last_name' => 'Test',
+            'email' => 'prof_test_' . time() . '@gwc.edu',
+            'role' => 'Faculty',
+            'department_id' => '',
+        ]);
+
+        $this->assertFalse($valid);
+        $this->assertArrayHasKey('department_id', $validator->errors());
+    }
+
+    public function testValidatorRejectsDeanWithoutDepartment(): void
+    {
+        $validator = new UserValidator();
+        $valid = $validator->validate([
+            'first_name' => 'Dean',
+            'last_name' => 'Test',
+            'email' => 'dean_test_' . time() . '@gwc.edu',
+            'role' => 'Dean',
+            'department_id' => '',
+        ]);
+
+        $this->assertFalse($valid);
+        $this->assertArrayHasKey('department_id', $validator->errors());
+    }
+
+    public function testValidatorRejectsDuplicateEmail(): void
+    {
+        $existing = User::first();
+        $this->assertNotNull($existing);
+
+        $validator = new UserValidator();
+        $valid = $validator->validate([
+            'first_name' => 'Clone',
+            'last_name' => 'User',
+            'email' => $existing->email,
+            'role' => 'Admin',
+        ]);
+
+        $this->assertFalse($valid);
+        $this->assertArrayHasKey('email', $validator->errors());
+    }
+
+    public function testValidatorAllowsUpdatingOwnEmail(): void
+    {
+        $existing = User::first();
+        $this->assertNotNull($existing);
+
+        $validator = new UserValidator();
+        $valid = $validator->validate([
+            'first_name' => $existing->first_name,
+            'last_name' => $existing->last_name,
+            'email' => $existing->email,
+            'role' => $existing->role,
+            'department_id' => self::$deptId,
+            'section_id' => self::$sectionId,
+        ], (int) $existing->id);
+
+        $this->assertTrue($valid);
+    }
+
+    public function testValidatorAcceptsValidStudent(): void
+    {
+        $this->assertNotNull(self::$sectionId);
+        $validator = new UserValidator();
+        $valid = $validator->validate([
+            'first_name' => 'Maria',
+            'last_name' => 'Santos',
+            'email' => 'maria_test_' . uniqid() . '@gwc.edu',
+            'role' => 'Student',
+            'section_id' => self::$sectionId,
+        ]);
+
+        $this->assertTrue($valid, json_encode($validator->errors()));
+    }
+
+    public function testValidatorAcceptsValidFaculty(): void
+    {
+        $this->assertNotNull(self::$deptId);
+        $validator = new UserValidator();
+        $valid = $validator->validate([
+            'first_name' => 'Alan',
+            'last_name' => 'Turing',
+            'email' => 'alan_test_' . uniqid() . '@gwc.edu',
+            'role' => 'Faculty',
+            'department_id' => self::$deptId,
+        ]);
+
+        $this->assertTrue($valid, json_encode($validator->errors()));
+    }
+}

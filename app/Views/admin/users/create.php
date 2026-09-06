@@ -15,7 +15,7 @@ ob_start();
         </div>
     </div>
 
-    <form method="POST" action="<?= url('/admin/users') ?>" novalidate>
+    <form method="POST" action="<?= url('/admin/users') ?>">
         <?= csrf_field() ?>
 
         <div class="card-body p-4">
@@ -130,20 +130,33 @@ document.addEventListener('DOMContentLoaded', function () {
             studentDetailsGroup.style.display = 'flex';
             if (sectionSelect) sectionSelect.required = true;
             deptGroup.style.display = 'none';
-            if (deptSelect) deptSelect.value = '';
+            if (deptSelect) {
+                deptSelect.required = false;
+                deptSelect.value = '';
+            }
         } else if (role === 'Faculty' || role === 'Dean') {
             studentGroup.style.display = 'none';
             studentDetailsGroup.style.display = 'none';
-            if (sectionSelect) sectionSelect.required = false;
+            if (sectionSelect) {
+                sectionSelect.required = false;
+                sectionSelect.value = '';
+            }
             if (studentInput) studentInput.value = '';
             deptGroup.style.display = 'block';
+            if (deptSelect) deptSelect.required = true;
         } else {
             studentGroup.style.display = 'none';
             studentDetailsGroup.style.display = 'none';
-            if (sectionSelect) sectionSelect.required = false;
+            if (sectionSelect) {
+                sectionSelect.required = false;
+                sectionSelect.value = '';
+            }
             deptGroup.style.display = 'none';
             if (studentInput) studentInput.value = '';
-            if (deptSelect) deptSelect.value = '';
+            if (deptSelect) {
+                deptSelect.required = false;
+                deptSelect.value = '';
+            }
         }
     }
 

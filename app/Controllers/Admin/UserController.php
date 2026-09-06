@@ -47,30 +47,27 @@ class UserController
     public function store(Request $request, Response $response, Session $session): void
     {
         $data = $request->all();
+        $validator = new \App\Validators\UserValidator();
+
+        if (!$validator->validate($data)) {
+            $session->flash('error', $validator->firstError());
+            redirect('/admin/users/create');
+            return;
+        }
+
         $plainPassword = \App\Models\User::generateRandomPassword();
-        $role = (string) ($data['role'] ?? 'Student');
+        $role = (string) $data['role'];
         $forceChange = true;
 
         $studentNumber = null;
         if ($role === 'Student') {
             $studentNumber = trim((string) ($data['student_number'] ?? '')) ?: null;
-            if ($studentNumber !== null && \App\Models\User::where('student_number', $studentNumber)->exists()) {
-                $session->flash('error', "Student ID number '{$studentNumber}' is already registered to another user.");
-                redirect('/admin/users/create');
-                return;
-            }
-
-            if (empty($data['section_id'])) {
-                $session->flash('error', 'Assigned section is required for student accounts.');
-                redirect('/admin/users/create');
-                return;
-            }
         }
 
         $user = \App\Models\User::create([
-            'first_name' => $data['first_name'] ?? '',
-            'last_name' => $data['last_name'] ?? '',
-            'email' => $data['email'] ?? '',
+            'first_name' => trim((string) $data['first_name']),
+            'last_name' => trim((string) $data['last_name']),
+            'email' => trim((string) $data['email']),
             'student_number' => $studentNumber,
             'password' => password_hash($plainPassword, PASSWORD_BCRYPT),
             'role' => $role,
@@ -133,31 +130,27 @@ class UserController
         }
 
         $data = $request->all();
+        // Email and system role are locked to existing database record
+        $data['email'] = $user->email;
+        $data['role'] = $user->role;
+
+        $validator = new \App\Validators\UserValidator();
+
+        if (!$validator->validate($data, (int) $user->id)) {
+            $session->flash('error', $validator->firstError());
+            redirect('/admin/users/' . $id . '/edit');
+            return;
+        }
+
         $updateData = [
-            'first_name' => $data['first_name'] ?? $user->first_name,
-            'last_name' => $data['last_name'] ?? $user->last_name,
-            'email' => $data['email'] ?? $user->email,
-            'role' => $data['role'] ?? $user->role,
+            'first_name' => trim((string) $data['first_name']),
+            'last_name' => trim((string) $data['last_name']),
             'status' => $data['status'] ?? $user->status,
         ];
 
-        $newRole = $updateData['role'] ?? $user->role;
-        if ($newRole === 'Student') {
+        if ($user->role === 'Student') {
             $studentNumber = trim((string) ($data['student_number'] ?? '')) ?: null;
-            if ($studentNumber !== null && \App\Models\User::where('student_number', $studentNumber)->where('id', '!=', $user->id)->exists()) {
-                $session->flash('error', "Student ID number '{$studentNumber}' is already registered to another user.");
-                redirect('/admin/users/' . $id . '/edit');
-                return;
-            }
-
-            if (empty($data['section_id'])) {
-                $session->flash('error', 'Assigned section is required for student accounts.');
-                redirect('/admin/users/' . $id . '/edit');
-                return;
-            }
-
             $updateData['student_number'] = $studentNumber;
-            \App\Models\Faculty::where('user_id', $user->id)->delete();
 
             $sectionId = !empty($data['section_id']) ? (int) $data['section_id'] : null;
             $yearLevel = !empty($data['year_level']) ? (int) $data['year_level'] : 1;
@@ -171,25 +164,12 @@ class UserController
                     'status' => $studentStatus,
                 ]
             );
-        } else {
-            $updateData['student_number'] = null;
-            if (in_array($newRole, ['Faculty', 'Dean'], true)) {
-                $deptId = !empty($data['department_id']) ? (int) $data['department_id'] : null;
-                \App\Models\Faculty::updateOrCreate(
-                    ['user_id' => (int) $user->id],
-                    ['department_id' => $deptId]
-                );
-            } else {
-                \App\Models\Faculty::where('user_id', $user->id)->delete();
-            }
-        }
-
-        if (!empty($data['password'])) {
-            $updateData['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
-        }
-
-        if ($request->has('force_password_change')) {
-            $updateData['force_password_change'] = (bool) $request->post('force_password_change');
+        } elseif (in_array($user->role, ['Faculty', 'Dean'], true)) {
+            $deptId = !empty($data['department_id']) ? (int) $data['department_id'] : null;
+            \App\Models\Faculty::updateOrCreate(
+                ['user_id' => (int) $user->id],
+                ['department_id' => $deptId]
+            );
         }
 
         $user->update($updateData);
