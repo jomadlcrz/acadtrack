@@ -10,6 +10,7 @@ use App\Controllers\Admin\DepartmentController;
 use App\Controllers\Admin\SettingsController;
 use App\Controllers\Dean\FacultyAssignmentController;
 use App\Controllers\Dean\SubjectController as DeanSubjectController;
+use App\Controllers\Dean\SectionController;
 use App\Controllers\Dean\GradeReviewController;
 use App\Controllers\Faculty\SubjectController as FacultySubjectController;
 use App\Controllers\Faculty\StudentController;
@@ -58,6 +59,10 @@ $router->get('/dean/subjects', [DeanSubjectController::class, 'index'], [new Aut
 $router->post('/dean/subjects', [DeanSubjectController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
 $router->post('/dean/subjects/{id}', [DeanSubjectController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
 $router->post('/dean/subjects/{id}/delete', [DeanSubjectController::class, 'destroy'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
+$router->get('/dean/sections', [SectionController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin'])]);
+$router->post('/dean/sections', [SectionController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
+$router->post('/dean/sections/{id}', [SectionController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
+$router->post('/dean/sections/{id}/delete', [SectionController::class, 'destroy'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
 $router->get('/dean/grade-review', [GradeReviewController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin'])]);
 $router->get('/dean/grade-review/{id}', [GradeReviewController::class, 'show'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin'])]);
 $router->post('/dean/grade-review/approve', [GradeReviewController::class, 'approve'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);

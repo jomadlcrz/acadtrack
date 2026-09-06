@@ -37,6 +37,19 @@ ob_start();
                         <option value="<?= $sub['id'] ?>" <?= ((int)$sub['id'] === (int)($subjectId ?? 0)) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($sub['code'] . ' - ' . $sub['name']) ?>
                         </option>
+                </select>
+            </div>
+
+            <div class="col-auto d-flex align-items-center gap-2">
+                <label for="section_id_filter" class="form-label mb-0 fw-semibold small text-muted d-flex align-items-center gap-1">
+                    <i class="bi bi-collection text-primary"></i> Section:
+                </label>
+                <select id="section_id_filter" name="section_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">All sections</option>
+                    <?php foreach (($sections ?? []) as $sec): ?>
+                        <option value="<?= $sec['id'] ?>" <?= ((int)($selectedSection ?? 0) === (int)$sec['id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($sec['name']) ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -72,11 +85,12 @@ ob_start();
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light border-bottom">
                     <tr>
-                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 160px;">Student ID</th>
+                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 150px;">Student ID</th>
                         <th class="fw-semibold text-muted small py-3 px-3">Student name</th>
                         <th class="fw-semibold text-muted small py-3 px-3">Email address</th>
-                        <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 130px;">Year level</th>
-                        <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 140px;">Status</th>
+                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 120px;">Section</th>
+                        <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 120px;">Year level</th>
+                        <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 120px;">Status</th>
                         <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 110px;">Actions</th>
                     </tr>
                 </thead>
@@ -92,6 +106,13 @@ ob_start();
                         </td>
                         <td class="px-3 text-muted small">
                             <?= htmlspecialchars($student['email']) ?>
+                        </td>
+                        <td class="px-3 small">
+                            <?php if (!empty($student['section_name'])): ?>
+                                <span class="badge bg-light text-dark border font-monospace"><i class="bi bi-collection me-1"></i><?= htmlspecialchars($student['section_name']) ?></span>
+                            <?php else: ?>
+                                <span class="text-muted">—</span>
+                            <?php endif; ?>
                         </td>
                         <td class="px-3 text-center small text-secondary">
                             <?= htmlspecialchars($student['year_level']) ?><?= match((int)$student['year_level']) { 1 => 'st', 2 => 'nd', 3 => 'rd', default => 'th' } ?> year
@@ -159,7 +180,7 @@ ob_start();
                         <input type="email" class="form-control" id="email" name="email" required placeholder="student@gwc.edu">
                         <div class="form-text">A secure temporary password will be auto-generated and emailed to this address. The student will be required to create their own password upon first sign in.</div>
                     </div>
-                    <div class="row g-3">
+                    <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label for="year_level" class="form-label">Year level <span class="text-danger">*</span></label>
                             <select class="form-select" id="year_level" name="year_level" required>
@@ -176,6 +197,17 @@ ob_start();
                                 <option value="Irregular">Irregular</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add_section_id" class="form-label">Section <span class="text-muted">(Optional)</span></label>
+                        <select class="form-select" id="add_section_id" name="section_id">
+                            <option value="">No section assigned</option>
+                            <?php foreach (($sections ?? []) as $sec): ?>
+                                <option value="<?= $sec['id'] ?>" <?= ((int)($selectedSection ?? 0) === (int)$sec['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($sec['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer bg-light py-3 border-top d-flex justify-content-end gap-2">
@@ -216,7 +248,7 @@ ob_start();
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="row g-3">
+                    <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label for="existing_year_level" class="form-label">Year level</label>
                             <select class="form-select" id="existing_year_level" name="year_level">
@@ -233,6 +265,17 @@ ob_start();
                                 <option value="Irregular">Irregular</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="enroll_section_id" class="form-label">Assign / Update section <span class="text-muted">(Optional)</span></label>
+                        <select class="form-select" id="enroll_section_id" name="section_id">
+                            <option value="">Keep current / No section</option>
+                            <?php foreach (($sections ?? []) as $sec): ?>
+                                <option value="<?= $sec['id'] ?>" <?= ((int)($selectedSection ?? 0) === (int)$sec['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($sec['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer bg-light py-3 border-top d-flex justify-content-end gap-2">

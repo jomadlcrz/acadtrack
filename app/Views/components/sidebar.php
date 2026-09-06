@@ -20,6 +20,10 @@
                     <i class="bi bi-building"></i>
                     <span>Departments</span>
                 </a>
+                <a href="<?= url('/dean/sections') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/sections') ? 'active' : '' ?>">
+                    <i class="bi bi-collection-fill"></i>
+                    <span>Sections</span>
+                </a>
                 <a href="<?= url('/admin/settings') ?>" class="sidebar-link <?= $currentPath === '/admin/settings' ? 'active' : '' ?>">
                     <i class="bi bi-gear-fill"></i>
                     <span>Institutional Settings</span>
@@ -40,6 +44,10 @@
                 <a href="<?= url('/dean/subjects') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/subjects') ? 'active' : '' ?>">
                     <i class="bi bi-journal-bookmark-fill"></i>
                     <span>Curriculum Subjects</span>
+                </a>
+                <a href="<?= url('/dean/sections') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/sections') ? 'active' : '' ?>">
+                    <i class="bi bi-collection-fill"></i>
+                    <span>Sections</span>
                 </a>
                 <a href="<?= url('/dean/faculty-assignments') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/faculty-assignments') ? 'active' : '' ?>">
                     <i class="bi bi-person-badge-fill"></i>

@@ -61,9 +61,14 @@ ob_start();
                                 <div class="small text-muted mt-1">
                                     <i class="bi bi-building me-1 text-primary"></i><?= htmlspecialchars($user['department_name']) ?> (<?= htmlspecialchars($user['department_code']) ?>)
                                 </div>
-                            <?php elseif ($user['role'] === 'Student' && !empty($user['student_number'])): ?>
-                                <div class="small text-muted mt-1 font-monospace">
-                                    <i class="bi bi-person-badge me-1"></i><?= htmlspecialchars($user['student_number']) ?>
+                            <?php elseif ($user['role'] === 'Student'): ?>
+                                <div class="small text-muted mt-1 font-monospace d-flex align-items-center gap-2">
+                                    <?php if (!empty($user['student_number'])): ?>
+                                        <span><i class="bi bi-person-badge me-1"></i><?= htmlspecialchars($user['student_number']) ?></span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($user['section_name'])): ?>
+                                        <span class="badge bg-light text-dark border"><i class="bi bi-collection me-1"></i><?= htmlspecialchars($user['section_name']) ?></span>
+                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
                         </td>

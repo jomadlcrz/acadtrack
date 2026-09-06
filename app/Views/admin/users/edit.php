@@ -90,6 +90,42 @@ ob_start();
                     <div class="form-text">Academic college/department the instructor or dean belongs to.</div>
                 </div>
             </div>
+
+            <div class="row g-3 mb-3" id="student_details_group">
+                <?php
+                $currentSectionId = $user['student']['section_id'] ?? null;
+                $currentYearLevel = (int)($user['student']['year_level'] ?? 1);
+                $currentStatus = $user['student']['status'] ?? 'Regular';
+                ?>
+                <div class="col-md-4">
+                    <label for="section_id" class="form-label">Assigned section <span class="text-muted">(Optional)</span></label>
+                    <select class="form-select" id="section_id" name="section_id">
+                        <option value="">No section assigned</option>
+                        <?php foreach ($sections ?? [] as $sec): ?>
+                            <option value="<?= $sec['id'] ?>" <?= ((string)$currentSectionId === (string)$sec['id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($sec['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="form-text">Active class section cohort.</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="year_level" class="form-label">Year level <span class="text-danger">*</span></label>
+                    <select class="form-select" id="year_level" name="year_level">
+                        <option value="1" <?= $currentYearLevel === 1 ? 'selected' : '' ?>>1st Year</option>
+                        <option value="2" <?= $currentYearLevel === 2 ? 'selected' : '' ?>>2nd Year</option>
+                        <option value="3" <?= $currentYearLevel === 3 ? 'selected' : '' ?>>3rd Year</option>
+                        <option value="4" <?= $currentYearLevel === 4 ? 'selected' : '' ?>>4th Year</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="student_status" class="form-label">Enrollment status <span class="text-danger">*</span></label>
+                    <select class="form-select" id="student_status" name="student_status">
+                        <option value="Regular" <?= $currentStatus === 'Regular' ? 'selected' : '' ?>>Regular</option>
+                        <option value="Irregular" <?= $currentStatus === 'Irregular' ? 'selected' : '' ?>>Irregular</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="card-footer bg-light py-3 border-top d-flex justify-content-end align-items-center gap-2">
@@ -105,6 +141,7 @@ ob_start();
 document.addEventListener('DOMContentLoaded', function () {
     const roleSelect = document.getElementById('role');
     const studentGroup = document.getElementById('student_number_group');
+    const studentDetailsGroup = document.getElementById('student_details_group');
     const deptGroup = document.getElementById('department_group');
     const studentInput = document.getElementById('student_number');
     const deptSelect = document.getElementById('department_id');
@@ -113,12 +150,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const role = roleSelect.value;
         if (role === 'Student') {
             studentGroup.style.display = 'block';
+            studentDetailsGroup.style.display = 'flex';
             deptGroup.style.display = 'none';
         } else if (role === 'Faculty' || role === 'Dean') {
             studentGroup.style.display = 'none';
+            studentDetailsGroup.style.display = 'none';
             deptGroup.style.display = 'block';
         } else {
             studentGroup.style.display = 'none';
+            studentDetailsGroup.style.display = 'none';
             deptGroup.style.display = 'none';
         }
     }

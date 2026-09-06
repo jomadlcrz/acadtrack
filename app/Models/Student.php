@@ -10,6 +10,13 @@ class Student extends Model
 {
     protected $table = 'students';
 
+    protected $fillable = [
+        'user_id',
+        'section_id',
+        'year_level',
+        'status',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -51,17 +58,25 @@ class Student extends Model
         return $stmt->fetchAll();
     }
 
-    public static function getBySubject(int $subjectId, int $academicTermId): array
+    public static function getBySubject(int $subjectId, int $academicTermId, ?int $sectionId = null): array
     {
+        $sectionClause = $sectionId ? "AND s.section_id = :section_id" : "";
         $stmt = self::db()->prepare("
-            SELECT s.*, u.first_name, u.last_name, u.email, u.student_number
+            SELECT s.*, u.first_name, u.last_name, u.email, u.student_number,
+                   sec.name AS section_name
             FROM students s
             JOIN users u ON s.user_id = u.id
             JOIN enrollments e ON e.student_id = s.id
+            LEFT JOIN sections sec ON sec.id = s.section_id
             WHERE e.subject_id = :subject_id AND e.academic_term_id = :academic_term_id
+            {$sectionClause}
             ORDER BY u.last_name, u.first_name
         ");
-        $stmt->execute(['subject_id' => $subjectId, 'academic_term_id' => $academicTermId]);
+        $params = ['subject_id' => $subjectId, 'academic_term_id' => $academicTermId];
+        if ($sectionId) {
+            $params['section_id'] = $sectionId;
+        }
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
@@ -81,9 +96,11 @@ class Student extends Model
     public static function getAllAvailable(): array
     {
         $stmt = self::db()->query("
-            SELECT s.*, u.first_name, u.last_name, u.email, u.student_number
+            SELECT s.*, u.first_name, u.last_name, u.email, u.student_number,
+                   sec.name AS section_name
             FROM students s
             JOIN users u ON s.user_id = u.id
+            LEFT JOIN sections sec ON sec.id = s.section_id
             WHERE u.role = 'Student'
             ORDER BY u.last_name, u.first_name
         ");

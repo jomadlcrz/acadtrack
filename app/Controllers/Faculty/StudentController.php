@@ -33,10 +33,12 @@ class StudentController
 
         $assignedSubjects = \App\Models\Faculty::getAssignedSubjects($facultyId, $termId);
         $subjectId = (int) $request->get('subject_id', !empty($assignedSubjects) ? $assignedSubjects[0]['id'] : 0);
+        $sectionFilter = !empty($request->get('section_id')) ? (int) $request->get('section_id') : null;
 
-        $students = $this->studentRepository->getBySubject($subjectId, $termId);
+        $students = $this->studentRepository->getBySubject($subjectId, $termId, $sectionFilter);
         $availableStudents = $this->studentRepository->getAllAvailable();
         $currentSubject = \App\Models\Subject::find($subjectId);
+        $sections = \App\Models\Section::getActiveByTerm($termId);
 
         $html = (new View())->render('faculty.students.index', [
             'students' => $students,
@@ -46,6 +48,8 @@ class StudentController
             'assignedSubjects' => $assignedSubjects,
             'academicTerm' => $academicTerm,
             'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
+            'sections' => $sections,
+            'selectedSection' => $sectionFilter,
         ]);
         $response->html($html);
     }
@@ -60,6 +64,7 @@ class StudentController
         $studentNumber = $studentNumber !== '' ? $studentNumber : null;
 
         $yearLevel = (int) $request->post('year_level', 1);
+        $sectionId = !empty($request->post('section_id')) ? (int) $request->post('section_id') : null;
         $status = in_array($request->post('status'), ['Regular', 'Irregular'], true) ? $request->post('status') : 'Regular';
         $inputPassword = trim((string) $request->post('password', ''));
         $password = empty($inputPassword) 
@@ -104,6 +109,7 @@ class StudentController
             // 2. Create Student via Eloquent ORM
             $createdStudent = \App\Models\Student::create([
                 'user_id' => $userId,
+                'section_id' => $sectionId,
                 'year_level' => $yearLevel,
                 'status' => $status,
             ]);
@@ -135,6 +141,7 @@ class StudentController
         $subjectId = (int) $request->post('subject_id');
         $studentId = (int) $request->post('student_id');
         $yearLevel = (int) $request->post('year_level', 0);
+        $sectionId = !empty($request->post('section_id')) ? (int) $request->post('section_id') : null;
         $status = $request->post('status', '');
 
         $semester = (string) $request->post('semester', '');
@@ -147,14 +154,17 @@ class StudentController
         }
 
         if ($studentId > 0 && $subjectId > 0) {
-            if ($yearLevel > 0 || in_array($status, ['Regular', 'Irregular'], true)) {
-                $updates = [];
-                if ($yearLevel > 0) {
-                    $updates['year_level'] = $yearLevel;
-                }
-                if (in_array($status, ['Regular', 'Irregular'], true)) {
-                    $updates['status'] = $status;
-                }
+            $updates = [];
+            if ($yearLevel > 0) {
+                $updates['year_level'] = $yearLevel;
+            }
+            if ($sectionId !== null) {
+                $updates['section_id'] = $sectionId;
+            }
+            if (in_array($status, ['Regular', 'Irregular'], true)) {
+                $updates['status'] = $status;
+            }
+            if (!empty($updates)) {
                 \App\Models\Student::where('id', $studentId)->update($updates);
             }
 

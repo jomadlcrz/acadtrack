@@ -37,9 +37,9 @@ class StudentRepository
         return Student::getBySection($sectionId);
     }
 
-    public function getBySubject(int $subjectId, int $academicTermId): array
+    public function getBySubject(int $subjectId, int $academicTermId, ?int $sectionId = null): array
     {
-        return Student::getBySubject($subjectId, $academicTermId);
+        return Student::getBySubject($subjectId, $academicTermId, $sectionId);
     }
 
     public function enroll(int $studentId, int $subjectId, int $academicTermId): bool
