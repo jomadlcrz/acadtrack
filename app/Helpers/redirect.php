@@ -5,12 +5,15 @@ declare(strict_types=1);
 if (!function_exists('base_path_url')) {
     function base_path_url(): string
     {
-        $reqUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
-
-        if (preg_match('#^/(acadtrack|grading-system)\b#i', $reqUri, $m)) {
-            return '/' . strtolower($m[1]);
+        $appUrl = env('APP_URL');
+        if (!empty($appUrl)) {
+            $appPath = parse_url($appUrl, PHP_URL_PATH);
+            if (!empty($appPath) && $appPath !== '/') {
+                return rtrim($appPath, '/');
+            }
         }
 
+        $reqUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
         $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
 
         // If accessed through root rewrite, SCRIPT_NAME has /public but REQUEST_URI does not

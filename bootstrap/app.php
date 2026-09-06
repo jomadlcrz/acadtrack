@@ -9,11 +9,16 @@ use App\Core\Database;
 
 $dotenv = Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
-$dotenv->required(['DB_HOST', 'DB_DATABASE', 'DB_USERNAME']);
+$dotenv->required(['DB_HOST', 'DB_DATABASE', 'DB_USERNAME', 'APP_URL']);
 
 session_start();
 
-$database = new Database($_ENV['DB_HOST'], $_ENV['DB_DATABASE'], $_ENV['DB_USERNAME'], $_ENV['DB_PASSWORD'] ?? '');
+$database = new Database(
+    env('DB_HOST'),
+    env('DB_DATABASE'),
+    env('DB_USERNAME'),
+    (string) env('DB_PASSWORD', '')
+);
 $router = new Router();
 
 require_once __DIR__ . '/../routes/web.php';

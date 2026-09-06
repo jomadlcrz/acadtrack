@@ -19,12 +19,12 @@ class DataWorkflowTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         $dotenv = \Dotenv\Dotenv::createImmutable(dirname(__DIR__, 2));
-        $dotenv->safeLoad();
+        $dotenv->load();
         new \App\Core\Database(
-            $_ENV['DB_HOST'] ?? '127.0.0.1',
-            $_ENV['DB_DATABASE'] ?? 'acadtrack',
-            $_ENV['DB_USERNAME'] ?? 'root',
-            $_ENV['DB_PASSWORD'] ?? ''
+            env('DB_HOST'),
+            env('DB_DATABASE'),
+            env('DB_USERNAME'),
+            (string) env('DB_PASSWORD', '')
         );
     }
 

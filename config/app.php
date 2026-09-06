@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 return [
-    'name' => $_ENV['APP_NAME'] ?? 'Acadtrack',
-    'env' => $_ENV['APP_ENV'] ?? 'production',
-    'debug' => ($_ENV['APP_DEBUG'] ?? 'false') === 'true',
-    'url' => $_ENV['APP_URL'] ?? 'http://localhost/acadtrack',
-    'key' => $_ENV['APP_KEY'] ?? '',
+    'name' => env('APP_NAME', 'Acadtrack'),
+    'env' => env('APP_ENV', 'production'),
+    'debug' => (bool) env('APP_DEBUG', false),
+    'url' => env('APP_URL'),
+    'key' => env('APP_KEY', ''),
 ];

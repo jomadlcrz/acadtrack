@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 return [
-    'host' => $_ENV['MAIL_HOST'] ?? 'smtp.example.com',
-    'port' => (int) ($_ENV['MAIL_PORT'] ?? 587),
-    'username' => $_ENV['MAIL_USERNAME'] ?? '',
-    'password' => $_ENV['MAIL_PASSWORD'] ?? '',
-    'encryption' => $_ENV['MAIL_ENCRYPTION'] ?? 'tls',
-    'from_address' => $_ENV['MAIL_FROM_ADDRESS'] ?? '',
-    'from_name' => $_ENV['MAIL_FROM_NAME'] ?? 'GWC Grading System',
+    'host' => env('MAIL_HOST'),
+    'port' => (int) env('MAIL_PORT', 587),
+    'username' => env('MAIL_USERNAME'),
+    'password' => env('MAIL_PASSWORD'),
+    'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+    'from_address' => env('MAIL_FROM_ADDRESS'),
+    'from_name' => env('MAIL_FROM_NAME', 'GWC Acadtrack'),
 ];

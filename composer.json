@@ -18,6 +18,7 @@
             "App\\": "app/"
         },
         "files": [
+            "app/Helpers/env.php",
             "app/Helpers/auth.php",
             "app/Helpers/redirect.php",
             "app/Helpers/response.php",

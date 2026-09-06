@@ -15,13 +15,13 @@ echo "========================================\n";
 echo "   Acadtrack - Gmail SMTP Diagnostics   \n";
 echo "========================================\n\n";
 
-$host = $_ENV['MAIL_HOST'] ?? 'smtp.gmail.com';
-$port = (int)($_ENV['MAIL_PORT'] ?? 587);
-$username = trim((string)($_ENV['MAIL_USERNAME'] ?? ''));
-$password = str_replace(' ', '', (string)($_ENV['MAIL_PASSWORD'] ?? ''));
-$encryption = strtolower((string)($_ENV['MAIL_ENCRYPTION'] ?? 'tls'));
-$fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? $username;
-$fromName = $_ENV['MAIL_FROM_NAME'] ?? 'GWC Acadtrack';
+$host = (string) env('MAIL_HOST');
+$port = (int) env('MAIL_PORT', 587);
+$username = trim((string) env('MAIL_USERNAME'));
+$password = str_replace(' ', '', (string) env('MAIL_PASSWORD'));
+$encryption = strtolower((string) env('MAIL_ENCRYPTION', 'tls'));
+$fromAddress = (string) (env('MAIL_FROM_ADDRESS') ?: $username);
+$fromName = (string) env('MAIL_FROM_NAME', 'GWC Acadtrack');
 
 echo "Configuration:\n";
 echo " - Host:        {$host}\n";

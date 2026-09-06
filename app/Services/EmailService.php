@@ -21,13 +21,13 @@ class EmailService
     private function configure(): void
     {
         $this->mailer->isSMTP();
-        $this->mailer->Host = $_ENV['MAIL_HOST'] ?? 'smtp.gmail.com';
+        $this->mailer->Host = (string) env('MAIL_HOST');
         $this->mailer->SMTPAuth = true;
-        $this->mailer->Username = trim((string)($_ENV['MAIL_USERNAME'] ?? ''));
-        $this->mailer->Password = str_replace(' ', '', (string)($_ENV['MAIL_PASSWORD'] ?? ''));
+        $this->mailer->Username = trim((string) env('MAIL_USERNAME'));
+        $this->mailer->Password = str_replace(' ', '', (string) env('MAIL_PASSWORD'));
         
-        $encryption = strtolower((string)($_ENV['MAIL_ENCRYPTION'] ?? 'tls'));
-        $port = (int) ($_ENV['MAIL_PORT'] ?? 587);
+        $encryption = strtolower((string) env('MAIL_ENCRYPTION', 'tls'));
+        $port = (int) env('MAIL_PORT', 587);
 
         if ($encryption === 'ssl' || $port === 465) {
             $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
@@ -40,13 +40,11 @@ class EmailService
         $this->mailer->Timeout = 15;
         $this->mailer->CharSet = 'UTF-8';
 
-        $fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? ($_ENV['MAIL_USERNAME'] ?? 'noreply@gwc.edu');
-        $fromName = $_ENV['MAIL_FROM_NAME'] ?? 'GWC Acadtrack';
+        $fromAddress = (string) (env('MAIL_FROM_ADDRESS') ?: env('MAIL_USERNAME'));
+        $fromName = (string) env('MAIL_FROM_NAME', 'GWC Acadtrack');
 
         if (!empty($fromAddress) && filter_var($fromAddress, FILTER_VALIDATE_EMAIL)) {
             $this->mailer->setFrom($fromAddress, $fromName);
-        } else {
-            $this->mailer->setFrom('noreply@gwc.edu', $fromName);
         }
     }
 

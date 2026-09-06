@@ -93,7 +93,7 @@ class Application
         }
 
         // For GET requests or unhandled fatal scenarios, render error page
-        $debug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true' || ($_ENV['APP_ENV'] ?? 'production') === 'development';
+        $debug = (bool) env('APP_DEBUG', false) || env('APP_ENV') === 'development';
         http_response_code(500);
         try {
             $html = $this->view->render('errors.error', [
