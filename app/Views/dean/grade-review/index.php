@@ -1,6 +1,15 @@
 <?php
 $pageTitle = 'Grade Review & Approval';
 $subtitle = 'Audit instructor grading submissions, verify score distributions, and authorize official approval.';
+$headerActions = '
+<div class="btn-group btn-group-sm" role="group" aria-label="Semester selection">
+    <a href="' . url('/dean/grade-review?semester=1&status=' . urlencode($statusFilter ?? 'all')) . '" class="btn ' . (($selectedSemester ?? '1') === '1' ? 'btn-primary' : 'btn-outline-secondary') . '">
+        1st Semester
+    </a>
+    <a href="' . url('/dean/grade-review?semester=2&status=' . urlencode($statusFilter ?? 'all')) . '" class="btn ' . (($selectedSemester ?? '1') === '2' ? 'btn-primary' : 'btn-outline-secondary') . '">
+        2nd Semester
+    </a>
+</div>';
 ob_start();
 $statusFilter = $statusFilter ?? 'all';
 ?>
@@ -9,19 +18,19 @@ $statusFilter = $statusFilter ?? 'all';
     <div class="card-body py-2 px-3">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
             <div class="nav nav-pills small gap-1">
-                <a href="<?= url('/dean/grade-review?status=all') ?>" class="nav-link py-1 px-3 <?= $statusFilter === 'all' ? 'active' : 'bg-light text-dark' ?>">
+                <a href="<?= url('/dean/grade-review?status=all&semester=' . ($selectedSemester ?? '1')) ?>" class="nav-link py-1 px-3 <?= $statusFilter === 'all' ? 'active' : 'bg-light text-dark' ?>">
                     All Submissions
                 </a>
-                <a href="<?= url('/dean/grade-review?status=pending') ?>" class="nav-link py-1 px-3 <?= $statusFilter === 'pending' ? 'active' : 'bg-light text-dark' ?>">
+                <a href="<?= url('/dean/grade-review?status=pending&semester=' . ($selectedSemester ?? '1')) ?>" class="nav-link py-1 px-3 <?= $statusFilter === 'pending' ? 'active' : 'bg-light text-dark' ?>">
                     Pending Review
                 </a>
-                <a href="<?= url('/dean/grade-review?status=approved') ?>" class="nav-link py-1 px-3 <?= $statusFilter === 'approved' ? 'active' : 'bg-light text-dark' ?>">
+                <a href="<?= url('/dean/grade-review?status=approved&semester=' . ($selectedSemester ?? '1')) ?>" class="nav-link py-1 px-3 <?= $statusFilter === 'approved' ? 'active' : 'bg-light text-dark' ?>">
                     Approved
                 </a>
-                <a href="<?= url('/dean/grade-review?status=finalized') ?>" class="nav-link py-1 px-3 <?= $statusFilter === 'finalized' ? 'active' : 'bg-light text-dark' ?>">
+                <a href="<?= url('/dean/grade-review?status=finalized&semester=' . ($selectedSemester ?? '1')) ?>" class="nav-link py-1 px-3 <?= $statusFilter === 'finalized' ? 'active' : 'bg-light text-dark' ?>">
                     Finalized
                 </a>
-                <a href="<?= url('/dean/grade-review?status=returned') ?>" class="nav-link py-1 px-3 <?= $statusFilter === 'returned' ? 'active' : 'bg-light text-dark' ?>">
+                <a href="<?= url('/dean/grade-review?status=returned&semester=' . ($selectedSemester ?? '1')) ?>" class="nav-link py-1 px-3 <?= $statusFilter === 'returned' ? 'active' : 'bg-light text-dark' ?>">
                     Returned
                 </a>
             </div>
@@ -34,9 +43,12 @@ $statusFilter = $statusFilter ?? 'all';
 
 <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-            <i class="bi bi-file-earmark-check text-primary"></i> Grading Sheets Roster
-        </h3>
+        <div>
+            <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark-check text-primary"></i> Grading Sheets Roster
+            </h3>
+            <small class="text-muted">Submissions for <?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></small>
+        </div>
     </div>
 
     <?php if (empty($gradingSheets)): ?>
@@ -45,7 +57,7 @@ $statusFilter = $statusFilter ?? 'all';
                 <i class="bi bi-check2-all"></i>
             </div>
             <h4 class="h6 fw-semibold text-dark mb-1">No grading sheets found</h4>
-            <p class="text-muted small mb-0">There are no grading sheets matching the current status filter for the active term.</p>
+            <p class="text-muted small mb-0">There are no grading sheets matching the current status filter for <?= htmlspecialchars($academicTerm['name'] ?? 'this semester') ?>.</p>
         </div>
     <?php else: ?>
         <div class="table-responsive">

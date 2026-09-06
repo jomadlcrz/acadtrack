@@ -51,10 +51,19 @@ class CompleteWorkflowEndToEndTest extends TestCase
 
         $admin = User::where('role', 'Admin')->first();
         $dean = User::where('role', 'Dean')->first();
-        $facultyUser = User::where('role', 'Faculty')->first();
         $this->assertNotNull($admin, 'Admin account must exist');
         $this->assertNotNull($dean, 'Dean account must exist');
-        $this->assertNotNull($facultyUser, 'Faculty account must exist');
+
+        $uniqueFac = time() . '_' . rand(1000, 9999);
+        $facultyUser = User::create([
+            'first_name' => 'E2EProf',
+            'last_name' => "Instructor_{$uniqueFac}",
+            'email' => "e2eprof_{$uniqueFac}@gwc.edu",
+            'password' => password_hash('secret123', PASSWORD_BCRYPT),
+            'role' => 'Faculty',
+            'status' => 'active',
+            'force_password_change' => false,
+        ]);
 
         // -------------------------------------------------------------
         // STEP 2: DEAN ASSIGNS SUBJECTS
@@ -251,5 +260,7 @@ class CompleteWorkflowEndToEndTest extends TestCase
         $studentUser->delete();
         $sheet->delete();
         $setting->delete();
+        \App\Models\Faculty::where('user_id', (int) $facultyUser->id)->delete();
+        $facultyUser->delete();
     }
 }

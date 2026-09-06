@@ -118,16 +118,19 @@ class GradingSystemWorkflowTest extends TestCase
 
         $this->assertNotNull($subject);
         $this->assertNotNull($period);
+        $this->assertNotNull($admin);
 
-        $facultyId = $faculty ? (int) $faculty['id'] : (int) $admin['id'];
         $adminId = (int) $admin['id'];
-
-        // Clean up any existing sheet for this composite key
-        GradingSheet::where('faculty_id', $facultyId)
-            ->where('subject_id', (int) $subject['id'])
-            ->where('grading_period_id', (int) $period['id'])
-            ->where('academic_term_id', (int) $term['id'])
-            ->delete();
+        $randSuffix = rand(1000, 9999);
+        $testFaculty = User::create([
+            'first_name' => 'TestFac',
+            'last_name' => "Lifecycle_{$randSuffix}",
+            'email' => "testfac_lifecycle_{$randSuffix}@gwc.edu",
+            'password' => password_hash('secret123', PASSWORD_BCRYPT),
+            'role' => 'Faculty',
+            'status' => 'active',
+        ]);
+        $facultyId = (int) $testFaculty->id;
 
         // 1. Create a draft grading sheet
         $createdSheet = GradingSheet::create([
@@ -163,7 +166,8 @@ class GradingSystemWorkflowTest extends TestCase
         $this->assertSame('Finalized and confirmed by Dean.', $sheet['remarks']);
         $this->assertNotNull($sheet['confirmed_at']);
 
-        // Clean up test sheet
+        // Clean up test sheet and test faculty user
         GradingSheet::query()->where('id', $sheetId)->delete();
+        $testFaculty->delete();
     }
 }

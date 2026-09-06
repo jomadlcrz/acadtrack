@@ -37,7 +37,14 @@ class GradeReviewController
 
     public function index(Request $request, Response $response, Session $session): void
     {
-        $academicTerm = AcademicTerm::getActive();
+        $selectedSem = (string) $request->get('semester', '');
+        if ($selectedSem === '1' || $selectedSem === '2') {
+            $academicTerm = AcademicTerm::getBySemester($selectedSem);
+        } else {
+            $academicTerm = AcademicTerm::getActive();
+        }
+
+        $termId = (int) ($academicTerm['id'] ?? 1);
         $statusFilter = $request->get('status', 'all');
 
         $statusParam = match ($statusFilter) {
@@ -48,11 +55,12 @@ class GradeReviewController
             default => null,
         };
 
-        $gradingSheets = GradingSheet::getAllWithDetails((int) ($academicTerm['id'] ?? 0), $statusParam);
+        $gradingSheets = GradingSheet::getAllWithDetails($termId, $statusParam);
 
         $html = (new View())->render('dean.grade-review.index', [
             'gradingSheets' => $gradingSheets,
             'academicTerm' => $academicTerm,
+            'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
             'statusFilter' => $statusFilter,
         ]);
         $response->html($html);
@@ -69,7 +77,7 @@ class GradeReviewController
             return;
         }
 
-        $academicTerm = AcademicTerm::getActive();
+        $academicTerm = AcademicTerm::find((int) $sheet['academic_term_id']) ?: AcademicTerm::getActive();
         $students = $this->studentRepository->getBySubject((int) $sheet['subject_id'], (int) $sheet['academic_term_id']);
         $existingGrades = $this->gradeRepository->getBySubjectAndPeriod((int) $sheet['subject_id'], (int) $sheet['grading_period_id'], (int) $sheet['academic_term_id']);
 
