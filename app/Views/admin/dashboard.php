@@ -29,6 +29,5 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-$pageTitle = 'Admin Dashboard';
 include __DIR__ . '/../layouts/dashboard.php';
 ?>

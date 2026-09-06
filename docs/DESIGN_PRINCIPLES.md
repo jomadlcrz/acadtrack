@@ -279,3 +279,14 @@ Some students do not have complete grades.
 
 Please complete all required grades before submitting.
 ```
+
+---
+
+## 16. Single Header Architecture & Visual Hierarchy
+
+Authenticated dashboard pages must maintain a clean, singular visual hierarchy:
+
+- **Single Master Header:** Each page features exactly one primary header rendered by the dashboard layout.
+- **No Stacked Duplicate Headers:** View templates must never render inner `<h1>` or `<h2>` page title rows.
+- **Action Buttons in Header:** Navigation buttons (e.g., "Add user", "Back to subjects") belong in the right-aligned layout header slot (`$headerActions`), keeping the content canvas below focused on data tables and cards.
+- **Strict Title Case:** Landmark titles use Title Case (`User Management`, `Curricular Subjects`), action buttons use Sentence case (`Add user`, `Save draft`).

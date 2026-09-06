@@ -1,14 +1,8 @@
 <?php
-$pageTitle = 'Grade Review';
+$pageTitle = 'Grade Review & Approval';
+$subtitle = 'Audit instructor grading submissions, verify score distributions, and authorize official approval.';
 ob_start();
 ?>
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="h4 mb-1 fw-semibold text-dark">Grade Review & Approval</h2>
-        <p class="text-muted small mb-0">Audit instructor grading submissions, verify score distributions, and authorize official approval.</p>
-    </div>
-</div>
 
 <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
@@ -92,6 +86,5 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-$pageTitle = 'Grade Review';
 include __DIR__ . '/../../layouts/dashboard.php';
 ?>

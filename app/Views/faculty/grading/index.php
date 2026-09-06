@@ -1,18 +1,10 @@
 <?php
-$pageTitle = 'Grade Encoding';
+$pageTitle = 'Grade Encoding Sheet';
+$subtitle = 'Encode and review student performance marks for the designated academic grading period.';
+$headerActions = '<a href="' . url('/faculty/subjects') . '" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><i class="bi bi-arrow-left"></i> Back to subjects</a>';
 ob_start();
 $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
 ?>
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="h4 mb-1 fw-semibold text-dark">Grade Encoding Sheet</h2>
-        <p class="text-muted small mb-0">Encode and review student performance marks for the designated academic grading period.</p>
-    </div>
-    <a href="<?= url('/faculty/subjects') ?>" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2">
-        <i class="bi bi-arrow-left"></i> Back to subjects
-    </a>
-</div>
 
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="card-body py-3 px-4">
@@ -189,6 +181,5 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
 
 <?php
 $content = ob_get_clean();
-$pageTitle = 'Grade Encoding';
 include __DIR__ . '/../../layouts/dashboard.php';
 ?>

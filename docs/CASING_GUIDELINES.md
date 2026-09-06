@@ -34,9 +34,12 @@ Capitalize the first letter of each major word. Used exclusively to answer: *"Wh
 **Apply to:**
 - **Sidebar Groups & Navigation Items:**
   - `Dashboard`, `Users`, `Settings`, `Subjects`, `Faculty Assignments`, `Grade Review`, `My Subjects`, `Grading`, `My Grades`, `Evaluation`
-- **Page Titles & Breadcrumbs:**
-  - `Faculty Dashboard`, `Dean Dashboard`, `System Administration`, `Student Portal`
-  - `User Directory`, `Subject Management`, `Faculty Workload`, `Grade Review & Approval`, `Grade Encoding`, `Academic Evaluation`, `Whole Evaluation`
+- **Page Titles (`$pageTitle`) & Breadcrumbs:**
+  - `Faculty Dashboard`, `Dean Dashboard`, `Admin Dashboard`, `Student Dashboard`
+  - `User Management`, `Add New User`, `Edit User`, `Institutional Settings`
+  - `Faculty Subject Assignments`, `Curricular Subjects`, `Grade Review & Approval`
+  - `Grade Encoding Sheet`, `My Assigned Subjects`, `Enrolled Students`
+  - `My Academic Grades`, `Academic Evaluation`
 - **Modal / Dialog / Drawer Titles:**
   - `Assign Subject`, `Configure Grading Settings`, `Add Student`, `Submit Grading Sheet`, `Return with Feedback`, `Approve Grading Sheet`, `Lock Academic Term`
 - **Tab Bar Items:**

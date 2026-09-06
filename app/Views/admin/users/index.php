@@ -1,17 +1,9 @@
 <?php
-$pageTitle = 'Manage Users';
+$pageTitle = 'User Management';
+$subtitle = 'Manage institutional accounts, role assignments, and system access.';
+$headerActions = '<a href="' . url('/admin/users/create') . '" class="btn btn-primary d-inline-flex align-items-center gap-2"><i class="bi bi-person-plus"></i> Add user</a>';
 ob_start();
 ?>
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="h4 mb-1 fw-semibold text-dark">User Management</h2>
-        <p class="text-muted small mb-0">Manage institutional accounts, role assignments, and system access.</p>
-    </div>
-    <a href="<?= url('/admin/users/create') ?>" class="btn btn-primary d-inline-flex align-items-center gap-2">
-        <i class="bi bi-person-plus"></i> Add user
-    </a>
-</div>
 
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="card-body py-3 px-4">
@@ -91,6 +83,5 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-$pageTitle = 'Manage Users';
 include __DIR__ . '/../../layouts/dashboard.php';
 ?>

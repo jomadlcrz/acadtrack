@@ -1,14 +1,8 @@
 <?php
-$pageTitle = 'Settings';
+$pageTitle = 'Institutional Settings';
+$subtitle = 'Configure institutional grading defaults and global academic calendar parameters.';
 ob_start();
 ?>
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="h4 mb-1 fw-semibold text-dark">Institutional Settings</h2>
-        <p class="text-muted small mb-0">Configure institutional grading defaults and global academic calendar parameters.</p>
-    </div>
-</div>
 
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; max-width: 760px;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
@@ -54,6 +48,5 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-$pageTitle = 'Settings';
 include __DIR__ . '/../../layouts/dashboard.php';
 ?>

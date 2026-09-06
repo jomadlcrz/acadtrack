@@ -488,3 +488,38 @@ In the event of an unhandled exception or database error:
 - Mutating requests (`POST`, `PUT`, `DELETE`) automatically extract a user-friendly summary, flash an error message, and redirect safely back to `$_SERVER['HTTP_REFERER']`.
 - Non-mutating requests (`GET`) or unhandled page loads render the dedicated [app/Views/errors/error.php](file:///C:/xampp/htdocs/grading-system/app/Views/errors/error.php) template.
 - When `APP_DEBUG=true`, technical stack traces are neatly encapsulated in an expandable `<details>` container for developers, keeping the interface clean and secure in production.
+
+---
+
+## 20. View & Template Architecture (Unified Layout & Header Pattern)
+
+Views in the GWC Acadtrack system follow a structured buffer-and-include pattern to render pages inside unified master layouts.
+
+### 20.1 View Rendering Flow
+```text
+Controller
+   │
+   ▼ calls $view->render('admin.users.index', $data)
+View.php extracts $data and includes app/Views/admin/users/index.php
+   │
+   ▼ View template sets configuration
+   $pageTitle = 'User Management';
+   $subtitle = 'Manage institutional accounts, role assignments, and system access.';
+   $headerActions = '<a href="..." class="btn btn-primary">...</a>';
+   ob_start();
+   │
+   ▼ View outputs main card / table / form body
+   │
+   ▼ View closes buffer and includes layout
+   $content = ob_get_clean();
+   include __DIR__ . '/../../layouts/dashboard.php';
+```
+
+### 20.2 The Single Header Rule (Preventing Double Headers)
+1. **Master Layout Header Ownership:**
+   - `app/Views/layouts/dashboard.php` centrally renders the only `<h1>` tag on the page inside `.dashboard-header`, alongside the optional subtitle and right-aligned `$headerActions`.
+2. **Strict Prohibition of View-Level Inner Headers:**
+   - Views **must never** render an inner `<div class="d-flex justify-content-between ..."><h2>...</h2></div>` or inner `<h1>`.
+   - Action buttons that belong in the header (such as "Add user" or "Back to subjects") must be assigned to `$headerActions` as HTML strings before `ob_start()`.
+3. **No Bottom Variable Overwriting:**
+   - Never reassign `$pageTitle` at the bottom of the view template before `include layouts/dashboard.php`. All view metadata is declared once at the top of the file.

@@ -110,11 +110,17 @@ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica N
 > [!IMPORTANT]
 > **Maximum Font Weight Cap:** Across all headings, table headers, labels, and badges, the maximum allowable font weight is **`600`** (semibold). Heavy weights (`700`, `800`, `bold`) are prohibited to ensure a refined, institutional editorial hierarchy.
 
-* **Page Heading (`h1`):** `1.5rem` (`24px`), font-weight `600`, line-height `1.2`.
+* **Page Heading (`h1`):** `1.5rem` (`24px`), font-weight `600`, line-height `1.2`. Rendered exclusively by the master dashboard layout.
 * **Section Heading (`h2` / Card Header):** `1.125rem` (`18px`), font-weight `600`.
 * **Sub-Heading / Table Header (`th`):** `0.8125rem` (`13px`), font-weight `600`, Sentence case per `CASING_GUIDELINES.md`.
 * **Body / Data Cell (`td`):** `0.875rem` (`14px`), line-height `1.4`.
 * **Micro-Labels & Badges:** `0.75rem` (`12px`), font-weight `600`.
+
+### Unified Page Header Architecture (Single `<h1>` Standard)
+To avoid visual duplication and maintain structural clarity across all authenticated portals:
+- **Centralized Layout Header:** The master layout (`app/Views/layouts/dashboard.php`) owns the page header (`.dashboard-header`), rendering the single `<h1>`, optional subtitle, and right-aligned action buttons (`$headerActions`).
+- **No Inner View Headers:** View templates MUST NOT render inner page header rows (`<h1>` or `<div class="d-flex justify-content-between ..."><h2>...</h2></div>`).
+- **Sidebar Navigation State:** Active sidebar navigation items use a clean slate neutral background (`#e2e8f0` / `rgba(226, 232, 240, 0.8)`) without harsh, generic colored borders.
 
 ---
 

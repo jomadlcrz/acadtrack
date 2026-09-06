@@ -1,14 +1,8 @@
 <?php
-$pageTitle = 'Faculty Assignments';
+$pageTitle = 'Faculty Subject Assignments';
+$subtitle = 'Assign teaching instructors to official college curriculum subjects for the active semester.';
 ob_start();
 ?>
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="h4 mb-1 fw-semibold text-dark">Faculty Subject Assignments</h2>
-        <p class="text-muted small mb-0">Assign teaching instructors to official college curriculum subjects for the active semester.</p>
-    </div>
-</div>
 
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
@@ -123,6 +117,5 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-$pageTitle = 'Faculty Assignments';
 include __DIR__ . '/../../layouts/dashboard.php';
 ?>

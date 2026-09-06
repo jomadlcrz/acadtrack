@@ -20,10 +20,17 @@
         <main class="main-content">
             <?php include __DIR__ . '/../components/alert.php'; ?>
 
-            <div class="dashboard-header">
-                <h1><?= htmlspecialchars($pageTitle ?? 'Dashboard') ?></h1>
-                <?php if (!empty($subtitle)): ?>
-                    <p><?= htmlspecialchars($subtitle) ?></p>
+            <div class="dashboard-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+                <div>
+                    <h1><?= htmlspecialchars($pageTitle ?? 'Dashboard') ?></h1>
+                    <?php if (!empty($subtitle)): ?>
+                        <p><?= htmlspecialchars($subtitle) ?></p>
+                    <?php endif; ?>
+                </div>
+                <?php if (!empty($headerActions)): ?>
+                    <div class="dashboard-actions d-flex align-items-center gap-2">
+                        <?= $headerActions ?>
+                    </div>
                 <?php endif; ?>
             </div>
 

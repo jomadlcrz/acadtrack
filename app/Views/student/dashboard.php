@@ -39,6 +39,5 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-$pageTitle = 'Student Dashboard';
 include __DIR__ . '/../layouts/dashboard.php';
 ?>
