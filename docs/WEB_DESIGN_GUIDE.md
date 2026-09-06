@@ -1,6 +1,6 @@
 # GWC Grading System — Web Design & UI/UX Architecture Specification
 
-> **Project:** Gordon Western College (GWC) Grading & Academic Evaluation System  
+> **Project:** Golden West Colleges, Inc. (GWC) Grading & Academic Evaluation System  
 > **Tech Stack:** Vanilla PHP 8.2 MVC, MySQL 10.4+, Bootstrap 5.3.3, Bootstrap Icons 1.11.3, Vanilla JavaScript  
 > **Related Documents:**
 > * [Workflow Architecture](file:///C:/xampp/htdocs/grading-system/grading_system_workflow.md)

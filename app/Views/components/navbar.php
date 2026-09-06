@@ -1,6 +1,9 @@
 <nav class="navbar">
     <div class="navbar-brand">
-        <a href="/dashboard">GWC Grading System</a>
+        <a href="/dashboard" class="d-flex align-items-center gap-2">
+            <img src="/assets/images/gwc.png" height="28" alt="GWC Logo">
+            <span>GWC Grading System</span>
+        </a>
     </div>
     <div class="navbar-menu">
         <?php if (isset($_SESSION['user'])): ?>

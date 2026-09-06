@@ -1,6 +1,6 @@
 # Anti-Generic Design Philosophy & Standards
 
-> **Project:** Gordon Western College (GWC) Grading & Academic Evaluation System  
+> **Project:** Golden West Colleges, Inc. (GWC) Grading & Academic Evaluation System  
 > **Target Audience:** College Deans, Faculty Members, Registrars, and Students  
 > **Core Objective:** Deliver an authentic, high-density, authoritative academic tool that rejects generic SaaS clichés and unstyled AI-template aesthetics.
 

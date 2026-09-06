@@ -1,6 +1,6 @@
 # GWC Grading System — Feature Specifications & Workflow Architecture
 
-> **Institution:** Gordon Western College (GWC)  
+> **Institution:** Golden West Colleges, Inc. (GWC)  
 > **System:** Academic Grading & Curriculum Evaluation Platform  
 > **Related Documents:**
 > * [Web Design & UI/UX Architecture](file:///C:/xampp/htdocs/grading-system/Web-Designing.md)
@@ -11,7 +11,7 @@
 
 ## 1. System Overview
 
-The **GWC Grading System** is a role-governed academic management platform designed to streamline course assignments, student enrollments, grade computation, multi-tier reviews, and curriculum evaluations for Gordon Western College (GWC).
+The **GWC Grading System** is a role-governed academic management platform designed to streamline course assignments, student enrollments, grade computation, multi-tier reviews, and curriculum evaluations for Golden West Colleges, Inc. (GWC).
 
 The platform serves four primary academic stakeholders:
 1. **System Administrator:** Manages user accounts, active academic terms, grading scales, and system security.

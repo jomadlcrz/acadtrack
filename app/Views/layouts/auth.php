@@ -3,29 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle ?? 'Login') ?> - GWC Grading System</title>
+    <meta name="description" content="Golden West Colleges, Inc. — Academic Grading &amp; Evaluation System">
+    <title><?= htmlspecialchars($pageTitle ?? 'Log In') ?> &mdash; Golden West Colleges, Inc.</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/assets/css/app.css">
     <link rel="stylesheet" href="/assets/css/pages/auth.css">
 </head>
 <body class="auth-body">
-    <div class="auth-container">
+    <main class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <h1>GWC Grading System</h1>
-                <p><?= htmlspecialchars($subtitle ?? 'Sign in to your account') ?></p>
+                <div class="auth-logo-wrap">
+                    <img src="/assets/images/gwc.png" alt="Golden West Colleges, Inc. Logo" class="auth-logo">
+                </div>
+                <h1 class="auth-title">Golden West Colleges, Inc.</h1>
+                <p class="auth-subtitle">Academic Grading &amp; Evaluation Portal</p>
             </div>
 
             <?php if (!empty($error)): ?>
-                <div class="alert alert-danger">
-                    <?= htmlspecialchars($error) ?>
+                <div class="auth-alert auth-alert-danger" role="alert">
+                    <i class="bi bi-exclamation-circle-fill flex-shrink-0" aria-hidden="true"></i>
+                    <div><?= htmlspecialchars($error) ?></div>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($success)): ?>
+                <div class="auth-alert auth-alert-success" role="alert">
+                    <i class="bi bi-check-circle-fill flex-shrink-0" aria-hidden="true"></i>
+                    <div><?= htmlspecialchars($success) ?></div>
                 </div>
             <?php endif; ?>
 
             <?= $content ?>
         </div>
-    </div>
+
+        <!-- Institutional Footer -->
+        <footer class="auth-footer">
+            &copy; <?= date('Y') ?> Golden West Colleges, Inc. All rights reserved.
+        </footer>
+    </main>
 
     <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/app.js"></script>
