@@ -38,15 +38,14 @@ ob_start();
                 <tr>
                     <th class="fw-semibold text-muted small py-3 px-3">Full name</th>
                     <th class="fw-semibold text-muted small py-3 px-3">Email address</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Role</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Department</th>
+                    <th class="fw-semibold text-muted small py-3 px-3">Role &amp; affiliation</th>
                     <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 160px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($users['data'])): ?>
                     <tr>
-                        <td colspan="5" class="text-center py-5 text-muted small">
+                        <td colspan="4" class="text-center py-5 text-muted small">
                             <i class="bi bi-people d-block fs-3 mb-2 text-secondary"></i>
                             No user accounts found matching the current filter.
                         </td>
@@ -56,14 +55,16 @@ ob_start();
                     <tr>
                         <td class="px-3 fw-semibold text-dark"><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></td>
                         <td class="px-3 text-muted small"><?= htmlspecialchars($user['email']) ?></td>
-                        <td class="px-3"><span class="badge badge-<?= strtolower($user['role']) ?>"><?= htmlspecialchars($user['role']) ?></span></td>
-                        <td class="px-3 small">
-                            <?php if (!empty($user['department_name'])): ?>
-                                <span class="badge bg-light text-dark border">
-                                    <?= htmlspecialchars($user['department_name']) ?> (<?= htmlspecialchars($user['department_code']) ?>)
-                                </span>
-                            <?php else: ?>
-                                <span class="text-muted">—</span>
+                        <td class="px-3">
+                            <span class="badge badge-<?= strtolower($user['role']) ?>"><?= htmlspecialchars($user['role']) ?></span>
+                            <?php if (in_array($user['role'], ['Faculty', 'Dean'], true) && !empty($user['department_name'])): ?>
+                                <div class="small text-muted mt-1">
+                                    <i class="bi bi-building me-1 text-primary"></i><?= htmlspecialchars($user['department_name']) ?> (<?= htmlspecialchars($user['department_code']) ?>)
+                                </div>
+                            <?php elseif ($user['role'] === 'Student' && !empty($user['student_number'])): ?>
+                                <div class="small text-muted mt-1 font-monospace">
+                                    <i class="bi bi-person-badge me-1"></i><?= htmlspecialchars($user['student_number']) ?>
+                                </div>
                             <?php endif; ?>
                         </td>
                         <td class="px-3 text-end">

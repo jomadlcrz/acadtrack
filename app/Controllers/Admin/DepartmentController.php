@@ -28,7 +28,7 @@ class DepartmentController
     public function store(Request $request, Response $response, Session $session): void
     {
         $code = strtoupper(trim((string) $request->post('code', '')));
-        $name = trim((string) $request->post('name', '')));
+        $name = trim((string) $request->post('name', ''));
         $description = trim((string) $request->post('description', '')) ?: null;
         $status = in_array($request->post('status'), ['active', 'inactive'], true) ? $request->post('status') : 'active';
 
@@ -65,7 +65,7 @@ class DepartmentController
         }
 
         $code = strtoupper(trim((string) $request->post('code', '')));
-        $name = trim((string) $request->post('name', '')));
+        $name = trim((string) $request->post('name', ''));
         $description = trim((string) $request->post('description', '')) ?: null;
         $status = in_array($request->post('status'), ['active', 'inactive'], true) ? $request->post('status') : 'active';
 

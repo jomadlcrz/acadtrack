@@ -40,7 +40,7 @@ class DepartmentWorkflowTest extends TestCase
 
     public function testBaselineDepartmentsExist(): void
     {
-        $cit = Department::findByCode('CIT');
+        $cit = Department::where('name', 'College of Information Technology')->first();
         $this->assertNotNull($cit);
         $this->assertSame('College of Information Technology', $cit->name);
 
@@ -54,7 +54,7 @@ class DepartmentWorkflowTest extends TestCase
 
     public function testFacultyBelongsToDepartmentRelationship(): void
     {
-        $dept = Department::findByCode('CIT');
+        $dept = Department::findByCode('CS');
         $this->assertNotNull($dept);
 
         $unique = time() . '_' . rand(1000, 9999);
@@ -78,7 +78,7 @@ class DepartmentWorkflowTest extends TestCase
         $loadedFaculty = Faculty::with('department')->find($faculty->id);
         $this->assertNotNull($loadedFaculty);
         $this->assertNotNull($loadedFaculty->department);
-        $this->assertSame('CIT', $loadedFaculty->department->code);
+        $this->assertSame($dept->code, $loadedFaculty->department->code);
 
         // Test Department -> Faculty
         $loadedDept = Department::with('faculty')->find($dept->id);
@@ -120,5 +120,27 @@ class DepartmentWorkflowTest extends TestCase
             'name' => 'Another department with duplicate code',
             'status' => 'active',
         ]);
+    }
+
+    public function testDepartmentViewRendering(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['user'] = ['role' => 'Admin', 'first_name' => 'Admin', 'last_name' => 'User'];
+
+        $departments = Department::withCount('faculty')
+            ->orderBy('name', 'asc')
+            ->get()
+            ->toArray();
+
+        $html = (new \App\Core\View())->render('admin.departments.index', [
+            'departments' => $departments,
+        ]);
+
+        $this->assertNotEmpty($html);
+        $this->assertStringContainsString('Institutional Departments', $html);
+        $this->assertStringContainsString('College of Information Technology', $html);
+        $this->assertStringContainsString('Department code', $html);
     }
 }

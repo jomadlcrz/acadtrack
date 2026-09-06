@@ -68,27 +68,27 @@ ob_start();
                     <div class="form-text">Assigning a new role adjusts permissions immediately.</div>
                 </div>
 
-                <div class="col-md-6">
-                    <label for="student_number" class="form-label">Student number</label>
-                    <input type="text" class="form-control" id="student_number" name="student_number" placeholder="e.g., 2026-0001 (optional for late ID)" value="<?= htmlspecialchars($user['student_number'] ?? '') ?>">
-                    <div class="form-text">Optional for students with late or pending ID.</div>
+                <div class="col-md-6" id="student_number_group">
+                    <label for="student_number" class="form-label">Student ID number <span class="text-muted">(Optional / Late ID)</span></label>
+                    <input type="text" class="form-control" id="student_number" name="student_number" placeholder="e.g., 2026-0001 (leave blank if pending)" value="<?= htmlspecialchars($user['student_number'] ?? '') ?>">
+                    <div class="form-text">Optional for students with late or pending ID. Must be unique if provided.</div>
                 </div>
-            </div>
 
-            <div class="mb-3" id="department_group">
-                <label for="department_id" class="form-label">Department / College</label>
-                <select class="form-select" id="department_id" name="department_id">
-                    <option value="">Select department (assigned to Faculty and Dean)</option>
-                    <?php
-                    $currentDeptId = $user['faculty']['department_id'] ?? null;
-                    foreach ($departments ?? [] as $dept):
-                    ?>
-                        <option value="<?= $dept['id'] ?>" <?= ((string)$currentDeptId === (string)$dept['id']) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($dept['name']) ?> (<?= htmlspecialchars($dept['code']) ?>)
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <div class="form-text">Designates the academic department or college this faculty member or dean belongs to.</div>
+                <div class="col-md-6" id="department_group" style="display: none;">
+                    <label for="department_id" class="form-label">Faculty department / College <span class="text-danger">*</span></label>
+                    <select class="form-select" id="department_id" name="department_id">
+                        <option value="">Select department</option>
+                        <?php
+                        $currentDeptId = $user['faculty']['department_id'] ?? null;
+                        foreach ($departments ?? [] as $dept):
+                        ?>
+                            <option value="<?= $dept['id'] ?>" <?= ((string)$currentDeptId === (string)$dept['id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($dept['name']) ?> (<?= htmlspecialchars($dept['code']) ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="form-text">Academic college/department the instructor or dean belongs to.</div>
+                </div>
             </div>
         </div>
 
@@ -100,6 +100,33 @@ ob_start();
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const roleSelect = document.getElementById('role');
+    const studentGroup = document.getElementById('student_number_group');
+    const deptGroup = document.getElementById('department_group');
+    const studentInput = document.getElementById('student_number');
+    const deptSelect = document.getElementById('department_id');
+
+    function syncRoleFields() {
+        const role = roleSelect.value;
+        if (role === 'Student') {
+            studentGroup.style.display = 'block';
+            deptGroup.style.display = 'none';
+        } else if (role === 'Faculty' || role === 'Dean') {
+            studentGroup.style.display = 'none';
+            deptGroup.style.display = 'block';
+        } else {
+            studentGroup.style.display = 'none';
+            deptGroup.style.display = 'none';
+        }
+    }
+
+    roleSelect.addEventListener('change', syncRoleFields);
+    syncRoleFields();
+});
+</script>
 
 <?php
 $content = ob_get_clean();

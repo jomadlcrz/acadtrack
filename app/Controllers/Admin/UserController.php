@@ -52,11 +52,14 @@ class UserController
             $plainPassword = \App\Models\User::generateRandomPassword();
         }
 
-        $studentNumber = trim((string) ($data['student_number'] ?? '')) ?: null;
-        if ($studentNumber !== null && \App\Models\User::where('student_number', $studentNumber)->exists()) {
-            $session->flash('error', "Student ID number '{$studentNumber}' is already registered to another user.");
-            redirect('/admin/users/create');
-            return;
+        $studentNumber = null;
+        if ($role === 'Student') {
+            $studentNumber = trim((string) ($data['student_number'] ?? '')) ?: null;
+            if ($studentNumber !== null && \App\Models\User::where('student_number', $studentNumber)->exists()) {
+                $session->flash('error', "Student ID number '{$studentNumber}' is already registered to another user.");
+                redirect('/admin/users/create');
+                return;
+            }
         }
 
         $user = \App\Models\User::create([
@@ -126,14 +129,27 @@ class UserController
             'status' => $data['status'] ?? $user->status,
         ];
 
-        if (isset($data['student_number'])) {
-            $studentNumber = trim((string) $data['student_number']) ?: null;
+        $newRole = $updateData['role'] ?? $user->role;
+        if ($newRole === 'Student') {
+            $studentNumber = trim((string) ($data['student_number'] ?? '')) ?: null;
             if ($studentNumber !== null && \App\Models\User::where('student_number', $studentNumber)->where('id', '!=', $user->id)->exists()) {
                 $session->flash('error', "Student ID number '{$studentNumber}' is already registered to another user.");
                 redirect('/admin/users/' . $id . '/edit');
                 return;
             }
             $updateData['student_number'] = $studentNumber;
+            \App\Models\Faculty::where('user_id', $user->id)->delete();
+        } else {
+            $updateData['student_number'] = null;
+            if (in_array($newRole, ['Faculty', 'Dean'], true)) {
+                $deptId = !empty($data['department_id']) ? (int) $data['department_id'] : null;
+                \App\Models\Faculty::updateOrCreate(
+                    ['user_id' => (int) $user->id],
+                    ['department_id' => $deptId]
+                );
+            } else {
+                \App\Models\Faculty::where('user_id', $user->id)->delete();
+            }
         }
 
         if (!empty($data['password'])) {
@@ -145,14 +161,6 @@ class UserController
         }
 
         $user->update($updateData);
-
-        if (in_array($updateData['role'] ?? $user->role, ['Faculty', 'Dean'], true)) {
-            $deptId = !empty($data['department_id']) ? (int) $data['department_id'] : null;
-            \App\Models\Faculty::updateOrCreate(
-                ['user_id' => (int) $user->id],
-                ['department_id' => $deptId]
-            );
-        }
 
         $session->flash('success', 'User updated successfully.');
         redirect('/admin/users');
