@@ -5,20 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Golden West Colleges, Inc. — Acadtrack">
     <title>Acadtrack &mdash; Golden West Colleges, Inc.</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="/assets/css/app.css">
-    <link rel="stylesheet" href="/assets/css/pages/home.css">
+    <link rel="icon" type="image/x-icon" href="<?= url('/favicon.ico') ?>">
+    <link rel="shortcut icon" type="image/x-icon" href="<?= url('/favicon.ico') ?>">
+    <link rel="stylesheet" href="<?= asset('vendor/bootstrap/css/bootstrap.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('vendor/bootstrap-icons/bootstrap-icons.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/pages/home.css') ?>">
 </head>
 <body class="landing-body">
 
     <!-- 1. Institutional Navigation Header -->
     <header class="landing-nav">
         <div class="container">
-            <a href="/" class="landing-brand">
-                <img src="/assets/images/gwc.png" alt="Golden West Colleges Logo" class="landing-logo">
+            <a href="<?= url('/') ?>" class="landing-brand">
+                <img src="<?= asset('images/gwc.png') ?>" alt="Golden West Colleges Logo" class="landing-logo">
                 <div class="landing-brand-text">
                     <span class="landing-college-name">Golden West Colleges, Inc.</span>
                     <span class="landing-system-tag">Acadtrack</span>
@@ -39,7 +39,7 @@
                         Streamlines course assignments, student rosters, period-based grading sheets, Dean audit reviews, and curriculum evaluation metrics.
                     </p>
                     <div class="hero-actions">
-                        <a href="/login" class="btn-hero-primary">
+                        <a href="<?= url('/login') ?>" class="btn-hero-primary">
                             <span>Log In to Portal</span>
                         </a>
                     </div>
@@ -115,7 +115,7 @@
             <div class="row g-4">
                 <div class="col-lg-5">
                     <div class="footer-brand">
-                        <img src="/assets/images/gwc.png" alt="GWC Logo" class="footer-logo">
+                        <img src="<?= asset('images/gwc.png') ?>" alt="GWC Logo" class="footer-logo">
                         <h3 class="footer-title">Golden West Colleges, Inc.</h3>
                     </div>
                     <p class="footer-desc">
@@ -125,17 +125,17 @@
                 <div class="col-6 col-lg-3 offset-lg-1">
                     <h4 class="footer-heading">Portals</h4>
                     <ul class="footer-links">
-                        <li><a href="/login"><i class="bi bi-chevron-right me-1"></i> Dean Review Portal</a></li>
-                        <li><a href="/login"><i class="bi bi-chevron-right me-1"></i> Faculty Grading Portal</a></li>
-                        <li><a href="/login"><i class="bi bi-chevron-right me-1"></i> Student Grade Inquiry</a></li>
-                        <li><a href="/login"><i class="bi bi-chevron-right me-1"></i> System Administration</a></li>
+                        <li><a href="<?= url('/login') ?>"><i class="bi bi-chevron-right me-1"></i> Dean Review Portal</a></li>
+                        <li><a href="<?= url('/login') ?>"><i class="bi bi-chevron-right me-1"></i> Faculty Grading Portal</a></li>
+                        <li><a href="<?= url('/login') ?>"><i class="bi bi-chevron-right me-1"></i> Student Grade Inquiry</a></li>
+                        <li><a href="<?= url('/login') ?>"><i class="bi bi-chevron-right me-1"></i> System Administration</a></li>
                     </ul>
                 </div>
                 <div class="col-6 col-lg-3">
                     <h4 class="footer-heading">Academic System</h4>
                     <ul class="footer-links">
                         <li><a href="#lifecycle"><i class="bi bi-chevron-right me-1"></i> Workflow Lifecycle</a></li>
-                        <li><a href="/login"><i class="bi bi-chevron-right me-1"></i> Log In to Portal</a></li>
+                        <li><a href="<?= url('/login') ?>"><i class="bi bi-chevron-right me-1"></i> Log In to Portal</a></li>
                     </ul>
                 </div>
             </div>
@@ -148,7 +148,7 @@
         </div>
     </footer>
 
-    <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/app.js"></script>
+    <script src="<?= asset('vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+    <script src="<?= asset('js/app.js') ?>"></script>
 </body>
 </html>
