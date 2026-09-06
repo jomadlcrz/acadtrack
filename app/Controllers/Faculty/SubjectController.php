@@ -16,12 +16,20 @@ class SubjectController
     public function index(Request $request, Response $response, Session $session): void
     {
         $user = $session->get('user');
-        $academicTerm = AcademicTerm::getActive();
-        $subjects = Faculty::getAssignedSubjects((int) $user['id'], $academicTerm['id'] ?? 0);
+        $selectedSem = (string) $request->get('semester', '');
+        if ($selectedSem === '1' || $selectedSem === '2') {
+            $academicTerm = AcademicTerm::getBySemester($selectedSem);
+        } else {
+            $academicTerm = AcademicTerm::getActive();
+        }
+
+        $termId = (int) ($academicTerm['id'] ?? 0);
+        $subjects = Faculty::getAssignedSubjects((int) $user['id'], $termId);
 
         $html = (new View())->render('faculty.subjects.index', [
             'subjects' => $subjects,
             'academicTerm' => $academicTerm,
+            'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
         ]);
         $response->html($html);
     }
@@ -46,8 +54,11 @@ class SubjectController
         \App\Models\Subject::where('id', $subjectId)->update(['nature' => $nature]);
 
         $user = $session->get('user');
-        $academicTerm = AcademicTerm::getActive();
-        $termId = (int) ($academicTerm['id'] ?? 1);
+        $termId = (int) $request->post('academic_term_id', 0);
+        if ($termId === 0) {
+            $academicTerm = AcademicTerm::getActive();
+            $termId = (int) ($academicTerm['id'] ?? 1);
+        }
         $facultyId = (int) ($user['id'] ?? 0);
 
         $existing = \App\Models\GradingSetting::query()

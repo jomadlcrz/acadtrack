@@ -8,14 +8,39 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
 
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="card-body py-3 px-4">
-        <form method="GET" action="<?= url('/faculty/grading') ?>" class="row g-3 align-items-center justify-content-between">
-            <input type="hidden" name="subject_id" value="<?= htmlspecialchars((string)$subjectId) ?>">
-            
-            <div class="col-auto d-flex align-items-center gap-2">
-                <label for="period_id" class="form-label mb-0 fw-semibold small text-muted d-flex align-items-center gap-1">
+        <form method="GET" action="<?= url('/faculty/grading') ?>" class="row g-3 align-items-center">
+            <div class="col-md-3">
+                <label for="semester" class="form-label mb-1 fw-semibold small text-muted d-flex align-items-center gap-1">
+                    <i class="bi bi-calendar3 text-primary"></i> Semester:
+                </label>
+                <select id="semester" name="semester" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="1" <?= ($selectedSemester ?? '1') === '1' ? 'selected' : '' ?>>1st Semester</option>
+                    <option value="2" <?= ($selectedSemester ?? '1') === '2' ? 'selected' : '' ?>>2nd Semester</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="subject_id" class="form-label mb-1 fw-semibold small text-muted d-flex align-items-center gap-1">
+                    <i class="bi bi-journal-bookmark text-primary"></i> Subject:
+                </label>
+                <select id="subject_id" name="subject_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <?php if (empty($assignedSubjects)): ?>
+                        <option value="">No subjects assigned</option>
+                    <?php else: ?>
+                        <?php foreach ($assignedSubjects as $subj): ?>
+                            <option value="<?= $subj['id'] ?>" <?= $subj['id'] == $subjectId ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($subj['code'] . ' - ' . $subj['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="period_id" class="form-label mb-1 fw-semibold small text-muted d-flex align-items-center gap-1">
                     <i class="bi bi-calendar-event text-primary"></i> Grading period:
                 </label>
-                <select id="period_id" name="period_id" class="form-select form-select-sm" style="width: 220px;" onchange="this.form.submit()">
+                <select id="period_id" name="period_id" class="form-select form-select-sm" onchange="this.form.submit()">
                     <?php foreach ($periods as $period): ?>
                         <option value="<?= $period['id'] ?>" <?= $period['id'] == $periodId ? 'selected' : '' ?>>
                             <?= htmlspecialchars($period['name']) ?>
@@ -24,10 +49,9 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
                 </select>
             </div>
 
-            <?php if ($gradingSheet): ?>
-                <div class="col-auto d-flex align-items-center gap-2">
-                    <span class="text-muted small">Sheet status:</span>
-                    <span class="badge badge-<?= strtolower($gradingSheet['status']) ?>">
+            <div class="col-md-2 text-md-end pt-md-3">
+                <?php if ($gradingSheet): ?>
+                    <span class="badge badge-<?= strtolower($gradingSheet['status']) ?> fs-6 py-2 px-3">
                         <?php if ($gradingSheet['status'] === 'DRAFT'): ?>
                             <i class="bi bi-pencil-square me-1"></i> Draft
                         <?php elseif ($gradingSheet['status'] === 'SUBMITTED'): ?>
@@ -40,8 +64,12 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
                             <?= htmlspecialchars(ucfirst(strtolower($gradingSheet['status']))) ?>
                         <?php endif; ?>
                     </span>
-                </div>
-            <?php endif; ?>
+                <?php else: ?>
+                    <span class="badge bg-secondary-subtle text-secondary border fs-6 py-2 px-3">
+                        <i class="bi bi-dash-circle me-1"></i> Unsaved
+                    </span>
+                <?php endif; ?>
+            </div>
         </form>
     </div>
 </div>
@@ -97,6 +125,8 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
             <?= csrf_field() ?>
             <input type="hidden" name="subject_id" value="<?= htmlspecialchars((string)$subjectId) ?>">
             <input type="hidden" name="grading_period_id" value="<?= htmlspecialchars((string)$periodId) ?>">
+            <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
+            <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
 
             <div class="table-responsive" style="max-height: 65vh;">
                 <table class="table table-hover align-middle mb-0">

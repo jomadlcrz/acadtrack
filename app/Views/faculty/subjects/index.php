@@ -5,11 +5,24 @@ ob_start();
 ?>
 
 <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
-    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-            <i class="bi bi-mortarboard text-primary"></i> Teaching Workload Roster
-        </h3>
-        <span class="text-muted small"><?= count($subjects) ?> courses assigned</span>
+    <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-mortarboard text-primary"></i> Teaching Workload Roster
+            </h3>
+            <span class="text-muted small"><?= count($subjects) ?> courses assigned &bull; <?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-muted small fw-semibold">Semester:</span>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Semester selection">
+                <a href="<?= url('/faculty/subjects?semester=1') ?>" class="btn <?= ($selectedSemester ?? '1') === '1' ? 'btn-primary' : 'btn-outline-secondary' ?>">
+                    1st Semester
+                </a>
+                <a href="<?= url('/faculty/subjects?semester=2') ?>" class="btn <?= ($selectedSemester ?? '1') === '2' ? 'btn-primary' : 'btn-outline-secondary' ?>">
+                    2nd Semester
+                </a>
+            </div>
+        </div>
     </div>
 
     <?php if (empty($subjects)): ?>
@@ -18,7 +31,7 @@ ob_start();
                 <i class="bi bi-book"></i>
             </div>
             <h4 class="h6 fw-semibold text-dark mb-1">No subjects assigned yet</h4>
-            <p class="text-muted small mb-0">You have not been designated to any course sections for the active term. Contact the College Dean for curriculum assignments.</p>
+            <p class="text-muted small mb-0">You have not been designated to any course sections for <?= htmlspecialchars($academicTerm['name'] ?? 'this term') ?>. Contact the College Dean for curriculum assignments.</p>
         </div>
     <?php else: ?>
         <div class="table-responsive">
@@ -64,7 +77,7 @@ ob_start();
                             <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#setupModal<?= $subject['id'] ?>">
                                 <i class="bi bi-gear"></i> Set up
                             </button>
-                            <a href="<?= url('/faculty/grading?subject_id=' . $subject['id']) ?>" class="btn btn-sm btn-primary py-1 px-2 d-inline-flex align-items-center gap-1 ms-1">
+                            <a href="<?= url('/faculty/grading?subject_id=' . $subject['id'] . '&semester=' . ($selectedSemester ?? '1')) ?>" class="btn btn-sm btn-primary py-1 px-2 d-inline-flex align-items-center gap-1 ms-1">
                                 <i class="bi bi-pencil-square"></i> Enter grades
                             </a>
                             <a href="<?= url('/faculty/students?subject_id=' . $subject['id']) ?>" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1 ms-1">
@@ -83,6 +96,7 @@ ob_start();
                 <div class="modal-content border-0 shadow">
                     <form method="POST" action="<?= url('/faculty/subjects/' . $subject['id'] . '/setup') ?>">
                         <?= csrf_field() ?>
+                        <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
                         <div class="modal-header border-bottom">
                             <h5 class="modal-title h6 fw-semibold mb-0" id="setupModalLabel<?= $subject['id'] ?>">
                                 Subject Setup: <?= htmlspecialchars($subject['code']) ?>
