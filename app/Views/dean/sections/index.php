@@ -21,9 +21,7 @@ ob_start();
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-                <i class="bi bi-collection text-primary"></i> Class Cohorts Roster
-            </h3>
+            <h3 class="h6 mb-0 fw-semibold text-dark">Class Cohorts Roster</h3>
             <small class="text-muted">Active section cohorts for <?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></small>
         </div>
         <span class="badge bg-light text-dark border"><?= count($sections) ?> sections registered</span>

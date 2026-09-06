@@ -8,9 +8,7 @@ ob_start();
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; max-width: 760px;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-                <i class="bi bi-person-gear text-primary"></i> Account Profile & Privilege Level
-            </h3>
+            <h3 class="h6 mb-0 fw-semibold text-dark">Account Profile & Privilege Level</h3>
             <small class="text-muted">Changes take effect immediately across all active sessions.</small>
         </div>
         <span class="badge badge-<?= strtolower($user['role']) ?>"><?= htmlspecialchars($user['role']) ?></span>

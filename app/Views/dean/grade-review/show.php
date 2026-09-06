@@ -88,9 +88,7 @@ $isPending = in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW']);
 <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-                <i class="bi bi-people text-primary"></i> Enrolled Student Grades Roster
-            </h3>
+            <h3 class="h6 mb-0 fw-semibold text-dark">Enrolled Student Grades Roster</h3>
             <span class="text-muted small"><?= count($students) ?> students evaluated for <?= htmlspecialchars($sheet['period_name']) ?></span>
         </div>
         <?php if (!$isFinalized): ?>

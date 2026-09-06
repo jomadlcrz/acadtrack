@@ -7,9 +7,7 @@ ob_start();
 <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-                <i class="bi bi-mortarboard text-primary"></i> Teaching Workload Roster
-            </h3>
+            <h3 class="h6 mb-0 fw-semibold text-dark">Teaching Workload Roster</h3>
             <span class="text-muted small"><?= count($subjects) ?> courses assigned &bull; <?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></span>
         </div>
         <div class="d-flex align-items-center gap-2">
@@ -52,9 +50,6 @@ ob_start();
                         <td class="px-3 fw-semibold text-primary font-monospace"><?= htmlspecialchars($subject['code']) ?></td>
                         <td class="px-3 fw-semibold text-dark">
                             <?= htmlspecialchars($subject['name']) ?>
-                            <div class="text-muted small">
-                                Weights: P: <?= (int)$subject['prelim_weight'] ?>% | M: <?= (int)$subject['midterm_weight'] ?>% | SF: <?= (int)$subject['semi_final_weight'] ?>% | F: <?= (int)$subject['final_weight'] ?>%
-                            </div>
                         </td>
                         <td class="px-3">
                             <span class="badge <?= match($subject['nature'] ?? 'Lecture') {
@@ -108,7 +103,7 @@ ob_start();
 
                             <div class="mb-3">
                                 <label for="nature_<?= $subject['id'] ?>" class="form-label small fw-semibold">Subject nature</label>
-                                <select class="form-select form-select-sm" id="nature_<?= $subject['id'] ?>" name="nature" required>
+                                <select class="form-select" id="nature_<?= $subject['id'] ?>" name="nature" required>
                                     <option value="Lecture" <?= ($subject['nature'] ?? 'Lecture') === 'Lecture' ? 'selected' : '' ?>>Lecture</option>
                                     <option value="Laboratory" <?= ($subject['nature'] ?? '') === 'Laboratory' ? 'selected' : '' ?>>Laboratory</option>
                                     <option value="Combined" <?= ($subject['nature'] ?? '') === 'Combined' ? 'selected' : '' ?>>Combined (Lecture + Lab)</option>
@@ -117,7 +112,7 @@ ob_start();
 
                             <div class="mb-3">
                                 <label for="grading_method_<?= $subject['id'] ?>" class="form-label small fw-semibold">Grading method</label>
-                                <select class="form-select form-select-sm" id="grading_method_<?= $subject['id'] ?>" name="grading_method" required>
+                                <select class="form-select" id="grading_method_<?= $subject['id'] ?>" name="grading_method" required>
                                     <option value="zero_based" <?= ($subject['grading_method'] ?? 'zero_based') === 'zero_based' ? 'selected' : '' ?>>Zero-Based (Raw % = Score / Total × 100)</option>
                                     <option value="fifty_based" <?= ($subject['grading_method'] ?? '') === 'fifty_based' ? 'selected' : '' ?>>50-Based (Raw % = (Score / Total × 50) + 50)</option>
                                 </select>

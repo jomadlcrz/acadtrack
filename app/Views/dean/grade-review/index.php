@@ -44,9 +44,7 @@ $statusFilter = $statusFilter ?? 'all';
 <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-                <i class="bi bi-file-earmark-check text-primary"></i> Grading Sheets Roster
-            </h3>
+            <h3 class="h6 mb-0 fw-semibold text-dark">Grading Sheets Roster</h3>
             <small class="text-muted">Submissions for <?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></small>
         </div>
     </div>

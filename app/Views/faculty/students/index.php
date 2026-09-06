@@ -19,20 +19,16 @@ ob_start();
     <div class="card-body py-3 px-4">
         <form method="GET" action="<?= url('/faculty/students') ?>" class="row g-3 align-items-center">
             <div class="col-auto d-flex align-items-center gap-2">
-                <label for="semester_select" class="form-label mb-0 fw-semibold small text-muted d-flex align-items-center gap-1">
-                    <i class="bi bi-calendar3 text-primary"></i> Semester:
-                </label>
-                <select id="semester_select" name="semester" class="form-select form-select-sm" onchange="this.form.submit()">
+                <label for="semester_select" class="form-label mb-0 fw-semibold small text-muted">Semester:</label>
+                <select id="semester_select" name="semester" class="form-select" style="width: auto; min-width: 150px;" onchange="this.form.submit()">
                     <option value="1" <?= ($selectedSemester ?? '1') === '1' ? 'selected' : '' ?>>1st Semester</option>
                     <option value="2" <?= ($selectedSemester ?? '1') === '2' ? 'selected' : '' ?>>2nd Semester</option>
                 </select>
             </div>
 
             <div class="col-auto d-flex align-items-center gap-2">
-                <label for="subject_id_select" class="form-label mb-0 fw-semibold small text-muted d-flex align-items-center gap-1">
-                    <i class="bi bi-book text-primary"></i> Active subject:
-                </label>
-                <select id="subject_id_select" name="subject_id" class="form-select form-select-sm" style="min-width: 280px;" onchange="this.form.submit()">
+                <label for="subject_id_select" class="form-label mb-0 fw-semibold small text-muted">Active subject:</label>
+                <select id="subject_id_select" name="subject_id" class="form-select" style="min-width: 280px;" onchange="this.form.submit()">
                     <?php foreach (($assignedSubjects ?? []) as $sub): ?>
                         <option value="<?= $sub['id'] ?>" <?= ((int)$sub['id'] === (int)($subjectId ?? 0)) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($sub['code'] . ' - ' . $sub['name']) ?>
@@ -42,10 +38,8 @@ ob_start();
             </div>
 
             <div class="col-auto d-flex align-items-center gap-2">
-                <label for="section_id_filter" class="form-label mb-0 fw-semibold small text-muted d-flex align-items-center gap-1">
-                    <i class="bi bi-collection text-primary"></i> Section:
-                </label>
-                <select id="section_id_filter" name="section_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                <label for="section_id_filter" class="form-label mb-0 fw-semibold small text-muted">Section:</label>
+                <select id="section_id_filter" name="section_id" class="form-select" style="width: auto; min-width: 150px;" onchange="this.form.submit()">
                     <option value="">All sections</option>
                     <?php foreach (($sections ?? []) as $sec): ?>
                         <option value="<?= $sec['id'] ?>" <?= ((int)($selectedSection ?? 0) === (int)$sec['id']) ? 'selected' : '' ?>>
@@ -67,9 +61,7 @@ ob_start();
 
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-            <i class="bi bi-people text-primary"></i> Class Enrollment Roster
-        </h3>
+        <h3 class="h6 mb-0 fw-semibold text-dark">Class Enrollment Roster</h3>
         <span class="text-muted small"><?= count($students) ?> students enrolled</span>
     </div>
 
@@ -150,9 +142,7 @@ ob_start();
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow" style="border-radius: 6px;">
             <div class="modal-header bg-white border-bottom py-3">
-                <h5 class="modal-title h6 fw-semibold text-dark d-flex align-items-center gap-2" id="addStudentModalLabel">
-                    <i class="bi bi-person-plus text-primary"></i> Add New Student to Roster
-                </h5>
+                <h5 class="modal-title h6 fw-semibold text-dark" id="addStudentModalLabel">Add New Student to Roster</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="<?= url('/faculty/students/add') ?>">
@@ -227,9 +217,7 @@ ob_start();
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow" style="border-radius: 6px;">
             <div class="modal-header bg-white border-bottom py-3">
-                <h5 class="modal-title h6 fw-semibold text-dark d-flex align-items-center gap-2" id="enrollExistingModalLabel">
-                    <i class="bi bi-person-check text-primary"></i> Select Existing Student
-                </h5>
+                <h5 class="modal-title h6 fw-semibold text-dark" id="enrollExistingModalLabel">Select Existing Student</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="<?= url('/faculty/students/enroll') ?>">

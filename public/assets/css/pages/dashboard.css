@@ -155,14 +155,35 @@
     background-color: #f8fafc;
 }
 
-/* 3. Collegiate Sidebar */
+/* 3. Collegiate Sidebar (Pinned Sticky Navigation) */
 .sidebar {
     width: 250px;
+    height: calc(100vh - 58px);
+    position: sticky;
+    top: 58px;
     background-color: #ffffff;
     border-right: 1px solid var(--gray-200);
     padding: 18px 12px;
     flex-shrink: 0;
     overflow-y: auto;
+    z-index: 1020;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
 }
 
 .sidebar-nav {

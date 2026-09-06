@@ -7,9 +7,7 @@ ob_start();
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-                <i class="bi bi-person-badge text-primary"></i> Assign Instructor to Course
-            </h3>
+            <h3 class="h6 mb-0 fw-semibold text-dark">Assign Instructor to Course</h3>
             <small class="text-muted">Select an accredited faculty member and designate an active curricular course offering &bull; <?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></small>
         </div>
         <div class="d-flex align-items-center gap-2">
@@ -69,9 +67,7 @@ ob_start();
 
 <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-            <i class="bi bi-journal-bookmark text-primary"></i> Course Allocation Roster
-        </h3>
+        <h3 class="h6 mb-0 fw-semibold text-dark">Course Allocation Roster</h3>
         <span class="text-muted small"><?= count($subjects) ?> courses registered</span>
     </div>
 

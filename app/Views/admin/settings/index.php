@@ -7,9 +7,7 @@ ob_start();
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; max-width: 760px;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-                <i class="bi bi-sliders text-primary"></i> Academic Governance Configuration
-            </h3>
+            <h3 class="h6 mb-0 fw-semibold text-dark">Academic Governance Configuration</h3>
             <small class="text-muted">Global defaults apply across all colleges, departments, and course offerings.</small>
         </div>
     </div>

@@ -10,20 +10,16 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
     <div class="card-body py-3 px-4">
         <form method="GET" action="<?= url('/faculty/grading') ?>" class="row g-3 align-items-center">
             <div class="col-md-3">
-                <label for="semester" class="form-label mb-1 fw-semibold small text-muted d-flex align-items-center gap-1">
-                    <i class="bi bi-calendar3 text-primary"></i> Semester:
-                </label>
-                <select id="semester" name="semester" class="form-select form-select-sm" onchange="this.form.submit()">
+                <label for="semester" class="form-label mb-1 fw-semibold small text-muted">Semester:</label>
+                <select id="semester" name="semester" class="form-select" onchange="this.form.submit()">
                     <option value="1" <?= ($selectedSemester ?? '1') === '1' ? 'selected' : '' ?>>1st Semester</option>
                     <option value="2" <?= ($selectedSemester ?? '1') === '2' ? 'selected' : '' ?>>2nd Semester</option>
                 </select>
             </div>
 
             <div class="col-md-4">
-                <label for="subject_id" class="form-label mb-1 fw-semibold small text-muted d-flex align-items-center gap-1">
-                    <i class="bi bi-journal-bookmark text-primary"></i> Subject:
-                </label>
-                <select id="subject_id" name="subject_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                <label for="subject_id" class="form-label mb-1 fw-semibold small text-muted">Subject:</label>
+                <select id="subject_id" name="subject_id" class="form-select" onchange="this.form.submit()">
                     <?php if (empty($assignedSubjects)): ?>
                         <option value="">No subjects assigned</option>
                     <?php else: ?>
@@ -37,10 +33,8 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
             </div>
 
             <div class="col-md-3">
-                <label for="period_id" class="form-label mb-1 fw-semibold small text-muted d-flex align-items-center gap-1">
-                    <i class="bi bi-calendar-event text-primary"></i> Grading period:
-                </label>
-                <select id="period_id" name="period_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                <label for="period_id" class="form-label mb-1 fw-semibold small text-muted">Grading period:</label>
+                <select id="period_id" name="period_id" class="form-select" onchange="this.form.submit()">
                     <?php foreach ($periods as $period): ?>
                         <option value="<?= $period['id'] ?>" <?= $period['id'] == $periodId ? 'selected' : '' ?>>
                             <?= htmlspecialchars($period['name']) ?>
@@ -111,9 +105,7 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
     <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
         <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-2">
-                <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-                    <i class="bi bi-table text-primary"></i> Student Grade Roster
-                </h3>
+                <h3 class="h6 mb-0 fw-semibold text-dark">Student Grade Roster</h3>
                 <span class="text-muted small">(<?= count($students) ?> enrolled students)</span>
             </div>
             <small class="text-muted">

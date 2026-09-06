@@ -9,10 +9,8 @@ ob_start();
     <div class="card-body py-3 px-4">
         <form method="GET" action="<?= url('/admin/users') ?>" class="row g-3 align-items-center">
             <div class="col-auto d-flex align-items-center gap-2">
-                <label for="filter_role" class="form-label mb-0 fw-semibold small text-muted d-flex align-items-center gap-1">
-                    <i class="bi bi-funnel text-primary"></i> Role:
-                </label>
-                <select id="filter_role" name="role" class="form-select form-select-sm" style="width: 150px;" onchange="this.form.submit()">
+                <label for="filter_role" class="form-label mb-0 fw-semibold small text-muted">Role:</label>
+                <select id="filter_role" name="role" class="form-select" style="width: 160px;" onchange="this.form.submit()">
                     <option value="">All roles</option>
                     <option value="Admin" <?= ($currentRole ?? '') === 'Admin' ? 'selected' : '' ?>>Admin</option>
                     <option value="Dean" <?= ($currentRole ?? '') === 'Dean' ? 'selected' : '' ?>>Dean</option>
@@ -21,10 +19,8 @@ ob_start();
                 </select>
             </div>
             <div class="col-auto d-flex align-items-center gap-2">
-                <label for="filter_status" class="form-label mb-0 fw-semibold small text-muted d-flex align-items-center gap-1">
-                    <i class="bi bi-toggle2-on text-primary"></i> Status:
-                </label>
-                <select id="filter_status" name="status" class="form-select form-select-sm" style="width: 150px;" onchange="this.form.submit()">
+                <label for="filter_status" class="form-label mb-0 fw-semibold small text-muted">Status:</label>
+                <select id="filter_status" name="status" class="form-select" style="width: 160px;" onchange="this.form.submit()">
                     <option value="">All status</option>
                     <option value="active" <?= ($currentStatus ?? '') === 'active' ? 'selected' : '' ?>>Active</option>
                     <option value="inactive" <?= ($currentStatus ?? '') === 'inactive' ? 'selected' : '' ?>>Inactive</option>

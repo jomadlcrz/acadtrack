@@ -9,9 +9,7 @@ ob_start();
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="card-body py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="d-flex align-items-center gap-2">
-            <span class="text-muted small fw-semibold d-flex align-items-center gap-1">
-                <i class="bi bi-calendar3 text-primary"></i> Academic term:
-            </span>
+            <span class="text-muted small fw-semibold">Academic term:</span>
             <span class="fw-semibold text-dark small"><?= htmlspecialchars($academicTerm['academic_year_name'] ?? '2026-2027') ?></span>
         </div>
         <div class="btn-group btn-group-sm" role="group" aria-label="Semester selection">
@@ -27,9 +25,7 @@ ob_start();
 
 <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <h3 class="h6 mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
-            <i class="bi bi-file-earmark-text text-primary"></i> <?= ($selectedSemester ?? '1') === '2' ? '2nd Semester' : '1st Semester' ?> Grade Summary
-        </h3>
+        <h3 class="h6 mb-0 fw-semibold text-dark"><?= ($selectedSemester ?? '1') === '2' ? '2nd Semester' : '1st Semester' ?> Grade Summary</h3>
         <span class="badge badge-student">Active enrollment</span>
     </div>
 
