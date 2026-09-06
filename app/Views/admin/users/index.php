@@ -28,7 +28,7 @@ ob_start();
             </div>
             <?php if (!empty($currentRole) || !empty($currentStatus)): ?>
                 <div class="col-auto">
-                    <a href="<?= url('/admin/users') ?>" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
+                    <a href="<?= url('/admin/users') ?>" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1">
                         <i class="bi bi-x-circle"></i> Clear filters
                     </a>
                 </div>

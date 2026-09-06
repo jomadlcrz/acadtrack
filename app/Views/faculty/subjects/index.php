@@ -123,27 +123,29 @@ ob_start();
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <label class="form-label small text-muted mb-1" for="prelim_<?= $subject['id'] ?>">Prelim (%)</label>
-                                        <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm" id="prelim_<?= $subject['id'] ?>" name="prelim_weight" value="<?= htmlspecialchars((string)$subject['prelim_weight']) ?>" required>
+                                        <input type="number" step="0.01" min="0" max="100" class="form-control" id="prelim_<?= $subject['id'] ?>" name="prelim_weight" value="<?= htmlspecialchars((string)$subject['prelim_weight']) ?>" required>
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label small text-muted mb-1" for="midterm_<?= $subject['id'] ?>">Midterm (%)</label>
-                                        <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm" id="midterm_<?= $subject['id'] ?>" name="midterm_weight" value="<?= htmlspecialchars((string)$subject['midterm_weight']) ?>" required>
+                                        <input type="number" step="0.01" min="0" max="100" class="form-control" id="midterm_<?= $subject['id'] ?>" name="midterm_weight" value="<?= htmlspecialchars((string)$subject['midterm_weight']) ?>" required>
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label small text-muted mb-1" for="semifinal_<?= $subject['id'] ?>">Semi-final (%)</label>
-                                        <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm" id="semifinal_<?= $subject['id'] ?>" name="semi_final_weight" value="<?= htmlspecialchars((string)$subject['semi_final_weight']) ?>" required>
+                                        <input type="number" step="0.01" min="0" max="100" class="form-control" id="semifinal_<?= $subject['id'] ?>" name="semi_final_weight" value="<?= htmlspecialchars((string)$subject['semi_final_weight']) ?>" required>
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label small text-muted mb-1" for="final_<?= $subject['id'] ?>">Final (%)</label>
-                                        <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm" id="final_<?= $subject['id'] ?>" name="final_weight" value="<?= htmlspecialchars((string)$subject['final_weight']) ?>" required>
+                                        <input type="number" step="0.01" min="0" max="100" class="form-control" id="final_<?= $subject['id'] ?>" name="final_weight" value="<?= htmlspecialchars((string)$subject['final_weight']) ?>" required>
                                     </div>
                                 </div>
                                 <div class="form-text mt-2 small">Total must sum to exactly 100% (e.g. 20% + 20% + 20% + 40%).</div>
                             </div>
                         </div>
-                        <div class="modal-footer border-top py-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-sm btn-primary">Save configuration</button>
+                        <div class="modal-footer border-top py-3 d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
+                                <i class="bi bi-check2"></i> Save configuration
+                            </button>
                         </div>
                     </form>
                 </div>

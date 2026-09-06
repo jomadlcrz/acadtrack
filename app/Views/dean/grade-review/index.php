@@ -148,12 +148,14 @@ $statusFilter = $statusFilter ?? 'all';
                             <p class="text-muted small mb-3">Confirming will formally finalize and permanently lock this grading sheet. No further grade revisions can be recorded once confirmed.</p>
                             <div class="mb-2">
                                 <label for="remarks_<?= $sheet['id'] ?>" class="form-label small fw-semibold">Institutional remarks / sign-off notes</label>
-                                <textarea class="form-control form-control-sm" id="remarks_<?= $sheet['id'] ?>" name="remarks" rows="3" placeholder="Enter confirmation remarks (e.g. Official semester rating confirmed by the Dean's Office.)"></textarea>
+                                <textarea class="form-control" id="remarks_<?= $sheet['id'] ?>" name="remarks" rows="3" placeholder="Enter confirmation remarks (e.g. Official semester rating confirmed by the Dean's Office.)"></textarea>
                             </div>
                         </div>
-                        <div class="modal-footer border-top py-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-sm btn-dark">Confirm &amp; finalize</button>
+                        <div class="modal-footer border-top py-3 d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-dark d-inline-flex align-items-center gap-2">
+                                <i class="bi bi-check2"></i> Confirm &amp; finalize
+                            </button>
                         </div>
                     </form>
                 </div>

@@ -217,12 +217,14 @@ $isPending = in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW']);
 
                     <div class="mb-2">
                         <label for="remarks" class="form-label small fw-semibold">Confirmation notes / institutional remarks</label>
-                        <textarea class="form-control form-control-sm" id="remarks" name="remarks" rows="3" placeholder="e.g. Official rating approved and confirmed for registrar filing."></textarea>
+                        <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="e.g. Official rating approved and confirmed for registrar filing."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer border-top py-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-sm btn-dark">Confirm &amp; finalize sheet</button>
+                <div class="modal-footer border-top py-3 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-dark d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-check2"></i> Confirm &amp; finalize sheet
+                    </button>
                 </div>
             </form>
         </div>
