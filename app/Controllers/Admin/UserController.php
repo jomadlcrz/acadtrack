@@ -45,7 +45,7 @@ class UserController
         $role = (string) ($data['role'] ?? 'Student');
         $forceChange = !empty($request->post('force_password_change')) || $role === 'Student' || empty($plainPassword);
 
-        if (empty($plainPassword) || $plainPassword === 'student123') {
+        if (empty($plainPassword)) {
             $plainPassword = \App\Models\User::generateRandomPassword();
         }
 

@@ -16,7 +16,7 @@ A lightweight, server-rendered academic grading and evaluation system built with
 2. Verify `.env` database credentials:
    ```env
    DB_HOST=127.0.0.1
-   DB_DATABASE=grading_system
+   DB_DATABASE=acadtrack
    DB_USERNAME=root
    DB_PASSWORD=
    APP_ENV=development
@@ -24,7 +24,7 @@ A lightweight, server-rendered academic grading and evaluation system built with
    ```
 3. Initialize the database schema:
    ```bash
-   mysql -u root grading_system < database/sql/schema.sql
+   mysql -u root acadtrack < database/sql/schema.sql
    ```
 
 ### Accessing the Web Application
@@ -40,8 +40,7 @@ Open your browser at:
 | **Admin** | System Admin | `admin@gwc.edu` | `admin123` |
 | **Dean** | College Dean | `dean@gwc.edu` | `dean123` |
 | **Faculty** | John Teacher | `faculty@gwc.edu` | `faculty123` |
-| **Student** | Jane Student | `student@gwc.edu` | `student123` *(Prompts to set new password)* |
-| **Student** | New Students | *(Provisioned email)* | *Auto-generated temporary password (sent via email; forced change upon login)* |
+| **Student** | Enrolled Students | *(Provisioned email)* | *Auto-generated temporary password (sent via email; forced change upon login)* |
 
 ---
 

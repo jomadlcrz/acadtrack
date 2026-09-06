@@ -32,7 +32,7 @@ class CompleteWorkflowEndToEndTest extends TestCase
         $dotenv->safeLoad();
         new \App\Core\Database(
             $_ENV['DB_HOST'] ?? '127.0.0.1',
-            $_ENV['DB_DATABASE'] ?? 'grading_system',
+            $_ENV['DB_DATABASE'] ?? 'acadtrack',
             $_ENV['DB_USERNAME'] ?? 'root',
             $_ENV['DB_PASSWORD'] ?? ''
         );

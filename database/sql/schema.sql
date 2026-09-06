@@ -1,10 +1,10 @@
 -- GWC Grading System Database Schema
 
-CREATE DATABASE IF NOT EXISTS grading_system
+CREATE DATABASE IF NOT EXISTS acadtrack
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE grading_system;
+USE acadtrack;
 
 -- Academic Years
 CREATE TABLE academic_years (

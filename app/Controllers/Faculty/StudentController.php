@@ -60,7 +60,7 @@ class StudentController
         $yearLevel = (int) $request->post('year_level', 1);
         $status = in_array($request->post('status'), ['Regular', 'Irregular'], true) ? $request->post('status') : 'Regular';
         $inputPassword = trim((string) $request->post('password', ''));
-        $password = (empty($inputPassword) || $inputPassword === 'student123') 
+        $password = empty($inputPassword) 
             ? \App\Models\User::generateRandomPassword() 
             : $inputPassword;
 
