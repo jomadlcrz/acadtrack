@@ -60,6 +60,19 @@ body.auth-body {
     margin-bottom: 14px;
 }
 
+.auth-logo-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.auth-logo-link:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
 .auth-logo {
     width: 68px;
     height: 68px;

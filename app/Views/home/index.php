@@ -32,7 +32,6 @@
                     <li><a href="#lifecycle" class="landing-nav-link">Workflow Lifecycle</a></li>
                     <li>
                         <a href="/login" class="btn-nav-login">
-                            <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
                             <span>Log In</span>
                         </a>
                     </li>
@@ -46,10 +45,6 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-8">
-                    <div class="hero-pill">
-                        <i class="bi bi-shield-check" aria-hidden="true"></i>
-                        <span>Official Academic Management Gateway</span>
-                    </div>
                     <h1 class="hero-title">Academic Grading &amp; Curriculum Evaluation Platform</h1>
                     <p class="hero-lead">
                         A centralized, role-governed academic management platform engineered for Golden West Colleges, Inc. 
@@ -57,11 +52,9 @@
                     </p>
                     <div class="hero-actions">
                         <a href="/login" class="btn-hero-primary">
-                            <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
-                            <span>Access Portal (Log In)</span>
+                            <span>Log In to Portal</span>
                         </a>
                         <a href="#roles" class="btn-hero-outline">
-                            <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
                             <span>Explore Stakeholder Roles</span>
                         </a>
                     </div>
@@ -70,59 +63,7 @@
         </div>
     </section>
 
-    <!-- 3. KPI & Institutional Metric Strip -->
-    <section class="landing-metrics">
-        <div class="container">
-            <div class="row g-3">
-                <div class="col-6 col-md-3">
-                    <div class="metric-item">
-                        <div class="metric-icon" aria-hidden="true">
-                            <i class="bi bi-people-fill"></i>
-                        </div>
-                        <div>
-                            <div class="metric-value">4 Roles</div>
-                            <div class="metric-label">Dean, Faculty, Student, Admin</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="metric-item">
-                        <div class="metric-icon" aria-hidden="true">
-                            <i class="bi bi-calculator-fill"></i>
-                        </div>
-                        <div>
-                            <div class="metric-value">4 Periods</div>
-                            <div class="metric-label">Prelim, Midterm, Semi, Final</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="metric-item">
-                        <div class="metric-icon" aria-hidden="true">
-                            <i class="bi bi-shield-lock-fill"></i>
-                        </div>
-                        <div>
-                            <div class="metric-value">5 States</div>
-                            <div class="metric-label">Draft to Certified Finalized</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="metric-item">
-                        <div class="metric-icon" aria-hidden="true">
-                            <i class="bi bi-award-fill"></i>
-                        </div>
-                        <div>
-                            <div class="metric-value">1.00 &ndash; 5.00</div>
-                            <div class="metric-label">GWC Official Grade Scale</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. Stakeholder Portals (Role Grid) -->
+    <!-- 3. Stakeholder Portals (Role Grid) -->
     <section id="roles" class="landing-section">
         <div class="container">
             <div class="section-header">
@@ -144,7 +85,7 @@
                                 </div>
                                 <div>
                                     <h3 class="role-title">College Dean</h3>
-                                    <span class="badge bg-warning text-dark role-badge">Academic Audit</span>
+                                    <span class="badge bg-warning text-dark role-badge"><i class="bi bi-shield-check me-1" aria-hidden="true"></i>Academic Audit</span>
                                 </div>
                             </div>
                             <p class="role-description">
@@ -173,7 +114,7 @@
                                 </div>
                                 <div>
                                     <h3 class="role-title">Faculty Member</h3>
-                                    <span class="badge bg-success text-white role-badge">Grade Entry</span>
+                                    <span class="badge bg-success text-white role-badge"><i class="bi bi-pencil-square me-1" aria-hidden="true"></i>Grade Entry</span>
                                 </div>
                             </div>
                             <p class="role-description">
@@ -202,7 +143,7 @@
                                 </div>
                                 <div>
                                     <h3 class="role-title">Student</h3>
-                                    <span class="badge bg-primary text-white role-badge">Academic Records</span>
+                                    <span class="badge bg-primary text-white role-badge"><i class="bi bi-journal-text me-1" aria-hidden="true"></i>Academic Records</span>
                                 </div>
                             </div>
                             <p class="role-description">
@@ -231,7 +172,7 @@
                                 </div>
                                 <div>
                                     <h3 class="role-title">Administrator</h3>
-                                    <span class="badge bg-dark text-white role-badge">Governance</span>
+                                    <span class="badge bg-dark text-white role-badge"><i class="bi bi-gear-fill me-1" aria-hidden="true"></i>Governance</span>
                                 </div>
                             </div>
                             <p class="role-description">
@@ -253,7 +194,7 @@
         </div>
     </section>
 
-    <!-- 5. Academic Grading Standards & Scale -->
+    <!-- 4. Academic Grading Standards & Scale -->
     <section id="grading-standards" class="landing-section bg-white border-top border-bottom">
         <div class="container">
             <div class="section-header">
@@ -314,37 +255,37 @@
                                     <td><strong>90.00% &ndash; 100.00%</strong></td>
                                     <td><code>1.00 &ndash; 1.25</code></td>
                                     <td><span class="text-success fw-bold">Excellent</span></td>
-                                    <td><span class="badge badge-approved">Passed (Honor)</span></td>
+                                    <td><span class="badge badge-approved"><i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>Passed (Honor)</span></td>
                                 </tr>
                                 <tr>
                                     <td><strong>80.00% &ndash; 89.99%</strong></td>
                                     <td><code>1.50 &ndash; 1.75</code></td>
                                     <td><span class="text-success fw-semibold">Very Good</span></td>
-                                    <td><span class="badge badge-approved">Passed</span></td>
+                                    <td><span class="badge badge-approved"><i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>Passed</span></td>
                                 </tr>
                                 <tr>
                                     <td><strong>70.00% &ndash; 79.99%</strong></td>
                                     <td><code>2.00 &ndash; 2.25</code></td>
                                     <td><span class="text-primary fw-semibold">Good</span></td>
-                                    <td><span class="badge badge-approved">Passed</span></td>
+                                    <td><span class="badge badge-approved"><i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>Passed</span></td>
                                 </tr>
                                 <tr>
                                     <td><strong>60.00% &ndash; 69.99%</strong></td>
                                     <td><code>2.50 &ndash; 2.75</code></td>
                                     <td><span class="text-secondary fw-semibold">Satisfactory</span></td>
-                                    <td><span class="badge badge-submitted">Passed</span></td>
+                                    <td><span class="badge badge-submitted"><i class="bi bi-check-circle me-1" aria-hidden="true"></i>Passed</span></td>
                                 </tr>
                                 <tr>
                                     <td><strong>50.00% &ndash; 59.99%</strong></td>
                                     <td><code>3.00</code></td>
                                     <td><span class="text-warning fw-semibold">Needs Improvement</span></td>
-                                    <td><span class="badge badge-under-review">Conditional Pass</span></td>
+                                    <td><span class="badge badge-under-review"><i class="bi bi-clock-history me-1" aria-hidden="true"></i>Conditional Pass</span></td>
                                 </tr>
                                 <tr>
                                     <td><strong>Below 50.00%</strong></td>
                                     <td><code>5.00</code></td>
                                     <td><span class="text-danger fw-bold">Failing</span></td>
-                                    <td><span class="badge badge-returned">Failed</span></td>
+                                    <td><span class="badge badge-returned"><i class="bi bi-x-circle-fill me-1" aria-hidden="true"></i>Failed</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -354,7 +295,7 @@
         </div>
     </section>
 
-    <!-- 6. Grading Sheet Lifecycle Workflow -->
+    <!-- 5. Grading Sheet Lifecycle Workflow -->
     <section id="lifecycle" class="landing-section">
         <div class="container">
             <div class="section-header">
@@ -415,7 +356,7 @@
         </div>
     </section>
 
-    <!-- 7. Institutional Footer -->
+    <!-- 6. Institutional Footer -->
     <footer class="landing-footer">
         <div class="container">
             <div class="row g-4">
@@ -443,7 +384,7 @@
                         <li><a href="#grading-standards"><i class="bi bi-chevron-right me-1"></i> Grading Period Weights</a></li>
                         <li><a href="#grading-standards"><i class="bi bi-chevron-right me-1"></i> Evaluation Scale</a></li>
                         <li><a href="#lifecycle"><i class="bi bi-chevron-right me-1"></i> Lifecycle State Machine</a></li>
-                        <li><a href="/login"><i class="bi bi-chevron-right me-1"></i> Sign In to Portal</a></li>
+                        <li><a href="/login"><i class="bi bi-chevron-right me-1"></i> Log In to Portal</a></li>
                     </ul>
                 </div>
             </div>
@@ -451,9 +392,6 @@
             <div class="footer-bottom">
                 <div>
                     &copy; <?= date('Y') ?> Golden West Colleges, Inc. All rights reserved.
-                </div>
-                <div>
-                    Academic Management System &bull; Version 1.0 (Vanilla PHP 8.2 MVC)
                 </div>
             </div>
         </div>

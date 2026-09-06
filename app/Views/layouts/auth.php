@@ -17,7 +17,9 @@
         <div class="auth-card">
             <div class="auth-header">
                 <div class="auth-logo-wrap">
-                    <img src="/assets/images/gwc.png" alt="Golden West Colleges, Inc. Logo" class="auth-logo">
+                    <a href="/" class="auth-logo-link" title="Return to Golden West Colleges Home">
+                        <img src="/assets/images/gwc.png" alt="Golden West Colleges, Inc. Logo" class="auth-logo">
+                    </a>
                 </div>
                 <h1 class="auth-title">Golden West Colleges, Inc.</h1>
                 <p class="auth-subtitle">Academic Grading &amp; Evaluation Portal</p>
