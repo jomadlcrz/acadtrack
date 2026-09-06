@@ -52,9 +52,6 @@
                         <a href="/login" class="btn-hero-primary">
                             <span>Log In to Portal</span>
                         </a>
-                        <a href="#lifecycle" class="btn-hero-outline">
-                            <span>Workflow Lifecycle</span>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -78,7 +75,7 @@
                         <div class="workflow-step-num">1</div>
                         <h4 class="workflow-step-title">DRAFT</h4>
                         <p class="workflow-step-desc">
-                            Faculty member encodes student scores. Drafts can be saved repeatedly without locking the sheet.
+                            Faculty selects semester, sets Zero/50-based grading, manages rosters, and encodes draft marks.
                         </p>
                     </div>
                 </div>
@@ -87,7 +84,7 @@
                         <div class="workflow-step-num">2</div>
                         <h4 class="workflow-step-title">SUBMITTED</h4>
                         <p class="workflow-step-desc">
-                            Faculty submits completed sheet for Dean review. Input fields lock to prevent accidental modification.
+                            Faculty verifies computed grade equivalents and submits the sheet. Score inputs lock immediately.
                         </p>
                     </div>
                 </div>
@@ -96,16 +93,16 @@
                         <div class="workflow-step-num">3</div>
                         <h4 class="workflow-step-title">UNDER REVIEW</h4>
                         <p class="workflow-step-desc">
-                            Dean inspects the grade distribution, historical averages, and ensures evaluative fairness.
+                            Dean and Admin inspect grade distributions, with permissions to edit or return with remarks.
                         </p>
                     </div>
                 </div>
                 <div class="col-md-4 col-lg">
                     <div class="workflow-step-card">
                         <div class="workflow-step-num">4</div>
-                        <h4 class="workflow-step-title">APPROVED / RETURNED</h4>
+                        <h4 class="workflow-step-title">APPROVED &amp; NOTIFIED</h4>
                         <p class="workflow-step-desc">
-                            Dean approves sheet to release grades, or returns it with mandatory feedback remarks for instructor revision.
+                            Dean or Admin approves and prints sheets. Automated emails alert students of grade availability.
                         </p>
                     </div>
                 </div>
@@ -114,7 +111,7 @@
                         <div class="workflow-step-num">5</div>
                         <h4 class="workflow-step-title">FINALIZED</h4>
                         <p class="workflow-step-desc">
-                            Registrar locks the term. Approved grades become immutable historical records in the GWC academic database.
+                            Grades lock into permanent academic records. Students log in to view their Whole Evaluation.
                         </p>
                     </div>
                 </div>
