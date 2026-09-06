@@ -6,7 +6,7 @@ $userRole = $currentUser['role'] ?? 'Student';
 $firstName = $currentUser['first_name'] ?? '';
 $lastName = $currentUser['last_name'] ?? '';
 $fullName = trim($firstName . ' ' . $lastName) ?: 'User';
-$initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1)) ?: 'U';
+$firstLetter = strtoupper(substr(trim($firstName) !== '' ? trim($firstName) : (trim($lastName) !== '' ? trim($lastName) : 'U'), 0, 1));
 
 $activeTerm = null;
 try {
@@ -40,7 +40,7 @@ $termLabel = $activeTerm
         <?php if ($currentUser): ?>
             <div class="navbar-user-card">
                 <div class="navbar-avatar" title="<?= htmlspecialchars($fullName) ?>">
-                    <?= htmlspecialchars($initials) ?>
+                    <?= htmlspecialchars($firstLetter) ?>
                 </div>
                 <div class="navbar-user-meta d-none d-sm-flex">
                     <span class="navbar-user-name"><?= htmlspecialchars($fullName) ?></span>

@@ -102,7 +102,7 @@ ob_start();
                         <tr>
                             <th class="fw-semibold text-muted small py-3 px-3">User</th>
                             <th class="fw-semibold text-muted small py-3 px-3">Role</th>
-                            <th class="fw-semibold text-muted small py-3 px-3">Status</th>
+                            <th class="fw-semibold text-muted small py-3 px-3 text-center">Status</th>
                             <th class="fw-semibold text-muted small py-3 px-3 text-end">Action</th>
                         </tr>
                     </thead>
@@ -119,19 +119,18 @@ ob_start();
                                         <div class="text-muted small"><?= htmlspecialchars($ru['email']) ?></div>
                                     </td>
                                     <td class="px-3">
-                                        <span class="badge <?= match($ru['role'] ?? '') {
-                                            'Admin' => 'bg-danger-subtle text-danger border border-danger-subtle',
-                                            'Dean' => 'bg-purple-subtle text-purple border border-purple-subtle',
-                                            'Faculty' => 'bg-primary-subtle text-primary border border-primary-subtle',
-                                            default => 'bg-secondary-subtle text-secondary border border-secondary-subtle'
-                                        } ?>">
-                                            <?= htmlspecialchars($ru['role'] ?? 'User') ?>
-                                        </span>
+                                        <span class="badge badge-<?= strtolower($ru['role']) ?>"><?= htmlspecialchars($ru['role']) ?></span>
                                     </td>
-                                    <td class="px-3">
-                                        <span class="badge <?= ($ru['status'] ?? 'active') === 'active' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-secondary-subtle text-muted border border-secondary-subtle' ?>">
-                                            <?= htmlspecialchars(ucfirst($ru['status'] ?? 'active')) ?>
-                                        </span>
+                                    <td class="px-3 text-center">
+                                        <?php if (($ru['status'] ?? 'active') === 'inactive'): ?>
+                                            <span class="badge bg-secondary-subtle text-secondary border px-2 py-1">
+                                                <i class="bi bi-dash-circle me-1"></i>Inactive
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                                <i class="bi bi-check-circle me-1"></i>Active
+                                            </span>
+                                        <?php endif; ?>
                                     </td>
                                     <td class="px-3 text-end">
                                         <a href="<?= url('/admin/users/' . $ru['id'] . '/edit') ?>" class="btn btn-sm btn-outline-primary py-1 px-2">

@@ -223,7 +223,7 @@
                 ?>
                 <tr>
                     <td class="text-center"><?= $idx + 1 ?></td>
-                    <td class="font-monospace fw-semibold"><?= htmlspecialchars($student['student_number'] ?? 'N/A') ?></td>
+                    <td class="font-monospace fw-semibold"><?= !empty($student['student_number']) ? htmlspecialchars($student['student_number']) : 'No ID' ?></td>
                     <td class="fw-semibold"><?= htmlspecialchars($student['last_name'] . ', ' . $student['first_name']) ?></td>
                     <td class="text-center"><?= htmlspecialchars($student['status'] ?? 'Regular') ?></td>
                     <?php foreach ($periods as $period): ?>

@@ -70,9 +70,7 @@ ob_start();
                                 </div>
                             <?php elseif ($user['role'] === 'Student'): ?>
                                 <div class="small text-muted mt-1 font-monospace d-flex align-items-center gap-2">
-                                    <?php if (!empty($user['student_number'])): ?>
-                                        <span><i class="bi bi-person-badge me-1"></i><?= htmlspecialchars($user['student_number']) ?></span>
-                                    <?php endif; ?>
+                                    <span><?= !empty($user['student_number']) ? htmlspecialchars($user['student_number']) : 'No ID' ?></span>
                                     <?php if (!empty($user['section_name'])): ?>
                                         <span class="badge bg-light text-dark border"><i class="bi bi-collection me-1"></i><?= htmlspecialchars($user['section_name']) ?></span>
                                     <?php endif; ?>

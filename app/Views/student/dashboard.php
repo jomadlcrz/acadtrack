@@ -28,7 +28,7 @@ ob_start();
             </div>
         </div>
         <span class="stat-subtext">
-            Year level: <?= htmlspecialchars((string)($student['year_level'] ?? 1)) ?><?= match((int)($student['year_level'] ?? 1)) { 1 => 'st', 2 => 'nd', 3 => 'rd', default => 'th' } ?> year
+            ID: <?= !empty($user['student_number']) ? htmlspecialchars($user['student_number']) : 'No ID' ?> • <?= htmlspecialchars((string)($student['year_level'] ?? 1)) ?><?= match((int)($student['year_level'] ?? 1)) { 1 => 'st', 2 => 'nd', 3 => 'rd', default => 'th' } ?> year
         </span>
     </div>
 

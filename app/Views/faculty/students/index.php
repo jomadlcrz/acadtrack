@@ -90,9 +90,8 @@ ob_start();
                 <tbody>
                     <?php foreach ($students as $student): ?>
                     <tr>
-                        <td class="px-3 fw-semibold text-primary font-monospace small">
-                            <i class="bi bi-person-vcard me-1 text-muted"></i>
-                            <?= htmlspecialchars($student['student_number'] ?? '—') ?>
+                        <td class="px-3 fw-semibold font-monospace small text-dark">
+                            <?= !empty($student['student_number']) ? htmlspecialchars($student['student_number']) : 'No ID' ?>
                         </td>
                         <td class="px-3 fw-semibold text-dark">
                             <?= htmlspecialchars($student['first_name'] . ' ' . $student['last_name']) ?>
@@ -232,7 +231,7 @@ ob_start();
                             <option value="">Choose a registered student...</option>
                             <?php foreach (($availableStudents ?? []) as $avail): ?>
                                 <option value="<?= $avail['id'] ?>">
-                                    <?= htmlspecialchars($avail['last_name'] . ', ' . $avail['first_name'] . ' (' . ($avail['student_number'] ?? 'No ID') . ')') ?>
+                                    <?= htmlspecialchars($avail['last_name'] . ', ' . $avail['first_name'] . ' (' . (!empty($avail['student_number']) ? $avail['student_number'] : 'No ID') . ')') ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>

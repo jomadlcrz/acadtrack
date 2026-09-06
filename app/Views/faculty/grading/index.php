@@ -134,9 +134,8 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
                         <?php foreach ($students as $student): ?>
                         <?php $score = $grades[$student['id']] ?? ''; ?>
                         <tr>
-                            <td class="px-3 fw-semibold text-secondary font-monospace small">
-                                <i class="bi bi-person-vcard me-1 text-muted"></i>
-                                <?= htmlspecialchars($student['student_number']) ?>
+                            <td class="px-3 fw-semibold font-monospace small text-dark">
+                                <?= !empty($student['student_number']) ? htmlspecialchars($student['student_number']) : 'No ID' ?>
                             </td>
                             <td class="px-3 fw-semibold text-dark">
                                 <?= htmlspecialchars($student['first_name'] . ' ' . $student['last_name']) ?>

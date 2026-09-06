@@ -132,8 +132,8 @@ $isPending = in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW']);
                         ?>
                         <tr>
                             <td class="px-3 small text-muted"><?= $index + 1 ?></td>
-                            <td class="px-3 font-monospace small text-primary fw-semibold">
-                                <?= htmlspecialchars($student['student_number'] ?? 'N/A') ?>
+                            <td class="px-3 font-monospace small text-dark fw-semibold">
+                                <?= !empty($student['student_number']) ? htmlspecialchars($student['student_number']) : 'No ID' ?>
                             </td>
                             <td class="px-3">
                                 <div class="fw-semibold text-dark">
