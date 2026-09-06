@@ -51,11 +51,21 @@ class UserRepository
         return User::getFaculty();
     }
 
-    public function paginate(int $page = 1, int $perPage = 20, string $role = ''): array
+    public function paginate(int $page = 1, int $perPage = 20, string $role = '', string $status = ''): array
     {
         $offset = ($page - 1) * $perPage;
-        $where = $role ? "WHERE u.role = :role" : "";
-        $params = $role ? ['role' => $role] : [];
+        $clauses = [];
+        $params = [];
+        if ($role !== '') {
+            $clauses[] = "u.role = :role";
+            $params['role'] = $role;
+        }
+        if ($status !== '') {
+            $clauses[] = "u.status = :status";
+            $params['status'] = $status;
+        }
+
+        $where = !empty($clauses) ? "WHERE " . implode(" AND ", $clauses) : "";
 
         $countSql = "SELECT COUNT(*) FROM users u {$where}";
         $stmt = \App\Core\Database::getConnection()->prepare($countSql);

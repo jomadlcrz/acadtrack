@@ -22,12 +22,15 @@ class UserController
     public function index(Request $request, Response $response, Session $session): void
     {
         $page = (int) $request->get('page', 1);
-        $role = $request->get('role', '');
-        $users = $this->userRepository->paginate($page, 20, $role);
+        $role = (string) $request->get('role', '');
+        $status = (string) $request->get('status', '');
+        $users = $this->userRepository->paginate($page, 20, $role, $status);
 
         $html = (new View())->render('admin.users.index', [
             'users' => $users,
             'currentRole' => $role,
+            'currentStatus' => $status,
+            'currentUserId' => (int) ($session->get('user')['id'] ?? 0),
         ]);
         $response->html($html);
     }
@@ -178,10 +181,82 @@ class UserController
         redirect('/admin/users');
     }
 
-    public function destroy(Request $request, Response $response, Session $session, string $id): void
+    public function toggleStatus(Request $request, Response $response, Session $session, string $id): void
     {
-        $this->userRepository->delete((int) $id);
-        $session->flash('success', 'User deleted successfully.');
+        $user = \App\Models\User::find((int) $id);
+        if (!$user) {
+            $session->flash('error', 'User account not found.');
+            redirect('/admin/users');
+            return;
+        }
+
+        $currentUserId = (int) ($session->get('user')['id'] ?? 0);
+        if ((int) $user->id === $currentUserId) {
+            $session->flash('error', 'You cannot deactivate your own active account.');
+            redirect('/admin/users');
+            return;
+        }
+
+        if ($user->role === 'Admin' && $user->status === 'active') {
+            $session->flash('error', 'Administrator accounts cannot be deactivated to prevent system lockout.');
+            redirect('/admin/users');
+            return;
+        }
+
+        $newStatus = ($user->status === 'inactive') ? 'active' : 'inactive';
+        $user->status = $newStatus;
+        $user->save();
+
+        $actionText = ($newStatus === 'inactive') ? 'deactivated' : 'activated';
+        $fullName = trim($user->first_name . ' ' . $user->last_name);
+        $session->flash('success', "User account for '{$fullName}' has been {$actionText} successfully.");
+        redirect('/admin/users');
+    }
+
+    public function deactivate(Request $request, Response $response, Session $session, string $id): void
+    {
+        $user = \App\Models\User::find((int) $id);
+        if (!$user) {
+            $session->flash('error', 'User account not found.');
+            redirect('/admin/users');
+            return;
+        }
+
+        $currentUserId = (int) ($session->get('user')['id'] ?? 0);
+        if ((int) $user->id === $currentUserId) {
+            $session->flash('error', 'You cannot deactivate your own active account.');
+            redirect('/admin/users');
+            return;
+        }
+
+        if ($user->role === 'Admin') {
+            $session->flash('error', 'Administrator accounts cannot be deactivated to prevent system lockout.');
+            redirect('/admin/users');
+            return;
+        }
+
+        $user->status = 'inactive';
+        $user->save();
+
+        $fullName = trim($user->first_name . ' ' . $user->last_name);
+        $session->flash('success', "User account for '{$fullName}' has been deactivated successfully.");
+        redirect('/admin/users');
+    }
+
+    public function activate(Request $request, Response $response, Session $session, string $id): void
+    {
+        $user = \App\Models\User::find((int) $id);
+        if (!$user) {
+            $session->flash('error', 'User account not found.');
+            redirect('/admin/users');
+            return;
+        }
+
+        $user->status = 'active';
+        $user->save();
+
+        $fullName = trim($user->first_name . ' ' . $user->last_name);
+        $session->flash('success', "User account for '{$fullName}' has been activated successfully.");
         redirect('/admin/users');
     }
 }

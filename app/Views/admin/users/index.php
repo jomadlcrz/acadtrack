@@ -10,9 +10,9 @@ ob_start();
         <form method="GET" action="<?= url('/admin/users') ?>" class="row g-3 align-items-center">
             <div class="col-auto d-flex align-items-center gap-2">
                 <label for="filter_role" class="form-label mb-0 fw-semibold small text-muted d-flex align-items-center gap-1">
-                    <i class="bi bi-funnel text-primary"></i> Filter by role:
+                    <i class="bi bi-funnel text-primary"></i> Role:
                 </label>
-                <select id="filter_role" name="role" class="form-select form-select-sm" style="width: 180px;" onchange="this.form.submit()">
+                <select id="filter_role" name="role" class="form-select form-select-sm" style="width: 150px;" onchange="this.form.submit()">
                     <option value="">All roles</option>
                     <option value="Admin" <?= ($currentRole ?? '') === 'Admin' ? 'selected' : '' ?>>Admin</option>
                     <option value="Dean" <?= ($currentRole ?? '') === 'Dean' ? 'selected' : '' ?>>Dean</option>
@@ -20,10 +20,20 @@ ob_start();
                     <option value="Student" <?= ($currentRole ?? '') === 'Student' ? 'selected' : '' ?>>Student</option>
                 </select>
             </div>
-            <?php if (!empty($currentRole)): ?>
+            <div class="col-auto d-flex align-items-center gap-2">
+                <label for="filter_status" class="form-label mb-0 fw-semibold small text-muted d-flex align-items-center gap-1">
+                    <i class="bi bi-toggle2-on text-primary"></i> Status:
+                </label>
+                <select id="filter_status" name="status" class="form-select form-select-sm" style="width: 150px;" onchange="this.form.submit()">
+                    <option value="">All status</option>
+                    <option value="active" <?= ($currentStatus ?? '') === 'active' ? 'selected' : '' ?>>Active</option>
+                    <option value="inactive" <?= ($currentStatus ?? '') === 'inactive' ? 'selected' : '' ?>>Inactive</option>
+                </select>
+            </div>
+            <?php if (!empty($currentRole) || !empty($currentStatus)): ?>
                 <div class="col-auto">
                     <a href="<?= url('/admin/users') ?>" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
-                        <i class="bi bi-x-circle"></i> Clear filter
+                        <i class="bi bi-x-circle"></i> Clear filters
                     </a>
                 </div>
             <?php endif; ?>
@@ -39,13 +49,14 @@ ob_start();
                     <th class="fw-semibold text-muted small py-3 px-3">Full name</th>
                     <th class="fw-semibold text-muted small py-3 px-3">Email address</th>
                     <th class="fw-semibold text-muted small py-3 px-3">Role &amp; affiliation</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 160px;">Actions</th>
+                    <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 120px;">Status</th>
+                    <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 190px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($users['data'])): ?>
                     <tr>
-                        <td colspan="4" class="text-center py-5 text-muted small">
+                        <td colspan="5" class="text-center py-5 text-muted small">
                             <i class="bi bi-people d-block fs-3 mb-2 text-secondary"></i>
                             No user accounts found matching the current filter.
                         </td>
@@ -72,16 +83,40 @@ ob_start();
                                 </div>
                             <?php endif; ?>
                         </td>
-                        <td class="px-3 text-end">
+                        <td class="px-3 text-center">
+                            <?php if (($user['status'] ?? 'active') === 'inactive'): ?>
+                                <span class="badge bg-secondary-subtle text-secondary border px-2 py-1">
+                                    <i class="bi bi-dash-circle me-1"></i>Inactive
+                                </span>
+                            <?php else: ?>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                    <i class="bi bi-check-circle me-1"></i>Active
+                                </span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-3 text-end text-nowrap">
                             <a href="<?= url('/admin/users/' . $user['id'] . '/edit') ?>" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1">
                                 <i class="bi bi-pencil"></i> Edit
                             </a>
-                            <form method="POST" action="<?= url('/admin/users/' . $user['id'] . '/delete') ?>" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user account?');">
-                                <?= csrf_field() ?>
-                                <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2 d-inline-flex align-items-center gap-1">
-                                    <i class="bi bi-trash"></i> Delete
-                                </button>
-                            </form>
+                            <?php if ($user['role'] === 'Admin'): ?>
+                                <span class="badge bg-light text-secondary border py-1 px-2 d-inline-flex align-items-center gap-1" title="Administrator accounts cannot be deactivated to prevent system lockout">
+                                    <i class="bi bi-shield-check text-primary"></i> Protected
+                                </span>
+                            <?php elseif (($user['status'] ?? 'active') === 'inactive'): ?>
+                                <form method="POST" action="<?= url('/admin/users/' . $user['id'] . '/activate') ?>" class="d-inline" onsubmit="return confirm('Are you sure you want to activate this user account?');">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2 d-inline-flex align-items-center gap-1" title="Activate account">
+                                        <i class="bi bi-person-check"></i> Activate
+                                    </button>
+                                </form>
+                            <?php else: ?>
+                                <form method="POST" action="<?= url('/admin/users/' . $user['id'] . '/deactivate') ?>" class="d-inline" onsubmit="return confirm('Are you sure you want to deactivate this user account? The user will immediately be unable to sign in.');">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="btn btn-sm btn-outline-warning py-1 px-2 d-inline-flex align-items-center gap-1" title="Deactivate account">
+                                        <i class="bi bi-person-x"></i> Deactivate
+                                    </button>
+                                </form>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>
