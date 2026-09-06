@@ -21,18 +21,33 @@ class EmailService
     private function configure(): void
     {
         $this->mailer->isSMTP();
-        $this->mailer->Host = $_ENV['MAIL_HOST'] ?? 'smtp.example.com';
+        $this->mailer->Host = $_ENV['MAIL_HOST'] ?? 'smtp.gmail.com';
         $this->mailer->SMTPAuth = true;
-        $this->mailer->Username = $_ENV['MAIL_USERNAME'] ?? '';
-        $this->mailer->Password = $_ENV['MAIL_PASSWORD'] ?? '';
-        $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $this->mailer->Port = (int) ($_ENV['MAIL_PORT'] ?? 587);
+        $this->mailer->Username = trim((string)($_ENV['MAIL_USERNAME'] ?? ''));
+        $this->mailer->Password = str_replace(' ', '', (string)($_ENV['MAIL_PASSWORD'] ?? ''));
+        
+        $encryption = strtolower((string)($_ENV['MAIL_ENCRYPTION'] ?? 'tls'));
+        $port = (int) ($_ENV['MAIL_PORT'] ?? 587);
+
+        if ($encryption === 'ssl' || $port === 465) {
+            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $this->mailer->Port = $port ?: 465;
+        } else {
+            $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $this->mailer->Port = $port ?: 587;
+        }
+
+        $this->mailer->Timeout = 15;
         $this->mailer->CharSet = 'UTF-8';
 
-        $this->mailer->setFrom(
-            $_ENV['MAIL_FROM_ADDRESS'] ?? 'noreply@example.com',
-            $_ENV['MAIL_FROM_NAME'] ?? 'GWC Grading System'
-        );
+        $fromAddress = $_ENV['MAIL_FROM_ADDRESS'] ?? ($_ENV['MAIL_USERNAME'] ?? 'noreply@gwc.edu');
+        $fromName = $_ENV['MAIL_FROM_NAME'] ?? 'GWC Acadtrack';
+
+        if (!empty($fromAddress) && filter_var($fromAddress, FILTER_VALIDATE_EMAIL)) {
+            $this->mailer->setFrom($fromAddress, $fromName);
+        } else {
+            $this->mailer->setFrom('noreply@gwc.edu', $fromName);
+        }
     }
 
     public function send(string $to, string $subject, string $htmlBody): bool
