@@ -55,14 +55,26 @@ CREATE TABLE students (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- Departments
+CREATE TABLE departments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(150) NOT NULL,
+    description TEXT NULL,
+    status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
 -- Faculty (extension of users)
 CREATE TABLE faculty (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
-    department VARCHAR(100) NULL,
+    department_id INT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Sections
@@ -237,4 +249,12 @@ INSERT INTO subjects (code, name, nature, year_level, semester, academic_term_id
 ('IT103', 'Data Structures and Algorithms', 'Combined', 2, '1', 1),
 ('IT201', 'Web Systems and Technologies', 'Combined', 2, '2', 2),
 ('IT202', 'Information Management', 'Lecture', 2, '2', 2);
+
+-- Insert default academic departments
+INSERT INTO departments (code, name, description, status) VALUES
+('CIT', 'College of Information Technology', 'Academic department managing Computer Science, Information Technology, and computing programs.', 'active'),
+('CS', 'Department of Computer Studies', 'Department providing core computer science, software engineering, and programming curricula.', 'active'),
+('CBA', 'College of Business Administration', 'Academic department covering Business Administration, Management, and Accountancy programs.', 'active'),
+('CAS', 'College of Arts and Sciences', 'Academic department delivering General Education, Humanities, Social Sciences, and Natural Sciences.', 'active'),
+('COE', 'College of Engineering', 'Academic department overseeing Computer Engineering and applied technical disciplines.', 'active');
 

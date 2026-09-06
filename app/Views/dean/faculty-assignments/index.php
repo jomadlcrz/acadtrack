@@ -37,7 +37,10 @@ ob_start();
                     <select class="form-select" id="faculty_id" name="faculty_id" required>
                         <option value="">Select faculty member</option>
                         <?php foreach ($faculty as $f): ?>
-                            <option value="<?= $f['id'] ?>"><?= htmlspecialchars($f['first_name'] . ' ' . $f['last_name']) ?> (<?= htmlspecialchars($f['email']) ?>)</option>
+                            <?php $deptName = $f['faculty']['department']['name'] ?? ($f['faculty']['department']['code'] ?? null); ?>
+                            <option value="<?= $f['id'] ?>">
+                                <?= htmlspecialchars($f['first_name'] . ' ' . $f['last_name']) ?> (<?= htmlspecialchars($f['email']) ?>)<?= $deptName ? ' — ' . htmlspecialchars($deptName) : '' ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                     <div class="form-text">Instructors granted assignment can encode grades for enrolled students.</div>

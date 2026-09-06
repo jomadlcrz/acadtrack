@@ -39,13 +39,14 @@ ob_start();
                     <th class="fw-semibold text-muted small py-3 px-3">Full name</th>
                     <th class="fw-semibold text-muted small py-3 px-3">Email address</th>
                     <th class="fw-semibold text-muted small py-3 px-3">Role</th>
+                    <th class="fw-semibold text-muted small py-3 px-3">Department</th>
                     <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 160px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($users['data'])): ?>
                     <tr>
-                        <td colspan="4" class="text-center py-5 text-muted small">
+                        <td colspan="5" class="text-center py-5 text-muted small">
                             <i class="bi bi-people d-block fs-3 mb-2 text-secondary"></i>
                             No user accounts found matching the current filter.
                         </td>
@@ -56,6 +57,15 @@ ob_start();
                         <td class="px-3 fw-semibold text-dark"><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></td>
                         <td class="px-3 text-muted small"><?= htmlspecialchars($user['email']) ?></td>
                         <td class="px-3"><span class="badge badge-<?= strtolower($user['role']) ?>"><?= htmlspecialchars($user['role']) ?></span></td>
+                        <td class="px-3 small">
+                            <?php if (!empty($user['department_name'])): ?>
+                                <span class="badge bg-light text-dark border">
+                                    <?= htmlspecialchars($user['department_name']) ?> (<?= htmlspecialchars($user['department_code']) ?>)
+                                </span>
+                            <?php else: ?>
+                                <span class="text-muted">—</span>
+                            <?php endif; ?>
+                        </td>
                         <td class="px-3 text-end">
                             <a href="<?= url('/admin/users/' . $user['id'] . '/edit') ?>" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1">
                                 <i class="bi bi-pencil"></i> Edit

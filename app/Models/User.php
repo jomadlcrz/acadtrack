@@ -77,6 +77,11 @@ class User extends Model
 
     public static function getFaculty(): array
     {
-        return self::where('role', 'Faculty')->orderBy('last_name')->orderBy('first_name')->get()->toArray();
+        return self::where('role', 'Faculty')
+            ->with(['faculty.department'])
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get()
+            ->toArray();
     }
 }

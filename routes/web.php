@@ -6,6 +6,7 @@ use App\Controllers\HomeController;
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\Admin\UserController;
+use App\Controllers\Admin\DepartmentController;
 use App\Controllers\Admin\SettingsController;
 use App\Controllers\Dean\FacultyAssignmentController;
 use App\Controllers\Dean\SubjectController as DeanSubjectController;
@@ -41,6 +42,10 @@ $router->post('/admin/users', [UserController::class, 'store'], [new AuthMiddlew
 $router->get('/admin/users/{id}/edit', [UserController::class, 'edit'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/users/{id}', [UserController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/users/{id}/delete', [UserController::class, 'destroy'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->get('/admin/departments', [DepartmentController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+$router->post('/admin/departments', [DepartmentController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/departments/{id}', [DepartmentController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/departments/{id}/delete', [DepartmentController::class, 'destroy'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->get('/admin/settings', [SettingsController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/settings', [SettingsController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 

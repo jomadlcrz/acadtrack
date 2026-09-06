@@ -34,7 +34,10 @@ class UserController
 
     public function create(Request $request, Response $response, Session $session): void
     {
-        $html = (new View())->render('admin.users.create');
+        $departments = \App\Models\Department::getActive();
+        $html = (new View())->render('admin.users.create', [
+            'departments' => $departments,
+        ]);
         $response->html($html);
     }
 
@@ -75,6 +78,12 @@ class UserController
                     'year_level' => 1,
                     'status' => 'Regular',
                 ]);
+            } elseif (in_array($role, ['Faculty', 'Dean'], true)) {
+                $deptId = !empty($data['department_id']) ? (int) $data['department_id'] : null;
+                \App\Models\Faculty::updateOrCreate(
+                    ['user_id' => (int) $user->id],
+                    ['department_id' => $deptId]
+                );
             }
 
             (new \App\Services\NotificationService())->sendStudentCredentials($user->toArray(), $plainPassword);
@@ -86,13 +95,17 @@ class UserController
 
     public function edit(Request $request, Response $response, Session $session, string $id): void
     {
-        $user = \App\Models\User::find((int) $id);
+        $user = \App\Models\User::with(['faculty.department'])->find((int) $id);
         if (!$user) {
             $response->statusCode(404)->html('User not found');
             return;
         }
 
-        $html = (new View())->render('admin.users.edit', ['user' => $user->toArray()]);
+        $departments = \App\Models\Department::getActive();
+        $html = (new View())->render('admin.users.edit', [
+            'user' => $user->toArray(),
+            'departments' => $departments,
+        ]);
         $response->html($html);
     }
 
@@ -132,6 +145,15 @@ class UserController
         }
 
         $user->update($updateData);
+
+        if (in_array($updateData['role'] ?? $user->role, ['Faculty', 'Dean'], true)) {
+            $deptId = !empty($data['department_id']) ? (int) $data['department_id'] : null;
+            \App\Models\Faculty::updateOrCreate(
+                ['user_id' => (int) $user->id],
+                ['department_id' => $deptId]
+            );
+        }
+
         $session->flash('success', 'User updated successfully.');
         redirect('/admin/users');
     }

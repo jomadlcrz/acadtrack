@@ -16,6 +16,10 @@
                     <i class="bi bi-people-fill"></i>
                     <span>User Management</span>
                 </a>
+                <a href="<?= url('/admin/departments') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/departments') ? 'active' : '' ?>">
+                    <i class="bi bi-building"></i>
+                    <span>Departments</span>
+                </a>
                 <a href="<?= url('/admin/settings') ?>" class="sidebar-link <?= $currentPath === '/admin/settings' ? 'active' : '' ?>">
                     <i class="bi bi-gear-fill"></i>
                     <span>Institutional Settings</span>

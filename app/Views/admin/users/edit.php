@@ -56,15 +56,39 @@ ob_start();
                 </label>
             </div>
 
-            <div class="mb-3">
-                <label for="role" class="form-label">System role <span class="text-danger">*</span></label>
-                <select class="form-select" id="role" name="role" required>
-                    <option value="Student" <?= $user['role'] === 'Student' ? 'selected' : '' ?>>Student</option>
-                    <option value="Faculty" <?= $user['role'] === 'Faculty' ? 'selected' : '' ?>>Faculty</option>
-                    <option value="Dean" <?= $user['role'] === 'Dean' ? 'selected' : '' ?>>Dean</option>
-                    <option value="Admin" <?= $user['role'] === 'Admin' ? 'selected' : '' ?>>Admin</option>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="role" class="form-label">System role <span class="text-danger">*</span></label>
+                    <select class="form-select" id="role" name="role" required>
+                        <option value="Student" <?= $user['role'] === 'Student' ? 'selected' : '' ?>>Student</option>
+                        <option value="Faculty" <?= $user['role'] === 'Faculty' ? 'selected' : '' ?>>Faculty</option>
+                        <option value="Dean" <?= $user['role'] === 'Dean' ? 'selected' : '' ?>>Dean</option>
+                        <option value="Admin" <?= $user['role'] === 'Admin' ? 'selected' : '' ?>>Admin</option>
+                    </select>
+                    <div class="form-text">Assigning a new role adjusts permissions immediately.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="student_number" class="form-label">Student number</label>
+                    <input type="text" class="form-control" id="student_number" name="student_number" placeholder="e.g., 2026-0001 (optional for late ID)" value="<?= htmlspecialchars($user['student_number'] ?? '') ?>">
+                    <div class="form-text">Optional for students with late or pending ID.</div>
+                </div>
+            </div>
+
+            <div class="mb-3" id="department_group">
+                <label for="department_id" class="form-label">Department / College</label>
+                <select class="form-select" id="department_id" name="department_id">
+                    <option value="">Select department (assigned to Faculty and Dean)</option>
+                    <?php
+                    $currentDeptId = $user['faculty']['department_id'] ?? null;
+                    foreach ($departments ?? [] as $dept):
+                    ?>
+                        <option value="<?= $dept['id'] ?>" <?= ((string)$currentDeptId === (string)$dept['id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($dept['name']) ?> (<?= htmlspecialchars($dept['code']) ?>)
+                        </option>
+                    <?php endforeach; ?>
                 </select>
-                <div class="form-text">Assigning a new role adjusts the navigation landmarks and authorization privileges immediately.</div>
+                <div class="form-text">Designates the academic department or college this faculty member or dean belongs to.</div>
             </div>
         </div>
 
