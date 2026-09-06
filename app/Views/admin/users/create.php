@@ -36,24 +36,9 @@ ob_start();
                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                     <input type="email" class="form-control" id="email" name="email" placeholder="name@gwc.edu" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
                 </div>
-                <div class="form-text">Must be a valid institutional or personal email address.</div>
+                <div class="form-text">Must be a valid institutional or personal email address. A secure temporary password will be auto-generated and emailed to this address, requiring the user to set their password upon first sign in.</div>
             </div>
-
-            <div class="mb-3">
-                <label for="password" class="form-label">Initial password</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-key"></i></span>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank to auto-generate a random secure password">
-                </div>
-                <div class="form-text">If left blank, a strong temporary password will be randomly generated and emailed.</div>
-            </div>
-
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" value="1" id="force_password_change" name="force_password_change" checked>
-                <label class="form-check-label text-dark" for="force_password_change">
-                    Require user to set a new password upon first sign in
-                </label>
-            </div>
+            <input type="hidden" name="force_password_change" value="1">
 
             <div class="row g-3 mb-3">
                 <div class="col-md-6">

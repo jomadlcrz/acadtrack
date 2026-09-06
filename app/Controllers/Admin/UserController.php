@@ -47,13 +47,9 @@ class UserController
     public function store(Request $request, Response $response, Session $session): void
     {
         $data = $request->all();
-        $plainPassword = trim((string) ($data['password'] ?? ''));
+        $plainPassword = \App\Models\User::generateRandomPassword();
         $role = (string) ($data['role'] ?? 'Student');
-        $forceChange = !empty($request->post('force_password_change')) || $role === 'Student' || empty($plainPassword);
-
-        if (empty($plainPassword)) {
-            $plainPassword = \App\Models\User::generateRandomPassword();
-        }
+        $forceChange = true;
 
         $studentNumber = null;
         if ($role === 'Student') {
