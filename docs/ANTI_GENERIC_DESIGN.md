@@ -86,7 +86,8 @@ graph TD
 | **Grid Spacing** | Dense, compact table cells (`py-2 px-3`), maximize records visible per viewport. | Over-padded cards (`p-5`), huge 80px row gaps requiring excessive scrolling. |
 | **Corner Radii** | Sharp, disciplined 4px–6px radius. Institutional and structured. | Extreme 24px–50px pill shapes on administrative tables and forms. |
 | **Number Formatting** | Monospaced numeric figures (`tabular-nums`), decimal points vertically aligned. | Proportional fonts where numbers wiggle and misalign across columns. |
-| **Typography** | Fast, native OS font stack (`-apple-system`, `Segoe UI`, `Roboto`). Clean weight hierarchy. | Slow web fonts, quirky display serif fonts on data-entry tables. |
+| **Typography & Weight**| Native system fonts (`-apple-system`, `Segoe UI`). **Max font-weight capped at 600**. | Heavy weights (`700`, `800`, `900`, `bold`), slow web fonts, display serifs. |
+| **Sidebar Navigation** | Slate background (`#e2e8f0`) with dark navy icon for active items. | Generic left accent border bars (`border-left: 3px solid ...`), solid dark navy blocks. |
 | **Buttons & Actions** | Clear visual hierarchy: Primary, Secondary Outline, Destructive with confirmation. | Uniform blue pills everywhere with vague labels like "Submit" or "Do It". |
 | **Table Headers** | Sticky headers with dark background/contrast border so labels never disappear. | Disappearing headers when scrolling past 10 students. |
 | **Empty States** | Contextual explanations with direct action buttons (e.g., "Add First Subject"). | Cartoon illustrations of sleeping robots or empty shopping carts. |
@@ -184,6 +185,8 @@ The following classes are implemented in [public/assets/css/app.css](file:///C:/
 Before shipping any new view, layout, or table in the GWC Grading System, verify:
 
 - [ ] **Tabular Numerics:** Are all score cells, GPAs, and student IDs styled with `tabular-nums`?
+- [ ] **Font Weight Cap:** Is the maximum font weight capped at `600` (semibold) with zero `700`/`800`/`bold`?
+- [ ] **Sidebar Navigation:** Are active sidebar links styled with a slate background (`#e2e8f0`) without generic left borders?
 - [ ] **Density Check:** Can an instructor view at least 15–20 student rows on a 1080p screen without scrolling?
 - [ ] **Contrast Compliance:** Does all body copy and secondary metadata have a contrast ratio of at least $4.5:1$ against its background?
 - [ ] **Sticky Headers:** When scrolling through a 50-student section, do the column headers remain anchored at the top?

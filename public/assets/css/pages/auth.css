@@ -82,7 +82,7 @@ body.auth-body {
 
 .auth-title {
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--gwc-text-primary);
     margin: 0 0 4px 0;
     letter-spacing: -0.01em;

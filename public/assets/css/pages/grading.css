@@ -92,24 +92,24 @@
 .grade-equivalent {
     display: inline-block;
     min-width: 48px;
-    font-weight: 700;
+    font-weight: 600;
     text-align: center;
     font-variant-numeric: tabular-nums;
 }
 
 .grade-passed {
     color: #15803d;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .grade-failed {
     color: #b91c1c;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .grade-inc {
     color: #b45309;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 /* Student Information Column */

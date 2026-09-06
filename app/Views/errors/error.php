@@ -37,7 +37,7 @@
         }
         .error-title {
             font-size: 22px;
-            font-weight: 700;
+            font-weight: 600;
             color: #1e293b;
             margin-bottom: 12px;
         }

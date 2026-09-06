@@ -103,9 +103,12 @@ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica N
   ```
 
 ### Type Scale & Hierarchy
-* **Page Heading (`h1`):** `1.5rem` (`24px`), font-weight `700`, line-height `1.2`.
+> [!IMPORTANT]
+> **Maximum Font Weight Cap:** Across all headings, table headers, labels, and badges, the maximum allowable font weight is **`600`** (semibold). Heavy weights (`700`, `800`, `bold`) are prohibited to ensure a refined, institutional editorial hierarchy.
+
+* **Page Heading (`h1`):** `1.5rem` (`24px`), font-weight `600`, line-height `1.2`.
 * **Section Heading (`h2` / Card Header):** `1.125rem` (`18px`), font-weight `600`.
-* **Sub-Heading / Table Header (`th`):** `0.8125rem` (`13px`), font-weight `700`, text-transform `uppercase`, letter-spacing `0.04em`.
+* **Sub-Heading / Table Header (`th`):** `0.8125rem` (`13px`), font-weight `600`, Sentence case per `CASING_GUIDELINES.md`.
 * **Body / Data Cell (`td`):** `0.875rem` (`14px`), line-height `1.4`.
 * **Micro-Labels & Badges:** `0.75rem` (`12px`), font-weight `600`.
 
@@ -146,7 +149,7 @@ graph TD
 
 ### 1. High-Density Academic Grade Sheet (`.table-academic`)
 * **Sticky Header:** The header row (`th`) is anchored to the top of the viewport during scrolling.
-* **Compact Input Cells:** Score inputs (`input.grade-input`) measure `80px` wide by `32px` high with right-aligned bold numbers.
+* **Compact Input Cells:** Score inputs (`input.grade-input`) measure `80px` wide by `32px` high with right-aligned semibold numbers (`font-weight: 600`).
 * **Zebra Striping on Hover:** Subtle `#f1f5f9` hover feedback ensures instructors track horizontal rows accurately across wide tables.
 * **Inline Dynamic Grade Equivalents:** Real-time computation badge displays the calculated equivalent (e.g. `1.25`, `2.00`, `5.00`) directly beside raw percentages.
 

@@ -414,6 +414,9 @@ Examples:
 Follow these principles:
 
 - Clear hierarchy
+- Maximum font weight capped at 600 (semibold); no 700, 800, or bold
+- Active sidebar items styled with slate background (`#e2e8f0`) without generic left borders
+- Hybrid casing strictly adhering to `CASING_GUIDELINES.md`
 - Consistent spacing
 - Consistent components
 - Clear primary actions

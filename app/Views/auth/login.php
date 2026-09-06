@@ -3,7 +3,7 @@ $pageTitle = 'Log In';
 ob_start();
 ?>
 
-<form method="POST" action="/login" class="auth-form" id="loginForm" novalidate>
+<form method="POST" action="<?= url('/login') ?>" class="auth-form" id="loginForm" novalidate>
     <?= csrf_field() ?>
 
     <div class="mb-3">

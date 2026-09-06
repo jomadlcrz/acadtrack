@@ -5,21 +5,35 @@ ob_start();
 
 <div class="dashboard-stats">
     <div class="stat-card">
-        <div class="stat-value"><?= htmlspecialchars(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')) ?></div>
-        <div class="stat-label">Welcome Back</div>
+        <div class="stat-card-top">
+            <span class="stat-label">Student name</span>
+            <div class="stat-icon stat-icon-blue"><i class="bi bi-person-circle"></i></div>
+        </div>
+        <div class="stat-value" style="font-size: 20px;"><?= htmlspecialchars(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')) ?></div>
     </div>
     <div class="stat-card">
-        <div class="stat-value"><?= htmlspecialchars($user['student_number'] ?? 'N/A') ?></div>
-        <div class="stat-label">Student Number</div>
+        <div class="stat-card-top">
+            <span class="stat-label">Student number</span>
+            <div class="stat-icon stat-icon-green"><i class="bi bi-card-text"></i></div>
+        </div>
+        <div class="stat-value tabular-nums"><?= htmlspecialchars($user['student_number'] ?? 'N/A') ?></div>
     </div>
 </div>
 
-<div class="card" style="margin-top: 20px; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <h3 style="margin-bottom: 10px;">Student Portal</h3>
-    <p style="margin-bottom: 15px; color: #555;">View your enrolled subjects, preliminary, midterm, and final grades, or review your curriculum evaluations.</p>
-    <div style="display: flex; gap: 10px;">
-        <a href="/student/grades" class="btn btn-primary">View My Grades</a>
-        <a href="/student/evaluation" class="btn">View Curriculum Evaluation</a>
+<div class="content-card">
+    <div class="content-card-header">
+        <h3 class="content-card-title">Student Portal Quick Actions</h3>
+    </div>
+    <p style="margin-bottom: 16px; color: #475569; font-size: 13.5px;">View your enrolled subjects, periodic scores (Prelim, Midterm, Semi-final, Final), and your complete curriculum evaluation progress.</p>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="<?= url('/student/grades') ?>" class="btn btn-primary">
+            <i class="bi bi-award-fill me-1"></i>
+            <span>View my grades</span>
+        </a>
+        <a href="<?= url('/student/evaluation') ?>" class="btn">
+            <i class="bi bi-mortarboard-fill me-1"></i>
+            <span>View whole evaluation</span>
+        </a>
     </div>
 </div>
 
