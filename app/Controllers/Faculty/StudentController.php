@@ -80,6 +80,12 @@ class StudentController
             return;
         }
 
+        if (empty($sectionId)) {
+            $session->flash('error', 'Assigned section is required when adding a student.');
+            redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
+            return;
+        }
+
         if ($studentNumber !== null && \App\Models\User::where('student_number', $studentNumber)->exists()) {
             $session->flash('error', "Student ID number '{$studentNumber}' is already registered to another student. Student numbers must be unique.");
             redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
@@ -154,6 +160,19 @@ class StudentController
         }
 
         if ($studentId > 0 && $subjectId > 0) {
+            $student = \App\Models\Student::find($studentId);
+            if (!$student) {
+                $session->flash('error', 'Student record not found.');
+                redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
+                return;
+            }
+
+            if ($sectionId === null && empty($student->section_id)) {
+                $session->flash('error', 'Assigned section is required when enrolling a student.');
+                redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
+                return;
+            }
+
             $updates = [];
             if ($yearLevel > 0) {
                 $updates['year_level'] = $yearLevel;
@@ -165,7 +184,7 @@ class StudentController
                 $updates['status'] = $status;
             }
             if (!empty($updates)) {
-                \App\Models\Student::where('id', $studentId)->update($updates);
+                $student->update($updates);
             }
 
             \App\Models\Student::enroll($studentId, $subjectId, $termId);

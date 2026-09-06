@@ -98,9 +98,9 @@ ob_start();
                 $currentStatus = $user['student']['status'] ?? 'Regular';
                 ?>
                 <div class="col-md-4">
-                    <label for="section_id" class="form-label">Assigned section <span class="text-muted">(Optional)</span></label>
-                    <select class="form-select" id="section_id" name="section_id">
-                        <option value="">No section assigned</option>
+                    <label for="section_id" class="form-label">Assigned section <span class="text-danger">*</span></label>
+                    <select class="form-select" id="section_id" name="section_id" required>
+                        <option value="">Select section...</option>
                         <?php foreach ($sections ?? [] as $sec): ?>
                             <option value="<?= $sec['id'] ?>" <?= ((string)$currentSectionId === (string)$sec['id']) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($sec['name']) ?>
@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const studentDetailsGroup = document.getElementById('student_details_group');
     const deptGroup = document.getElementById('department_group');
     const studentInput = document.getElementById('student_number');
+    const sectionSelect = document.getElementById('section_id');
     const deptSelect = document.getElementById('department_id');
 
     function syncRoleFields() {
@@ -151,14 +152,17 @@ document.addEventListener('DOMContentLoaded', function () {
         if (role === 'Student') {
             studentGroup.style.display = 'block';
             studentDetailsGroup.style.display = 'flex';
+            if (sectionSelect) sectionSelect.required = true;
             deptGroup.style.display = 'none';
         } else if (role === 'Faculty' || role === 'Dean') {
             studentGroup.style.display = 'none';
             studentDetailsGroup.style.display = 'none';
+            if (sectionSelect) sectionSelect.required = false;
             deptGroup.style.display = 'block';
         } else {
             studentGroup.style.display = 'none';
             studentDetailsGroup.style.display = 'none';
+            if (sectionSelect) sectionSelect.required = false;
             deptGroup.style.display = 'none';
         }
     }

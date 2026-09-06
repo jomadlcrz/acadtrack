@@ -199,9 +199,9 @@ ob_start();
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="add_section_id" class="form-label">Section <span class="text-muted">(Optional)</span></label>
-                        <select class="form-select" id="add_section_id" name="section_id">
-                            <option value="">No section assigned</option>
+                        <label for="add_section_id" class="form-label">Assigned section <span class="text-danger">*</span></label>
+                        <select class="form-select" id="add_section_id" name="section_id" required>
+                            <option value="">Select section...</option>
                             <?php foreach (($sections ?? []) as $sec): ?>
                                 <option value="<?= $sec['id'] ?>" <?= ((int)($selectedSection ?? 0) === (int)$sec['id']) ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($sec['name']) ?>
@@ -267,9 +267,9 @@ ob_start();
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="enroll_section_id" class="form-label">Assign / Update section <span class="text-muted">(Optional)</span></label>
-                        <select class="form-select" id="enroll_section_id" name="section_id">
-                            <option value="">Keep current / No section</option>
+                        <label for="enroll_section_id" class="form-label">Assigned section <span class="text-danger">*</span></label>
+                        <select class="form-select" id="enroll_section_id" name="section_id" required>
+                            <option value="">Select section...</option>
                             <?php foreach (($sections ?? []) as $sec): ?>
                                 <option value="<?= $sec['id'] ?>" <?= ((int)($selectedSection ?? 0) === (int)$sec['id']) ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($sec['name']) ?>

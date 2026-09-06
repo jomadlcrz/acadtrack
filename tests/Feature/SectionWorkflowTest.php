@@ -208,4 +208,37 @@ class SectionWorkflowTest extends TestCase
         $this->assertContains((int) $studentB->id, $secBIds);
         $this->assertNotContains((int) $studentA->id, $secBIds);
     }
+
+    public function testAssignedSectionIsRequiredForStudent(): void
+    {
+        // 1. In Admin UserController::store, missing section_id fails validation
+        $_POST = [
+            'first_name' => 'ReqSection',
+            'last_name' => 'Student',
+            'email' => 'req_section_' . time() . '@gwc.edu',
+            'role' => 'Student',
+            'section_id' => '',
+        ];
+        $adminController = new \App\Controllers\Admin\UserController();
+        $request = new \App\Core\Request();
+        $response = new \App\Core\Response();
+        $session = new \App\Core\Session();
+
+        $adminController->store($request, $response, $session);
+        $this->assertSame('Assigned section is required for student accounts.', $session->getFlash('error'));
+
+        // 2. In Faculty StudentController::addStudent, missing section_id fails validation
+        $_POST = [
+            'first_name' => 'FacultyReq',
+            'last_name' => 'Student',
+            'email' => 'fac_req_' . time() . '@gwc.edu',
+            'subject_id' => '1',
+            'section_id' => '',
+        ];
+        $facultyController = new \App\Controllers\Faculty\StudentController();
+        $facRequest = new \App\Core\Request();
+        $facultyController->addStudent($facRequest, $response, $session);
+        $this->assertSame('Assigned section is required when adding a student.', $session->getFlash('error'));
+    }
 }
+

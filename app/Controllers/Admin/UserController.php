@@ -59,6 +59,12 @@ class UserController
                 redirect('/admin/users/create');
                 return;
             }
+
+            if (empty($data['section_id'])) {
+                $session->flash('error', 'Assigned section is required for student accounts.');
+                redirect('/admin/users/create');
+                return;
+            }
         }
 
         $user = \App\Models\User::create([
@@ -143,6 +149,13 @@ class UserController
                 redirect('/admin/users/' . $id . '/edit');
                 return;
             }
+
+            if (empty($data['section_id'])) {
+                $session->flash('error', 'Assigned section is required for student accounts.');
+                redirect('/admin/users/' . $id . '/edit');
+                return;
+            }
+
             $updateData['student_number'] = $studentNumber;
             \App\Models\Faculty::where('user_id', $user->id)->delete();
 
