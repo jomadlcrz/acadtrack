@@ -25,22 +25,46 @@ ob_start();
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light border-bottom">
                     <tr>
-                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 150px;">Subject code</th>
+                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 130px;">Subject code</th>
                         <th class="fw-semibold text-muted small py-3 px-3">Descriptive title</th>
-                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 140px;">Year level</th>
-                        <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 240px;">Actions</th>
+                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 120px;">Nature</th>
+                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 140px;">Grading method</th>
+                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 110px;">Year level</th>
+                        <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 310px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($subjects as $subject): ?>
                     <tr>
                         <td class="px-3 fw-semibold text-primary font-monospace"><?= htmlspecialchars($subject['code']) ?></td>
-                        <td class="px-3 fw-semibold text-dark"><?= htmlspecialchars($subject['name']) ?></td>
+                        <td class="px-3 fw-semibold text-dark">
+                            <?= htmlspecialchars($subject['name']) ?>
+                            <div class="text-muted small">
+                                Weights: P: <?= (int)$subject['prelim_weight'] ?>% | M: <?= (int)$subject['midterm_weight'] ?>% | SF: <?= (int)$subject['semi_final_weight'] ?>% | F: <?= (int)$subject['final_weight'] ?>%
+                            </div>
+                        </td>
+                        <td class="px-3">
+                            <span class="badge <?= match($subject['nature'] ?? 'Lecture') {
+                                'Laboratory' => 'bg-info-subtle text-info border border-info-subtle',
+                                'Combined' => 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
+                                default => 'bg-primary-subtle text-primary border border-primary-subtle'
+                            } ?> fw-semibold">
+                                <?= htmlspecialchars($subject['nature'] ?? 'Lecture') ?>
+                            </span>
+                        </td>
+                        <td class="px-3 small">
+                            <span class="badge bg-light text-dark border fw-semibold">
+                                <?= ($subject['grading_method'] ?? 'zero_based') === 'fifty_based' ? '50-Based' : 'Zero-Based' ?>
+                            </span>
+                        </td>
                         <td class="px-3 small text-secondary">
                             <?= htmlspecialchars($subject['year_level']) ?><?= match((int)$subject['year_level']) { 1 => 'st', 2 => 'nd', 3 => 'rd', default => 'th' } ?> year
                         </td>
                         <td class="px-3 text-end text-nowrap">
-                            <a href="<?= url('/faculty/grading?subject_id=' . $subject['id']) ?>" class="btn btn-sm btn-primary py-1 px-2 d-inline-flex align-items-center gap-1">
+                            <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#setupModal<?= $subject['id'] ?>">
+                                <i class="bi bi-gear"></i> Set up
+                            </button>
+                            <a href="<?= url('/faculty/grading?subject_id=' . $subject['id']) ?>" class="btn btn-sm btn-primary py-1 px-2 d-inline-flex align-items-center gap-1 ms-1">
                                 <i class="bi bi-pencil-square"></i> Enter grades
                             </a>
                             <a href="<?= url('/faculty/students?subject_id=' . $subject['id']) ?>" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1 ms-1">
@@ -52,6 +76,70 @@ ob_start();
                 </tbody>
             </table>
         </div>
+
+        <?php foreach ($subjects as $subject): ?>
+        <div class="modal fade" id="setupModal<?= $subject['id'] ?>" tabindex="-1" aria-labelledby="setupModalLabel<?= $subject['id'] ?>" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <form method="POST" action="<?= url('/faculty/subjects/' . $subject['id'] . '/setup') ?>">
+                        <div class="modal-header border-bottom">
+                            <h5 class="modal-title h6 fw-semibold mb-0" id="setupModalLabel<?= $subject['id'] ?>">
+                                Subject Setup: <?= htmlspecialchars($subject['code']) ?>
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-muted small mb-3">Configure course nature and grading period percentage weights per institutional syllabus guidelines.</p>
+
+                            <div class="mb-3">
+                                <label for="nature_<?= $subject['id'] ?>" class="form-label small fw-semibold">Subject nature</label>
+                                <select class="form-select form-select-sm" id="nature_<?= $subject['id'] ?>" name="nature" required>
+                                    <option value="Lecture" <?= ($subject['nature'] ?? 'Lecture') === 'Lecture' ? 'selected' : '' ?>>Lecture</option>
+                                    <option value="Laboratory" <?= ($subject['nature'] ?? '') === 'Laboratory' ? 'selected' : '' ?>>Laboratory</option>
+                                    <option value="Combined" <?= ($subject['nature'] ?? '') === 'Combined' ? 'selected' : '' ?>>Combined (Lecture + Lab)</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="grading_method_<?= $subject['id'] ?>" class="form-label small fw-semibold">Grading method</label>
+                                <select class="form-select form-select-sm" id="grading_method_<?= $subject['id'] ?>" name="grading_method" required>
+                                    <option value="zero_based" <?= ($subject['grading_method'] ?? 'zero_based') === 'zero_based' ? 'selected' : '' ?>>Zero-Based (Raw % = Score / Total × 100)</option>
+                                    <option value="fifty_based" <?= ($subject['grading_method'] ?? '') === 'fifty_based' ? 'selected' : '' ?>>50-Based (Raw % = (Score / Total × 50) + 50)</option>
+                                </select>
+                            </div>
+
+                            <div class="card bg-light border p-3 mb-2">
+                                <span class="small fw-semibold text-dark mb-2 d-block">Grading period weights (%)</span>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="form-label small text-muted mb-1" for="prelim_<?= $subject['id'] ?>">Prelim (%)</label>
+                                        <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm" id="prelim_<?= $subject['id'] ?>" name="prelim_weight" value="<?= htmlspecialchars((string)$subject['prelim_weight']) ?>" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small text-muted mb-1" for="midterm_<?= $subject['id'] ?>">Midterm (%)</label>
+                                        <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm" id="midterm_<?= $subject['id'] ?>" name="midterm_weight" value="<?= htmlspecialchars((string)$subject['midterm_weight']) ?>" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small text-muted mb-1" for="semifinal_<?= $subject['id'] ?>">Semi-final (%)</label>
+                                        <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm" id="semifinal_<?= $subject['id'] ?>" name="semi_final_weight" value="<?= htmlspecialchars((string)$subject['semi_final_weight']) ?>" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small text-muted mb-1" for="final_<?= $subject['id'] ?>">Final (%)</label>
+                                        <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm" id="final_<?= $subject['id'] ?>" name="final_weight" value="<?= htmlspecialchars((string)$subject['final_weight']) ?>" required>
+                                    </div>
+                                </div>
+                                <div class="form-text mt-2 small">Total must sum to exactly 100% (e.g. 20% + 20% + 20% + 40%).</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top py-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-sm btn-primary">Save configuration</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php endforeach; ?>
     <?php endif; ?>
 </div>
 

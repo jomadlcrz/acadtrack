@@ -69,7 +69,7 @@ class GradingService
         $this->gradingSheetRepository->submit($gradingSheetId);
     }
 
-    public function approveGradingSheet(int $gradingSheetId): void
+    public function approveGradingSheet(int $gradingSheetId, ?int $approvedBy = null): void
     {
         $sheet = $this->gradingSheetRepository->findById($gradingSheetId);
         if (!$sheet) {
@@ -80,7 +80,28 @@ class GradingService
             throw new \RuntimeException("Sheet must be SUBMITTED or UNDER_REVIEW to approve.");
         }
 
-        $this->gradingSheetRepository->approve($gradingSheetId);
+        GradingSheet::where('id', $gradingSheetId)->update([
+            'status' => GradingSheet::STATUS_APPROVED,
+            'approved_by' => $approvedBy,
+            'approved_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    public function confirmGradingSheet(int $gradingSheetId, int $confirmedBy, ?string $remarks = null): void
+    {
+        $sheet = $this->gradingSheetRepository->findById($gradingSheetId);
+        if (!$sheet) {
+            throw new \RuntimeException("Grading sheet not found.");
+        }
+
+        GradingSheet::where('id', $gradingSheetId)->update([
+            'status' => GradingSheet::STATUS_FINALIZED,
+            'approved_by' => $confirmedBy,
+            'remarks' => $remarks,
+            'confirmed_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
     }
 
     public function returnGradingSheet(int $gradingSheetId): void

@@ -52,13 +52,21 @@ $router->post('/dean/subjects', [DeanSubjectController::class, 'store'], [new Au
 $router->post('/dean/subjects/{id}', [DeanSubjectController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
 $router->post('/dean/subjects/{id}/delete', [DeanSubjectController::class, 'destroy'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
 $router->get('/dean/grade-review', [GradeReviewController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin'])]);
+$router->get('/dean/grade-review/{id}', [GradeReviewController::class, 'show'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin'])]);
 $router->post('/dean/grade-review/approve', [GradeReviewController::class, 'approve'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
+$router->post('/dean/grade-review/confirm', [GradeReviewController::class, 'confirm'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
 $router->post('/dean/grade-review/return', [GradeReviewController::class, 'returnToFaculty'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
+$router->post('/dean/grade-review/{id}/edit', [GradeReviewController::class, 'updateGrade'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
+$router->get('/dean/grade-review/{id}/print', [GradeReviewController::class, 'printSheet'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin'])]);
 
 // Faculty routes
 $router->get('/faculty/dashboard', [DashboardController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
 $router->get('/faculty/subjects', [FacultySubjectController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
+$router->post('/faculty/subjects/{id}/setup', [FacultySubjectController::class, 'setup'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->get('/faculty/students', [StudentController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
+$router->post('/faculty/students/add', [StudentController::class, 'addStudent'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
+$router->post('/faculty/students/enroll', [StudentController::class, 'enrollExisting'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
+$router->post('/faculty/students/remove', [StudentController::class, 'remove'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->get('/faculty/grading', [GradingController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
 $router->post('/faculty/grading/save', [GradingController::class, 'save'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->post('/faculty/grading/submit', [GradingController::class, 'submit'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);

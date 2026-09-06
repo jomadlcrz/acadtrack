@@ -10,24 +10,26 @@ class SubjectRepository
 {
     public function findById(int $id): ?array
     {
-        return Subject::find($id);
+        $subject = Subject::find($id);
+        return $subject ? $subject->toArray() : null;
     }
 
     public function create(array $data): int
     {
         $data['created_at'] = date('Y-m-d H:i:s');
-        return Subject::create($data);
+        $subject = Subject::create($data);
+        return (int) $subject->id;
     }
 
     public function update(int $id, array $data): bool
     {
         $data['updated_at'] = date('Y-m-d H:i:s');
-        return Subject::update($id, $data);
+        return (bool) Subject::where('id', $id)->update($data);
     }
 
     public function delete(int $id): bool
     {
-        return Subject::delete($id);
+        return (bool) Subject::destroy($id);
     }
 
     public function getByDean(int $academicTermId): array

@@ -8,9 +8,22 @@ use App\Core\Model;
 
 class Enrollment extends Model
 {
-    protected static function table(): string
+    protected $table = 'enrollments';
+    public $timestamps = false;
+
+    public function student()
     {
-        return 'enrollments';
+        return $this->belongsTo(Student::class, 'student_id');
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    public function academicTerm()
+    {
+        return $this->belongsTo(AcademicTerm::class, 'academic_term_id');
     }
 
     public static function getBySubject(int $subjectId, int $academicTermId): array
@@ -43,11 +56,12 @@ class Enrollment extends Model
 
     public static function enroll(int $studentId, int $subjectId, int $academicTermId): int
     {
-        return self::create([
+        $enrollment = self::create([
             'student_id' => $studentId,
             'subject_id' => $subjectId,
             'academic_term_id' => $academicTermId,
             'enrolled_at' => date('Y-m-d H:i:s'),
         ]);
+        return (int) $enrollment->id;
     }
 }

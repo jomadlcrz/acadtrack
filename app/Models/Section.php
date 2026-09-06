@@ -8,9 +8,16 @@ use App\Core\Model;
 
 class Section extends Model
 {
-    protected static function table(): string
+    protected $table = 'sections';
+
+    public function academicTerm()
     {
-        return 'sections';
+        return $this->belongsTo(AcademicTerm::class, 'academic_term_id');
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'section_id');
     }
 
     public static function getByYearAndTerm(int $yearLevel, int $academicTermId): array

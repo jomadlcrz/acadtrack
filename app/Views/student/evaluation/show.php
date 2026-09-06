@@ -1,6 +1,7 @@
 <?php
 $pageTitle = 'Academic Evaluation';
 $subtitle = 'Official curricular evaluation, weighted averages, and academic standing.';
+$headerActions = '<a href="' . url('/student/grades') . '" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><i class="bi bi-arrow-left"></i> Back to grades</a>';
 ob_start();
 ?>
 

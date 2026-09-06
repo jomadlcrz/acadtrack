@@ -10,7 +10,8 @@ class GradingSheetRepository
 {
     public function findById(int $id): ?array
     {
-        return GradingSheet::find($id);
+        $sheet = GradingSheet::find($id);
+        return $sheet ? $sheet->toArray() : null;
     }
 
     public function findByComposite(int $facultyId, int $subjectId, int $gradingPeriodId, int $academicTermId): ?array
@@ -33,7 +34,8 @@ class GradingSheetRepository
         $data['status'] = $data['status'] ?? GradingSheet::STATUS_DRAFT;
         $data['created_at'] = date('Y-m-d H:i:s');
         $data['updated_at'] = date('Y-m-d H:i:s');
-        return GradingSheet::create($data);
+        $sheet = GradingSheet::create($data);
+        return (int) $sheet->id;
     }
 
     public function updateStatus(int $id, string $status): bool
@@ -43,7 +45,7 @@ class GradingSheetRepository
 
     public function submit(int $id): bool
     {
-        return GradingSheet::update($id, [
+        return (bool) GradingSheet::where('id', $id)->update([
             'status' => GradingSheet::STATUS_SUBMITTED,
             'submitted_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
@@ -52,7 +54,7 @@ class GradingSheetRepository
 
     public function approve(int $id): bool
     {
-        return GradingSheet::update($id, [
+        return (bool) GradingSheet::where('id', $id)->update([
             'status' => GradingSheet::STATUS_APPROVED,
             'approved_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
@@ -61,7 +63,7 @@ class GradingSheetRepository
 
     public function returnToFaculty(int $id): bool
     {
-        return GradingSheet::update($id, [
+        return (bool) GradingSheet::where('id', $id)->update([
             'status' => GradingSheet::STATUS_RETURNED,
             'returned_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),

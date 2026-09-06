@@ -8,9 +8,21 @@ use App\Core\Model;
 
 class GradingPeriod extends Model
 {
-    protected static function table(): string
+    protected $table = 'grading_periods';
+
+    public function academicTerm()
     {
-        return 'grading_periods';
+        return $this->belongsTo(AcademicTerm::class, 'academic_term_id');
+    }
+
+    public function grades()
+    {
+        return $this->hasMany(Grade::class, 'grading_period_id');
+    }
+
+    public function gradingSheets()
+    {
+        return $this->hasMany(GradingSheet::class, 'grading_period_id');
     }
 
     public static function getActive(): array

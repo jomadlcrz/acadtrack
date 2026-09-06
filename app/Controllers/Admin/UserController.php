@@ -41,7 +41,16 @@ class UserController
     public function store(Request $request, Response $response, Session $session): void
     {
         $data = $request->all();
-        $this->userRepository->create($data);
+        $plainPassword = $data['password'] ?? '';
+        $userId = $this->userRepository->create($data);
+
+        if ($userId > 0 && !empty($plainPassword)) {
+            $createdUser = $this->userRepository->findById($userId);
+            if ($createdUser) {
+                (new \App\Services\NotificationService())->sendStudentCredentials($createdUser, $plainPassword);
+            }
+        }
+
         $session->flash('success', 'User created successfully.');
         redirect('/admin/users');
     }

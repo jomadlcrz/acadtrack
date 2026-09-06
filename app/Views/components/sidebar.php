@@ -20,6 +20,10 @@
                     <i class="bi bi-gear-fill"></i>
                     <span>Institutional Settings</span>
                 </a>
+                <a href="<?= url('/dean/grade-review') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/grade-review') ? 'active' : '' ?>">
+                    <i class="bi bi-file-earmark-check-fill"></i>
+                    <span>Grade Review &amp; Approval</span>
+                </a>
             </div>
 
         <?php elseif ($userRole === 'Dean'): ?>

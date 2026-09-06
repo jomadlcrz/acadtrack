@@ -8,9 +8,26 @@ use App\Core\Model;
 
 class Subject extends Model
 {
-    protected static function table(): string
+    protected $table = 'subjects';
+
+    public function academicTerm()
     {
-        return 'subjects';
+        return $this->belongsTo(AcademicTerm::class, 'academic_term_id');
+    }
+
+    public function gradingSetting()
+    {
+        return $this->hasOne(GradingSetting::class, 'subject_id');
+    }
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class, 'subject_id');
+    }
+
+    public function gradingSheets()
+    {
+        return $this->hasMany(GradingSheet::class, 'subject_id');
     }
 
     public static function getByDean(int $academicTermId): array

@@ -11,7 +11,8 @@ class GradeRepository
 {
     public function findById(int $id): ?array
     {
-        return Grade::find($id);
+        $grade = Grade::find($id);
+        return $grade ? $grade->toArray() : null;
     }
 
     public function getByStudent(int $studentId, int $academicTermId): array

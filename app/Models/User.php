@@ -8,9 +8,21 @@ use App\Core\Model;
 
 class User extends Model
 {
-    protected static function table(): string
+    protected $table = 'users';
+
+    public function student()
     {
-        return 'users';
+        return $this->hasOne(Student::class, 'user_id');
+    }
+
+    public function faculty()
+    {
+        return $this->hasOne(Faculty::class, 'user_id');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'user_id');
     }
 
     public static function findByEmail(string $email): ?array

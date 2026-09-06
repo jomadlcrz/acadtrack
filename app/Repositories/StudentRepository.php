@@ -10,7 +10,8 @@ class StudentRepository
 {
     public function findById(int $id): ?array
     {
-        return Student::find($id);
+        $student = Student::find($id);
+        return $student ? $student->toArray() : null;
     }
 
     public function findByUserId(int $userId): ?array
@@ -21,13 +22,14 @@ class StudentRepository
     public function create(array $data): int
     {
         $data['created_at'] = date('Y-m-d H:i:s');
-        return Student::create($data);
+        $student = Student::create($data);
+        return (int) $student->id;
     }
 
     public function update(int $id, array $data): bool
     {
         $data['updated_at'] = date('Y-m-d H:i:s');
-        return Student::update($id, $data);
+        return (bool) Student::where('id', $id)->update($data);
     }
 
     public function getBySection(int $sectionId): array
@@ -38,5 +40,15 @@ class StudentRepository
     public function getBySubject(int $subjectId, int $academicTermId): array
     {
         return Student::getBySubject($subjectId, $academicTermId);
+    }
+
+    public function enroll(int $studentId, int $subjectId, int $academicTermId): bool
+    {
+        return Student::enroll($studentId, $subjectId, $academicTermId);
+    }
+
+    public function getAllAvailable(): array
+    {
+        return Student::getAllAvailable();
     }
 }

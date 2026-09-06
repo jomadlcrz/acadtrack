@@ -10,7 +10,8 @@ class FacultyRepository
 {
     public function findById(int $id): ?array
     {
-        return Faculty::find($id);
+        $faculty = Faculty::find($id);
+        return $faculty ? $faculty->toArray() : null;
     }
 
     public function findByUserId(int $userId): ?array
@@ -21,7 +22,8 @@ class FacultyRepository
     public function create(array $data): int
     {
         $data['created_at'] = date('Y-m-d H:i:s');
-        return Faculty::create($data);
+        $faculty = Faculty::create($data);
+        return (int) $faculty->id;
     }
 
     public function getAssignedSubjects(int $facultyId, int $academicTermId): array

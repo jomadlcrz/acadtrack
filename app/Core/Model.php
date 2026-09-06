@@ -4,77 +4,60 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 use PDO;
 
-class Model
+class Model extends EloquentModel
 {
-    protected static ?PDO $db = null;
+    /**
+     * Mass assignable attributes. Empty guarded allows all attributes by default.
+     */
+    protected $guarded = [];
 
-    protected static function db(): PDO
+    /**
+     * Default timestamps.
+     */
+    public $timestamps = true;
+
+    /**
+     * Get the table name associated with the model.
+     * Supports both $table property and legacy static table() method.
+     */
+    public function getTable()
     {
-        if (self::$db === null) {
-            self::$db = Database::getConnection();
+        if (isset($this->table)) {
+            return $this->table;
         }
-        return self::$db;
+
+        if (method_exists(static::class, 'table')) {
+            return static::table();
+        }
+
+        return parent::getTable();
     }
 
-    protected static function table(): string
+    /**
+     * Get the direct PDO connection for raw/complex SQL queries when desired.
+     */
+    public static function db(): PDO
     {
-        $class = basename(str_replace('\\', '/', static::class));
-        return strtolower($class) . 's';
+        return Database::getConnection();
     }
 
-    public static function find(int $id): ?array
+    /**
+     * Dynamic static calls proxy to support legacy Model::update($id, $data)
+     * and Model::delete($id) signatures alongside standard Eloquent builder calls.
+     */
+    public static function __callStatic($method, $parameters)
     {
-        $table = static::table();
-        $stmt = self::db()->prepare("SELECT * FROM {$table} WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        $result = $stmt->fetch();
-        return $result ?: null;
-    }
+        if ($method === 'update' && count($parameters) === 2 && (is_int($parameters[0]) || is_string($parameters[0])) && is_array($parameters[1])) {
+            return (bool) static::query()->where((new static)->getKeyName(), $parameters[0])->update($parameters[1]);
+        }
 
-    public static function all(): array
-    {
-        $table = static::table();
-        $stmt = self::db()->query("SELECT * FROM {$table}");
-        return $stmt->fetchAll();
-    }
+        if ($method === 'delete' && count($parameters) === 1 && (is_int($parameters[0]) || is_string($parameters[0]))) {
+            return (bool) static::query()->where((new static)->getKeyName(), $parameters[0])->delete();
+        }
 
-    public static function where(string $column, mixed $value): static
-    {
-        $instance = new static();
-        $instance->query = "SELECT * FROM " . static::table() . " WHERE {$column} = :value";
-        $instance->bindings[':value'] = $value;
-        return $instance;
-    }
-
-    public static function create(array $data): int
-    {
-        unset($data['_token']);
-        $table = static::table();
-        $columns = implode(', ', array_keys($data));
-        $placeholders = ':' . implode(', :', array_keys($data));
-
-        $stmt = self::db()->prepare("INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})");
-        $stmt->execute($data);
-        return (int) self::db()->lastInsertId();
-    }
-
-    public static function update(int $id, array $data): bool
-    {
-        unset($data['_token']);
-        $table = static::table();
-        $setClause = implode(', ', array_map(fn($col) => "{$col} = :{$col}", array_keys($data)));
-
-        $data['id'] = $id;
-        $stmt = self::db()->prepare("UPDATE {$table} SET {$setClause} WHERE id = :id");
-        return $stmt->execute($data);
-    }
-
-    public static function delete(int $id): bool
-    {
-        $table = static::table();
-        $stmt = self::db()->prepare("DELETE FROM {$table} WHERE id = :id");
-        return $stmt->execute(['id' => $id]);
+        return parent::__callStatic($method, $parameters);
     }
 }

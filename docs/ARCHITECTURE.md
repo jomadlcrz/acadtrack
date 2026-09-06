@@ -5,7 +5,8 @@
 The GWC Grading System is a server-rendered web application built using:
 
 - PHP 8.2+
-- Vanilla PHP
+- Vanilla PHP (Routing & Controllers)
+- Eloquent ORM (`illuminate/database` Capsule)
 - MySQL
 - PDO
 - Composer
@@ -202,9 +203,16 @@ Business rules must remain in services.
 
 ---
 
-## 8. Models
+## 8. Models & ORM
 
-Models represent application/domain entities.
+Models represent domain entities and extend `App\Core\Model`, which inherits from Eloquent ORM (`Illuminate\Database\Eloquent\Model`) booted globally via Eloquent Capsule.
+
+Features provided by Eloquent ORM:
+- Active Record persistence (`find()`, `where()`, `first()`, `all()`, `create()`, `update()`, `delete()`)
+- Eloquent relationships (`belongsTo`, `hasMany`, `hasOne`, `belongsToMany`)
+- Eager loading (`with(['relation'])`)
+- Collections with utility methods (`pluck()`, `map()`, `filter()`, `toArray()`)
+- Dual attribute access: supports both object property syntax (`$user->email`) and array syntax (`$user['email']`)
 
 Examples:
 
@@ -216,11 +224,11 @@ Subject
 Enrollment
 Grade
 GradingSheet
+GradingSetting
 GradingPeriod
 AcademicTerm
+Notification
 ```
-
-Models should not become large collections of unrelated database logic.
 
 ---
 

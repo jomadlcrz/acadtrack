@@ -10,7 +10,8 @@ class UserRepository
 {
     public function findById(int $id): ?array
     {
-        return User::find($id);
+        $user = User::find($id);
+        return $user ? $user->toArray() : null;
     }
 
     public function findByEmail(string $email): ?array
@@ -22,7 +23,8 @@ class UserRepository
     {
         $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         $data['created_at'] = date('Y-m-d H:i:s');
-        return User::create($data);
+        $user = User::create($data);
+        return (int) $user->id;
     }
 
     public function update(int $id, array $data): bool
@@ -31,12 +33,12 @@ class UserRepository
             $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
         }
         $data['updated_at'] = date('Y-m-d H:i:s');
-        return User::update($id, $data);
+        return (bool) User::where('id', $id)->update($data);
     }
 
     public function delete(int $id): bool
     {
-        return User::delete($id);
+        return (bool) User::destroy($id);
     }
 
     public function getStudents(): array

@@ -14,11 +14,22 @@
 
 **Acadtrack** is a role-governed academic grading and curriculum evaluation platform engineered for Golden West Colleges, Inc. (GWC). It streamlines semester offerings, course assignments, student roster classification, period-based grade computation, multi-tier administrative reviews, automated email notifications, and student curriculum evaluations.
 
-### The Four Academic Stakeholders
-1. **System Administrator:** Oversees master system accounts, user credential provisioning, global term activation, system security, and joint grade sheet review/approval/printing.
-2. **College Dean:** Manages curriculum offerings, assigns qualified faculty to subjects, audits grading distributions, and reviews, edits, approves, or returns submitted grading sheets with mandatory remarks.
-3. **Faculty / Instructor:** Manages assigned subjects, configures subject nature and grading rules (Zero-Based vs. 50-Based), maintains student rosters (Regular/Irregular, 1st–4th Year), selects active semester, encodes period scores, repeatedly saves working drafts, and submits final sheets.
-4. **Student:** Receives automated email credentials and grade availability notifications, selects semester (1st or 2nd), reviews period-by-period grades, and inspects their complete cumulative academic evaluation.
+### Core Features (Official Specification)
+As specified in `grading_system_workflow_text_based.pdf`, the system provides:
+
+- **Role-Based Login** — Separate access and dashboards for Admin, Dean, Faculty/Instructor, and Student.
+- **Semester Management** — Supports 1st Semester and 2nd Semester grading.
+- **Faculty Subject Assignment** — Dean can assign subjects to specific Faculty/Instructor.
+- **Subject Management** — Faculty can manage their assigned subjects and set the subject nature/type.
+- **Student Management** — Faculty can add students and identify their status as Regular or Irregular and their Year Level from 1st–4th Year.
+- **Grading Settings** — Faculty can choose Zero-Based or 50-Based grading and configure grading period weights.
+- **Grade Encoding** — Faculty can enter and save grades for students.
+- **Grade Submission** — Faculty can submit completed grading sheets for review and approval.
+- **Grade Review and Approval** — Dean and Admin can view, edit, review, approve, and print submitted grading sheets.
+- **Student Grade Viewing** — Students can select a semester and view their grades.
+- **Whole Evaluation** — Students can view their complete grading evaluation and results.
+- **Email Notifications** — Students receive email notifications for their account credentials (password) and when their grades/results are available.
+- **Access Control** — Users can only access features and information appropriate to their role.
 
 ---
 
@@ -30,15 +41,16 @@
 | **User Account & Password Administration** | Yes | No | No | No | `/admin/users` |
 | **Semester & Term Management** (1st & 2nd Sem) | Yes | Yes | Yes | Yes | `/admin/settings`, `/faculty/grading` |
 | **Faculty Subject Assignment** (Dean assigns to Faculty) | Yes | Yes | No | No | `/dean/faculty-assignments` |
-| **Subject Nature & Type Management** | Yes | Yes | Yes | No | `/faculty/subjects` |
+| **Subject Management** (Nature & Type) | Yes | Yes | Yes | No | `/faculty/subjects` |
 | **Student Management** (Regular/Irregular, 1st–4th Year) | Yes | Yes | Yes | No | `/faculty/students` |
 | **Grading Settings** (Zero-Based / 50-Based, Weights) | No | No | Yes | No | `/faculty/grading/settings` |
 | **Grade Encoding & Draft Autosaving** | No | No | Yes | No | `/faculty/grading` |
 | **Grade Submission for Review** | No | No | Yes | No | `/faculty/grading/submit` |
 | **Grade Review, Edit, Approval & Printing** | Yes | Yes | No | No | `/dean/grade-review`, `/dean/grading/print` |
-| **Student Grade Inquiry (By Semester)** | Yes | Yes | Yes | Yes | `/student/grades` |
-| **Whole Evaluation & Cumulative GPA Viewing** | Yes | Yes | No | Yes | `/student/evaluation` |
-| **Automated Email Notifications** (Credentials & Grades) | System | System | System | Recipient | Background Mailer Service |
+| **Student Grade Viewing (1st & 2nd Semester)** | Yes | Yes | Yes | Yes | `/student/grades` |
+| **Whole Evaluation & Results Viewing** | Yes | Yes | No | Yes | `/student/evaluation` |
+| **Email Notifications** (Credentials & Grades) | System | System | System | Recipient | Background Mailer Service |
+| **Access Control** (Role-Appropriate Isolation) | Yes | Yes | Yes | Yes | `AuthMiddleware`, `RoleMiddleware` |
 
 ---
 
@@ -141,33 +153,33 @@ sequenceDiagram
 * **Route:** `POST /faculty/grading/submit`
 * **Process:** Once all scores are verified, faculty submits the completed grading sheet. A modal confirmation confirms finalization. Input fields immediately lock (`SUBMITTED`) to safeguard data integrity.
 
-### Step 9: Dean / Admin Review & Approval
+### Step 9: Dean/Admin Review
 * **Actor:** College Dean and/or System Administrator
 * **Route:** `/dean/grade-review`, `/dean/grading/print`
-* **Capabilities:**
-  * **View:** Inspect grade distributions, averages, and passing/failing ratios.
-  * **Edit:** Adjust or correct individual marks when institutional policy requires correction.
+* **Process:** Dean and/or Admin reviews the submitted grades. They can:
+  * **View:** Inspect grade distributions, averages, and student performance.
+  * **Edit when necessary:** Adjust or correct individual marks when institutional policy requires correction.
   * **Approve:** Certify and approve the grading sheet.
-  * **Return:** Reject sheet with mandatory feedback remarks explaining required instructor revisions.
+  * **Confirm the grading sheet:** Finalize the sheet status and lock approved records.
   * **Print:** Generate and print official physical grade sheets for registrar filing.
 
 ### Step 10: Grade Finalization
-* **Actor:** Administration / Registrar
-* **Process:** Once approved, grades become official historical records for the term. Final Grade Point Equivalents are locked against tampering.
+* **Actor:** Administration / System
+* **Process:** Once the grades are finalized/approved, the student's results become available according to the existing approval workflow. Final marks become official records in the student's academic transcript.
 
-### Step 11: Automated Email Notification
+### Step 11: Email Notification
 * **Actor:** System (Automated Mailer Service)
 * **Process:** 
-  1. Automated credential emails notify newly provisioned student and faculty accounts of their login credentials.
-  2. Automated release alerts dispatch to enrolled students informing them that official semester grades have been approved and published.
+  1. Student receives an email notification informing them that their grades/results are available.
+  2. Newly provisioned student accounts also receive an automated email notification with their account credentials (password).
 
 ### Step 12: Student Views Evaluation
 * **Actor:** Student
 * **Routes:** `/student/grades`, `/student/evaluation`
 * **Process:**
-  1. Student logs in to Acadtrack.
-  2. Selects **1st Semester** or **2nd Semester** to inspect period-by-period marks and remarks.
-  3. Clicks **"View Whole Evaluation"** to open their comprehensive curriculum evaluation, tracking completed units, cumulative GPA, and overall academic standing.
+  1. Student logs in.
+  2. Selects **1st Semester** or **2nd Semester** to view period grades.
+  3. Clicks **"View Whole Evaluation"** to view their complete grading evaluation, curriculum progress, and academic standing results.
 
 ---
 

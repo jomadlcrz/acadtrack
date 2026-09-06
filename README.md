@@ -1,6 +1,6 @@
 # GWC Grading System
 
-A lightweight, server-rendered academic grading and evaluation system built with Vanilla PHP 8.2, MySQL/MariaDB, and Composer.
+A lightweight, server-rendered academic grading and evaluation system built with Vanilla PHP 8.2, Eloquent ORM (`illuminate/database` Capsule), MySQL/MariaDB, and Composer.
 
 ---
 
@@ -90,21 +90,33 @@ Run the full PHPUnit unit and feature test suite from the repository root:
 ```text
 PHPUnit 11.5.56 by Sebastian Bergmann and contributors.
 
-.................                                                 17 / 17 (100%)
+.............................                                     29 / 29 (100%)
 
-Time: 00:00.161, Memory: 8.00 MB
+Time: 00:00.715, Memory: 16.00 MB
 
-OK (17 tests, 34 assertions)
+OK (29 tests, 100 assertions)
 ```
 
 ---
 
-## 5. Architectural & Design Documentation
- 
-Detailed architecture, workflows, and UI specifications can be found under `docs/` and root documentation:
-* [grading_system_workflow.md](file:///C:/xampp/htdocs/grading-system/grading_system_workflow.md) / [docs/WORKFLOW.md](file:///C:/xampp/htdocs/grading-system/docs/WORKFLOW.md) - End-to-end 12-step grading workflow & lifecycle state machine
-* [Web-Designing.md](file:///C:/xampp/htdocs/grading-system/Web-Designing.md) / [docs/WEB_DESIGN_GUIDE.md](file:///C:/xampp/htdocs/grading-system/docs/WEB_DESIGN_GUIDE.md) - UI/UX design architecture, Bootstrap 5.3 integration & component specifications
-* [docs/ANTI_GENERIC_DESIGN.md](file:///C:/xampp/htdocs/grading-system/docs/ANTI_GENERIC_DESIGN.md) - The 6 core pillars of Anti-Generic Academic Design (high density, tabular nums, institutional identity)
-* [docs/ARCHITECTURE.md](file:///C:/xampp/htdocs/grading-system/docs/ARCHITECTURE.md) - System architecture, routing, and error design
-* [docs/DESIGN_PRINCIPLES.md](file:///C:/xampp/htdocs/grading-system/docs/DESIGN_PRINCIPLES.md) - Role-oriented UI and notification standards
-* [docs/CODING_PRINCIPLES.md](file:///C:/xampp/htdocs/grading-system/docs/CODING_PRINCIPLES.md) - Clean code and strict typing guidelines
+## 5. System Features & Workflow Architecture
+
+The application strictly implements the workflow specified in `grading_system_workflow_text_based.pdf`:
+
+```text
+1. Login  ──>  2. Dean Assigns Subjects  ──>  3. Faculty Sets Up Subject  ──>  4. Faculty Adds/Selects Students
+                                                                                         │
+8. Submit Grading Sheet  <──  7. Save and Review  <──  6. Faculty Enters Grades  <──  5. Select Semester
+         │
+         ▼
+9. Dean/Admin Review  ──>  10. Grade Finalization  ──>  11. Email Notification  ──>  12. Student Views Evaluation
+```
+
+- **Features & Workflow:** [grading_system_workflow.md](file:///C:/xampp/htdocs/acadtrack/grading_system_workflow.md) | [docs/WORKFLOW.md](file:///C:/xampp/htdocs/acadtrack/docs/WORKFLOW.md)
+- **Bootstrap 5 & Forms Guide:** [docs/BOOTSTRAP_GUIDE.md](file:///C:/xampp/htdocs/acadtrack/docs/BOOTSTRAP_GUIDE.md)
+- **Casing & Typography Standards:** [CASING_GUIDELINES.md](file:///C:/xampp/htdocs/acadtrack/CASING_GUIDELINES.md)
+- **Web Design & UI/UX Architecture:** [docs/WEB_DESIGN_GUIDE.md](file:///C:/xampp/htdocs/acadtrack/docs/WEB_DESIGN_GUIDE.md)
+- **Anti-Generic Design Standards:** [docs/ANTI_GENERIC_DESIGN.md](file:///C:/xampp/htdocs/acadtrack/docs/ANTI_GENERIC_DESIGN.md)
+- **System Architecture & Error Handling:** [docs/ARCHITECTURE.md](file:///C:/xampp/htdocs/acadtrack/docs/ARCHITECTURE.md)
+- **Design Principles:** [docs/DESIGN_PRINCIPLES.md](file:///C:/xampp/htdocs/acadtrack/docs/DESIGN_PRINCIPLES.md)
+- **Coding Principles:** [docs/CODING_PRINCIPLES.md](file:///C:/xampp/htdocs/acadtrack/docs/CODING_PRINCIPLES.md)

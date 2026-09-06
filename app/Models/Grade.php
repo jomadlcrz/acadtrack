@@ -8,9 +8,26 @@ use App\Core\Model;
 
 class Grade extends Model
 {
-    protected static function table(): string
+    protected $table = 'grades';
+
+    public function student()
     {
-        return 'grades';
+        return $this->belongsTo(Student::class, 'student_id');
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    public function gradingPeriod()
+    {
+        return $this->belongsTo(GradingPeriod::class, 'grading_period_id');
+    }
+
+    public function academicTerm()
+    {
+        return $this->belongsTo(AcademicTerm::class, 'academic_term_id');
     }
 
     public static function getByStudent(int $studentId, int $academicTermId): array
@@ -63,11 +80,11 @@ class Grade extends Model
         $row = $existing->fetch();
 
         if ($row) {
-            self::update((int)$row['id'], ['grade' => $grade, 'updated_at' => date('Y-m-d H:i:s')]);
+            self::where('id', (int)$row['id'])->update(['grade' => $grade, 'updated_at' => date('Y-m-d H:i:s')]);
             return (int)$row['id'];
         }
 
-        return self::create([
+        $newGrade = self::create([
             'student_id' => $studentId,
             'subject_id' => $subjectId,
             'grading_period_id' => $gradingPeriodId,
@@ -75,5 +92,6 @@ class Grade extends Model
             'grade' => $grade,
             'created_at' => date('Y-m-d H:i:s'),
         ]);
+        return (int) $newGrade->id;
     }
 }
