@@ -1,4 +1,4 @@
-# GWC Grading System
+# Acadtrack
 
 A lightweight, server-rendered academic grading and evaluation system built with Vanilla PHP 8.2, Eloquent ORM (`illuminate/database` Capsule), MySQL/MariaDB, and Composer.
 
@@ -53,7 +53,7 @@ In standard PHP/PDO applications, a unique constraint conflict (e.g., adding an 
 Fatal error: Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'CS102-1' for key 'unique_subject' in Model.php...
 ```
 
-The GWC Grading System implements a two-tier error handling architecture to ensure that raw exceptions are never presented to end-users:
+The GWC Acadtrack implements a two-tier error handling architecture to ensure that raw exceptions are never presented to end-users:
 
 ### 1. Specific Controller-Level Handling & Flash Alerts
 Controllers capture database exceptions on state-mutating actions (such as subject creation, user registration, and faculty assignment):

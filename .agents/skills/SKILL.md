@@ -1,8 +1,8 @@
-# GWC Grading System Development Skill
+# GWC Acadtrack Development Skill
 
 ## Purpose
 
-This skill defines how the GWC Grading System should be developed, modified, reviewed, and maintained.
+This skill defines how the GWC Acadtrack should be developed, modified, reviewed, and maintained.
 
 The application uses:
 

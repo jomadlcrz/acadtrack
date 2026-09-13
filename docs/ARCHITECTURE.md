@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-The GWC Grading System is a server-rendered web application built using:
+The GWC Acadtrack is a server-rendered web application built using:
 
 - PHP 8.2+
 - Vanilla PHP (Routing & Controllers)

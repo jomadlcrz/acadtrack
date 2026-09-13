@@ -1,4 +1,4 @@
-# GWC Grading System — Web Design & UI/UX Architecture Specification
+# GWC Acadtrack — Web Design & UI/UX Architecture Specification
 
 > **Project:** Golden West Colleges, Inc. (GWC) Grading & Academic Evaluation System  
 > **Tech Stack:** Vanilla PHP 8.2 MVC, MySQL 10.4+, Bootstrap 5.3.3, Bootstrap Icons 1.11.3, Vanilla JavaScript  
@@ -12,7 +12,7 @@
 
 ## 1. Design System Identity & Philosophy
 
-The **GWC Grading System** is a mission-critical academic portal built for instructors, academic deans, administrators, and students. Unlike consumer-facing web applications or marketing landing pages, an academic grading portal requires:
+The **GWC Acadtrack** is a mission-critical academic portal built for instructors, academic deans, administrators, and students. Unlike consumer-facing web applications or marketing landing pages, an academic grading portal requires:
 
 1. **Institutional Authority:** Grounded in collegiate colors (Deep Navy `#1e3a8a`, Slate `#475569`, and crisp white surfaces) reflecting institutional trust.
 2. **High Information Density:** Maximum visible data rows per screen, compact form inputs, and zero decorative fluff. Instructors grading classes of 40–60 students must navigate grade sheets without endless scrolling.

@@ -1,4 +1,4 @@
-# Grading System — Features and Workflow
+# Acadtrack — Features and Workflow
 
 > **Source Document:** `grading_system_workflow_text_based.pdf`  
 > **System:** Golden West Colleges, Inc. (GWC) Academic Grading & Evaluation Platform  

@@ -182,7 +182,7 @@ The following classes are implemented in [public/assets/css/app.css](file:///C:/
 
 ## 5. Developer Verification Checklist
 
-Before shipping any new view, layout, or table in the GWC Grading System, verify:
+Before shipping any new view, layout, or table in the GWC Acadtrack, verify:
 
 - [ ] **Tabular Numerics:** Are all score cells, GPAs, and student IDs styled with `tabular-nums`?
 - [ ] **Font Weight Cap:** Is the maximum font weight capped at `600` (semibold) with zero `700`/`800`/`bold`?
