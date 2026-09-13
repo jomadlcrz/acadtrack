@@ -9,7 +9,7 @@ USE acadtrack;
 -- Academic Years
 CREATE TABLE academic_years (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(20) NOT NULL,
+    school_year VARCHAR(20) NOT NULL,
     is_active TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -78,8 +78,8 @@ CREATE TABLE admin_details (
 -- Departments
 CREATE TABLE departments (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    code VARCHAR(50) NOT NULL UNIQUE,
-    name VARCHAR(150) NOT NULL,
+    dept_abbrev VARCHAR(50) NOT NULL UNIQUE,
+    dept_name VARCHAR(150) NOT NULL,
     description TEXT NULL,
     status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -359,7 +359,7 @@ CREATE TABLE notifications (
 ) ENGINE=InnoDB;
 
 -- Insert default academic year and terms
-INSERT INTO academic_years (name, is_active) VALUES
+INSERT INTO academic_years (school_year, is_active) VALUES
 ('2026-2027', 1);
 
 INSERT INTO academic_terms (academic_year_id, semester, is_active) VALUES

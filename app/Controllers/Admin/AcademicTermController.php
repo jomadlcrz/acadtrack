@@ -21,13 +21,13 @@ class AcademicTermController
 
         $stmt = $pdo->query("
             SELECT at.*, 
-                   COALESCE(at.school_year, ay.name, '2026-2027') as school_year_display,
-                   ay.name as academic_year_name,
+                   COALESCE(at.school_year, ay.school_year, '2026-2027') as school_year_display,
+                   ay.school_year as academic_year_name,
                    (SELECT COUNT(*) FROM sets s WHERE s.academic_term_id = at.id) as sets_count,
                    (SELECT COUNT(*) FROM subjects sub WHERE sub.academic_term_id = at.id) as subjects_count
             FROM academic_terms at
             LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
-            ORDER BY COALESCE(at.school_year, ay.name) DESC, at.semester ASC
+            ORDER BY COALESCE(at.school_year, ay.school_year) DESC, at.semester ASC
         ");
         $terms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -69,13 +69,13 @@ class AcademicTermController
         $pdo = Database::getConnection();
 
         // 1. Ensure academic_years record exists
-        $stmtYear = $pdo->prepare("SELECT id FROM academic_years WHERE name = :name LIMIT 1");
+        $stmtYear = $pdo->prepare("SELECT id FROM academic_years WHERE school_year = :name LIMIT 1");
         $stmtYear->execute(['name' => $schoolYear]);
         $yearRow = $stmtYear->fetch(PDO::FETCH_ASSOC);
 
         if (!$yearRow) {
             $stmtInsertYear = $pdo->prepare("
-                INSERT INTO academic_years (name, is_active, created_at, updated_at)
+                INSERT INTO academic_years (school_year, is_active, created_at, updated_at)
                 VALUES (:name, 0, NOW(), NOW())
             ");
             $stmtInsertYear->execute(['name' => $schoolYear]);

@@ -141,7 +141,7 @@ class Subject extends Model
             SELECT s.*, 
                    s.subject_code as code,
                    s.descriptive_title as name,
-                   ay.name as academic_year_name
+                   ay.school_year as academic_year_name
             FROM subjects s
             JOIN academic_terms at2 ON s.academic_term_id = at2.id
             JOIN academic_years ay ON at2.academic_year_id = ay.id

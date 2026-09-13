@@ -53,7 +53,7 @@ class SettingsController
             }
 
             if ($academicYear !== '' && !empty($term['academic_year_id'])) {
-                $ayStmt = $db->prepare("UPDATE academic_years SET name = :name WHERE id = :id");
+                $ayStmt = $db->prepare("UPDATE academic_years SET school_year = :name WHERE id = :id");
                 $ayStmt->execute(['name' => $academicYear, 'id' => $term['academic_year_id']]);
             }
         }

@@ -33,7 +33,7 @@ class AcademicTerm extends Model
     public static function getActive(): ?array
     {
         $stmt = self::db()->query("
-            SELECT at.*, ay.name as academic_year_name
+            SELECT at.*, ay.school_year as academic_year_name
             FROM academic_terms at
             JOIN academic_years ay ON at.academic_year_id = ay.id
             WHERE at.is_active = 1
@@ -46,10 +46,10 @@ class AcademicTerm extends Model
     public static function getAll(): array
     {
         $stmt = self::db()->query("
-            SELECT at.*, ay.name as academic_year_name
+            SELECT at.*, ay.school_year as academic_year_name
             FROM academic_terms at
             JOIN academic_years ay ON at.academic_year_id = ay.id
-            ORDER BY ay.name DESC, at.semester
+            ORDER BY ay.school_year DESC, at.semester
         ");
         return $stmt->fetchAll();
     }
@@ -60,7 +60,7 @@ class AcademicTerm extends Model
         $yearId = $active['academic_year_id'] ?? 1;
 
         $stmt = self::db()->prepare("
-            SELECT at.*, ay.name as academic_year_name
+            SELECT at.*, ay.school_year as academic_year_name
             FROM academic_terms at
             JOIN academic_years ay ON at.academic_year_id = ay.id
             WHERE at.academic_year_id = :year_id AND at.semester = :sem

@@ -166,7 +166,7 @@ class UserRepository
                        COALESCE(r.role_name, 'Student') AS role,
                        sd.student_number,
                        fd.faculty_type,
-                       d.name AS department_name, d.code AS department_code, sec.set_name AS set_name
+                       d.dept_name AS department_name, d.dept_abbrev AS department_code, sec.set_name AS set_name
                 FROM users u
                 LEFT JOIN user_roles ur ON ur.user_id = u.id
                 LEFT JOIN roles r ON r.id = ur.role_id

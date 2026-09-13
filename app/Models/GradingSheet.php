@@ -104,7 +104,7 @@ class GradingSheet extends Model
                    s.subject_code, s.subject_code as code, s.descriptive_title as subject_name, s.nature as subject_nature, s.year_level, s.semester,
                    gp.name as period_name,
                    fd.first_name as faculty_first_name, fd.last_name as faculty_last_name, u.email as faculty_email,
-                   ay.name as academic_year_name,
+                   ay.school_year as academic_year_name,
                    COALESCE(app_ad.first_name, app_fd.first_name, '') as approver_first_name,
                    COALESCE(app_ad.last_name, app_fd.last_name, '') as approver_last_name
             FROM grading_sheets gs

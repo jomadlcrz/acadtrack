@@ -27,8 +27,8 @@ class DepartmentController
 
     public function store(Request $request, Response $response, Session $session): void
     {
-        $code = strtoupper(trim((string) $request->post('code', '')));
-        $name = trim((string) $request->post('name', ''));
+        $code = strtoupper(trim((string) ($request->post('dept_abbrev') ?: $request->post('code', ''))));
+        $name = trim((string) ($request->post('dept_name') ?: $request->post('name', '')));
         $description = trim((string) $request->post('description', '')) ?: null;
         $status = in_array($request->post('status'), ['active', 'inactive'], true) ? $request->post('status') : 'active';
 
@@ -38,15 +38,15 @@ class DepartmentController
             return;
         }
 
-        if (Department::where('code', $code)->exists()) {
+        if (Department::where('dept_abbrev', $code)->exists()) {
             $session->flash('error', "Department code '{$code}' already exists.");
             redirect('/admin/departments');
             return;
         }
 
         Department::create([
-            'code' => $code,
-            'name' => $name,
+            'dept_abbrev' => $code,
+            'dept_name' => $name,
             'description' => $description,
             'status' => $status,
         ]);
@@ -64,8 +64,8 @@ class DepartmentController
             return;
         }
 
-        $code = strtoupper(trim((string) $request->post('code', '')));
-        $name = trim((string) $request->post('name', ''));
+        $code = strtoupper(trim((string) ($request->post('dept_abbrev') ?: $request->post('code', ''))));
+        $name = trim((string) ($request->post('dept_name') ?: $request->post('name', '')));
         $description = trim((string) $request->post('description', '')) ?: null;
         $status = in_array($request->post('status'), ['active', 'inactive'], true) ? $request->post('status') : 'active';
 
@@ -75,15 +75,15 @@ class DepartmentController
             return;
         }
 
-        if (Department::where('code', $code)->where('id', '!=', $department->id)->exists()) {
+        if (Department::where('dept_abbrev', $code)->where('id', '!=', $department->id)->exists()) {
             $session->flash('error', "Department code '{$code}' is already assigned to another department.");
             redirect('/admin/departments');
             return;
         }
 
         $department->update([
-            'code' => $code,
-            'name' => $name,
+            'dept_abbrev' => $code,
+            'dept_name' => $name,
             'description' => $description,
             'status' => $status,
         ]);
