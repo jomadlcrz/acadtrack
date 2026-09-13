@@ -106,12 +106,11 @@ CREATE TABLE programs (
 CREATE TABLE curricula (
     id INT AUTO_INCREMENT PRIMARY KEY,
     program_id INT NOT NULL,
-    version VARCHAR(50) NOT NULL DEFAULT '2026-2027',
     status ENUM('draft', 'active', 'archived') NOT NULL DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE RESTRICT,
-    UNIQUE KEY unique_curriculum (program_id, version),
+    UNIQUE KEY unique_program_curriculum (program_id),
     INDEX idx_prog_status (program_id, status)
 ) ENGINE=InnoDB;
 

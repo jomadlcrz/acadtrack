@@ -33,10 +33,11 @@ return new class {
 
             // Sync school_year from academic_years if present
             if (Capsule::schema()->hasTable('academic_years')) {
+                $ayCol = Capsule::schema()->hasColumn('academic_years', 'school_year') ? 'school_year' : 'name';
                 $pdo->exec("
                     UPDATE academic_terms at
                     JOIN academic_years ay ON at.academic_year_id = ay.id
-                    SET at.school_year = ay.name
+                    SET at.school_year = ay.{$ayCol}
                     WHERE at.school_year IS NULL OR at.school_year = ''
                 ");
             }
@@ -247,7 +248,8 @@ return new class {
 
             foreach ($allSets as $set) {
                 // E.g., 'BSIT-1A' -> program 'BSIT', year 1, code 'A'
-                if (preg_match('/^([A-Za-z]+)-(\d+)([A-Za-z0-9]+)$/', $set->name, $matches)) {
+                $setName = (string) ($set->set_name ?? $set->name ?? '');
+                if ($setName !== '' && preg_match('/^([A-Za-z]+)-(\d+)([A-Za-z0-9]+)$/', $setName, $matches)) {
                     $abbrev = $matches[1];
                     $year = (int)$matches[2];
                     $code = strtoupper($matches[3]);

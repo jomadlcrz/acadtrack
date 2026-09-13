@@ -7,6 +7,10 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 return new class {
     public function up(): void
     {
+        if (!Capsule::schema()->hasColumn('users', 'student_number')) {
+            return;
+        }
+
         // 1. Convert any empty strings to true NULL
         Capsule::table('users')->where('student_number', '')->update(['student_number' => null]);
 

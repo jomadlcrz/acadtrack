@@ -57,46 +57,51 @@ return new class {
         }
 
         // 3. Seed baseline academic sections
-        $citDept = Capsule::table('departments')->where('code', 'CIT')->orWhere('code', 'CITE')->first();
-        $csDept = Capsule::table('departments')->where('code', 'CS')->first();
-        $citDeptId = $citDept ? $citDept->id : null;
-        $csDeptId = $csDept ? $csDept->id : null;
+        if (Capsule::schema()->hasTable('sections')) {
+            $codeCol = Capsule::schema()->hasColumn('departments', 'dept_abbrev') ? 'dept_abbrev' : 'code';
+            $citDept = Capsule::table('departments')->where($codeCol, 'CIT')->orWhere($codeCol, 'CITE')->first();
+            $csDept = Capsule::table('departments')->where($codeCol, 'CS')->first();
+            $citDeptId = $citDept ? $citDept->id : null;
+            $csDeptId = $csDept ? $csDept->id : null;
 
-        $terms = Capsule::table('academic_terms')->get();
-        foreach ($terms as $term) {
-            $baselineSections = [
-                ['name' => 'BSIT-1A', 'year_level' => 1, 'department_id' => $citDeptId],
-                ['name' => 'BSIT-1B', 'year_level' => 1, 'department_id' => $citDeptId],
-                ['name' => 'BSIT-2A', 'year_level' => 2, 'department_id' => $citDeptId],
-                ['name' => 'BSCS-1A', 'year_level' => 1, 'department_id' => $csDeptId],
-            ];
+            $terms = Capsule::table('academic_terms')->get();
+            foreach ($terms as $term) {
+                $baselineSections = [
+                    ['name' => 'BSIT-1A', 'year_level' => 1, 'department_id' => $citDeptId],
+                    ['name' => 'BSIT-1B', 'year_level' => 1, 'department_id' => $citDeptId],
+                    ['name' => 'BSIT-2A', 'year_level' => 2, 'department_id' => $citDeptId],
+                    ['name' => 'BSCS-1A', 'year_level' => 1, 'department_id' => $csDeptId],
+                ];
 
-            foreach ($baselineSections as $sec) {
-                $exists = Capsule::table('sections')
-                    ->where('name', $sec['name'])
-                    ->where('academic_term_id', $term->id)
-                    ->exists();
+                foreach ($baselineSections as $sec) {
+                    $exists = Capsule::table('sections')
+                        ->where('name', $sec['name'])
+                        ->where('academic_term_id', $term->id)
+                        ->exists();
 
-                if (!$exists) {
-                    Capsule::table('sections')->insert([
-                        'name' => $sec['name'],
-                        'year_level' => $sec['year_level'],
-                        'academic_term_id' => $term->id,
-                        'department_id' => $sec['department_id'],
-                        'status' => 'active',
-                        'created_at' => date('Y-m-d H:i:s'),
-                        'updated_at' => date('Y-m-d H:i:s'),
-                    ]);
+                    if (!$exists) {
+                        Capsule::table('sections')->insert([
+                            'name' => $sec['name'],
+                            'year_level' => $sec['year_level'],
+                            'academic_term_id' => $term->id,
+                            'department_id' => $sec['department_id'],
+                            'status' => 'active',
+                            'created_at' => date('Y-m-d H:i:s'),
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
+                    }
                 }
             }
         }
 
         // 4. Backfill any existing students without a section into the first section
-        $firstSection = Capsule::table('sections')->orderBy('id', 'asc')->first();
-        if ($firstSection) {
-            Capsule::table('students')->whereNull('section_id')->update([
-                'section_id' => $firstSection->id,
-            ]);
+        if (Capsule::schema()->hasTable('sections')) {
+            $firstSection = Capsule::table('sections')->orderBy('id', 'asc')->first();
+            if ($firstSection) {
+                Capsule::table('students')->whereNull('section_id')->update([
+                    'section_id' => $firstSection->id,
+                ]);
+            }
         }
     }
 

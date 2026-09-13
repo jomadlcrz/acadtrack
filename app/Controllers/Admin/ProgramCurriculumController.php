@@ -135,9 +135,6 @@ class ProgramCurriculumController
         $isJson = str_contains((string) $request->header('Content-Type'), 'application/json');
         $data = $isJson ? json_decode(file_get_contents('php://input'), true) ?? [] : $_POST;
 
-        $programMode = $data['program_mode'] ?? 'new'; // 'new' or 'existing'
-        $existingProgramId = !empty($data['existing_program_id']) ? (int) $data['existing_program_id'] : null;
-
         $programName = trim((string) ($data['program_name'] ?? ''));
         $programAbbrev = strtoupper(trim((string) ($data['program_abbrev'] ?? '')));
         $departmentId = !empty($data['department_id']) ? (int) $data['department_id'] : null;
@@ -145,59 +142,50 @@ class ProgramCurriculumController
         $programLength = trim((string) ($data['program_length'] ?? '4 Years'));
         $description = trim((string) ($data['description'] ?? '')) ?: null;
         $status = in_array($data['status'] ?? 'active', ['active', 'draft', 'archived'], true) ? $data['status'] : 'active';
-        $version = trim((string) ($data['version'] ?? '2026-2027')) ?: '2026-2027';
 
-        $subjectsInput = $data['subjects'] ?? [];
+        $subjectsInput = $data['subjects'] ?? $data['subjects_json'] ?? [];
         if (is_string($subjectsInput)) {
             $subjectsInput = json_decode($subjectsInput, true) ?? [];
         }
 
-        if ($programMode === 'existing' && $existingProgramId) {
-            $program = Program::find($existingProgramId);
-            if (!$program) {
-                $this->respondError($isJson, $response, $session, 'Selected program was not found.');
-                return;
-            }
-        } else {
-            if (empty($programName) || empty($programAbbrev)) {
-                $this->respondError($isJson, $response, $session, 'Program Name and Program Abbreviation are required.');
-                return;
-            }
-
-            // Check if abbreviation already exists
-            $existing = Program::where('program_abbrev', $programAbbrev)->first();
-            if ($existing) {
-                $program = $existing;
-                $program->update([
-                    'program_name' => $programName,
-                    'department_id' => $departmentId,
-                    'program_type' => $programType,
-                    'program_length' => $programLength,
-                    'description' => $description,
-                    'status' => $status,
-                ]);
-            } else {
-                $program = Program::create([
-                    'program_name' => $programName,
-                    'program_abbrev' => $programAbbrev,
-                    'department_id' => $departmentId,
-                    'program_type' => $programType,
-                    'program_length' => $programLength,
-                    'description' => $description,
-                    'status' => $status,
-                ]);
-            }
+        if (empty($programName) || empty($programAbbrev)) {
+            $this->respondError($isJson, $response, $session, 'Program Name and Program Abbreviation are required.');
+            return;
         }
 
-        // Create or locate curriculum for this version
-        $curriculum = Curriculum::where('program_id', $program->id)
-            ->where('version', $version)
-            ->first();
+        // Check if program with abbreviation already exists
+        $existing = Program::where('program_abbrev', $programAbbrev)->first();
+        if ($existing) {
+            $program = $existing;
+            $program->update([
+                'program_name' => $programName,
+                'department_id' => $departmentId,
+                'program_type' => $programType,
+                'program_length' => $programLength,
+                'description' => $description,
+                'status' => $status,
+            ]);
+        } else {
+            $program = Program::create([
+                'program_name' => $programName,
+                'program_abbrev' => $programAbbrev,
+                'department_id' => $departmentId,
+                'program_type' => $programType,
+                'program_length' => $programLength,
+                'description' => $description,
+                'status' => $status,
+            ]);
+        }
 
+        // Create or locate canonical curriculum for this program
+        $curriculum = Curriculum::where('program_id', $program->id)->first();
         if (!$curriculum) {
             $curriculum = Curriculum::create([
                 'program_id' => $program->id,
-                'version' => $version,
+                'status' => $status,
+            ]);
+        } else {
+            $curriculum->update([
                 'status' => $status,
             ]);
         }
@@ -360,6 +348,21 @@ class ProgramCurriculumController
                 $s->prerequisites ?? '',
             ]);
         }
+        fclose($out);
+        exit;
+    }
+
+    public function downloadTemplateCsv(Request $request, Response $response): void
+    {
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="Curriculum_Subjects_Template.csv"');
+
+        $out = fopen('php://output', 'w');
+        fputcsv($out, ['Year Level', 'Semester', 'Subject Code', 'Descriptive Title', 'Units', 'Subject Type', 'Pre-Requisite']);
+        fputcsv($out, ['First Year', '1st Semester', 'IT101', 'Introduction to Computing', '3.0', 'GenEd Core', '']);
+        fputcsv($out, ['First Year', '1st Semester', 'IT102', 'Computer Programming 1', '3.0', 'Major with Lab', '']);
+        fputcsv($out, ['First Year', '2nd Semester', 'IT103', 'Computer Programming 2', '3.0', 'Major with Lab', 'IT102']);
+        fputcsv($out, ['First Year', '2nd Semester', 'IT104', 'Data Structures and Algorithms', '3.0', 'Major with Lab', 'IT102']);
         fclose($out);
         exit;
     }

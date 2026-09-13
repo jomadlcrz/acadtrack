@@ -64,6 +64,7 @@ $router->post('/admin/academic-terms/{id}/restore', [AcademicTermController::cla
 // Program Curricula routes
 $router->get('/admin/program-curricula', [ProgramCurriculumController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean'])]);
 $router->get('/admin/program-curricula/new', [ProgramCurriculumController::class, 'create'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+$router->get('/admin/program-curricula/template-csv', [ProgramCurriculumController::class, 'downloadTemplateCsv'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/program-curricula', [ProgramCurriculumController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->get('/admin/program-curricula/{id}/export-csv', [ProgramCurriculumController::class, 'exportCsv'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean'])]);
 

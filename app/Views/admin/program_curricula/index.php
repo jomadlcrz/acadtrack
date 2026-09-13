@@ -10,7 +10,6 @@ ob_start();
     <h2 class="h4 mb-1"><?= htmlspecialchars($selectedProgram ? $selectedProgram->program_name : 'Program Curriculum') ?></h2>
     <div class="text-muted small">
         Program Code: <?= htmlspecialchars($selectedProgram->program_abbrev ?? '') ?> | 
-        Version: <?= htmlspecialchars($curriculum->version ?? '2026-2027') ?> | 
         Total Units: <?= $totalUnits ?> | 
         Printed on <?= date('F j, Y') ?>
     </div>
@@ -83,7 +82,6 @@ ob_start();
                             <?php if (!empty($selectedProgram->department->code)): ?>
                                 (<?= htmlspecialchars($selectedProgram->department->code) ?>)
                             <?php endif; ?>
-                            · Version <?= htmlspecialchars($curriculum->version ?? '2026-2027') ?>
                         </div>
                         <div class="d-flex flex-wrap gap-3 mt-1 small text-secondary">
                             <span><span class="text-muted">Type:</span> <span class="fw-semibold text-dark"><?= htmlspecialchars($selectedProgram->program_type ?? "Bachelor's Degree") ?></span></span>

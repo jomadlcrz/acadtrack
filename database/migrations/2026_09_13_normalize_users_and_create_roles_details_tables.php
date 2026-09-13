@@ -159,8 +159,12 @@ echo "Altering users table...\n";
 
 // Rename force_password_change -> is_temp_password if exists
 if (Capsule::schema()->hasColumn('users', 'force_password_change')) {
-    $pdo->exec("ALTER TABLE users CHANGE COLUMN force_password_change is_temp_password TINYINT(1) NOT NULL DEFAULT 0");
-    echo "Renamed 'force_password_change' to 'is_temp_password'.\n";
+    if (Capsule::schema()->hasColumn('users', 'is_temp_password')) {
+        $pdo->exec("ALTER TABLE users DROP COLUMN force_password_change");
+    } else {
+        $pdo->exec("ALTER TABLE users CHANGE COLUMN force_password_change is_temp_password TINYINT(1) NOT NULL DEFAULT 0");
+    }
+    echo "Handled 'force_password_change'.\n";
 } elseif (!Capsule::schema()->hasColumn('users', 'is_temp_password')) {
     $pdo->exec("ALTER TABLE users ADD COLUMN is_temp_password TINYINT(1) NOT NULL DEFAULT 0");
     echo "Added 'is_temp_password' column.\n";

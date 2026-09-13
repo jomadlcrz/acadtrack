@@ -64,9 +64,19 @@ return new class {
             ],
         ];
 
+        $codeCol = Capsule::schema()->hasColumn('departments', 'dept_abbrev') ? 'dept_abbrev' : 'code';
+        $nameCol = Capsule::schema()->hasColumn('departments', 'dept_name') ? 'dept_name' : 'name';
         foreach ($baselineDepartments as $dept) {
-            if (!Capsule::table('departments')->where('code', $dept['code'])->exists()) {
-                Capsule::table('departments')->insert($dept);
+            $insertData = [
+                $codeCol => $dept['code'],
+                $nameCol => $dept['name'],
+                'description' => $dept['description'],
+                'status' => $dept['status'],
+                'created_at' => $dept['created_at'],
+                'updated_at' => $dept['updated_at'],
+            ];
+            if (!Capsule::table('departments')->where($codeCol, $dept['code'])->exists()) {
+                Capsule::table('departments')->insert($insertData);
             }
         }
 

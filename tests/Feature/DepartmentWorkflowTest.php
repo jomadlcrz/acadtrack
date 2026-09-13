@@ -24,6 +24,7 @@ class DepartmentWorkflowTest extends TestCase
             env('DB_USERNAME'),
             (string) env('DB_PASSWORD', '')
         );
+        Department::whereIn('dept_abbrev', ['CIT', 'CS', 'CBA', 'CAS', 'COE'])->update(['status' => 'active']);
     }
 
     public static function tearDownAfterClass(): void

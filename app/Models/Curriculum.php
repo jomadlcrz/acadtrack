@@ -12,7 +12,6 @@ class Curriculum extends Model
 
     protected $fillable = [
         'program_id',
-        'version',
         'status',
     ];
 
