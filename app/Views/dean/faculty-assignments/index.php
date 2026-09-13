@@ -210,9 +210,13 @@ ob_start();
                     <tbody class="divide-y">
                         <?php if (empty($subList)): ?>
                             <tr class="group-empty-row">
-                                <td colspan="4" class="text-center py-4 text-muted small">
-                                    <i class="bi bi-dash-circle me-1 text-secondary"></i>
-                                    No course offerings registered for this year level.
+                                <td colspan="4" class="p-0">
+                                    <?php
+                                    $icon = 'bi-journal-x';
+                                    $title = 'No course offerings';
+                                    $message = 'No course offerings registered for this year level.';
+                                    include __DIR__ . '/../../components/empty-state.php';
+                                    ?>
                                 </td>
                             </tr>
                         <?php else: ?>
@@ -321,17 +325,15 @@ ob_start();
 </div>
 
 <!-- Empty Search Fallback State -->
-<div id="noResultsState" class="card shadow-sm border-0 py-5 text-center d-none" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-    <div class="card-body">
-        <div class="bg-light text-secondary d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 56px; height: 56px;">
-            <i class="bi bi-search fs-4"></i>
-        </div>
-        <h4 class="h6 fw-bold text-dark mb-1">No course allocations match your filter</h4>
-        <p class="text-muted small mb-3">Try adjusting your keywords or clearing the year level / status filter.</p>
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetFilters()">
-            Clear Filters
-        </button>
-    </div>
+<div id="noResultsState" class="d-none mb-4">
+    <?php
+    $icon = 'bi-search';
+    $title = 'No course allocations match your filter';
+    $message = 'Try adjusting your keywords or clearing the year level / status filter.';
+    $actionHtml = '<button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetFilters()">Clear Filters</button>';
+    $card = true;
+    include __DIR__ . '/../../components/empty-state.php';
+    ?>
 </div>
 
 <!-- Modal: Assign Instructor to Course -->

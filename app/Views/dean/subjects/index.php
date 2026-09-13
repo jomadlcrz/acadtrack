@@ -248,15 +248,15 @@ ob_start();
     <?php endforeach; ?>
 
     <!-- Global Empty Search Result Card -->
-    <div id="noSearchResultsCard" class="card shadow-sm border-0 text-center py-5 d-none mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-        <div class="card-body">
-            <i class="bi bi-search d-block fs-2 mb-2 text-secondary"></i>
-            <h4 class="h6 fw-bold text-dark mb-1">No matching courses found</h4>
-            <p class="text-muted small mb-3">Try adjusting your search keywords or year level filter.</p>
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetFilters()">
-                <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Filters
-            </button>
-        </div>
+    <div id="noSearchResultsCard" class="d-none mb-4">
+        <?php
+        $icon = 'bi-search';
+        $title = 'No matching courses found';
+        $message = 'Try adjusting your search keywords or year level filter.';
+        $actionHtml = '<button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetFilters()"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset Filters</button>';
+        $card = true;
+        include __DIR__ . '/../../components/empty-state.php';
+        ?>
     </div>
 </div>
 

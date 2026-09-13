@@ -107,8 +107,13 @@ ob_start();
             <tbody class="divide-y">
                 <?php if (empty($grades)): ?>
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted small">
-                            No enrolled courses recorded for the current term.
+                        <td colspan="7" class="p-0">
+                            <?php
+                            $icon = 'bi-journal-x';
+                            $title = 'No enrolled subjects';
+                            $message = 'No enrolled courses recorded for the current term.';
+                            include __DIR__ . '/../components/empty-state.php';
+                            ?>
                         </td>
                     </tr>
                 <?php else: ?>

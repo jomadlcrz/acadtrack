@@ -149,13 +149,13 @@ $metrics = $metrics ?? [
     </div>
 
     <?php if (empty($gradingSheets)): ?>
-        <div class="card-body text-center py-5">
-            <div class="d-inline-flex align-items-center justify-content-center bg-light text-muted rounded-circle mb-3" style="width: 52px; height: 52px; font-size: 24px;">
-                <i class="bi bi-check2-all"></i>
-            </div>
-            <h4 class="h6 fw-semibold text-dark mb-1">No grading sheets found</h4>
-            <p class="text-muted small mb-0">There are no grading sheets matching the current status filter for <?= htmlspecialchars($academicTerm['name'] ?? 'this semester') ?>.</p>
-        </div>
+        <?php
+        $icon = 'bi-check2-all';
+        $iconColor = 'blue';
+        $title = 'No grading sheets found';
+        $message = 'There are no grading sheets matching the current status filter for ' . ($academicTerm['name'] ?? 'this semester') . '.';
+        include __DIR__ . '/../../components/empty-state.php';
+        ?>
     <?php else: ?>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" id="gradeReviewTable">
@@ -253,12 +253,13 @@ $metrics = $metrics ?? [
 
                     <!-- Empty Search Result Fallback Row -->
                     <tr id="noResultsRow" style="display: none;">
-                        <td colspan="6" class="text-center py-5">
-                            <div class="d-inline-flex align-items-center justify-content-center bg-light text-muted rounded-circle mb-2" style="width: 44px; height: 44px; font-size: 20px;">
-                                <i class="bi bi-search"></i>
-                            </div>
-                            <div class="fw-semibold text-dark">No matching submissions found</div>
-                            <div class="text-muted small">Try adjusting your search keywords or clear the filter.</div>
+                        <td colspan="6" class="p-0">
+                            <?php
+                            $icon = 'bi-search';
+                            $title = 'No matching submissions found';
+                            $message = 'Try adjusting your search keywords or clear the filter.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
                         </td>
                     </tr>
                 </tbody>

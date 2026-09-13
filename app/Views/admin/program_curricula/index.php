@@ -1,7 +1,7 @@
 <?php
 $pageTitle = 'Program Curricula';
 $subtitle = 'Manage degree programs, curriculum frameworks, and subject sequences.';
-$headerActions = '<a href="' . url('/admin/program-curricula/new') . '" class="btn text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;"><i class="bi bi-plus-lg"></i> New Curriculum</a>';
+$headerActions = '<a href="' . url('/admin/program-curricula/new') . '" class="btn btn-primary d-inline-flex align-items-center gap-1.5"><i class="bi bi-plus-lg"></i> New Curriculum</a>';
 ob_start();
 ?>
 
@@ -17,20 +17,15 @@ ob_start();
 </div>
 
 <?php if (empty($programs) || $programs->isEmpty()): ?>
-    <div class="card shadow-sm border-0 text-center py-5" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-        <div class="card-body py-5">
-            <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center mb-3 text-primary" style="width: 56px; height: 56px; background-color: #eff6ff;">
-                <i class="bi bi-book fs-3" style="color: #2f4a86;"></i>
-            </div>
-            <h3 class="h5 fw-bold text-dark mb-2">No program curricula yet</h3>
-            <p class="text-muted small mb-4" style="max-width: 420px; margin-inline: auto;">
-                Create the first program and its curriculum to start organizing subjects, units, and academic pathways.
-            </p>
-            <a href="<?= url('/admin/program-curricula/new') ?>" class="btn text-white" style="background-color: #2f4a86; border-color: #2f4a86;">
-                <i class="bi bi-plus-lg me-1"></i> Create First Curriculum
-            </a>
-        </div>
-    </div>
+    <?php
+    $icon = 'bi-book';
+    $iconColor = 'blue';
+    $title = 'No program curricula yet';
+    $message = 'Create the first program and its curriculum to start organizing subjects, units, and academic pathways.';
+    $actionHtml = '<a href="' . url('/admin/program-curricula/new') . '" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Create First Curriculum</a>';
+    $card = true;
+    include __DIR__ . '/../../components/empty-state.php';
+    ?>
 <?php else: ?>
 
     <!-- Program Selector & Header Card -->
@@ -110,9 +105,13 @@ ob_start();
 
     <!-- Subjects Grouped by Year and Semester -->
     <?php if (empty($groupedSubjects)): ?>
-        <div class="card shadow-sm border-0 text-center py-5 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-            <p class="text-muted small mb-0">No subjects found in this curriculum. Click "New Curriculum" to add subjects.</p>
-        </div>
+        <?php
+        $icon = 'bi-journal-x';
+        $title = 'No subjects found';
+        $message = 'No subjects found in this curriculum. Click "New Curriculum" to add subjects.';
+        $card = true;
+        include __DIR__ . '/../../components/empty-state.php';
+        ?>
     <?php else: ?>
         <div class="space-y-4" id="curriculumGroupsContainer">
             <?php foreach ($groupedSubjects as $group): ?>
@@ -171,18 +170,41 @@ ob_start();
                 </div>
             <?php endforeach; ?>
         </div>
+
+        <!-- Dynamic Search Fallback Card -->
+        <div id="noCurriculumSearchResults" class="d-none mb-4">
+            <?php
+            $icon = 'bi-search';
+            $title = 'No matching subjects found';
+            $message = 'No curriculum subjects match your search keywords.';
+            $actionHtml = '<button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetCurriculumSearch()"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset Search</button>';
+            $card = true;
+            include __DIR__ . '/../../components/empty-state.php';
+            ?>
+        </div>
     <?php endif; ?>
 
 <?php endif; ?>
 
 <script>
+function resetCurriculumSearch() {
+    const input = document.getElementById('curriculumSubjectSearch');
+    if (input) {
+        input.value = '';
+        input.dispatchEvent(new Event('input'));
+        input.focus();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('curriculumSubjectSearch');
     const groupCards = document.querySelectorAll('.curriculum-group-card');
+    const noResults = document.getElementById('noCurriculumSearchResults');
 
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             const q = this.value.trim().toLowerCase();
+            let totalVisible = 0;
 
             groupCards.forEach(function(card) {
                 const rows = card.querySelectorAll('.curriculum-subject-row');
@@ -193,6 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!q || searchData.includes(q)) {
                         row.style.display = '';
                         visibleRows++;
+                        totalVisible++;
                     } else {
                         row.style.display = 'none';
                     }
@@ -200,7 +223,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Hide card if no rows match
                 card.style.display = visibleRows > 0 ? '' : 'none';
+                const countBadge = card.querySelector('.group-count');
+                if (countBadge) {
+                    countBadge.textContent = visibleRows;
+                }
             });
+
+            if (noResults) {
+                if (totalVisible === 0) {
+                    noResults.classList.remove('d-none');
+                } else {
+                    noResults.classList.add('d-none');
+                }
+            }
         });
     }
 });

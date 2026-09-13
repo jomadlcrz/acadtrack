@@ -43,9 +43,13 @@ $displaySets = $sets ?? [];
             <tbody>
                 <?php if (empty($displaySets)): ?>
                     <tr>
-                        <td colspan="6" class="text-center py-5 text-muted small">
-                            <i class="bi bi-collection-play d-block fs-3 mb-2 text-secondary"></i>
-                            No academic sets configured for this semester yet. Click "Add set" to create one.
+                        <td colspan="6" class="p-0">
+                            <?php
+                            $icon = 'bi-collection';
+                            $title = 'No academic sets';
+                            $message = 'No academic sets configured for this semester yet. Click "Add set" to create one.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
                         </td>
                     </tr>
                 <?php else: ?>

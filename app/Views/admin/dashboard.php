@@ -109,7 +109,14 @@ ob_start();
                     <tbody class="divide-y">
                         <?php if (empty($recentUsers)): ?>
                             <tr>
-                                <td colspan="4" class="text-center py-4 text-muted small">No users found in database.</td>
+                                <td colspan="4" class="p-0">
+                                    <?php
+                                    $icon = 'bi-people';
+                                    $title = 'No users found';
+                                    $message = 'No recently created user accounts found in the database.';
+                                    include __DIR__ . '/../components/empty-state.php';
+                                    ?>
+                                </td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($recentUsers as $ru): ?>

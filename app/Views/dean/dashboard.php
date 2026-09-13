@@ -111,9 +111,14 @@ ob_start();
                     <tbody class="divide-y">
                         <?php if (empty($pendingSheets)): ?>
                             <tr>
-                                <td colspan="4" class="text-center py-4 text-muted small">
-                                    <i class="bi bi-check2-circle text-success fs-4 d-block mb-1"></i>
-                                    All submitted grading sheets have been reviewed and finalized.
+                                <td colspan="4" class="p-0">
+                                    <?php
+                                    $icon = 'bi-check2-circle';
+                                    $iconColor = 'green';
+                                    $title = 'All caught up';
+                                    $message = 'All submitted grading sheets have been reviewed and finalized.';
+                                    include __DIR__ . '/../components/empty-state.php';
+                                    ?>
                                 </td>
                             </tr>
                         <?php else: ?>

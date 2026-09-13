@@ -98,8 +98,13 @@ ob_start();
             <tbody class="divide-y">
                 <?php if (empty($workload)): ?>
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted small">
-                            No assigned subjects found for the current academic term.
+                        <td colspan="6" class="p-0">
+                            <?php
+                            $icon = 'bi-book';
+                            $title = 'No assigned courses';
+                            $message = 'No assigned subjects found for the current academic term.';
+                            include __DIR__ . '/../components/empty-state.php';
+                            ?>
                         </td>
                     </tr>
                 <?php else: ?>

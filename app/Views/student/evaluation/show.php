@@ -24,13 +24,13 @@ ob_start();
     </div>
 
     <?php if (empty($evaluations)): ?>
-        <div class="card-body text-center py-5">
-            <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3" style="width: 52px; height: 52px; font-size: 24px;">
-                <i class="bi bi-mortarboard"></i>
-            </div>
-            <h4 class="h6 fw-semibold text-dark mb-1">No evaluation records available</h4>
-            <p class="text-muted small mb-0">Finalized course evaluations will appear here once term grading is officially concluded.</p>
-        </div>
+        <?php
+        $icon = 'bi-award';
+        $iconColor = 'blue';
+        $title = 'No evaluation records available';
+        $message = 'Finalized course evaluations will appear here once term grading is officially concluded.';
+        include __DIR__ . '/../../components/empty-state.php';
+        ?>
     <?php else: ?>
         <?php
             $totalSum = 0;

@@ -75,9 +75,13 @@ ob_start();
             <tbody class="divide-y">
                 <?php if (empty($sets) || $sets->isEmpty()): ?>
                     <tr id="emptySetsRow">
-                        <td colspan="<?= $isReadOnly ? 6 : 8 ?>" class="text-center py-5 text-muted small">
-                            <i class="bi bi-collection d-block fs-3 mb-2 text-secondary"></i>
-                            <?= $isReadOnly ? 'No sections found for the current academic term.' : 'No sections created for the current academic term yet. Click "Create Sections" to generate sections.' ?>
+                        <td colspan="<?= $isReadOnly ? 6 : 8 ?>" class="p-0">
+                            <?php
+                            $icon = 'bi-collection';
+                            $title = 'No sections found';
+                            $message = $isReadOnly ? 'No sections found for the current academic term.' : 'No sections created for the current academic term yet. Click "Create Sections" to generate sections.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
                         </td>
                     </tr>
                 <?php else: ?>
@@ -208,6 +212,16 @@ ob_start();
                             </div>
                         <?php endif; ?>
                     <?php endforeach; ?>
+                    <tr id="emptySetsRow" style="display: none;">
+                        <td colspan="<?= $isReadOnly ? 6 : 8 ?>" class="p-0">
+                            <?php
+                            $icon = 'bi-search';
+                            $title = 'No sections found';
+                            $message = 'No sections match your search and filter criteria.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
+                        </td>
+                    </tr>
                 <?php endif; ?>
             </tbody>
         </table>

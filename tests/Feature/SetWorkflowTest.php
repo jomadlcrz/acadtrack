@@ -40,11 +40,15 @@ class SetWorkflowTest extends TestCase
                 ['set_name' => 'BSCS-1A', 'year_level' => 1, 'department_id' => $csId],
             ];
             foreach ($baseline as $b) {
-                if (!Set::where('academic_term_id', $term['id'])->where('set_name', $b['set_name'])->exists()) {
+                $existing = Set::where('academic_term_id', $term['id'])->where('set_name', $b['set_name'])->first();
+                if (!$existing) {
                     Set::create(array_merge($b, [
                         'academic_term_id' => $term['id'],
                         'status' => 'active',
                     ]));
+                } elseif ($existing->status !== 'active') {
+                    $existing->status = 'active';
+                    $existing->save();
                 }
             }
         }

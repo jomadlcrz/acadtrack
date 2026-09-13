@@ -36,9 +36,13 @@ ob_start();
             <tbody class="divide-y">
                 <?php if (empty($departments)): ?>
                     <tr id="emptyDeptRow">
-                        <td colspan="6" class="text-center py-5 text-muted small">
-                            <i class="bi bi-building-x d-block fs-3 mb-2 text-secondary"></i>
-                            No departments created yet. Click "New Department" to register one.
+                        <td colspan="6" class="p-0">
+                            <?php
+                            $icon = 'bi-building-x';
+                            $title = 'No departments created yet';
+                            $message = 'Click "New Department" above to register an academic department.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
                         </td>
                     </tr>
                 <?php else: ?>
@@ -131,6 +135,16 @@ ob_start();
                         </div>
                     </div>
                     <?php endforeach; ?>
+                    <tr id="emptyDeptRow" style="display: none;">
+                        <td colspan="6" class="p-0">
+                            <?php
+                            $icon = 'bi-search';
+                            $title = 'No departments found';
+                            $message = 'No departments match your search keywords.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
+                        </td>
+                    </tr>
                 <?php endif; ?>
             </tbody>
         </table>

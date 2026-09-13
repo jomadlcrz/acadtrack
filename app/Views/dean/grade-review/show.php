@@ -99,13 +99,13 @@ $isPending = in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW']);
     </div>
 
     <?php if (empty($students)): ?>
-        <div class="card-body text-center py-5">
-            <div class="d-inline-flex align-items-center justify-content-center bg-light text-muted rounded-circle mb-3" style="width: 52px; height: 52px; font-size: 24px;">
-                <i class="bi bi-person-x"></i>
-            </div>
-            <h4 class="h6 fw-semibold text-dark mb-1">No enrolled students</h4>
-            <p class="text-muted small mb-0">There are no students enrolled in this course set for the active term.</p>
-        </div>
+        <?php
+        $icon = 'bi-people';
+        $iconColor = 'blue';
+        $title = 'No enrolled students';
+        $message = 'There are no students enrolled in this course set for the active term.';
+        include __DIR__ . '/../../components/empty-state.php';
+        ?>
     <?php else: ?>
         <form id="editGradesForm" method="POST" action="<?= url('/dean/grade-review/' . $sheet['id'] . '/edit') ?>">
             <?= csrf_field() ?>

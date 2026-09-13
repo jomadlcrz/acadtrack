@@ -30,13 +30,13 @@ ob_start();
     </div>
 
     <?php if (empty($summary)): ?>
-        <div class="card-body text-center py-5">
-            <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3" style="width: 52px; height: 52px; font-size: 24px;">
-                <i class="bi bi-mortarboard"></i>
-            </div>
-            <h4 class="h6 fw-semibold text-dark mb-1">No grades available yet</h4>
-            <p class="text-muted small mb-0">Your course instructors have not published approved marks for the current semester.</p>
-        </div>
+        <?php
+        $icon = 'bi-mortarboard';
+        $iconColor = 'blue';
+        $title = 'No grades available yet';
+        $message = 'Your course instructors have not published approved marks for the current semester.';
+        include __DIR__ . '/../../components/empty-state.php';
+        ?>
     <?php else: ?>
         <?php
         $periodNames = [];

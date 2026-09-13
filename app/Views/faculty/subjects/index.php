@@ -24,13 +24,13 @@ ob_start();
     </div>
 
     <?php if (empty($subjects)): ?>
-        <div class="card-body text-center py-5">
-            <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3" style="width: 52px; height: 52px; font-size: 24px;">
-                <i class="bi bi-book"></i>
-            </div>
-            <h4 class="h6 fw-semibold text-dark mb-1">No subjects assigned yet</h4>
-            <p class="text-muted small mb-0">You have not been designated to any course sets for <?= htmlspecialchars($academicTerm['name'] ?? 'this term') ?>. Contact the College Dean for curriculum assignments.</p>
-        </div>
+        <?php
+        $icon = 'bi-journal-bookmark';
+        $iconColor = 'blue';
+        $title = 'No subjects assigned yet';
+        $message = 'You have not been designated to any course sets for ' . ($academicTerm['name'] ?? 'this term') . '. Contact the College Dean for curriculum assignments.';
+        include __DIR__ . '/../../components/empty-state.php';
+        ?>
     <?php else: ?>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">

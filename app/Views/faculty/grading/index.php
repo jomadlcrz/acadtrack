@@ -92,15 +92,14 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
 <?php endif; ?>
 
 <?php if (empty($students)): ?>
-    <div class="card shadow-sm border-0 text-center py-5" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-        <div class="card-body">
-            <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3" style="width: 52px; height: 52px; font-size: 24px;">
-                <i class="bi bi-people"></i>
-            </div>
-            <h4 class="h6 fw-semibold text-dark mb-1">No enrolled students found</h4>
-            <p class="text-muted small mb-0">There are currently no students registered for this course set.</p>
-        </div>
-    </div>
+    <?php
+    $icon = 'bi-people';
+    $iconColor = 'blue';
+    $title = 'No enrolled students found';
+    $message = 'There are currently no students registered for this course set.';
+    $card = true;
+    include __DIR__ . '/../../components/empty-state.php';
+    ?>
 <?php else: ?>
     <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
         <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">

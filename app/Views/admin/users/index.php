@@ -52,9 +52,13 @@ ob_start();
             <tbody class="divide-y">
                 <?php if (empty($users['data'])): ?>
                     <tr>
-                        <td colspan="5" class="text-center py-5 text-muted small">
-                            <i class="bi bi-people d-block fs-3 mb-2 text-secondary"></i>
-                            No user accounts found matching the current filter.
+                        <td colspan="5" class="p-0">
+                            <?php
+                            $icon = 'bi-people';
+                            $title = 'No user accounts found';
+                            $message = 'No user accounts found matching the current search or filter criteria.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
                         </td>
                     </tr>
                 <?php else: ?>

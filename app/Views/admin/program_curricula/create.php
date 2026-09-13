@@ -462,7 +462,7 @@ function renderSubjectsTable() {
     tbody.innerHTML = '';
 
     if (subjectsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted small">No subjects added yet. Click "+ Add Subject" or "Import Subjects".</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-0"><div class="empty-state py-4"><div class="empty-state-icon"><i class="bi bi-journal-x"></i></div><h4 class="empty-state-title">No subjects added yet</h4><p class="empty-state-text">Click "+ Add Subject" or "Import Subjects" above to start building the curriculum framework.</p></div></td></tr>`;
         updateTotals();
         return;
     }

@@ -37,9 +37,13 @@ ob_start();
             <tbody class="divide-y">
                 <?php if (empty($terms)): ?>
                     <tr id="emptyRow">
-                        <td colspan="6" class="text-center py-5 text-muted small">
-                            <i class="bi bi-calendar-x d-block fs-3 mb-2 text-secondary"></i>
-                            No academic terms created yet. Click "Create Academic Term" to register one.
+                        <td colspan="6" class="p-0">
+                            <?php
+                            $icon = 'bi-calendar-x';
+                            $title = 'No academic terms created yet';
+                            $message = 'Click "Create Academic Term" to register one.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
                         </td>
                     </tr>
                 <?php else: ?>
@@ -119,6 +123,16 @@ ob_start();
                             </td>
                         </tr>
                     <?php endforeach; ?>
+                    <tr id="emptyRow" style="display: none;">
+                        <td colspan="6" class="p-0">
+                            <?php
+                            $icon = 'bi-search';
+                            $title = 'No academic terms found';
+                            $message = 'No academic terms match your search keywords.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
+                        </td>
+                    </tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -176,6 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('termsSearch');
     const rows = document.querySelectorAll('.term-row');
     const counter = document.getElementById('termsCounter');
+    const emptyRow = document.getElementById('emptyRow');
 
     if (searchInput) {
         searchInput.addEventListener('input', function() {
@@ -194,6 +209,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (counter) {
                 counter.textContent = `${visibleCount} ${visibleCount === 1 ? 'term' : 'terms'}`;
+            }
+
+            if (emptyRow && rows.length > 0) {
+                emptyRow.style.display = visibleCount === 0 ? '' : 'none';
             }
         });
     }

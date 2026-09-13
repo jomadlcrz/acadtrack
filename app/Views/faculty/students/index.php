@@ -66,13 +66,13 @@ ob_start();
     </div>
 
     <?php if (empty($students)): ?>
-        <div class="card-body text-center py-5">
-            <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3" style="width: 52px; height: 52px; font-size: 24px;">
-                <i class="bi bi-person-x"></i>
-            </div>
-            <h4 class="h6 fw-semibold text-dark mb-1">No students enrolled</h4>
-            <p class="text-muted small mb-0">Use "Add new student" or "Select existing student" above to enroll students into this class.</p>
-        </div>
+        <?php
+        $icon = 'bi-people';
+        $iconColor = 'blue';
+        $title = 'No students enrolled';
+        $message = 'Use "Add new student" or "Select existing student" above to enroll students into this class.';
+        include __DIR__ . '/../../components/empty-state.php';
+        ?>
     <?php else: ?>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
