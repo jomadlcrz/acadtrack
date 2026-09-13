@@ -26,6 +26,28 @@ class SetWorkflowTest extends TestCase
             env('DB_USERNAME'),
             (string) env('DB_PASSWORD', '')
         );
+
+        $term = \App\Models\AcademicTerm::getActive();
+        if ($term) {
+            $citDept = \App\Models\Department::whereIn('dept_abbrev', ['CIT', 'CITE'])->first();
+            $csDept = \App\Models\Department::whereIn('dept_abbrev', ['CS'])->first();
+            $citId = $citDept ? $citDept->id : null;
+            $csId = $csDept ? $csDept->id : null;
+            $baseline = [
+                ['set_name' => 'BSIT-1A', 'year_level' => 1, 'department_id' => $citId],
+                ['set_name' => 'BSIT-1B', 'year_level' => 1, 'department_id' => $citId],
+                ['set_name' => 'BSIT-2A', 'year_level' => 2, 'department_id' => $citId],
+                ['set_name' => 'BSCS-1A', 'year_level' => 1, 'department_id' => $csId],
+            ];
+            foreach ($baseline as $b) {
+                if (!Set::where('academic_term_id', $term['id'])->where('set_name', $b['set_name'])->exists()) {
+                    Set::create(array_merge($b, [
+                        'academic_term_id' => $term['id'],
+                        'status' => 'active',
+                    ]));
+                }
+            }
+        }
     }
 
     public static function tearDownAfterClass(): void

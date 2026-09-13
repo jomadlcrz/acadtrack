@@ -137,14 +137,25 @@ ob_start();
             </div>
             <div class="d-flex flex-wrap align-items-center gap-2">
                 <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5" onclick="openImportModal()">
-                    <i class="bi bi-file-earmark-arrow-up"></i> Import Subjects
+                    <i class="bi bi-file-earmark-excel text-success"></i> Import Excel / CSV
                 </button>
-                <a href="<?= url('/admin/program-curricula/template-csv') ?>" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5" download title="Download CSV template format">
-                    <i class="bi bi-download"></i> CSV Template
-                </a>
-                <button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5" onclick="addSampleSubjects()">
-                    <i class="bi bi-magic"></i> Sample BSIT
-                </button>
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-inline-flex align-items-center gap-1.5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-download"></i> Template
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border text-xs" style="font-size: 13px;">
+                        <li>
+                            <button type="button" class="dropdown-item d-flex align-items-center gap-2 py-1.5" onclick="downloadExcelTemplate()">
+                                <i class="bi bi-file-earmark-excel text-success fs-6"></i> Excel Template (.xlsx)
+                            </button>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 py-1.5" href="<?= url('/admin/program-curricula/template-csv') ?>" download>
+                                <i class="bi bi-file-earmark-text text-primary fs-6"></i> CSV Template (.csv)
+                            </a>
+                        </li>
+                    </ul>
+                </div>
                 <button type="button" class="btn btn-sm text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" onclick="addSubjectRow()">
                     <i class="bi bi-plus-lg"></i> Add Subject
                 </button>
@@ -259,9 +270,9 @@ ob_start();
             <div class="modal-header border-bottom py-3 px-4">
                 <div>
                     <h5 class="modal-title fw-bold text-dark mb-0" id="importSubjectsModalLabel">
-                        <i class="bi bi-file-earmark-arrow-up text-primary me-1" style="color: #2f4a86 !important;"></i> Import Curriculum Subjects
+                        <i class="bi bi-file-earmark-excel text-success me-1"></i> Import Curriculum Subjects (Excel / CSV)
                     </h5>
-                    <div class="text-muted text-xs mt-0.5">Upload a CSV file or paste tabular data to bulk-populate subjects.</div>
+                    <div class="text-muted text-xs mt-0.5">Upload an Excel workbook (.xlsx, .xls) or CSV file to bulk-populate subjects.</div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -270,12 +281,12 @@ ob_start();
                 <ul class="nav nav-tabs mb-3" id="importTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active fw-semibold small" id="upload-tab" data-bs-toggle="tab" data-bs-target="#uploadTabPane" type="button" role="tab" aria-selected="true">
-                            <i class="bi bi-upload me-1"></i> Upload CSV File
+                            <i class="bi bi-file-earmark-excel text-success me-1"></i> Upload Excel / CSV File
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link fw-semibold small" id="paste-tab" data-bs-toggle="tab" data-bs-target="#pasteTabPane" type="button" role="tab" aria-selected="false">
-                            <i class="bi bi-clipboard me-1"></i> Paste CSV / TSV Data
+                            <i class="bi bi-clipboard me-1"></i> Paste Tabular Data
                         </button>
                     </li>
                 </ul>
@@ -284,21 +295,28 @@ ob_start();
                     <!-- Upload File Pane -->
                     <div class="tab-pane fade show active" id="uploadTabPane" role="tabpanel">
                         <div id="dropZone" class="border border-2 border-dashed rounded p-4 text-center" style="border-color: #cbd5e1 !important; background-color: #f8fafc; cursor: pointer;">
-                            <i class="bi bi-cloud-arrow-up display-6 text-secondary mb-2 d-block"></i>
-                            <div class="fw-semibold text-dark mb-1">Drag &amp; drop your CSV file here, or click to browse</div>
-                            <div class="text-muted text-xs mb-3">Accepts standard .csv files with header row</div>
-                            <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display: none;">
+                            <i class="bi bi-file-earmark-excel display-6 text-success mb-2 d-block"></i>
+                            <div class="fw-semibold text-dark mb-1">Drag &amp; drop your Excel (.xlsx, .xls) or CSV file here, or click to browse</div>
+                            <div class="text-muted text-xs mb-3">Accepts Microsoft Excel (.xlsx, .xls) and standard CSV/TSV spreadsheets</div>
+                            <input type="file" id="csvFileInput" accept=".xlsx,.xls,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="display: none;">
                             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('csvFileInput').click()">
-                                Choose CSV File
+                                Choose Excel / CSV File
                             </button>
                             <div id="selectedFileName" class="mt-2 text-xs fw-bold text-success" style="display: none;"></div>
+                            <!-- Sheet selector for multi-sheet workbooks -->
+                            <div id="sheetSelectorContainer" class="mt-3 text-start p-2.5 bg-white rounded border" style="display: none;">
+                                <label class="form-label small fw-semibold text-dark mb-1 d-flex align-items-center gap-1.5">
+                                    <i class="bi bi-layers text-primary"></i> Multiple sheets found. Select sheet to import:
+                                </label>
+                                <select id="sheetSelect" class="form-select form-select-sm" onchange="onSheetSelectChange()"></select>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Paste Data Pane -->
                     <div class="tab-pane fade" id="pasteTabPane" role="tabpanel">
-                        <label class="form-label small fw-semibold text-dark">Paste tabular data (comma or tab delimited):</label>
-                        <textarea id="pasteCsvTextarea" class="form-control font-monospace text-xs" rows="7" placeholder="Year Level,Semester,Subject Code,Descriptive Title,Units,Subject Type,Pre-Requisite&#10;First Year,1st Semester,IT101,Introduction to Computing,3.0,GenEd Core,&#10;First Year,1st Semester,IT102,Computer Programming 1,3.0,Major with Lab,&#10;First Year,2nd Semester,IT103,Computer Programming 2,3.0,Major with Lab,IT102"></textarea>
+                        <label class="form-label small fw-semibold text-dark">Paste tabular data (copied directly from Excel or Google Sheets):</label>
+                        <textarea id="pasteCsvTextarea" class="form-control font-monospace text-xs" rows="7" placeholder="Year Level&#9;Semester&#9;Subject Code&#9;Descriptive Title&#9;Units&#9;Subject Type&#9;Pre-Requisite&#10;First Year&#9;1st Semester&#9;IT101&#9;Introduction to Computing&#9;3.0&#9;GenEd Core&#9;&#10;First Year&#9;1st Semester&#9;IT102&#9;Computer Programming 1&#9;3.0&#9;Major with Lab&#9;&#10;First Year&#9;2nd Semester&#9;IT103&#9;Computer Programming 2&#9;3.0&#9;Major with Lab&#9;IT102"></textarea>
                         <div class="d-flex justify-content-end mt-2">
                             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="parsePastedText()">
                                 <i class="bi bi-lightning-charge me-1"></i> Parse Pasted Content
@@ -311,9 +329,15 @@ ob_start();
                 <div class="mt-3 p-3 bg-light rounded border" style="border-color: #e2e8f0 !important;">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="small fw-bold text-dark">Expected Column Order / Headers:</span>
-                        <a href="<?= url('/admin/program-curricula/template-csv') ?>" class="text-xs fw-semibold text-primary text-decoration-none" download>
-                            <i class="bi bi-download me-0.5"></i> Download Sample CSV
-                        </a>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-link p-0 text-xs fw-semibold text-success text-decoration-none" onclick="downloadExcelTemplate()">
+                                <i class="bi bi-file-earmark-excel me-0.5"></i> Excel Template (.xlsx)
+                            </button>
+                            <span class="text-muted">·</span>
+                            <a href="<?= url('/admin/program-curricula/template-csv') ?>" class="text-xs fw-semibold text-primary text-decoration-none" download>
+                                <i class="bi bi-file-earmark-text me-0.5"></i> CSV Template (.csv)
+                            </a>
+                        </div>
                     </div>
                     <div class="d-flex flex-wrap gap-1 mt-1 font-monospace text-xs">
                         <span class="badge bg-white border text-dark">Year Level</span>
@@ -378,6 +402,16 @@ ob_start();
     </div>
 </div>
 
+<!-- SheetJS for Excel (.xlsx, .xls) and Spreadsheet Parsing -->
+<script src="<?= asset('vendor/xlsx/xlsx.full.min.js') ?>"></script>
+<script>
+if (typeof XLSX === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    document.head.appendChild(s);
+}
+</script>
+
 <script>
 const years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
 const semesters = ["1st Semester", "2nd Semester", "Summer"];
@@ -394,6 +428,7 @@ const subjectTypes = [
 
 let subjectsList = [];
 let parsedImportRows = [];
+let currentWorkbook = null;
 
 function addSubjectRow(data = {}) {
     const defaultData = {
@@ -427,7 +462,7 @@ function renderSubjectsTable() {
     tbody.innerHTML = '';
 
     if (subjectsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted small">No subjects added yet. Click "+ Add Subject", "Import Subjects", or "Sample BSIT".</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted small">No subjects added yet. Click "+ Add Subject" or "Import Subjects".</td></tr>`;
         updateTotals();
         return;
     }
@@ -483,19 +518,6 @@ function updateTotals() {
 function escapeHtml(text) {
     if (!text) return '';
     return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function addSampleSubjects() {
-    const sample = [
-        { year_level: "First Year", semester: "1st Semester", subject_code: "IT101", descriptive_title: "Introduction to Computing", units: 3.0, subject_type: "GenEd Core", prerequisites: "" },
-        { year_level: "First Year", semester: "1st Semester", subject_code: "IT102", descriptive_title: "Computer Programming 1", units: 3.0, subject_type: "Major with Lab", prerequisites: "" },
-        { year_level: "First Year", semester: "2nd Semester", subject_code: "IT103", descriptive_title: "Computer Programming 2", units: 3.0, subject_type: "Major with Lab", prerequisites: "IT102" },
-        { year_level: "First Year", semester: "2nd Semester", subject_code: "IT104", descriptive_title: "Data Structures and Algorithms", units: 3.0, subject_type: "Major with Lab", prerequisites: "IT102" },
-        { year_level: "Second Year", semester: "1st Semester", subject_code: "IT201", descriptive_title: "Object-Oriented Programming", units: 3.0, subject_type: "Major with Lab", prerequisites: "IT104" },
-        { year_level: "Second Year", semester: "1st Semester", subject_code: "IT202", descriptive_title: "Information Management", units: 3.0, subject_type: "Major with Lab", prerequisites: "IT104" },
-    ];
-    sample.forEach(s => subjectsList.push(s));
-    renderSubjectsTable();
 }
 
 function goToStep(stepNumber) {
@@ -605,11 +627,14 @@ function submitCurriculum() {
 // ----------------------------------------------------
 function openImportModal() {
     parsedImportRows = [];
+    currentWorkbook = null;
     document.getElementById('importPreviewContainer').style.display = 'none';
+    document.getElementById('sheetSelectorContainer').style.display = 'none';
     document.getElementById('applyImportBtn').disabled = true;
     document.getElementById('selectedFileName').style.display = 'none';
     document.getElementById('selectedFileName').textContent = '';
     document.getElementById('pasteCsvTextarea').value = '';
+    document.getElementById('csvFileInput').value = '';
 
     const modalEl = document.getElementById('importSubjectsModal');
     const modal = new bootstrap.Modal(modalEl);
@@ -647,8 +672,11 @@ if (dropZone && fileInput) {
 }
 
 function handleFileSelect(file) {
-    if (!file.name.toLowerCase().endsWith('.csv') && !file.type.includes('csv') && !file.type.includes('text')) {
-        alert('Please upload a CSV file (.csv).');
+    const isExcel = file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls');
+    const isCsv = file.name.toLowerCase().endsWith('.csv') || file.type.includes('csv') || file.type.includes('text');
+
+    if (!isExcel && !isCsv) {
+        alert('Please upload an Excel workbook (.xlsx, .xls) or a CSV file (.csv).');
         return;
     }
 
@@ -656,18 +684,71 @@ function handleFileSelect(file) {
     nameEl.textContent = `✓ Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
     nameEl.style.display = 'block';
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const text = e.target.result;
-        parseDelimitedText(text);
-    };
-    reader.readAsText(file);
+    if (isExcel) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                if (typeof XLSX === 'undefined') {
+                    alert('Excel library is loading, please try again in a moment.');
+                    return;
+                }
+                const data = new Uint8Array(e.target.result);
+                currentWorkbook = XLSX.read(data, { type: 'array' });
+                setupSheetSelector(currentWorkbook);
+                loadSheetData(currentWorkbook, currentWorkbook.SheetNames[0]);
+            } catch (err) {
+                console.error('Excel parse error:', err);
+                alert('Could not parse this Excel workbook. Please verify the file format.');
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    } else {
+        document.getElementById('sheetSelectorContainer').style.display = 'none';
+        currentWorkbook = null;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            parseDelimitedText(e.target.result);
+        };
+        reader.readAsText(file);
+    }
+}
+
+function setupSheetSelector(workbook) {
+    const container = document.getElementById('sheetSelectorContainer');
+    const select = document.getElementById('sheetSelect');
+    select.innerHTML = '';
+
+    if (!workbook || !workbook.SheetNames || workbook.SheetNames.length <= 1) {
+        container.style.display = 'none';
+        return;
+    }
+
+    workbook.SheetNames.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+    });
+    container.style.display = 'block';
+}
+
+function onSheetSelectChange() {
+    if (!currentWorkbook) return;
+    const select = document.getElementById('sheetSelect');
+    loadSheetData(currentWorkbook, select.value);
+}
+
+function loadSheetData(workbook, sheetName) {
+    const worksheet = workbook.Sheets[sheetName];
+    if (!worksheet) return;
+    const matrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+    parseMatrixData(matrix);
 }
 
 function parsePastedText() {
     const text = document.getElementById('pasteCsvTextarea').value;
     if (!text.trim()) {
-        alert('Please paste CSV or tab-delimited text first.');
+        alert('Please paste spreadsheet tabular data first.');
         return;
     }
     parseDelimitedText(text);
@@ -676,11 +757,10 @@ function parsePastedText() {
 function parseDelimitedText(rawText) {
     const lines = rawText.split(/\r?\n/).filter(line => line.trim() !== '');
     if (lines.length === 0) {
-        alert('File is empty.');
+        alert('File or input text is empty.');
         return;
     }
 
-    // Detect delimiter: tab or comma
     const firstLine = lines[0];
     const delimiter = firstLine.includes('\t') ? '\t' : ',';
 
@@ -688,7 +768,6 @@ function parseDelimitedText(rawText) {
         if (delimiter === '\t') {
             return line.split('\t').map(c => c.trim().replace(/^["']|["']$/g, ''));
         }
-        // CSV regex handling quotes
         const pattern = /(?:,|\r?\n|^)("(?:(?:"")*[^"]*)*"|[^",\r\n]*)/gi;
         const entries = [];
         let match;
@@ -703,37 +782,44 @@ function parseDelimitedText(rawText) {
         return entries;
     };
 
-    const header = parseLine(firstLine).map(h => h.toLowerCase().replace(/[^a-z0-9]/g, ''));
+    const matrix = lines.map(line => parseLine(line));
+    parseMatrixData(matrix);
+}
+
+function parseMatrixData(rows) {
+    if (!rows || rows.length === 0) {
+        alert('No rows found to parse.');
+        return;
+    }
+
+    const nonEmptyRows = rows.filter(r => Array.isArray(r) && r.some(c => String(c || '').trim() !== ''));
+    if (nonEmptyRows.length === 0) {
+        renderImportPreview(['No non-empty data rows found in worksheet.']);
+        return;
+    }
+
+    const firstRowClean = nonEmptyRows[0].map(c => String(c || '').toLowerCase().replace(/[^a-z0-9]/g, ''));
     let startIdx = 0;
 
-    // Check if first row is a header row
-    const isHeader = header.some(h => ['yearlevel', 'year', 'semester', 'sem', 'subjectcode', 'code', 'descriptivetitle', 'title', 'units'].includes(h));
+    const isHeader = firstRowClean.some(h => ['yearlevel', 'year', 'semester', 'sem', 'subjectcode', 'code', 'descriptivetitle', 'title', 'units', 'nature', 'prerequisite'].includes(h));
     if (isHeader) {
         startIdx = 1;
     }
 
-    // Map column indices
-    let colYear = -1;
-    let colSem = -1;
-    let colCode = -1;
-    let colTitle = -1;
-    let colUnits = -1;
-    let colType = -1;
-    let colPrereq = -1;
+    let colYear = -1, colSem = -1, colCode = -1, colTitle = -1, colUnits = -1, colType = -1, colPrereq = -1;
 
     if (isHeader) {
-        header.forEach((col, idx) => {
+        firstRowClean.forEach((col, idx) => {
             if (col.includes('year')) colYear = idx;
             else if (col.includes('sem')) colSem = idx;
             else if (col.includes('code')) colCode = idx;
             else if (col.includes('title') || col.includes('name') || col.includes('desc')) colTitle = idx;
             else if (col.includes('unit')) colUnits = idx;
-            else if (col.includes('type')) colType = idx;
+            else if (col.includes('type') || col.includes('nature') || col.includes('category')) colType = idx;
             else if (col.includes('prereq') || col.includes('requisite')) colPrereq = idx;
         });
     }
 
-    // Fallbacks if no headers matched or order is standard
     if (colYear === -1) colYear = 0;
     if (colSem === -1) colSem = 1;
     if (colCode === -1) colCode = 2;
@@ -745,20 +831,18 @@ function parseDelimitedText(rawText) {
     parsedImportRows = [];
     const errors = [];
 
-    for (let i = startIdx; i < lines.length; i++) {
-        const row = parseLine(lines[i]);
-        if (row.length === 0 || row.every(c => c === '')) continue;
-
-        const rawCode = (row[colCode] || '').trim().toUpperCase();
-        const rawTitle = (row[colTitle] || '').trim();
+    for (let i = startIdx; i < nonEmptyRows.length; i++) {
+        const row = nonEmptyRows[i];
+        const rawCode = String(row[colCode] || '').trim().toUpperCase();
+        const rawTitle = String(row[colTitle] || '').trim();
         const rawUnits = parseFloat(row[colUnits]) || 3.0;
         const rawYear = normalizeYearLevel(row[colYear]);
         const rawSem = normalizeSemester(row[colSem]);
         const rawType = normalizeSubjectType(row[colType]);
-        const rawPrereq = (row[colPrereq] || '').trim();
+        const rawPrereq = String(row[colPrereq] || '').trim();
 
         if (!rawCode || !rawTitle) {
-            errors.push(`Row ${i + 1}: Missing subject code or title.`);
+            errors.push(`Row ${i + 1}: Missing course code or title.`);
             continue;
         }
 
@@ -773,8 +857,37 @@ function parseDelimitedText(rawText) {
         });
     }
 
-    // Render Preview
     renderImportPreview(errors);
+}
+
+function downloadExcelTemplate() {
+    if (typeof XLSX === 'undefined') {
+        window.location.href = '<?= url('/admin/program-curricula/template-csv') ?>';
+        return;
+    }
+
+    const wsData = [
+        ["Year Level", "Semester", "Subject Code", "Descriptive Title", "Units", "Subject Type", "Pre-Requisite"],
+        ["First Year", "1st Semester", "IT101", "Introduction to Computing", 3.0, "GenEd Core", ""],
+        ["First Year", "1st Semester", "IT102", "Computer Programming 1", 3.0, "Major with Lab", ""],
+        ["First Year", "2nd Semester", "IT103", "Computer Programming 2", 3.0, "Major with Lab", "IT102"],
+        ["First Year", "2nd Semester", "IT104", "Data Structures and Algorithms", 3.0, "Major with Lab", "IT102"]
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = [
+        { wch: 14 },
+        { wch: 16 },
+        { wch: 14 },
+        { wch: 35 },
+        { wch: 8 },
+        { wch: 22 },
+        { wch: 16 }
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Curriculum");
+    XLSX.writeFile(wb, "Curriculum_Subjects_Template.xlsx");
 }
 
 function normalizeYearLevel(val) {
@@ -876,7 +989,7 @@ function applyImportedSubjects() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    addSampleSubjects();
+    renderSubjectsTable();
 });
 </script>
 
