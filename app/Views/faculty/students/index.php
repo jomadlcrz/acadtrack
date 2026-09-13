@@ -123,8 +123,8 @@ ob_start();
                                 <input type="hidden" name="subject_id" value="<?= $subjectId ?>">
                                 <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
                                 <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                                <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2" title="Remove from class">
-                                    <i class="bi bi-trash"></i> Remove
+                                <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Unenroll from class section">
+                                    <i class="bi bi-person-dash"></i> Unenroll
                                 </button>
                             </form>
                         </td>

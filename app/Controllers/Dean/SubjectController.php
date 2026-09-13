@@ -23,11 +23,18 @@ class SubjectController
     public function index(Request $request, Response $response, Session $session): void
     {
         $academicTerm = (new \App\Models\AcademicTerm())->getActive();
-        $subjects = $this->subjectRepository->getByDean($academicTerm['id'] ?? 0);
+        $statusFilter = (string) $request->get('status', 'all');
+        if (!in_array($statusFilter, ['all', 'active', 'archived'], true)) {
+            $statusFilter = 'all';
+        }
+
+        $filterArg = $statusFilter === 'all' ? null : $statusFilter;
+        $subjects = $this->subjectRepository->getByDean($academicTerm['id'] ?? 0, $filterArg);
 
         $html = (new View())->render('dean.subjects.index', [
             'subjects' => $subjects,
             'academicTerm' => $academicTerm,
+            'statusFilter' => $statusFilter,
         ]);
         $response->html($html);
     }
@@ -75,13 +82,24 @@ class SubjectController
         redirect('/dean/subjects');
     }
 
-    public function destroy(Request $request, Response $response, Session $session, string $id): void
+    public function archive(Request $request, Response $response, Session $session, string $id): void
     {
         try {
-            $this->subjectRepository->delete((int) $id);
-            $session->flash('success', 'Subject deleted.');
-        } catch (\PDOException $e) {
-            $session->flash('error', 'Cannot delete subject because it has linked faculty assignments or enrollments.');
+            $this->subjectRepository->archive((int) $id);
+            $session->flash('success', 'Subject archived successfully. Academic records and grades remain intact.');
+        } catch (\Exception $e) {
+            $session->flash('error', 'Failed to archive subject.');
+        }
+        redirect('/dean/subjects');
+    }
+
+    public function restore(Request $request, Response $response, Session $session, string $id): void
+    {
+        try {
+            $this->subjectRepository->restore((int) $id);
+            $session->flash('success', 'Subject restored to active curriculum catalog.');
+        } catch (\Exception $e) {
+            $session->flash('error', 'Failed to restore subject.');
         }
         redirect('/dean/subjects');
     }

@@ -10,6 +10,19 @@ class Subject extends Model
 {
     protected $table = 'subjects';
 
+    protected $fillable = [
+        'code',
+        'name',
+        'nature',
+        'year_level',
+        'semester',
+        'academic_term_id',
+        'is_archived',
+        'archived_at',
+        'created_at',
+        'updated_at',
+    ];
+
     public function academicTerm()
     {
         return $this->belongsTo(AcademicTerm::class, 'academic_term_id');
@@ -25,21 +38,74 @@ class Subject extends Model
         return $this->hasMany(Enrollment::class, 'subject_id');
     }
 
+    public function grades()
+    {
+        return $this->hasMany(Grade::class, 'subject_id');
+    }
+
     public function gradingSheets()
     {
         return $this->hasMany(GradingSheet::class, 'subject_id');
     }
 
-    public static function getByDean(int $academicTermId): array
+    public function archive(): bool
     {
+        return (bool) $this->update([
+            'is_archived' => 1,
+            'archived_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    public function restore(): bool
+    {
+        return (bool) $this->update([
+            'is_archived' => 0,
+            'archived_at' => null,
+        ]);
+    }
+
+    public function hasDependentRecords(): bool
+    {
+        $subjectId = (int) $this->id;
+        $db = self::db();
+
+        $stmt = $db->prepare("
+            SELECT (
+                (SELECT COUNT(*) FROM grades WHERE subject_id = :s1) +
+                (SELECT COUNT(*) FROM enrollments WHERE subject_id = :s2) +
+                (SELECT COUNT(*) FROM grading_sheets WHERE subject_id = :s3) +
+                (SELECT COUNT(*) FROM faculty_subjects WHERE subject_id = :s4)
+            ) as total_deps
+        ");
+        $stmt->execute([
+            's1' => $subjectId,
+            's2' => $subjectId,
+            's3' => $subjectId,
+            's4' => $subjectId,
+        ]);
+        $row = $stmt->fetch();
+        return ((int) ($row['total_deps'] ?? 0)) > 0;
+    }
+
+    public static function getByDean(int $academicTermId, ?string $statusFilter = null): array
+    {
+        $whereSql = "s.academic_term_id = :academic_term_id2";
+        if ($statusFilter === 'active') {
+            $whereSql .= " AND s.is_archived = 0";
+        } elseif ($statusFilter === 'archived') {
+            $whereSql .= " AND s.is_archived = 1";
+        }
+
         $stmt = self::db()->prepare("
             SELECT s.*, 
-                   COUNT(DISTINCT fs.faculty_id) as assigned_faculty_count
+                   COUNT(DISTINCT fs.faculty_id) as assigned_faculty_count,
+                   (SELECT COUNT(*) FROM enrollments e WHERE e.subject_id = s.id) as enrolled_students_count,
+                   (SELECT COUNT(*) FROM grades g WHERE g.subject_id = s.id) as grades_count
             FROM subjects s
             LEFT JOIN faculty_subjects fs ON fs.subject_id = s.id AND fs.academic_term_id = :academic_term_id
-            WHERE s.academic_term_id = :academic_term_id2
+            WHERE {$whereSql}
             GROUP BY s.id
-            ORDER BY s.code
+            ORDER BY s.is_archived ASC, s.code ASC
         ");
         $stmt->execute(['academic_term_id' => $academicTermId, 'academic_term_id2' => $academicTermId]);
         return $stmt->fetchAll();
@@ -52,7 +118,7 @@ class Subject extends Model
             FROM subjects s
             JOIN academic_terms at2 ON s.academic_term_id = at2.id
             JOIN academic_years ay ON at2.academic_year_id = ay.id
-            WHERE at2.is_active = 1
+            WHERE at2.is_active = 1 AND s.is_archived = 0
             ORDER BY s.code
         ");
         return $stmt->fetchAll();

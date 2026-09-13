@@ -210,6 +210,17 @@ class StudentController
             $termId = (int) ($academicTerm['id'] ?? 1);
         }
 
+        $hasGrades = \App\Models\Grade::where('student_id', $studentId)
+            ->where('subject_id', $subjectId)
+            ->where('academic_term_id', $termId)
+            ->exists();
+
+        if ($hasGrades) {
+            $session->flash('error', 'Cannot remove student from this course roster because academic grades have already been recorded. Academic history must remain immutable.');
+            redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
+            return;
+        }
+
         \App\Models\Enrollment::where('student_id', $studentId)
             ->where('subject_id', $subjectId)
             ->where('academic_term_id', $termId)

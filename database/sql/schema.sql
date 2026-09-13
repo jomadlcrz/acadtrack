@@ -102,10 +102,13 @@ CREATE TABLE subjects (
     year_level INT NOT NULL,
     semester ENUM('1', '2') NOT NULL,
     academic_term_id INT NOT NULL,
+    is_archived TINYINT(1) DEFAULT 0,
+    archived_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_subject (code, academic_term_id)
+    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
+    UNIQUE KEY unique_subject (code, academic_term_id),
+    INDEX idx_is_archived (is_archived)
 ) ENGINE=InnoDB;
 
 -- Faculty-Subject Assignments
@@ -116,8 +119,8 @@ CREATE TABLE faculty_subjects (
     academic_term_id INT NOT NULL,
     assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (faculty_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
-    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
+    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
     UNIQUE KEY unique_assignment (faculty_id, subject_id, academic_term_id)
 ) ENGINE=InnoDB;
 
@@ -128,9 +131,9 @@ CREATE TABLE enrollments (
     subject_id INT NOT NULL,
     academic_term_id INT NOT NULL,
     enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
-    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE RESTRICT,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
+    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
     UNIQUE KEY unique_enrollment (student_id, subject_id, academic_term_id)
 ) ENGINE=InnoDB;
 
@@ -156,11 +159,24 @@ CREATE TABLE grades (
     grade DECIMAL(5,2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE RESTRICT,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
     FOREIGN KEY (grading_period_id) REFERENCES grading_periods(id) ON DELETE CASCADE,
-    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE CASCADE,
+    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
     UNIQUE KEY unique_grade (student_id, subject_id, grading_period_id, academic_term_id)
+) ENGINE=InnoDB;
+
+-- Grade History Log (Immutable Audit Trail)
+CREATE TABLE grade_history_log (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    grade_id INT NOT NULL,
+    student_id INT NOT NULL,
+    old_score DECIMAL(5,2) NULL,
+    new_score DECIMAL(5,2) NULL,
+    action_performed VARCHAR(20) DEFAULT 'UPDATE',
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_grade_id (grade_id),
+    INDEX idx_student_id (student_id)
 ) ENGINE=InnoDB;
 
 -- Grading Sheets
@@ -180,9 +196,9 @@ CREATE TABLE grading_sheets (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (faculty_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
     FOREIGN KEY (grading_period_id) REFERENCES grading_periods(id) ON DELETE CASCADE,
-    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE CASCADE,
+    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
     UNIQUE KEY unique_sheet (faculty_id, subject_id, grading_period_id, academic_term_id)
 ) ENGINE=InnoDB;
 
@@ -277,5 +293,19 @@ INSERT INTO sections (name, year_level, academic_term_id, department_id, status)
 ('BSIT-1B', 1, 2, 1, 'active'),
 ('BSIT-2A', 2, 2, 1, 'active'),
 ('BSCS-1A', 1, 2, 2, 'active');
+
+-- Automated Grade Audit Trigger
+DELIMITER //
+CREATE TRIGGER IF NOT EXISTS before_grade_evaluation_change
+BEFORE UPDATE ON grades
+FOR EACH ROW
+BEGIN
+    IF (OLD.grade <> NEW.grade) OR (OLD.grade IS NULL AND NEW.grade IS NOT NULL) OR (OLD.grade IS NOT NULL AND NEW.grade IS NULL) THEN
+        INSERT INTO grade_history_log (grade_id, student_id, old_score, new_score, action_performed)
+        VALUES (OLD.id, OLD.student_id, OLD.grade, NEW.grade, 'UPDATE');
+    END IF;
+END //
+DELIMITER ;
+
 
 

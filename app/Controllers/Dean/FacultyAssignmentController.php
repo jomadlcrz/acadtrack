@@ -75,6 +75,18 @@ class FacultyAssignmentController
             $termId = (int) ($academicTerm['id'] ?? 1);
         }
 
+        $hasActiveGradingSheets = \App\Models\GradingSheet::where('faculty_id', $facultyId)
+            ->where('subject_id', $subjectId)
+            ->where('academic_term_id', $termId)
+            ->whereIn('status', ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'FINALIZED'])
+            ->exists();
+
+        if ($hasActiveGradingSheets) {
+            $session->flash('error', 'Cannot remove faculty assignment because submitted or approved grading sheets exist for this course in this academic term.');
+            redirect("/dean/faculty-assignments{$semQuery}");
+            return;
+        }
+
         $this->facultyRepository->removeAssignment($facultyId, $subjectId, $termId);
         $session->flash('success', 'Assignment removed.');
         redirect("/dean/faculty-assignments{$semQuery}");

@@ -260,3 +260,4 @@ class UserController
         redirect('/admin/users');
     }
 }
+

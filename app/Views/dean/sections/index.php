@@ -89,13 +89,23 @@ ob_start();
                                     data-bs-target="#editSectionModal<?= $sec['id'] ?>">
                                 <i class="bi bi-pencil"></i> Edit
                             </button>
-                            <form method="POST" action="<?= url('/dean/sections/' . $sec['id'] . '/delete') ?>" class="d-inline" onsubmit="return confirm('Are you sure you want to delete section <?= htmlspecialchars(addslashes($sec['name'])) ?>?');">
-                                <?= csrf_field() ?>
-                                <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                                <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2 d-inline-flex align-items-center gap-1" <?= $studentCount > 0 ? 'disabled title="Reassign enrolled students before deleting"' : '' ?>>
-                                    <i class="bi bi-trash"></i> Delete
-                                </button>
-                            </form>
+                            <?php if (($sec['status'] ?? 'active') === 'active'): ?>
+                                <form method="POST" action="<?= url('/dean/sections/' . $sec['id'] . '/archive') ?>" class="d-inline" onsubmit="return confirm('Archive section <?= htmlspecialchars(addslashes($sec['name'])) ?>?');">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Archive section">
+                                        <i class="bi bi-archive"></i> Archive
+                                    </button>
+                                </form>
+                            <?php else: ?>
+                                <form method="POST" action="<?= url('/dean/sections/' . $sec['id'] . '/restore') ?>" class="d-inline">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2 d-inline-flex align-items-center gap-1" title="Restore section">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Restore
+                                    </button>
+                                </form>
+                            <?php endif; ?>
                         </td>
                     </tr>
 

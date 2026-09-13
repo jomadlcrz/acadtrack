@@ -27,14 +27,27 @@ class SubjectRepository
         return (bool) Subject::where('id', $id)->update($data);
     }
 
-    public function delete(int $id): bool
+    public function archive(int $id): bool
     {
-        return (bool) Subject::destroy($id);
+        $subject = Subject::find($id);
+        if (!$subject) {
+            return false;
+        }
+        return $subject->archive();
     }
 
-    public function getByDean(int $academicTermId): array
+    public function restore(int $id): bool
     {
-        return Subject::getByDean($academicTermId);
+        $subject = Subject::find($id);
+        if (!$subject) {
+            return false;
+        }
+        return $subject->restore();
+    }
+
+    public function getByDean(int $academicTermId, ?string $statusFilter = null): array
+    {
+        return Subject::getByDean($academicTermId, $statusFilter);
     }
 
     public function getActive(): array

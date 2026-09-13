@@ -92,7 +92,7 @@ class DepartmentController
         redirect('/admin/departments');
     }
 
-    public function destroy(Request $request, Response $response, Session $session, string $id): void
+    public function archive(Request $request, Response $response, Session $session, string $id): void
     {
         $department = Department::find((int) $id);
         if (!$department) {
@@ -101,14 +101,22 @@ class DepartmentController
             return;
         }
 
-        if ($department->faculty()->count() > 0) {
-            $session->flash('error', "Cannot delete '{$department->name}' because faculty members are assigned to it. Reassign or remove faculty first.");
+        $department->update(['status' => 'inactive']);
+        $session->flash('success', "Department '{$department->name}' archived successfully.");
+        redirect('/admin/departments');
+    }
+
+    public function restore(Request $request, Response $response, Session $session, string $id): void
+    {
+        $department = Department::find((int) $id);
+        if (!$department) {
+            $session->flash('error', 'Department not found.');
             redirect('/admin/departments');
             return;
         }
 
-        $department->delete();
-        $session->flash('success', "Department '{$department->name}' deleted successfully.");
+        $department->update(['status' => 'active']);
+        $session->flash('success', "Department '{$department->name}' restored to active status.");
         redirect('/admin/departments');
     }
 }

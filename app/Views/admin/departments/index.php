@@ -63,12 +63,21 @@ ob_start();
                                     data-bs-target="#editDepartmentModal<?= $dept['id'] ?>">
                                 <i class="bi bi-pencil"></i> Edit
                             </button>
-                            <form method="POST" action="<?= url('/admin/departments/' . $dept['id'] . '/delete') ?>" class="d-inline" onsubmit="return confirm('Are you sure you want to delete the <?= htmlspecialchars(addslashes($dept['name'])) ?> department?');">
-                                <?= csrf_field() ?>
-                                <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2 d-inline-flex align-items-center gap-1" <?= $facCount > 0 ? 'disabled title="Reassign faculty before deleting"' : '' ?>>
-                                    <i class="bi bi-trash"></i> Delete
-                                </button>
-                            </form>
+                            <?php if (($dept['status'] ?? 'active') === 'active'): ?>
+                                <form method="POST" action="<?= url('/admin/departments/' . $dept['id'] . '/archive') ?>" class="d-inline" onsubmit="return confirm('Archive the <?= htmlspecialchars(addslashes($dept['name'])) ?> department?');">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Archive department">
+                                        <i class="bi bi-archive"></i> Archive
+                                    </button>
+                                </form>
+                            <?php else: ?>
+                                <form method="POST" action="<?= url('/admin/departments/' . $dept['id'] . '/restore') ?>" class="d-inline">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2 d-inline-flex align-items-center gap-1" title="Restore department">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Restore
+                                    </button>
+                                </form>
+                            <?php endif; ?>
                         </td>
                     </tr>
 

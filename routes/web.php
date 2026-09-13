@@ -48,7 +48,8 @@ $router->post('/admin/users/{id}/activate', [UserController::class, 'activate'],
 $router->get('/admin/departments', [DepartmentController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/departments', [DepartmentController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/departments/{id}', [DepartmentController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
-$router->post('/admin/departments/{id}/delete', [DepartmentController::class, 'destroy'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/departments/{id}/archive', [DepartmentController::class, 'archive'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/departments/{id}/restore', [DepartmentController::class, 'restore'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->get('/admin/settings', [SettingsController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/settings', [SettingsController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 
@@ -60,11 +61,13 @@ $router->post('/dean/faculty-assignments/remove', [FacultyAssignmentController::
 $router->get('/dean/subjects', [DeanSubjectController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin'])]);
 $router->post('/dean/subjects', [DeanSubjectController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
 $router->post('/dean/subjects/{id}', [DeanSubjectController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
-$router->post('/dean/subjects/{id}/delete', [DeanSubjectController::class, 'destroy'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
+$router->post('/dean/subjects/{id}/archive', [DeanSubjectController::class, 'archive'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
+$router->post('/dean/subjects/{id}/restore', [DeanSubjectController::class, 'restore'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
 $router->get('/dean/sections', [SectionController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin'])]);
 $router->post('/dean/sections', [SectionController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
 $router->post('/dean/sections/{id}', [SectionController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
-$router->post('/dean/sections/{id}/delete', [SectionController::class, 'destroy'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
+$router->post('/dean/sections/{id}/archive', [SectionController::class, 'archive'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
+$router->post('/dean/sections/{id}/restore', [SectionController::class, 'restore'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);
 $router->get('/dean/grade-review', [GradeReviewController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin'])]);
 $router->get('/dean/grade-review/{id}', [GradeReviewController::class, 'show'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin'])]);
 $router->post('/dean/grade-review/approve', [GradeReviewController::class, 'approve'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin']), new CsrfMiddleware()]);

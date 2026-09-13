@@ -118,7 +118,7 @@ class SectionController
         redirect("/dean/sections{$semQuery}");
     }
 
-    public function destroy(Request $request, Response $response, Session $session, string $id): void
+    public function archive(Request $request, Response $response, Session $session, string $id): void
     {
         $section = Section::find((int) $id);
         $semester = (string) $request->post('semester', '');
@@ -130,14 +130,25 @@ class SectionController
             return;
         }
 
-        if ($section->students()->count() > 0) {
-            $session->flash('error', "Cannot delete section '{$section->name}' because students are currently assigned to it. Please reassign students first.");
+        $section->update(['status' => 'inactive']);
+        $session->flash('success', "Section '{$section->name}' archived successfully.");
+        redirect("/dean/sections{$semQuery}");
+    }
+
+    public function restore(Request $request, Response $response, Session $session, string $id): void
+    {
+        $section = Section::find((int) $id);
+        $semester = (string) $request->post('semester', '');
+        $semQuery = $semester !== '' ? "?semester={$semester}" : '';
+
+        if (!$section) {
+            $session->flash('error', 'Section not found.');
             redirect("/dean/sections{$semQuery}");
             return;
         }
 
-        $section->delete();
-        $session->flash('success', "Section '{$section->name}' deleted successfully.");
+        $section->update(['status' => 'active']);
+        $session->flash('success', "Section '{$section->name}' restored to active status.");
         redirect("/dean/sections{$semQuery}");
     }
 }
