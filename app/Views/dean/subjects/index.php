@@ -1,7 +1,6 @@
 <?php
 $pageTitle = 'Curricular Subjects';
 $subtitle = 'Academic course offerings organized by year level and semester placement.';
-$currentFilter = $statusFilter ?? 'all';
 $headerActions = '<span class="badge bg-light text-secondary border px-2.5 py-1.5 fs-7 d-inline-flex align-items-center gap-1.5"><i class="bi bi-shield-lock"></i> Read-Only View</span>';
 
 // Organize subjects into Year Level & Semester groupings
@@ -147,18 +146,7 @@ ob_start();
     </div>
 
     <div class="d-flex flex-wrap align-items-center gap-2">
-        <div class="btn-group btn-group-sm" role="group" aria-label="Status filter">
-            <a href="<?= url('/dean/subjects?status=all') ?>" class="btn <?= $currentFilter === 'all' ? 'btn-primary' : 'btn-outline-secondary' ?>">
-                All
-            </a>
-            <a href="<?= url('/dean/subjects?status=active') ?>" class="btn <?= $currentFilter === 'active' ? 'btn-primary' : 'btn-outline-secondary' ?>">
-                Active Only
-            </a>
-            <a href="<?= url('/dean/subjects?status=archived') ?>" class="btn <?= $currentFilter === 'archived' ? 'btn-primary' : 'btn-outline-secondary' ?>">
-                Archived Only
-            </a>
-        </div>
-        <div class="text-muted small fw-medium text-nowrap ms-1" id="visibleCounter">
+        <div class="text-muted small fw-medium text-nowrap" id="visibleCounter">
             <?= count($subjects) ?> <?= count($subjects) === 1 ? 'course' : 'courses' ?>
         </div>
     </div>
@@ -170,12 +158,10 @@ ob_start();
     <?php foreach ($allGroups as $groupKey => $group): ?>
         <?php 
             $subList = $group['subjects'];
-            if (empty($subList) && $currentFilter !== 'all') {
-                continue; // Skip completely empty containers when filtering
+            if (empty($subList)) {
+                continue; // Hide containers with no subjects for this semester placement
             }
-            if (!empty($subList)) {
-                $anyGroupHasSubjects = true;
-            }
+            $anyGroupHasSubjects = true;
         ?>
         <div class="card shadow-sm border-0 mb-4 subject-group-container" 
              id="group-<?= htmlspecialchars($groupKey) ?>"
@@ -209,19 +195,10 @@ ob_start();
                             <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 90px; font-size: 11px;">Units</th>
                             <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 150px; font-size: 11px;">Course Type</th>
                             <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 150px; font-size: 11px;">Assigned Faculty</th>
-                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 110px; font-size: 11px;">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y">
-                        <?php if (empty($subList)): ?>
-                            <tr class="group-empty-row">
-                                <td colspan="6" class="text-center py-4 text-muted small">
-                                    <i class="bi bi-dash-circle me-1 text-secondary"></i>
-                                    No courses registered for this semester placement.
-                                </td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($subList as $subject): ?>
+                        <?php foreach ($subList as $subject): ?>
                                 <?php 
                                     $isArchived = !empty($subject['is_archived']);
                                     $facultyCount = (int) ($subject['assigned_faculty_count'] ?? 0);
@@ -262,20 +239,8 @@ ob_start();
                                             <span class="text-muted small">Unassigned</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="py-3 px-3 text-center">
-                                        <?php if ($isArchived): ?>
-                                            <span class="badge rounded-pill fw-medium" style="background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">
-                                                <i class="bi bi-archive me-1"></i>Archived
-                                            </span>
-                                        <?php else: ?>
-                                            <span class="badge rounded-pill fw-medium" style="background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">
-                                                <i class="bi bi-check-circle me-1"></i>Active
-                                            </span>
-                                        <?php endif; ?>
-                                    </td>
                                 </tr>
                             <?php endforeach; ?>
-                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

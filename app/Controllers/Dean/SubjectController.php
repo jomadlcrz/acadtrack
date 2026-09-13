@@ -9,7 +9,6 @@ use App\Core\Response;
 use App\Core\Session;
 use App\Core\View;
 use App\Repositories\SubjectRepository;
-use App\Validators\SubjectValidator;
 
 class SubjectController
 {
@@ -23,18 +22,11 @@ class SubjectController
     public function index(Request $request, Response $response, Session $session): void
     {
         $academicTerm = (new \App\Models\AcademicTerm())->getActive();
-        $statusFilter = (string) $request->get('status', 'all');
-        if (!in_array($statusFilter, ['all', 'active', 'archived'], true)) {
-            $statusFilter = 'all';
-        }
-
-        $filterArg = $statusFilter === 'all' ? null : $statusFilter;
-        $subjects = $this->subjectRepository->getByDean($academicTerm['id'] ?? 0, $filterArg);
+        $subjects = $this->subjectRepository->getByDean($academicTerm['id'] ?? 0);
 
         $html = (new View())->render('dean.subjects.index', [
             'subjects' => $subjects,
             'academicTerm' => $academicTerm,
-            'statusFilter' => $statusFilter,
         ]);
         $response->html($html);
     }
