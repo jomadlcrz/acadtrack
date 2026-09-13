@@ -64,8 +64,8 @@ class DashboardController
     {
         $activeTerm = AcademicTerm::getActive();
         $totalUsers = User::count();
-        $totalStudents = \App\Models\UserRole::where('role_name', 'Student')->count();
-        $totalFaculty = \App\Models\UserRole::whereIn('role_name', ['Faculty', 'Dean'])->count();
+        $totalStudents = \App\Models\UserRole::where('role_id', 4)->count();
+        $totalFaculty = \App\Models\UserRole::whereIn('role_id', [2, 3])->count();
         $totalDepts = Department::count();
         $recentUsers = User::orderBy('id', 'desc')->limit(5)->get()->toArray();
         $gradingSetting = GradingSetting::first();

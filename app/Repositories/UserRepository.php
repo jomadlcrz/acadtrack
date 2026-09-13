@@ -70,9 +70,10 @@ class UserRepository
 
         // Update role if provided
         if (!empty($data['role'])) {
+            $roleId = \App\Models\Role::getIdByName($data['role']) ?? 4;
             UserRole::updateOrCreate(
                 ['user_id' => $id],
-                ['role_name' => $data['role']]
+                ['role_id' => $roleId]
             );
         }
 
@@ -83,45 +84,41 @@ class UserRepository
                 AdminDetail::updateOrCreate(
                     ['user_id' => $id],
                     array_filter([
-                        'first_name' => $firstName ?: null,
-                        'last_name' => $lastName ?: null,
+                        'first_name' => $firstName,
+                        'last_name' => $lastName,
                         'middle_name' => $middleName,
-                    ])
+                        'phone_number' => $data['phone_number'] ?? null,
+                    ], fn($val) => $val !== null && $val !== '')
                 );
             }
         } elseif (in_array($role, ['Faculty', 'Dean'], true)) {
-            $deptId = isset($data['department_id']) ? (int) $data['department_id'] : null;
-            $fType = $role === 'Dean' ? 'dean' : 'instructor';
-            FacultyDetail::updateOrCreate(
-                ['user_id' => $id],
-                array_filter([
-                    'first_name' => $firstName ?: null,
-                    'last_name' => $lastName ?: null,
-                    'middle_name' => $middleName,
-                    'faculty_type' => $fType,
-                    'department_id' => $deptId ?: null,
-                ])
-            );
+            if ($firstName || $lastName || isset($data['department_id'])) {
+                FacultyDetail::updateOrCreate(
+                    ['user_id' => $id],
+                    array_filter([
+                        'first_name' => $firstName,
+                        'last_name' => $lastName,
+                        'middle_name' => $middleName,
+                        'department_id' => !empty($data['department_id']) ? (int) $data['department_id'] : null,
+                        'faculty_type' => $role === 'Dean' ? 'dean' : 'instructor',
+                    ], fn($val) => $val !== null && $val !== '')
+                );
+            }
         } elseif ($role === 'Student') {
-            $studentNumber = isset($data['student_number']) ? trim((string) $data['student_number']) : null;
-            $setId = isset($data['set_id']) ? (int) $data['set_id'] : null;
-            $yearLevel = isset($data['year_level']) ? (int) $data['year_level'] : null;
-            $status = isset($data['status']) && in_array($data['status'], ['Regular', 'Irregular'], true)
-                ? $data['status']
-                : (isset($data['student_status']) ? $data['student_status'] : null);
-
-            StudentDetail::updateOrCreate(
-                ['user_id' => $id],
-                array_filter([
-                    'first_name' => $firstName ?: null,
-                    'last_name' => $lastName ?: null,
-                    'middle_name' => $middleName,
-                    'student_number' => $studentNumber,
-                    'set_id' => $setId,
-                    'year_level' => $yearLevel,
-                    'status' => $status,
-                ])
-            );
+            if ($firstName || $lastName || isset($data['student_number']) || isset($data['set_id']) || isset($data['year_level'])) {
+                StudentDetail::updateOrCreate(
+                    ['user_id' => $id],
+                    array_filter([
+                        'first_name' => $firstName,
+                        'last_name' => $lastName,
+                        'middle_name' => $middleName,
+                        'student_number' => !empty($data['student_number']) ? trim((string) $data['student_number']) : null,
+                        'set_id' => !empty($data['set_id']) ? (int) $data['set_id'] : null,
+                        'year_level' => !empty($data['year_level']) ? (int) $data['year_level'] : null,
+                        'status' => !empty($data['student_status']) ? (string) $data['student_status'] : null,
+                    ], fn($val) => $val !== null && $val !== '')
+                );
+            }
         }
 
         return true;
@@ -148,7 +145,7 @@ class UserRepository
         $clauses = [];
         $params = [];
         if ($role !== '') {
-            $clauses[] = "ur.role_name = :role";
+            $clauses[] = "r.role_name = :role";
             $params['role'] = $role;
         }
         if ($status !== '') {
@@ -158,7 +155,7 @@ class UserRepository
 
         $where = !empty($clauses) ? "WHERE " . implode(" AND ", $clauses) : "";
 
-        $countSql = "SELECT COUNT(*) FROM users u LEFT JOIN user_roles ur ON ur.user_id = u.id {$where}";
+        $countSql = "SELECT COUNT(*) FROM users u LEFT JOIN user_roles ur ON ur.user_id = u.id LEFT JOIN roles r ON r.id = ur.role_id {$where}";
         $stmt = Database::getConnection()->prepare($countSql);
         $stmt->execute($params);
         $total = (int) $stmt->fetchColumn();
@@ -166,12 +163,13 @@ class UserRepository
         $sql = "SELECT u.id, u.email, u.status, u.is_temp_password, u.created_at, u.deactivated_at,
                        COALESCE(ad.first_name, fd.first_name, sd.first_name, '') AS first_name,
                        COALESCE(ad.last_name, fd.last_name, sd.last_name, '') AS last_name,
-                       COALESCE(ur.role_name, 'Student') AS role,
+                       COALESCE(r.role_name, 'Student') AS role,
                        sd.student_number,
                        fd.faculty_type,
                        d.name AS department_name, d.code AS department_code, sec.set_name AS set_name
                 FROM users u
                 LEFT JOIN user_roles ur ON ur.user_id = u.id
+                LEFT JOIN roles r ON r.id = ur.role_id
                 LEFT JOIN admin_details ad ON ad.user_id = u.id
                 LEFT JOIN faculty_details fd ON fd.user_id = u.id
                 LEFT JOIN student_details sd ON sd.user_id = u.id

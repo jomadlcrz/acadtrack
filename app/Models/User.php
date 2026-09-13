@@ -41,6 +41,16 @@ class User extends Model
         return $this->hasMany(UserRole::class, 'user_id');
     }
 
+    public function role()
+    {
+        return $this->hasOneThrough(Role::class, UserRole::class, 'user_id', 'id', 'id', 'role_id');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
+    }
+
     public function adminDetail()
     {
         return $this->hasOne(AdminDetail::class, 'user_id');
@@ -177,7 +187,10 @@ class User extends Model
         $uid = $this->id ?? null;
         if (!$uid) return 'Student';
 
-        $roleName = DB::table('user_roles')->where('user_id', $uid)->value('role_name');
+        $roleName = DB::table('user_roles')
+            ->join('roles', 'roles.id', '=', 'user_roles.role_id')
+            ->where('user_roles.user_id', $uid)
+            ->value('roles.role_name');
         if ($roleName) return (string) $roleName;
 
         return 'Student';
@@ -257,7 +270,8 @@ class User extends Model
             }
             if ($this->pendingRole !== null) {
                 $roleName = ucfirst(strtolower((string) $this->pendingRole));
-                UserRole::updateOrCreate(['user_id' => $uid], ['role_name' => $roleName]);
+                $roleId = Role::getIdByName($roleName) ?? 4;
+                UserRole::updateOrCreate(['user_id' => $uid], ['role_id' => $roleId]);
                 $this->pendingRole = null;
             }
         }
@@ -293,7 +307,8 @@ class User extends Model
         }
         if (array_key_exists('role', $attributes)) {
             $roleName = ucfirst(strtolower((string) $attributes['role']));
-            UserRole::updateOrCreate(['user_id' => $this->id], ['role_name' => $roleName]);
+            $roleId = Role::getIdByName($roleName) ?? 4;
+            UserRole::updateOrCreate(['user_id' => $this->id], ['role_id' => $roleId]);
             $this->pendingRole = null;
             unset($attributes['role']);
         }
@@ -346,9 +361,10 @@ class User extends Model
             $uid = (int) $user->id;
 
             // 1. Create user_roles
+            $roleId = Role::getIdByName($role) ?? 4;
             UserRole::create([
                 'user_id' => $uid,
-                'role_name' => $role,
+                'role_id' => $roleId,
             ]);
 
             // 2. Create detail records based on role
@@ -447,7 +463,7 @@ class User extends Model
     public static function getStudents(): array
     {
         $users = self::whereHas('userRole', function ($q) {
-            $q->where('role_name', 'Student');
+            $q->where('role_id', 4);
         })
         ->get();
 
@@ -457,7 +473,7 @@ class User extends Model
     public static function getFaculty(): array
     {
         $users = self::whereHas('userRole', function ($q) {
-            $q->where('role_name', 'Faculty');
+            $q->where('role_id', 3);
         })
         ->with(['faculty.department'])
         ->get();

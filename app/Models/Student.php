@@ -105,7 +105,7 @@ class Student extends Model
             LEFT JOIN student_details sd ON sd.user_id = u.id
             JOIN user_roles ur ON ur.user_id = u.id
             LEFT JOIN sets sec ON sec.id = s.set_id
-            WHERE ur.role_name = 'Student'
+            WHERE ur.role_id = 4
             ORDER BY sd.last_name, sd.first_name
         ");
         return $stmt->fetchAll();

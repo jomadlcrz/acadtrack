@@ -39,16 +39,27 @@ CREATE TABLE users (
     INDEX idx_email (email)
 ) ENGINE=InnoDB;
 
+-- Roles
+CREATE TABLE roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
 -- User Roles
 CREATE TABLE user_roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    role_name ENUM('Admin', 'Dean', 'Faculty', 'Student') NOT NULL,
+    role_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_user_role (user_id, role_id),
     INDEX idx_user_id (user_id),
-    INDEX idx_role_name (role_name)
+    INDEX idx_role_id (role_id)
 ) ENGINE=InnoDB;
 
 -- Admin Details
