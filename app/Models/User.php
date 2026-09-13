@@ -246,37 +246,39 @@ class User extends Model
 
     public function save(array $options = [])
     {
-        $saved = parent::save($options);
+        return DB::connection()->transaction(function () use ($options) {
+            $saved = parent::save($options);
 
-        if ($saved && $this->id) {
-            $uid = (int) $this->id;
-            if ($this->pendingStudentNumber !== null) {
-                StudentDetail::updateOrCreate(['user_id' => $uid], ['student_number' => $this->pendingStudentNumber]);
-                $this->pendingStudentNumber = null;
-            }
-            if ($this->pendingFirstName !== null || $this->pendingLastName !== null) {
-                $fn = $this->first_name;
-                $ln = $this->last_name;
-                $role = ucfirst(strtolower($this->role));
-                if ($role === 'Admin') {
-                    AdminDetail::updateOrCreate(['user_id' => $uid], ['first_name' => $fn, 'last_name' => $ln]);
-                } elseif (in_array($role, ['Faculty', 'Dean'], true)) {
-                    FacultyDetail::updateOrCreate(['user_id' => $uid], ['first_name' => $fn, 'last_name' => $ln]);
-                } elseif ($role === 'Student') {
-                    StudentDetail::updateOrCreate(['user_id' => $uid], ['first_name' => $fn, 'last_name' => $ln]);
+            if ($saved && $this->id) {
+                $uid = (int) $this->id;
+                if ($this->pendingStudentNumber !== null) {
+                    StudentDetail::updateOrCreate(['user_id' => $uid], ['student_number' => $this->pendingStudentNumber]);
+                    $this->pendingStudentNumber = null;
                 }
-                $this->pendingFirstName = null;
-                $this->pendingLastName = null;
+                if ($this->pendingFirstName !== null || $this->pendingLastName !== null) {
+                    $fn = $this->first_name;
+                    $ln = $this->last_name;
+                    $role = ucfirst(strtolower($this->role));
+                    if ($role === 'Admin') {
+                        AdminDetail::updateOrCreate(['user_id' => $uid], ['first_name' => $fn, 'last_name' => $ln]);
+                    } elseif (in_array($role, ['Faculty', 'Dean'], true)) {
+                        FacultyDetail::updateOrCreate(['user_id' => $uid], ['first_name' => $fn, 'last_name' => $ln]);
+                    } elseif ($role === 'Student') {
+                        StudentDetail::updateOrCreate(['user_id' => $uid], ['first_name' => $fn, 'last_name' => $ln]);
+                    }
+                    $this->pendingFirstName = null;
+                    $this->pendingLastName = null;
+                }
+                if ($this->pendingRole !== null) {
+                    $roleName = ucfirst(strtolower((string) $this->pendingRole));
+                    $roleId = Role::getIdByName($roleName) ?? 4;
+                    UserRole::updateOrCreate(['user_id' => $uid], ['role_id' => $roleId]);
+                    $this->pendingRole = null;
+                }
             }
-            if ($this->pendingRole !== null) {
-                $roleName = ucfirst(strtolower((string) $this->pendingRole));
-                $roleId = Role::getIdByName($roleName) ?? 4;
-                UserRole::updateOrCreate(['user_id' => $uid], ['role_id' => $roleId]);
-                $this->pendingRole = null;
-            }
-        }
 
-        return $saved;
+            return $saved;
+        });
     }
 
     public function update(array $attributes = [], array $options = [])
@@ -333,86 +335,88 @@ class User extends Model
      */
     public static function create(array $attributes = [])
     {
-        $firstName = trim((string) ($attributes['first_name'] ?? ''));
-        $lastName = trim((string) ($attributes['last_name'] ?? ''));
-        $middleName = !empty($attributes['middle_name']) ? trim((string) $attributes['middle_name']) : null;
-        $role = ucfirst(strtolower(trim((string) ($attributes['role'] ?? 'Student'))));
-        $studentNumber = !empty($attributes['student_number']) ? trim((string) $attributes['student_number']) : null;
-        $isTempPassword = !empty($attributes['is_temp_password']) || !empty($attributes['force_password_change']) ? 1 : 0;
-        $departmentId = !empty($attributes['department_id']) ? (int) $attributes['department_id'] : null;
-        $setId = !empty($attributes['set_id']) ? (int) $attributes['set_id'] : null;
-        $yearLevel = !empty($attributes['year_level']) ? (int) $attributes['year_level'] : 1;
-        $studentStatus = !empty($attributes['status']) && in_array($attributes['status'], ['Regular', 'Irregular'], true)
-            ? $attributes['status']
-            : (!empty($attributes['student_status']) ? (string) $attributes['student_status'] : 'Regular');
+        return DB::connection()->transaction(function () use ($attributes) {
+            $firstName = trim((string) ($attributes['first_name'] ?? ''));
+            $lastName = trim((string) ($attributes['last_name'] ?? ''));
+            $middleName = !empty($attributes['middle_name']) ? trim((string) $attributes['middle_name']) : null;
+            $role = ucfirst(strtolower(trim((string) ($attributes['role'] ?? 'Student'))));
+            $studentNumber = !empty($attributes['student_number']) ? trim((string) $attributes['student_number']) : null;
+            $isTempPassword = !empty($attributes['is_temp_password']) || !empty($attributes['force_password_change']) ? 1 : 0;
+            $departmentId = !empty($attributes['department_id']) ? (int) $attributes['department_id'] : null;
+            $setId = !empty($attributes['set_id']) ? (int) $attributes['set_id'] : null;
+            $yearLevel = !empty($attributes['year_level']) ? (int) $attributes['year_level'] : 1;
+            $studentStatus = !empty($attributes['status']) && in_array($attributes['status'], ['Regular', 'Irregular'], true)
+                ? $attributes['status']
+                : (!empty($attributes['student_status']) ? (string) $attributes['student_status'] : 'Regular');
 
-        $userAttrs = [
-            'email' => trim((string) ($attributes['email'] ?? '')),
-            'password' => $attributes['password'] ?? '',
-            'is_temp_password' => $isTempPassword,
-            'status' => in_array($attributes['status'] ?? '', ['active', 'inactive'], true) ? $attributes['status'] : 'active',
-            'deactivated_at' => $attributes['deactivated_at'] ?? null,
-        ];
+            $userAttrs = [
+                'email' => trim((string) ($attributes['email'] ?? '')),
+                'password' => $attributes['password'] ?? '',
+                'is_temp_password' => $isTempPassword,
+                'status' => in_array($attributes['status'] ?? '', ['active', 'inactive'], true) ? $attributes['status'] : 'active',
+                'deactivated_at' => $attributes['deactivated_at'] ?? null,
+            ];
 
-        $user = new static($userAttrs);
-        $user->save();
+            $user = new static($userAttrs);
+            $user->save();
 
-        if ($user && $user->id) {
-            $uid = (int) $user->id;
+            if ($user && $user->id) {
+                $uid = (int) $user->id;
 
-            // 1. Create user_roles
-            $roleId = Role::getIdByName($role) ?? 4;
-            UserRole::create([
-                'user_id' => $uid,
-                'role_id' => $roleId,
-            ]);
-
-            // 2. Create detail records based on role
-            if ($role === 'Admin') {
-                AdminDetail::create([
+                // 1. Create user_roles
+                $roleId = Role::getIdByName($role) ?? 4;
+                UserRole::create([
                     'user_id' => $uid,
-                    'first_name' => $firstName ?: 'Admin',
-                    'last_name' => $lastName ?: 'User',
-                    'middle_name' => $middleName,
+                    'role_id' => $roleId,
                 ]);
-            } elseif ($role === 'Dean') {
-                FacultyDetail::create([
-                    'user_id' => $uid,
-                    'first_name' => $firstName ?: 'Dean',
-                    'last_name' => $lastName ?: 'User',
-                    'middle_name' => $middleName,
-                    'faculty_type' => 'dean',
-                    'department_id' => $departmentId,
-                ]);
-            } elseif ($role === 'Faculty') {
-                FacultyDetail::create([
-                    'user_id' => $uid,
-                    'first_name' => $firstName ?: 'Faculty',
-                    'last_name' => $lastName ?: 'User',
-                    'middle_name' => $middleName,
-                    'faculty_type' => 'instructor',
-                    'department_id' => $departmentId,
-                ]);
-            } elseif ($role === 'Student') {
-                StudentDetail::create([
-                    'user_id' => $uid,
-                    'student_number' => $studentNumber,
-                    'first_name' => $firstName ?: 'Student',
-                    'last_name' => $lastName ?: 'User',
-                    'middle_name' => $middleName,
-                    'set_id' => $setId,
-                    'year_level' => $yearLevel,
-                    'status' => $studentStatus,
-                ]);
+
+                // 2. Create detail records based on role
+                if ($role === 'Admin') {
+                    AdminDetail::create([
+                        'user_id' => $uid,
+                        'first_name' => $firstName ?: 'Admin',
+                        'last_name' => $lastName ?: 'User',
+                        'middle_name' => $middleName,
+                    ]);
+                } elseif ($role === 'Dean') {
+                    FacultyDetail::create([
+                        'user_id' => $uid,
+                        'first_name' => $firstName ?: 'Dean',
+                        'last_name' => $lastName ?: 'User',
+                        'middle_name' => $middleName,
+                        'faculty_type' => 'dean',
+                        'department_id' => $departmentId,
+                    ]);
+                } elseif ($role === 'Faculty') {
+                    FacultyDetail::create([
+                        'user_id' => $uid,
+                        'first_name' => $firstName ?: 'Faculty',
+                        'last_name' => $lastName ?: 'User',
+                        'middle_name' => $middleName,
+                        'faculty_type' => 'instructor',
+                        'department_id' => $departmentId,
+                    ]);
+                } elseif ($role === 'Student') {
+                    StudentDetail::create([
+                        'user_id' => $uid,
+                        'student_number' => $studentNumber,
+                        'first_name' => $firstName ?: 'Student',
+                        'last_name' => $lastName ?: 'User',
+                        'middle_name' => $middleName,
+                        'set_id' => $setId,
+                        'year_level' => $yearLevel,
+                        'status' => $studentStatus,
+                    ]);
+                }
+
+                $user->pendingFirstName = $firstName;
+                $user->pendingLastName = $lastName;
+                $user->pendingRole = $role;
+                $user->pendingStudentNumber = $studentNumber;
             }
 
-            $user->pendingFirstName = $firstName;
-            $user->pendingLastName = $lastName;
-            $user->pendingRole = $role;
-            $user->pendingStudentNumber = $studentNumber;
-        }
-
-        return $user;
+            return $user;
+        });
     }
 
     /**

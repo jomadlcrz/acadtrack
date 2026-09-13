@@ -139,7 +139,7 @@ class AcademicModulesWorkflowTest extends TestCase
         ]);
 
         $this->assertNotEmpty($html);
-        $this->assertStringContainsString('Sets (Sections)', $html);
+        $this->assertStringContainsString('Sets', $html);
         $this->assertStringContainsString('Create Sections', $html);
         $this->assertStringContainsString('All Programs', $html);
         $this->assertStringContainsString('All Years', $html);

@@ -68,7 +68,7 @@ $router->get('/admin/program-curricula/template-csv', [ProgramCurriculumControll
 $router->post('/admin/program-curricula', [ProgramCurriculumController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->get('/admin/program-curricula/{id}/export-csv', [ProgramCurriculumController::class, 'exportCsv'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean'])]);
 
-// Sets (Sections) routes
+// Sets routes
 $router->get('/admin/sets', [AdminSetController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean'])]);
 $router->post('/admin/sets', [AdminSetController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
 $router->post('/admin/sets/bulk-delete', [AdminSetController::class, 'bulkDelete'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);

@@ -38,7 +38,7 @@
                 </a>
                 <a href="<?= url('/admin/sets') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/sets') ? 'active' : '' ?>">
                     <i class="bi bi-collection-fill"></i>
-                    <span>Sets (Sections)</span>
+                    <span>Sets</span>
                 </a>
                 <a href="<?= url('/dean/grade-review') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/grade-review') ? 'active' : '' ?>">
                     <i class="bi bi-file-earmark-check-fill"></i>
@@ -63,7 +63,7 @@
                 </a>
                 <a href="<?= url('/admin/sets') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/sets') || str_starts_with($currentPath, '/dean/sets') ? 'active' : '' ?>">
                     <i class="bi bi-collection-fill"></i>
-                    <span>Sets (Sections)</span>
+                    <span>Sets</span>
                 </a>
                 <a href="<?= url('/dean/faculty-assignments') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/faculty-assignments') ? 'active' : '' ?>">
                     <i class="bi bi-person-badge-fill"></i>

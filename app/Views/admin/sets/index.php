@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Sets (Sections)';
+$pageTitle = 'Sets';
 $subtitle = 'Manage academic class sections, cohorts, and batch-generate student sets.';
 $headerActions = '<button type="button" class="btn text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" data-bs-toggle="modal" data-bs-target="#createSetsModal"><i class="bi bi-plus-lg"></i> Create Sections</button>';
 ob_start();
