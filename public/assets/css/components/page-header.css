@@ -1,0 +1,65 @@
+/* ==========================================================================
+   Acadtrack UI Component: Page & Section Headers
+   ========================================================================== */
+
+/* 1. Standard Page Header Container */
+.page-header,
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+/* 2. Header Text Content */
+.page-header-content,
+.dashboard-header > div:first-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.page-header-title,
+.dashboard-header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px 0;
+    line-height: 1.25;
+}
+
+.page-header-subtitle,
+.dashboard-header p {
+    font-size: 13.5px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* 3. Header Action Buttons & Controls */
+.page-header-actions,
+.dashboard-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* 4. Compact Section Header (Within Cards or Panels) */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.section-header-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+}

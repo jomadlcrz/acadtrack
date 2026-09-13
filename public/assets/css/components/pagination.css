@@ -1,0 +1,54 @@
+/* ==========================================================================
+   Acadtrack UI Component: Table & Roster Pagination
+   ========================================================================== */
+
+.pagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+    gap: 4px;
+    margin: 0;
+}
+
+.page-item .page-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    text-decoration: none;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    transition: all 0.15s ease-in-out;
+}
+
+.pagination-sm .page-item .page-link {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.page-item .page-link:hover {
+    z-index: 2;
+    color: #0f172a;
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.page-item.active .page-link {
+    z-index: 3;
+    color: #ffffff;
+    background-color: var(--primary, #2563eb);
+    border-color: var(--primary, #2563eb);
+    font-weight: 600;
+}
+
+.page-item.disabled .page-link {
+    color: #94a3b8;
+    pointer-events: none;
+    background-color: #f8fafc;
+    border-color: #e2e8f0;
+}

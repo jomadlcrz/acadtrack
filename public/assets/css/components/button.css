@@ -1,0 +1,248 @@
+/* ==========================================================================
+   Acadtrack UI Component: Buttons & Interactive Action Controls
+   ========================================================================== */
+
+/* 1. Base Button Standard */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid var(--gray-300, #cbd5e1);
+    border-radius: var(--radius, 6px);
+    background: #ffffff;
+    color: var(--gray-700, #334155);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    text-decoration: none;
+    line-height: 1.4;
+}
+
+.btn:hover {
+    background: var(--gray-100, #f1f5f9);
+    color: var(--gray-900, #0f172a);
+    text-decoration: none;
+}
+
+.btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+/* 2. Solid Color Variants */
+.btn-primary {
+    background-color: var(--primary, #2563eb) !important;
+    border-color: var(--primary, #2563eb) !important;
+    color: #ffffff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--primary-dark, #1d4ed8) !important;
+    border-color: var(--primary-dark, #1d4ed8) !important;
+    color: #ffffff !important;
+}
+
+.btn-secondary {
+    background-color: #64748b !important;
+    border-color: #64748b !important;
+    color: #ffffff !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active {
+    background-color: #475569 !important;
+    border-color: #475569 !important;
+    color: #ffffff !important;
+}
+
+.btn-danger {
+    background-color: var(--danger, #dc2626) !important;
+    border-color: var(--danger, #dc2626) !important;
+    color: #ffffff !important;
+}
+
+.btn-danger:hover,
+.btn-danger:focus,
+.btn-danger:active {
+    background-color: #b91c1c !important;
+    border-color: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+.btn-warning {
+    background-color: var(--warning, #d97706) !important;
+    border-color: var(--warning, #d97706) !important;
+    color: #ffffff !important;
+}
+
+.btn-warning:hover,
+.btn-warning:focus,
+.btn-warning:active {
+    background-color: #b45309 !important;
+    border-color: #b45309 !important;
+    color: #ffffff !important;
+}
+
+.btn-success {
+    background-color: var(--success, #16a34a) !important;
+    border-color: var(--success, #16a34a) !important;
+    color: #ffffff !important;
+}
+
+.btn-success:hover,
+.btn-success:focus,
+.btn-success:active {
+    background-color: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+
+.btn-dark {
+    background-color: #0f172a !important;
+    border-color: #0f172a !important;
+    color: #ffffff !important;
+}
+
+.btn-dark:hover,
+.btn-dark:focus,
+.btn-dark:active {
+    background-color: #1e293b !important;
+    border-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+/* 3. High-Contrast Outline Variants */
+.btn-outline-primary {
+    background-color: transparent !important;
+    border-color: var(--primary, #2563eb) !important;
+    color: var(--primary, #2563eb) !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active,
+.btn-outline-primary.active {
+    background-color: var(--primary, #2563eb) !important;
+    border-color: var(--primary, #2563eb) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.btn-outline-secondary {
+    background-color: transparent !important;
+    border-color: #94a3b8 !important;
+    color: #475569 !important;
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus,
+.btn-outline-secondary:active,
+.btn-outline-secondary.active {
+    background-color: #475569 !important;
+    border-color: #475569 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(71, 85, 105, 0.2);
+}
+
+.btn-outline-danger {
+    background-color: transparent !important;
+    border-color: var(--danger, #dc2626) !important;
+    color: var(--danger, #dc2626) !important;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus,
+.btn-outline-danger:active,
+.btn-outline-danger.active {
+    background-color: var(--danger, #dc2626) !important;
+    border-color: var(--danger, #dc2626) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+}
+
+.btn-outline-warning {
+    background-color: transparent !important;
+    border-color: var(--warning, #d97706) !important;
+    color: #b45309 !important;
+}
+
+.btn-outline-warning:hover,
+.btn-outline-warning:focus,
+.btn-outline-warning:active,
+.btn-outline-warning.active {
+    background-color: var(--warning, #d97706) !important;
+    border-color: var(--warning, #d97706) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+}
+
+.btn-outline-success {
+    background-color: transparent !important;
+    border-color: var(--success, #16a34a) !important;
+    color: var(--success, #16a34a) !important;
+}
+
+.btn-outline-success:hover,
+.btn-outline-success:focus,
+.btn-outline-success:active,
+.btn-outline-success.active {
+    background-color: var(--success, #16a34a) !important;
+    border-color: var(--success, #16a34a) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);
+}
+
+/* 4. Sizing & Utility Variants */
+.btn-sm {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+}
+
+.btn-block {
+    display: flex;
+    width: 100%;
+}
+
+.btn-link {
+    background: none !important;
+    border: none !important;
+    color: var(--primary, #2563eb) !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+}
+
+.btn-link:hover {
+    text-decoration: underline !important;
+}
+
+/* 5. Button Groups */
+.btn-group .btn {
+    border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+    border-top-left-radius: var(--radius, 6px);
+    border-bottom-left-radius: var(--radius, 6px);
+}
+
+.btn-group .btn:last-child {
+    border-top-right-radius: var(--radius, 6px);
+    border-bottom-right-radius: var(--radius, 6px);
+}
+
+.btn-group-sm .btn:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.btn-group-sm .btn:last-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}

@@ -9,13 +9,21 @@
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap/css/bootstrap.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap-icons/bootstrap-icons.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/components/navbar.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/components/sidebar.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/button.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/input.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/select.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/card.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/table.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/modal.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/badge.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/pages/dashboard.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/navbar.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/sidebar.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/alert.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/pagination.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/empty-state.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/page-header.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/filter-bar.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/layouts/app-shell.css') ?>">
 </head>
 <body>
     <?php include __DIR__ . '/../components/navbar.php'; ?>

@@ -1,0 +1,65 @@
+/* ==========================================================================
+   Acadtrack UI Component: Search & Filtering Bars
+   ========================================================================== */
+
+/* 1. Base Filter Bar Layout */
+.filter-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+    .filter-bar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+/* 2. Elevated Card Filter Bar Variant */
+.filter-bar-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px 16px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+/* 3. Search Field with Positioned Icon */
+.filter-search {
+    position: relative;
+    flex-grow: 1;
+    min-width: 220px;
+}
+
+.filter-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.filter-search .form-control {
+    padding-left: 36px;
+}
+
+/* 4. Controls Grouping */
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* 5. Live Records Counter Badge */
+.filter-counter {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    white-space: nowrap;
+}

@@ -1,23 +1,16 @@
 /* ==========================================================================
-   Acadtrack Authenticated Collegiate Dashboard & Layout Canvas
+   Acadtrack Layout Architecture: Authenticated Application Shell
+   Governs all authenticated portal pages: Admin, Dean, Faculty, and Student.
    ========================================================================== */
 
-/* 1. Component Modular Inclusions */
-@import url('../components/navbar.css');
-@import url('../components/sidebar.css');
-@import url('../components/card.css');
-@import url('../components/table.css');
-@import url('../components/modal.css');
-@import url('../components/badge.css');
-
-/* 2. Layout Structure */
+/* 1. Viewport Container Structure */
 .app-container {
     display: flex;
     min-height: calc(100vh - 58px);
     background-color: #f8fafc;
 }
 
-/* 3. Main Content Canvas */
+/* 2. Main Content Canvas */
 .main-content {
     flex: 1;
     min-width: 0;
@@ -25,11 +18,14 @@
     overflow-x: auto;
 }
 
-.dashboard-header {
+/* 3. Page Header Structure (Dashboard & Portal Views) */
+.dashboard-header,
+.page-header {
     margin-bottom: 24px;
 }
 
-.dashboard-header h1 {
+.dashboard-header h1,
+.page-header h1 {
     font-size: 22px;
     font-weight: 600;
     color: #0f172a;
@@ -37,18 +33,22 @@
     margin-bottom: 4px;
 }
 
-.dashboard-header p {
+.dashboard-header p,
+.page-header p {
     font-size: 13.5px;
     color: var(--gray-500, #64748b);
     margin: 0;
 }
 
-.dashboard-actions {
+/* 4. Action Area & Content Wrapper */
+.dashboard-actions,
+.page-header-actions {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.dashboard-content {
+.dashboard-content,
+.content-wrapper {
     position: relative;
 }

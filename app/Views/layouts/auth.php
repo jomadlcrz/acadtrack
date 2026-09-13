@@ -10,7 +10,10 @@
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap/css/bootstrap.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap-icons/bootstrap-icons.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/pages/auth.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/button.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/input.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/alert.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/layouts/auth.css') ?>">
 </head>
 <body class="auth-body">
     <main class="auth-container">

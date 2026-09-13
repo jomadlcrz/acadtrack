@@ -24,7 +24,32 @@
 | **Badges (`.badge`)** | [getbootstrap.com/docs/5.3/components/badge/](https://getbootstrap.com/docs/5.3/components/badge/) |
 | **Alerts (`.alert`)** | [getbootstrap.com/docs/5.3/components/alerts/](https://getbootstrap.com/docs/5.3/components/alerts/) |
 | **Modals (`.modal`)** | [getbootstrap.com/docs/5.3/components/modal/](https://getbootstrap.com/docs/5.3/components/modal/) |
+| **Pagination (`.pagination`)** | [getbootstrap.com/docs/5.3/components/pagination/](https://getbootstrap.com/docs/5.3/components/pagination/) |
 | **Bootstrap Icons Catalog** | [icons.getbootstrap.com/](https://icons.getbootstrap.com/) |
+
+---
+
+## Acadtrack Component Stylesheets Directory (`public/assets/css/components/`)
+
+All UI components are decoupled from page styles and maintained as standalone stylesheets to guarantee cross-portal consistency:
+
+| UI Component | Stylesheet Path | Key Classes & Elements Governed |
+| :--- | :--- | :--- |
+| **Buttons & Actions** | `components/button.css` | `.btn`, `.btn-primary`, `.btn-outline-*`, `.btn-dark`, `.btn-sm`, `.btn-group` |
+| **Form Inputs** | `components/input.css` | `.form-control`, `.form-control-sm`, `.form-label`, `.grade-input`, `.form-text`, `.input-group` |
+| **Select Dropdowns** | `components/select.css` | `.form-select`, `.form-select-sm`, custom SVG caret, inline min-width |
+| **Card & KPI Blocks** | `components/card.css` | `.stat-card`, `.dashboard-stats`, `.stat-icon-*`, `.quick-action-card`, `.content-card` |
+| **Academic Tables** | `components/table.css` | `.table`, `.table.align-middle`, thead uppercase 11px specs, tbody cells, `.table-academic`, `.tabular-nums` |
+| **Modals & Dialogs** | `components/modal.css` | `.modal-content` (8px radius, border), `.modal-header`, `.modal-body`, `.modal-footer`, backdrops |
+| **Badges & Tags** | `components/badge.css` | `.badge`, `.badge-role`, `.badge-admin`, `.badge-dean`, `.badge-approved`, `.text-amber` |
+| **Top Navbar** | `components/navbar.css` | `.app-navbar`, brand text, term badge, user card, avatar, logout button |
+| **Sidebar Navigation**| `components/sidebar.css` | `.sidebar`, `.sidebar-nav`, `.sidebar-group`, `.sidebar-link`, active link state |
+| **Alerts & Toasts** | `components/alert.css` | `.alert`, `.alert-success`, `.alert-danger`, `.alert-warning`, `.alert-info`, `.toast-container` |
+| **Pagination** | `components/pagination.css` | `.pagination`, `.pagination-sm`, `.page-item`, `.page-link`, active/disabled states |
+| **Empty States** | `components/empty-state.css` | `.empty-state`, `.empty-state-card`, `.empty-state-icon`, `.empty-state-title`, `.empty-state-text` |
+| **Page & Section Headers** | `components/page-header.css` | `.page-header`, `.page-header-title`, `.page-header-subtitle`, `.page-header-actions`, `.section-header` |
+| **Filter Bars** | `components/filter-bar.css` | `.filter-bar`, `.filter-bar-card`, `.filter-search`, `.filter-group`, `.filter-counter` |
+| **Layout Shells** | `layouts/app-shell.css`, `layouts/auth.css`, `layouts/home.css` | `.app-container`, `.main-content`, `.auth-card`, `.auth-container`, `.landing-body` |
 
 ---
 

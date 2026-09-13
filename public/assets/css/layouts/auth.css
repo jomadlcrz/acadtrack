@@ -1,12 +1,6 @@
 /* ==========================================================================
-   Golden West Colleges, Inc. — Authentication Portal Styles
+   Golden West Colleges, Inc. — Authentication Layout Architecture
    Complies with: docs/ANTI_GENERIC_DESIGN.md & docs/WEB_DESIGN_GUIDE.md
-   - No generic neon/pastel SaaS gradients
-   - Clean institutional surface canvas (#f8fafc)
-   - Structured 6px radius card with uniform 1px border (#cbd5e1)
-   - No generic colored border-top stripes
-   - WCAG AAA high-contrast typography (#0f172a / #334155)
-   - GWC Institutional Deep Navy (#1e3a8a) brand anchors
    ========================================================================== */
 
 :root {
@@ -38,7 +32,7 @@ body.auth-body {
     max-width: 420px;
 }
 
-/* Grounded Institutional Card - Uniform 1px Border (No generic border-top stripe) */
+/* Grounded Institutional Card - Uniform 1px Border */
 .auth-card {
     background-color: #ffffff;
     border: 1px solid var(--gwc-border);
@@ -95,7 +89,31 @@ body.auth-body {
     font-weight: 500;
 }
 
-/* Form Controls */
+/* Alert Boxes in Auth Layout */
+.auth-alert {
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.45;
+}
+
+.auth-alert-danger {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.auth-alert-success {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+}
+
+/* Form Controls in Auth Layout */
 .auth-form .form-label {
     display: block;
     font-size: 13px;
@@ -110,23 +128,23 @@ body.auth-body {
 
 .auth-form .input-group-text {
     background-color: #f8fafc;
-    border: 1px solid var(--gwc-border);
+    border: 1px solid var(--gwc-border, #cbd5e1);
     color: #64748b;
     font-size: 15px;
     padding: 0 12px;
 }
 
 .auth-form .form-control {
-    border: 1px solid var(--gwc-border);
+    border: 1px solid var(--gwc-border, #cbd5e1);
     font-size: 14px;
-    color: var(--gwc-text-primary);
+    color: var(--gwc-text-primary, #0f172a);
     padding: 9px 12px;
     height: 42px;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .auth-form .form-control:focus {
-    border-color: var(--gwc-blue);
+    border-color: var(--gwc-blue, #2563eb);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     outline: none;
     z-index: 3;
@@ -139,7 +157,7 @@ body.auth-body {
 
 .auth-form .btn-toggle-pwd {
     background-color: #f8fafc;
-    border: 1px solid var(--gwc-border);
+    border: 1px solid var(--gwc-border, #cbd5e1);
     color: #64748b;
     padding: 0 12px;
     cursor: pointer;
@@ -148,7 +166,7 @@ body.auth-body {
 
 .auth-form .btn-toggle-pwd:hover {
     background-color: #f1f5f9;
-    color: var(--gwc-text-primary);
+    color: var(--gwc-text-primary, #0f172a);
 }
 
 .auth-form .btn-toggle-pwd:focus {
@@ -165,9 +183,9 @@ body.auth-body {
     gap: 8px;
     width: 100%;
     height: 42px;
-    background-color: var(--gwc-navy);
+    background-color: var(--gwc-navy, #1e3a8a);
     color: #ffffff;
-    border: 1px solid var(--gwc-navy);
+    border: 1px solid var(--gwc-navy, #1e3a8a);
     border-radius: 6px;
     font-size: 14px;
     font-weight: 600;
@@ -184,7 +202,7 @@ body.auth-body {
 }
 
 .btn-auth-submit:active {
-    background-color: var(--gwc-navy-dark);
+    background-color: var(--gwc-navy-dark, #172554);
     transform: translateY(1px);
 }
 
@@ -193,33 +211,10 @@ body.auth-body {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
 }
 
-/* Alert Box */
-.auth-alert {
-    padding: 10px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.auth-alert-danger {
-    background-color: #fef2f2;
-    color: #991b1b;
-    border: 1px solid #fecaca;
-}
-
-.auth-alert-success {
-    background-color: #f0fdf4;
-    color: #166534;
-    border: 1px solid #bbf7d0;
-}
-
-/* Institutional Footer */
+/* Footer Attribution */
 .auth-footer {
-    margin-top: 20px;
     text-align: center;
+    margin-top: 24px;
     font-size: 12px;
     color: var(--gwc-text-muted);
 }

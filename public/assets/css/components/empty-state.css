@@ -1,0 +1,70 @@
+/* ==========================================================================
+   Acadtrack UI Component: Empty State Containers & Fallbacks
+   ========================================================================== */
+
+/* 1. Base Empty State Layout */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 48px 24px;
+    width: 100%;
+}
+
+/* 2. Elevated Empty State Card */
+.empty-state-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+/* 3. Empty State Icon Graphic Circle */
+.empty-state-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: #f1f5f9;
+    color: #64748b;
+    font-size: 24px;
+    margin-bottom: 14px;
+    flex-shrink: 0;
+}
+
+.empty-state-icon-blue   { background-color: #eff6ff; color: #1d4ed8; }
+.empty-state-icon-green  { background-color: #f0fdf4; color: #16a34a; }
+.empty-state-icon-amber  { background-color: #fffbeb; color: #d97706; }
+.empty-state-icon-red    { background-color: #fef2f2; color: #dc2626; }
+.empty-state-icon-purple { background-color: #faf5ff; color: #7c3aed; }
+
+/* 4. Empty State Typography */
+.empty-state-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+    line-height: 1.3;
+}
+
+.empty-state-text {
+    font-size: 13px;
+    color: #64748b;
+    max-width: 440px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* 5. Optional Action Buttons Area */
+.empty-state-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}

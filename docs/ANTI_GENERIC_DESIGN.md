@@ -97,7 +97,7 @@ graph TD
 
 ## 4. Reusable Anti-Generic CSS Classes
 
-The following classes are implemented in [public/assets/css/app.css](file:///C:/xampp/htdocs/grading-system/public/assets/css/app.css) and [public/assets/css/pages/grading.css](file:///C:/xampp/htdocs/grading-system/public/assets/css/pages/grading.css):
+The following classes are implemented in [public/assets/css/components/table.css](file:///C:/xampp/htdocs/acadtrack/public/assets/css/components/table.css) and [public/assets/css/components/input.css](file:///C:/xampp/htdocs/acadtrack/public/assets/css/components/input.css):
 
 ```css
 /* Tabular Numerics for All Academic Calculation Data */

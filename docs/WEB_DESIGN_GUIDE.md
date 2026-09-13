@@ -21,9 +21,9 @@ The **GWC Acadtrack** is a mission-critical academic portal built for instructor
 
 ---
 
-## 2. Asset Architecture & Local Vendor Setup
+## 2. Asset Architecture & Modular CSS Organization
 
-To ensure strict zero-CDN campus deployment and offline reliability, all vendor assets are self-contained within `public/assets/vendor/`:
+To ensure strict zero-CDN campus deployment, component modularity, and offline reliability, all stylesheets and vendor assets are strictly structured:
 
 ```text
 public/
@@ -42,11 +42,26 @@ public/
 │   │           ├── bootstrap-icons.woff
 │   │           └── bootstrap-icons.woff2
 │   ├── css/
-│   │   ├── app.css                           # Global design tokens & utility classes
-│   │   └── pages/
-│   │       ├── auth.css                      # Login portal presentation
-│   │       ├── dashboard.css                 # Role dashboard grids & metric cards
-│   │       └── grading.css                   # High-density grade encoding tables
+│   │   ├── app.css                           # Global design tokens & root CSS variables
+│   │   ├── components/                       # Atomic & reusable UI component stylesheets
+│   │   │   ├── alert.css                     # Flash alerts & toast notifications
+│   │   │   ├── badge.css                     # Role, status, and counter pill badges
+│   │   │   ├── button.css                    # Solid, outline, and group action buttons
+│   │   │   ├── card.css                      # Stat KPI cards, quick actions, content panels
+│   │   │   ├── empty-state.css               # Empty states, fallbacks & icon circles
+│   │   │   ├── filter-bar.css                # Search & filtering toolbars & live counters
+│   │   │   ├── input.css                     # Form controls, labels, grade inputs
+│   │   │   ├── modal.css                     # Dialogs, headers, footers, confirmations
+│   │   │   ├── navbar.css                    # Pinned top navigation & user cards
+│   │   │   ├── page-header.css               # Standardized page and section header blocks
+│   │   │   ├── pagination.css                # Table roster pagination controls
+│   │   │   ├── select.css                    # Styled dropdown select controls & caret
+│   │   │   ├── sidebar.css                   # Pinned sidebar navigation & active links
+│   │   │   └── table.css                     # Standardized academic tables & thead specs
+│   │   └── layouts/                          # Structural viewport shell stylesheets
+│   │       ├── app-shell.css                 # Authenticated application viewport shell
+│   │       ├── auth.css                      # Authentication portal viewport shell
+│   │       └── home.css                      # Public portal landing viewport shell
 │   └── js/
 │       └── app.js                            # Sidebar toggle, dynamic calculations, modals
 ```
@@ -55,8 +70,9 @@ public/
 Every application view includes styles in a strictly governed order to maintain predictable cascade overrides:
 1. `bootstrap.min.css` (Base responsive grid & component framework — [Official Bootstrap Documentation](https://getbootstrap.com/docs/5.3/))
 2. `bootstrap-icons.min.css` (Vector iconography — [Official Bootstrap Icons Catalog](https://icons.getbootstrap.com/))
-3. `app.css` (GWC tokens, typography, `.table-academic`, `.tabular-nums`, and academic badges)
-4. `pages/{page}.css` (Page-specific overrides for grading, dashboard, or authentication)
+3. `app.css` (GWC tokens, typography, CSS root variables)
+4. `components/*.css` (Standardized UI components: `button.css`, `input.css`, `select.css`, `card.css`, `table.css`, `modal.css`, `badge.css`, `navbar.css`, `sidebar.css`, `alert.css`, `pagination.css`, `empty-state.css`, `page-header.css`, `filter-bar.css`)
+5. `layouts/*.css` (Structural viewport shell: `app-shell.css`, `auth.css`, or `home.css`)
 
 > [!TIP]
 > For complete form control specifications (`.form-control`, `.form-select`, `.mb-3`, `.row g-3`), card components, and table patterns, consult the dedicated [Bootstrap 5 Component & Form Guidelines](file:///C:/xampp/htdocs/acadtrack/docs/BOOTSTRAP_GUIDE.md).

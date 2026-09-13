@@ -123,16 +123,27 @@ assets/css/app.css
 Shared components:
 
 ```text
-assets/css/components.css
+assets/css/components/
+├── button.css
+├── input.css
+├── select.css
+├── card.css
+├── table.css
+├── modal.css
+├── badge.css
+├── navbar.css
+├── sidebar.css
+├── alert.css
+└── pagination.css
 ```
 
-Page-specific:
+Layout-specific shells:
 
 ```text
-assets/css/pages/
-├── dashboard.css
-├── grading.css
-└── auth.css
+assets/css/layouts/
+├── app-shell.css
+├── auth.css
+└── home.css
 ```
 
 ---

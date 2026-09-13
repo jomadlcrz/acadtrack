@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap/css/bootstrap.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap-icons/bootstrap-icons.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/pages/home.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/layouts/home.css') ?>">
 </head>
 <body class="landing-body">
 
