@@ -64,8 +64,8 @@ class DashboardController
     {
         $activeTerm = AcademicTerm::getActive();
         $totalUsers = User::count();
-        $totalStudents = User::where('role', 'Student')->count();
-        $totalFaculty = User::where('role', 'Faculty')->count();
+        $totalStudents = \App\Models\UserRole::where('role_name', 'Student')->count();
+        $totalFaculty = \App\Models\UserRole::whereIn('role_name', ['Faculty', 'Dean'])->count();
         $totalDepts = Department::count();
         $recentUsers = User::orderBy('id', 'desc')->limit(5)->get()->toArray();
         $gradingSetting = GradingSetting::first();
@@ -92,12 +92,12 @@ class DashboardController
 
         // Pending submissions awaiting review
         $pendingSheets = GradingSheet::db()->query("
-            SELECT gs.*, s.code as subject_code, s.name as subject_name,
-                   u.first_name as faculty_first_name, u.last_name as faculty_last_name,
+            SELECT gs.*, s.subject_code as subject_code, s.descriptive_title as subject_name,
+                   fd.first_name as faculty_first_name, fd.last_name as faculty_last_name,
                    gp.name as period_name
             FROM grading_sheets gs
             JOIN subjects s ON gs.subject_id = s.id
-            JOIN users u ON gs.faculty_id = u.id
+            LEFT JOIN faculty_details fd ON gs.faculty_id = fd.user_id
             JOIN grading_periods gp ON gs.grading_period_id = gp.id
             WHERE gs.status = 'SUBMITTED'
             ORDER BY gs.updated_at DESC
@@ -106,12 +106,12 @@ class DashboardController
 
         // Recent grading sheets
         $recentSheets = GradingSheet::db()->query("
-            SELECT gs.*, s.code as subject_code, s.name as subject_name,
-                   u.first_name as faculty_first_name, u.last_name as faculty_last_name,
+            SELECT gs.*, s.subject_code as subject_code, s.descriptive_title as subject_name,
+                   fd.first_name as faculty_first_name, fd.last_name as faculty_last_name,
                    gp.name as period_name
             FROM grading_sheets gs
             JOIN subjects s ON gs.subject_id = s.id
-            JOIN users u ON gs.faculty_id = u.id
+            LEFT JOIN faculty_details fd ON gs.faculty_id = fd.user_id
             JOIN grading_periods gp ON gs.grading_period_id = gp.id
             ORDER BY gs.updated_at DESC
             LIMIT 6

@@ -29,12 +29,13 @@ class Enrollment extends Model
     public static function getBySubject(int $subjectId, int $academicTermId): array
     {
         $stmt = self::db()->prepare("
-            SELECT e.*, s.id as student_id, u.first_name, u.last_name, u.student_number
+            SELECT e.*, s.id as student_id, sd.first_name, sd.last_name, sd.student_number
             FROM enrollments e
             JOIN students s ON e.student_id = s.id
             JOIN users u ON s.user_id = u.id
+            LEFT JOIN student_details sd ON s.user_id = sd.user_id
             WHERE e.subject_id = :subject_id AND e.academic_term_id = :academic_term_id
-            ORDER BY u.last_name, u.first_name
+            ORDER BY sd.last_name, sd.first_name
         ");
         $stmt->execute(['subject_id' => $subjectId, 'academic_term_id' => $academicTermId]);
         return $stmt->fetchAll();

@@ -19,13 +19,13 @@ ob_start();
         <div class="card-body p-4">
             <div class="row g-3">
                 <div class="col-md-3">
-                    <label for="code" class="form-label">Subject code <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="code" name="code" placeholder="e.g., IT 101" value="<?= htmlspecialchars($_POST['code'] ?? '') ?>" required>
+                    <label for="subject_code" class="form-label">Subject code <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="subject_code" name="subject_code" placeholder="e.g., IT 101" value="<?= htmlspecialchars($_POST['subject_code'] ?? $_POST['code'] ?? '') ?>" required>
                 </div>
 
                 <div class="col-md-5">
-                    <label for="name" class="form-label">Descriptive title <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="name" name="name" placeholder="e.g., Introduction to Computing" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required>
+                    <label for="descriptive_title" class="form-label">Descriptive title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="descriptive_title" name="descriptive_title" placeholder="e.g., Introduction to Computing" value="<?= htmlspecialchars($_POST['descriptive_title'] ?? $_POST['name'] ?? '') ?>" required>
                 </div>
 
                 <div class="col-md-2">
@@ -106,13 +106,13 @@ ob_start();
                         ?>
                     <tr class="<?= $isArchived ? 'table-light text-muted' : '' ?>">
                         <td class="px-3 fw-semibold <?= $isArchived ? 'text-secondary' : 'text-primary' ?> font-monospace">
-                            <?= htmlspecialchars($subject['code']) ?>
+                            <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>
                         </td>
                         <td class="px-3 fw-semibold <?= $isArchived ? 'text-secondary' : 'text-dark' ?>">
-                            <?= htmlspecialchars($subject['name']) ?>
+                            <?= htmlspecialchars($subject['descriptive_title'] ?? $subject['name']) ?>
                             <?php if ($isArchived && !empty($subject['archived_at'])): ?>
                                 <small class="d-block text-muted fw-normal" style="font-size: 0.75rem;">
-                                    Archived on <?= date('M d, Y', strtotime($subject['archived_at'])) ?>
+                                     Archived on <?= date('M d, Y', strtotime($subject['archived_at'])) ?>
                                 </small>
                             <?php endif; ?>
                         </td>
@@ -120,7 +120,7 @@ ob_start();
                             <?= htmlspecialchars((string) $subject['year_level']) ?><?= match((int)$subject['year_level']) { 1 => 'st', 2 => 'nd', 3 => 'rd', default => 'th' } ?> year
                         </td>
                         <td class="px-3 small text-secondary">
-                            <?= $subject['semester'] === '1' ? '1st semester' : '2nd semester' ?>
+                            <?= ((int)$subject['semester']) === 1 ? '1st semester' : (((int)$subject['semester']) === 2 ? '2nd semester' : 'Summer') ?>
                         </td>
                         <td class="px-3 text-center">
                             <?php if ($isArchived): ?>
@@ -143,7 +143,7 @@ ob_start();
                                         </button>
                                     </form>
                                 <?php else: ?>
-                                    <form method="POST" action="<?= url('/dean/subjects/' . $subject['id'] . '/archive') ?>" class="d-inline" onsubmit="return confirm('Archive course <?= htmlspecialchars($subject['code']) ?>? The subject will be retired from active offerings, and all existing academic records and grades will remain permanently preserved.');">
+                                    <form method="POST" action="<?= url('/dean/subjects/' . $subject['id'] . '/archive') ?>" class="d-inline" onsubmit="return confirm('Archive course <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>? The subject will be retired from active offerings, and all existing academic records and grades will remain permanently preserved.');">
                                         <?= csrf_field() ?>
                                         <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Archive Subject">
                                             <i class="bi bi-archive"></i> Archive

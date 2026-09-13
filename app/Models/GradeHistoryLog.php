@@ -34,7 +34,9 @@ class GradeHistoryLog extends Model
     public static function getByStudent(int $studentId): array
     {
         $stmt = self::db()->prepare("
-            SELECT ghl.*, s.code as subject_code, s.name as subject_name
+            SELECT ghl.*, 
+                   s.subject_code, s.subject_code as code, s.subject_code as subject_code, 
+                   s.descriptive_title, s.descriptive_title as name, s.descriptive_title as subject_name
             FROM grade_history_log ghl
             LEFT JOIN grades g ON ghl.grade_id = g.id
             LEFT JOIN subjects s ON g.subject_id = s.id

@@ -57,14 +57,14 @@ class SetController
             return;
         }
 
-        if (Set::where('name', $name)->where('academic_term_id', $termId)->exists()) {
+        if (Set::where('set_name', $name)->where('academic_term_id', $termId)->exists()) {
             $session->flash('error', "Set '{$name}' already exists for this academic term.");
             redirect("/dean/sets{$semQuery}");
             return;
         }
 
         Set::create([
-            'name' => $name,
+            'set_name' => $name,
             'year_level' => $yearLevel,
             'academic_term_id' => $termId,
             'department_id' => $deptId,
@@ -98,7 +98,7 @@ class SetController
             return;
         }
 
-        if (Set::where('name', $name)
+        if (Set::where('set_name', $name)
             ->where('academic_term_id', $set->academic_term_id)
             ->where('id', '!=', $set->id)
             ->exists()) {
@@ -108,7 +108,7 @@ class SetController
         }
 
         $set->update([
-            'name' => $name,
+            'set_name' => $name,
             'year_level' => $yearLevel,
             'department_id' => $deptId,
             'status' => $status,

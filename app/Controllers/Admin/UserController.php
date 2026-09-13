@@ -175,7 +175,7 @@ class UserController
             );
         }
 
-        $user->update($updateData);
+        (new \App\Repositories\UserRepository())->update((int) $user->id, $data);
 
         $session->flash('success', 'User updated successfully.');
         redirect('/admin/users');
@@ -205,6 +205,7 @@ class UserController
 
         $newStatus = ($user->status === 'inactive') ? 'active' : 'inactive';
         $user->status = $newStatus;
+        $user->deactivated_at = ($newStatus === 'inactive') ? date('Y-m-d H:i:s') : null;
         $user->save();
 
         $actionText = ($newStatus === 'inactive') ? 'deactivated' : 'activated';
@@ -236,6 +237,7 @@ class UserController
         }
 
         $user->status = 'inactive';
+        $user->deactivated_at = date('Y-m-d H:i:s');
         $user->save();
 
         $fullName = trim($user->first_name . ' ' . $user->last_name);
@@ -253,6 +255,7 @@ class UserController
         }
 
         $user->status = 'active';
+        $user->deactivated_at = null;
         $user->save();
 
         $fullName = trim($user->first_name . ' ' . $user->last_name);

@@ -8,6 +8,9 @@ use App\Controllers\DashboardController;
 use App\Controllers\Admin\UserController;
 use App\Controllers\Admin\DepartmentController;
 use App\Controllers\Admin\SettingsController;
+use App\Controllers\Admin\AcademicTermController;
+use App\Controllers\Admin\ProgramCurriculumController;
+use App\Controllers\Admin\SetController as AdminSetController;
 use App\Controllers\Dean\FacultyAssignmentController;
 use App\Controllers\Dean\SubjectController as DeanSubjectController;
 use App\Controllers\Dean\SetController;
@@ -50,6 +53,28 @@ $router->post('/admin/departments', [DepartmentController::class, 'store'], [new
 $router->post('/admin/departments/{id}', [DepartmentController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/departments/{id}/archive', [DepartmentController::class, 'archive'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/departments/{id}/restore', [DepartmentController::class, 'restore'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+
+// Academic Terms routes
+$router->get('/admin/academic-terms', [AcademicTermController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+$router->post('/admin/academic-terms', [AcademicTermController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/academic-terms/{id}/toggle-active', [AcademicTermController::class, 'toggleActive'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/academic-terms/{id}/archive', [AcademicTermController::class, 'archive'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/academic-terms/{id}/restore', [AcademicTermController::class, 'restore'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+
+// Program Curricula routes
+$router->get('/admin/program-curricula', [ProgramCurriculumController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean'])]);
+$router->get('/admin/program-curricula/new', [ProgramCurriculumController::class, 'create'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+$router->post('/admin/program-curricula', [ProgramCurriculumController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->get('/admin/program-curricula/{id}/export-csv', [ProgramCurriculumController::class, 'exportCsv'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean'])]);
+
+// Sets (Sections) routes
+$router->get('/admin/sets', [AdminSetController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean'])]);
+$router->post('/admin/sets', [AdminSetController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
+$router->post('/admin/sets/bulk-delete', [AdminSetController::class, 'bulkDelete'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
+$router->post('/admin/sets/{id}', [AdminSetController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
+$router->post('/admin/sets/{id}/archive', [AdminSetController::class, 'archive'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
+$router->post('/admin/sets/{id}/restore', [AdminSetController::class, 'restore'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
+
 $router->get('/admin/settings', [SettingsController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/settings', [SettingsController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 

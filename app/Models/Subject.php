@@ -11,6 +11,8 @@ class Subject extends Model
     protected $table = 'subjects';
 
     protected $fillable = [
+        'subject_code',
+        'descriptive_title',
         'code',
         'name',
         'nature',
@@ -22,6 +24,26 @@ class Subject extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function getCodeAttribute(): ?string
+    {
+        return $this->attributes['subject_code'] ?? null;
+    }
+
+    public function setCodeAttribute(?string $value): void
+    {
+        $this->attributes['subject_code'] = $value;
+    }
+
+    public function getNameAttribute(): ?string
+    {
+        return $this->attributes['descriptive_title'] ?? null;
+    }
+
+    public function setNameAttribute(?string $value): void
+    {
+        $this->attributes['descriptive_title'] = $value;
+    }
 
     public function academicTerm()
     {
@@ -98,6 +120,8 @@ class Subject extends Model
 
         $stmt = self::db()->prepare("
             SELECT s.*, 
+                   s.subject_code as code,
+                   s.descriptive_title as name,
                    COUNT(DISTINCT fs.faculty_id) as assigned_faculty_count,
                    (SELECT COUNT(*) FROM enrollments e WHERE e.subject_id = s.id) as enrolled_students_count,
                    (SELECT COUNT(*) FROM grades g WHERE g.subject_id = s.id) as grades_count
@@ -105,7 +129,7 @@ class Subject extends Model
             LEFT JOIN faculty_subjects fs ON fs.subject_id = s.id AND fs.academic_term_id = :academic_term_id
             WHERE {$whereSql}
             GROUP BY s.id
-            ORDER BY s.is_archived ASC, s.code ASC
+            ORDER BY s.is_archived ASC, s.subject_code ASC
         ");
         $stmt->execute(['academic_term_id' => $academicTermId, 'academic_term_id2' => $academicTermId]);
         return $stmt->fetchAll();
@@ -114,12 +138,15 @@ class Subject extends Model
     public static function getActive(): array
     {
         $stmt = self::db()->query("
-            SELECT s.*, ay.name as academic_year_name
+            SELECT s.*, 
+                   s.subject_code as code,
+                   s.descriptive_title as name,
+                   ay.name as academic_year_name
             FROM subjects s
             JOIN academic_terms at2 ON s.academic_term_id = at2.id
             JOIN academic_years ay ON at2.academic_year_id = ay.id
             WHERE at2.is_active = 1 AND s.is_archived = 0
-            ORDER BY s.code
+            ORDER BY s.subject_code ASC
         ");
         return $stmt->fetchAll();
     }

@@ -45,7 +45,10 @@ class GradingSheet extends Model
     public static function getByFaculty(int $facultyId, int $academicTermId): array
     {
         $stmt = self::db()->prepare("
-            SELECT gs.*, s.code as subject_code, s.name as subject_name, gp.name as period_name
+            SELECT gs.*, 
+                   s.subject_code, s.subject_code as code, s.subject_code as subject_code,
+                   s.descriptive_title, s.descriptive_title as name, s.descriptive_title as subject_name,
+                   gp.name as period_name
             FROM grading_sheets gs
             JOIN subjects s ON gs.subject_id = s.id
             JOIN grading_periods gp ON gs.grading_period_id = gp.id
@@ -59,12 +62,15 @@ class GradingSheet extends Model
     public static function getPendingReview(int $academicTermId): array
     {
         $stmt = self::db()->prepare("
-            SELECT gs.*, s.code as subject_code, s.name as subject_name, 
-                   gp.name as period_name, u.first_name, u.last_name
+            SELECT gs.*, 
+                   s.subject_code, s.subject_code as code, s.subject_code as subject_code,
+                   s.descriptive_title, s.descriptive_title as name, s.descriptive_title as subject_name,
+                   gp.name as period_name, fd.first_name, fd.last_name
             FROM grading_sheets gs
             JOIN subjects s ON gs.subject_id = s.id
             JOIN grading_periods gp ON gs.grading_period_id = gp.id
             JOIN users u ON gs.faculty_id = u.id
+            LEFT JOIN faculty_details fd ON gs.faculty_id = fd.user_id
             WHERE gs.academic_term_id = :academic_term_id 
               AND gs.status IN ('SUBMITTED', 'UNDER_REVIEW')
             ORDER BY gs.submitted_at DESC
@@ -95,18 +101,21 @@ class GradingSheet extends Model
     {
         $stmt = self::db()->prepare("
             SELECT gs.*, 
-                   s.code as subject_code, s.name as subject_name, s.nature as subject_nature, s.year_level, s.semester,
+                   s.subject_code, s.subject_code as code, s.descriptive_title as subject_name, s.nature as subject_nature, s.year_level, s.semester,
                    gp.name as period_name,
-                   u.first_name as faculty_first_name, u.last_name as faculty_last_name, u.email as faculty_email,
+                   fd.first_name as faculty_first_name, fd.last_name as faculty_last_name, u.email as faculty_email,
                    ay.name as academic_year_name,
-                   approver.first_name as approver_first_name, approver.last_name as approver_last_name
+                   COALESCE(app_ad.first_name, app_fd.first_name, '') as approver_first_name,
+                   COALESCE(app_ad.last_name, app_fd.last_name, '') as approver_last_name
             FROM grading_sheets gs
             JOIN subjects s ON gs.subject_id = s.id
             JOIN grading_periods gp ON gs.grading_period_id = gp.id
             JOIN users u ON gs.faculty_id = u.id
+            LEFT JOIN faculty_details fd ON gs.faculty_id = fd.user_id
             JOIN academic_terms at ON gs.academic_term_id = at.id
             JOIN academic_years ay ON at.academic_year_id = ay.id
-            LEFT JOIN users approver ON gs.approved_by = approver.id
+            LEFT JOIN admin_details app_ad ON gs.approved_by = app_ad.user_id
+            LEFT JOIN faculty_details app_fd ON gs.approved_by = app_fd.user_id
             WHERE gs.id = :id
             LIMIT 1
         ");
@@ -118,12 +127,13 @@ class GradingSheet extends Model
     public static function getAllWithDetails(int $academicTermId, ?string $status = null): array
     {
         $sql = "
-            SELECT gs.*, s.code as subject_code, s.name as subject_name, 
-                   gp.name as period_name, u.first_name, u.last_name
+            SELECT gs.*, s.subject_code as code, s.descriptive_title as subject_name, 
+                   gp.name as period_name, fd.first_name, fd.last_name
             FROM grading_sheets gs
             JOIN subjects s ON gs.subject_id = s.id
             JOIN grading_periods gp ON gs.grading_period_id = gp.id
             JOIN users u ON gs.faculty_id = u.id
+            LEFT JOIN faculty_details fd ON gs.faculty_id = fd.user_id
             WHERE gs.academic_term_id = :academic_term_id
         ";
         $params = ['academic_term_id' => $academicTermId];

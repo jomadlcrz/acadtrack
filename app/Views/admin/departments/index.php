@@ -1,42 +1,49 @@
 <?php
 $pageTitle = 'Institutional Departments';
 $subtitle = 'Manage academic colleges, faculties, and departmental divisions.';
-$headerActions = '<button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addDepartmentModal"><i class="bi bi-plus-circle"></i> Add department</button>';
+$headerActions = '<button type="button" class="btn text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" data-bs-toggle="modal" data-bs-target="#addDepartmentModal"><i class="bi bi-plus-lg"></i> New Department</button>';
 ob_start();
 ?>
 
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
-    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark">Academic Departments Roster</h3>
-            <small class="text-muted">Colleges and departments governing faculty assignments and academic curricula.</small>
-        </div>
-        <span class="badge bg-light text-dark border"><?= count($departments) ?> registered</span>
+<!-- Search & Statistics Bar -->
+<div class="d-flex flex-column flex-sm-row gap-3 align-items-sm-center justify-content-between mb-4">
+    <div class="position-relative w-100" style="max-width: 420px;">
+        <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 14px;"></i>
+        <input type="text" 
+               id="deptSearch" 
+               class="form-control ps-5" 
+               placeholder="Search by code or department name..." 
+               autocomplete="off">
     </div>
+    <div class="text-muted small fw-medium" id="deptCounter">
+        <?= count($departments) ?> <?= count($departments) === 1 ? 'department' : 'departments' ?>
+    </div>
+</div>
 
+<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-light border-bottom">
+        <table class="table table-hover align-middle mb-0" id="departmentsTable">
+            <thead class="bg-light border-bottom">
                 <tr>
-                    <th class="fw-semibold text-muted small py-3 px-3" style="width: 140px;">Department code</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Department name</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Description</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 150px;">Assigned faculty</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 120px;">Status</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 160px;">Actions</th>
+                    <th class="fw-semibold text-dark small py-3 px-4" style="width: 160px;">Department code</th>
+                    <th class="fw-semibold text-dark small py-3 px-4">Department Name</th>
+                    <th class="fw-semibold text-dark small py-3 px-3">Description</th>
+                    <th class="fw-semibold text-dark small py-3 px-3 text-center" style="width: 150px;">Assigned faculty</th>
+                    <th class="fw-semibold text-dark small py-3 px-3 text-center" style="width: 120px;">Status</th>
+                    <th class="fw-semibold text-dark small py-3 px-4 text-end" style="width: 160px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($departments)): ?>
-                    <tr>
+                    <tr id="emptyDeptRow">
                         <td colspan="6" class="text-center py-5 text-muted small">
                             <i class="bi bi-building-x d-block fs-3 mb-2 text-secondary"></i>
-                            No academic departments registered in the system yet.
+                            No departments created yet. Click "New Department" to register one.
                         </td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($departments as $dept): ?>
-                    <tr>
+                    <tr class="dept-row" data-search="<?= strtolower(htmlspecialchars($dept['code'] . ' ' . $dept['name'])) ?>">
                         <td class="px-3 fw-semibold text-primary font-monospace"><?= htmlspecialchars($dept['code']) ?></td>
                         <td class="px-3 fw-semibold text-dark"><?= htmlspecialchars($dept['name']) ?></td>
                         <td class="px-3 text-muted small"><?= htmlspecialchars($dept['description'] ?? '—') ?></td>
@@ -162,16 +169,50 @@ ob_start();
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
-                        <i class="bi bi-plus-circle"></i> Save department
+                <div class="modal-footer bg-light py-3 px-4">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;">
+                        <i class="bi bi-check-lg"></i> Save Department
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('deptSearch');
+    const rows = document.querySelectorAll('.dept-row');
+    const counter = document.getElementById('deptCounter');
+    const emptyRow = document.getElementById('emptyDeptRow');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim().toLowerCase();
+            let visibleCount = 0;
+
+            rows.forEach(function(row) {
+                const searchData = row.getAttribute('data-search') || '';
+                if (!query || searchData.includes(query)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (counter) {
+                counter.textContent = visibleCount + (visibleCount === 1 ? ' department' : ' departments');
+            }
+
+            if (emptyRow && rows.length > 0) {
+                emptyRow.style.display = visibleCount === 0 ? '' : 'none';
+            }
+        });
+    }
+});
+</script>
 
 <?php
 $content = ob_get_clean();

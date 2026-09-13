@@ -47,8 +47,8 @@ class NotificationService
     public function sendGradesPublished(int $subjectId, int $academicTermId, string $periodName = 'Term'): void
     {
         $subject = Subject::find($subjectId);
-        $subjectTitle = $subject['name'] ?? 'Assigned Course';
-        $subjectCode = $subject['code'] ?? '';
+        $subjectTitle = $subject['descriptive_title'] ?? $subject['name'] ?? 'Assigned Course';
+        $subjectCode = $subject['subject_code'] ?? $subject['code'] ?? '';
 
         $students = Student::getBySubject($subjectId, $academicTermId);
 

@@ -49,7 +49,7 @@ ob_start();
                     <select class="form-select" id="subject_id" name="subject_id" required>
                         <option value="">Select subject</option>
                         <?php foreach ($subjects as $s): ?>
-                            <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['code']) ?> — <?= htmlspecialchars($s['name']) ?></option>
+                            <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['subject_code'] ?? $s['code']) ?> — <?= htmlspecialchars($s['descriptive_title'] ?? $s['name']) ?></option>
                         <?php endforeach; ?>
                     </select>
                     <div class="form-text">Course subjects active in the current institutional curriculum.</div>
@@ -92,8 +92,8 @@ ob_start();
                 <?php else: ?>
                     <?php foreach ($subjects as $subject): ?>
                     <tr>
-                        <td class="px-3 fw-semibold text-primary font-monospace"><?= htmlspecialchars($subject['code']) ?></td>
-                        <td class="px-3 fw-semibold text-dark"><?= htmlspecialchars($subject['name']) ?></td>
+                        <td class="px-3 fw-semibold text-primary font-monospace"><?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?></td>
+                        <td class="px-3 fw-semibold text-dark"><?= htmlspecialchars($subject['descriptive_title'] ?? $subject['name']) ?></td>
                         <td class="px-3">
                             <?php $count = (int)($subject['assigned_faculty_count'] ?? 0); ?>
                             <?php if ($count > 0): ?>
@@ -108,7 +108,7 @@ ob_start();
                         </td>
                         <td class="px-3 text-end">
                             <?php if ($count > 0): ?>
-                                <form method="POST" action="<?= url('/dean/faculty-assignments/remove') ?>" class="d-inline" onsubmit="return confirm('Remove faculty assignment for <?= htmlspecialchars($subject['code']) ?>?');">
+                                <form method="POST" action="<?= url('/dean/faculty-assignments/remove') ?>" class="d-inline" onsubmit="return confirm('Remove faculty assignment for <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>?');">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="subject_id" value="<?= $subject['id'] ?>">
                                     <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">

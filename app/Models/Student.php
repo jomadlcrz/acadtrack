@@ -48,11 +48,12 @@ class Student extends Model
     public static function getBySet(int $setId): array
     {
         $stmt = self::db()->prepare("
-            SELECT s.*, u.first_name, u.last_name, u.email, u.student_number
+            SELECT s.*, sd.first_name, sd.last_name, u.email, sd.student_number
             FROM students s
             JOIN users u ON s.user_id = u.id
+            LEFT JOIN student_details sd ON sd.user_id = u.id
             WHERE s.set_id = :set_id
-            ORDER BY u.last_name, u.first_name
+            ORDER BY sd.last_name, sd.first_name
         ");
         $stmt->execute(['set_id' => $setId]);
         return $stmt->fetchAll();
@@ -62,15 +63,16 @@ class Student extends Model
     {
         $setClause = $setId ? "AND s.set_id = :set_id" : "";
         $stmt = self::db()->prepare("
-            SELECT s.*, u.first_name, u.last_name, u.email, u.student_number,
-                   sec.name AS set_name
+            SELECT s.*, sd.first_name, sd.last_name, u.email, sd.student_number,
+                   sec.set_name AS set_name
             FROM students s
             JOIN users u ON s.user_id = u.id
+            LEFT JOIN student_details sd ON sd.user_id = u.id
             JOIN enrollments e ON e.student_id = s.id
             LEFT JOIN sets sec ON sec.id = s.set_id
             WHERE e.subject_id = :subject_id AND e.academic_term_id = :academic_term_id
             {$setClause}
-            ORDER BY u.last_name, u.first_name
+            ORDER BY sd.last_name, sd.first_name
         ");
         $params = ['subject_id' => $subjectId, 'academic_term_id' => $academicTermId];
         if ($setId) {
@@ -96,13 +98,15 @@ class Student extends Model
     public static function getAllAvailable(): array
     {
         $stmt = self::db()->query("
-            SELECT s.*, u.first_name, u.last_name, u.email, u.student_number,
-                   sec.name AS set_name
+            SELECT s.*, sd.first_name, sd.last_name, u.email, sd.student_number,
+                   sec.set_name AS set_name
             FROM students s
             JOIN users u ON s.user_id = u.id
+            LEFT JOIN student_details sd ON sd.user_id = u.id
+            JOIN user_roles ur ON ur.user_id = u.id
             LEFT JOIN sets sec ON sec.id = s.set_id
-            WHERE u.role = 'Student'
-            ORDER BY u.last_name, u.first_name
+            WHERE ur.role_name = 'Student'
+            ORDER BY sd.last_name, sd.first_name
         ");
         return $stmt->fetchAll();
     }

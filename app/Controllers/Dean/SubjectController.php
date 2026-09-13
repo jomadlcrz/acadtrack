@@ -44,6 +44,10 @@ class SubjectController
         $validator = new SubjectValidator();
         $data = $request->all();
         $data['academic_term_id'] = (new \App\Models\AcademicTerm())->getActive()['id'] ?? 0;
+        $data['subject_code'] = trim((string) ($data['subject_code'] ?? $data['code'] ?? ''));
+        $data['descriptive_title'] = trim((string) ($data['descriptive_title'] ?? $data['name'] ?? ''));
+        $data['code'] = $data['subject_code'];
+        $data['name'] = $data['descriptive_title'];
 
         if (!$validator->validate($data)) {
             $session->flash('error', $validator->firstError());
@@ -56,7 +60,7 @@ class SubjectController
             $session->flash('success', 'Subject created successfully.');
         } catch (\PDOException $e) {
             if ($e->getCode() === '23000' || str_contains($e->getMessage(), '1062')) {
-                $code = htmlspecialchars((string) ($data['code'] ?? ''));
+                $code = htmlspecialchars((string) ($data['subject_code'] ?? ''));
                 $session->flash('error', "Subject code '{$code}' already exists for this academic term.");
             } else {
                 $session->flash('error', 'Database error: unable to save subject.');
@@ -68,12 +72,21 @@ class SubjectController
     public function update(Request $request, Response $response, Session $session, string $id): void
     {
         $data = $request->all();
+        if (isset($data['subject_code']) || isset($data['code'])) {
+            $data['subject_code'] = trim((string) ($data['subject_code'] ?? $data['code'] ?? ''));
+            $data['code'] = $data['subject_code'];
+        }
+        if (isset($data['descriptive_title']) || isset($data['name'])) {
+            $data['descriptive_title'] = trim((string) ($data['descriptive_title'] ?? $data['name'] ?? ''));
+            $data['name'] = $data['descriptive_title'];
+        }
+
         try {
             $this->subjectRepository->update((int) $id, $data);
             $session->flash('success', 'Subject updated successfully.');
         } catch (\PDOException $e) {
             if ($e->getCode() === '23000' || str_contains($e->getMessage(), '1062')) {
-                $code = htmlspecialchars((string) ($data['code'] ?? ''));
+                $code = htmlspecialchars((string) ($data['subject_code'] ?? $data['code'] ?? ''));
                 $session->flash('error', "Subject code '{$code}' already exists for this academic term.");
             } else {
                 $session->flash('error', 'Database error: unable to update subject.');

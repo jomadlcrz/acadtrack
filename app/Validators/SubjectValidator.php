@@ -12,14 +12,16 @@ class SubjectValidator
     {
         $this->errors = [];
 
-        if (empty($data['code'])) {
+        $code = trim((string) ($data['subject_code'] ?? $data['code'] ?? ''));
+        if ($code === '') {
             $this->errors['code'] = 'Subject code is required.';
-        } elseif (strlen($data['code']) > 20) {
-            $this->errors['code'] = 'Subject code must be 20 characters or less.';
+        } elseif (strlen($code) > 50) {
+            $this->errors['code'] = 'Subject code must be 50 characters or less.';
         }
 
-        if (empty($data['name'])) {
-            $this->errors['name'] = 'Subject name is required.';
+        $title = trim((string) ($data['descriptive_title'] ?? $data['name'] ?? ''));
+        if ($title === '') {
+            $this->errors['name'] = 'Descriptive title is required.';
         }
 
         if (empty($data['year_level'])) {

@@ -47,9 +47,9 @@ class UserValidator
         if ($role === 'Student') {
             $studentNumber = trim((string) ($data['student_number'] ?? ''));
             if ($studentNumber !== '') {
-                $stuQuery = User::where('student_number', $studentNumber);
+                $stuQuery = \App\Models\StudentDetail::where('student_number', $studentNumber);
                 if ($userId !== null) {
-                    $stuQuery->where('id', '!=', $userId);
+                    $stuQuery->where('user_id', '!=', $userId);
                 }
                 if ($stuQuery->exists()) {
                     $this->errors['student_number'] = "Student ID number '{$studentNumber}' is already registered to another user.";

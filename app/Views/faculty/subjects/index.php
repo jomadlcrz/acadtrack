@@ -47,9 +47,9 @@ ob_start();
                 <tbody>
                     <?php foreach ($subjects as $subject): ?>
                     <tr>
-                        <td class="px-3 fw-semibold text-primary font-monospace"><?= htmlspecialchars($subject['code']) ?></td>
+                        <td class="px-3 fw-semibold text-primary font-monospace"><?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?></td>
                         <td class="px-3 fw-semibold text-dark">
-                            <?= htmlspecialchars($subject['name']) ?>
+                            <?= htmlspecialchars($subject['descriptive_title'] ?? $subject['name']) ?>
                         </td>
                         <td class="px-3">
                             <span class="badge <?= match($subject['nature'] ?? 'Lecture') {
@@ -94,7 +94,7 @@ ob_start();
                         <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
                         <div class="modal-header border-bottom">
                             <h5 class="modal-title h6 fw-semibold mb-0" id="setupModalLabel<?= $subject['id'] ?>">
-                                Subject Setup: <?= htmlspecialchars($subject['code']) ?>
+                                Subject Setup: <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>

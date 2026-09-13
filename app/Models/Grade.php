@@ -34,7 +34,10 @@ class Grade extends Model
     {
         if ($academicTermId > 0) {
             $stmt = self::db()->prepare("
-                SELECT g.*, s.code as subject_code, s.name as subject_name, gp.name as period_name, gs.status as sheet_status
+                SELECT g.*, 
+                       s.subject_code, s.subject_code as code, s.subject_code as subject_code, 
+                       s.descriptive_title, s.descriptive_title as name, s.descriptive_title as subject_name, 
+                       gp.name as period_name, gs.status as sheet_status
                 FROM grades g
                 JOIN subjects s ON g.subject_id = s.id
                 JOIN grading_periods gp ON g.grading_period_id = gp.id
@@ -44,12 +47,15 @@ class Grade extends Model
                 WHERE g.student_id = :student_id 
                   AND g.academic_term_id = :academic_term_id
                   AND (gs.status IN ('APPROVED', 'FINALIZED') OR gs.id IS NULL)
-                ORDER BY gp.order_num, s.code
+                ORDER BY gp.order_num, s.subject_code
             ");
             $stmt->execute(['student_id' => $studentId, 'academic_term_id' => $academicTermId]);
         } else {
             $stmt = self::db()->prepare("
-                SELECT g.*, s.code as subject_code, s.name as subject_name, gp.name as period_name, gs.status as sheet_status
+                SELECT g.*, 
+                       s.subject_code, s.subject_code as code, s.subject_code as subject_code, 
+                       s.descriptive_title, s.descriptive_title as name, s.descriptive_title as subject_name, 
+                       gp.name as period_name, gs.status as sheet_status
                 FROM grades g
                 JOIN subjects s ON g.subject_id = s.id
                 JOIN grading_periods gp ON g.grading_period_id = gp.id
@@ -58,7 +64,7 @@ class Grade extends Model
                                            AND gs.academic_term_id = g.academic_term_id
                 WHERE g.student_id = :student_id
                   AND (gs.status IN ('APPROVED', 'FINALIZED') OR gs.id IS NULL)
-                ORDER BY g.academic_term_id, gp.order_num, s.code
+                ORDER BY g.academic_term_id, gp.order_num, s.subject_code
             ");
             $stmt->execute(['student_id' => $studentId]);
         }
@@ -68,14 +74,15 @@ class Grade extends Model
     public static function getBySubjectAndPeriod(int $subjectId, int $gradingPeriodId, int $academicTermId): array
     {
         $stmt = self::db()->prepare("
-            SELECT g.*, u.first_name, u.last_name, u.student_number
+            SELECT g.*, sd.first_name, sd.last_name, sd.student_number
             FROM grades g
             JOIN students st ON g.student_id = st.id
             JOIN users u ON st.user_id = u.id
+            LEFT JOIN student_details sd ON sd.user_id = u.id
             WHERE g.subject_id = :subject_id 
               AND g.grading_period_id = :grading_period_id
               AND g.academic_term_id = :academic_term_id
-            ORDER BY u.last_name, u.first_name
+            ORDER BY sd.last_name, sd.first_name
         ");
         $stmt->execute([
             'subject_id' => $subjectId,

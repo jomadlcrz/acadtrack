@@ -27,6 +27,11 @@ class Department extends Model
         return $this->hasMany(Set::class, 'department_id');
     }
 
+    public function programs()
+    {
+        return $this->hasMany(Program::class, 'department_id');
+    }
+
     public static function getActive(): array
     {
         return self::where('status', 'active')

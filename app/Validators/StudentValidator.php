@@ -28,9 +28,9 @@ class StudentValidator
 
         if (!empty($data['student_number'])) {
             $studentNumber = trim((string) $data['student_number']);
-            $query = \App\Models\User::where('student_number', $studentNumber);
+            $query = \App\Models\StudentDetail::where('student_number', $studentNumber);
             if (!empty($data['id'])) {
-                $query->where('id', '!=', $data['id']);
+                $query->where('user_id', '!=', $data['id']);
             }
             if ($query->exists()) {
                 $this->errors['student_number'] = 'Student number is already taken.';

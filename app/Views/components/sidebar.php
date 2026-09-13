@@ -16,17 +16,29 @@
                     <i class="bi bi-people-fill"></i>
                     <span>User Management</span>
                 </a>
+                <a href="<?= url('/admin/settings') ?>" class="sidebar-link <?= $currentPath === '/admin/settings' ? 'active' : '' ?>">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Institutional Settings</span>
+                </a>
+            </div>
+
+            <div class="sidebar-group">
+                <span class="sidebar-heading">Academics</span>
+                <a href="<?= url('/admin/academic-terms') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/academic-terms') ? 'active' : '' ?>">
+                    <i class="bi bi-calendar3"></i>
+                    <span>Academic Terms</span>
+                </a>
                 <a href="<?= url('/admin/departments') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/departments') ? 'active' : '' ?>">
                     <i class="bi bi-building"></i>
                     <span>Departments</span>
                 </a>
-                <a href="<?= url('/dean/sets') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/sets') ? 'active' : '' ?>">
-                    <i class="bi bi-collection-fill"></i>
-                    <span>Sets</span>
+                <a href="<?= url('/admin/program-curricula') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/program-curricula') ? 'active' : '' ?>">
+                    <i class="bi bi-journal-bookmark-fill"></i>
+                    <span>Program Curricula</span>
                 </a>
-                <a href="<?= url('/admin/settings') ?>" class="sidebar-link <?= $currentPath === '/admin/settings' ? 'active' : '' ?>">
-                    <i class="bi bi-gear-fill"></i>
-                    <span>Institutional Settings</span>
+                <a href="<?= url('/admin/sets') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/sets') ? 'active' : '' ?>">
+                    <i class="bi bi-collection-fill"></i>
+                    <span>Sets (Sections)</span>
                 </a>
                 <a href="<?= url('/dean/grade-review') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/grade-review') ? 'active' : '' ?>">
                     <i class="bi bi-file-earmark-check-fill"></i>
@@ -41,13 +53,17 @@
                     <i class="bi bi-grid-1x2-fill"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="<?= url('/dean/subjects') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/subjects') ? 'active' : '' ?>">
+                <a href="<?= url('/admin/program-curricula') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/program-curricula') ? 'active' : '' ?>">
                     <i class="bi bi-journal-bookmark-fill"></i>
+                    <span>Program Curricula</span>
+                </a>
+                <a href="<?= url('/dean/subjects') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/subjects') ? 'active' : '' ?>">
+                    <i class="bi bi-journal-text"></i>
                     <span>Curriculum Subjects</span>
                 </a>
-                <a href="<?= url('/dean/sets') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/sets') ? 'active' : '' ?>">
+                <a href="<?= url('/admin/sets') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/sets') || str_starts_with($currentPath, '/dean/sets') ? 'active' : '' ?>">
                     <i class="bi bi-collection-fill"></i>
-                    <span>Sets</span>
+                    <span>Sets (Sections)</span>
                 </a>
                 <a href="<?= url('/dean/faculty-assignments') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/faculty-assignments') ? 'active' : '' ?>">
                     <i class="bi bi-person-badge-fill"></i>

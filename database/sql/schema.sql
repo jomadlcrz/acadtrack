@@ -19,7 +19,8 @@ CREATE TABLE academic_years (
 CREATE TABLE academic_terms (
     id INT AUTO_INCREMENT PRIMARY KEY,
     academic_year_id INT NOT NULL,
-    semester ENUM('1', '2') NOT NULL,
+    school_year VARCHAR(20) NULL,
+    semester INT(2) NOT NULL DEFAULT 1,
     is_active TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -29,18 +30,38 @@ CREATE TABLE academic_terms (
 -- Users
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    student_number VARCHAR(50) NULL UNIQUE,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('Admin', 'Dean', 'Faculty', 'Student') NOT NULL DEFAULT 'Student',
     status ENUM('active', 'inactive') DEFAULT 'active',
-    force_password_change TINYINT(1) DEFAULT 0,
+    deactivated_at TIMESTAMP NULL DEFAULT NULL,
+    is_temp_password TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_email (email)
+) ENGINE=InnoDB;
+
+-- User Roles
+CREATE TABLE user_roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    role_name ENUM('Admin', 'Dean', 'Faculty', 'Student') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_role (role),
-    INDEX idx_email (email)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_role_name (role_name)
+) ENGINE=InnoDB;
+
+-- Admin Details
+CREATE TABLE admin_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100) NULL,
+    phone_number VARCHAR(20) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- Departments
@@ -54,11 +75,61 @@ CREATE TABLE departments (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
+-- Programs (Academic Degrees)
+CREATE TABLE programs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    program_abbrev VARCHAR(30) NOT NULL UNIQUE,
+    program_name VARCHAR(191) NOT NULL UNIQUE,
+    program_type VARCHAR(100) NOT NULL DEFAULT 'Bachelors Degree',
+    program_length VARCHAR(50) NOT NULL DEFAULT '4 Years',
+    department_id INT NULL,
+    status ENUM('draft', 'active', 'archived') NOT NULL DEFAULT 'active',
+    description TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
+    INDEX idx_dept_status (department_id, status)
+) ENGINE=InnoDB;
+
+-- Curricula
+CREATE TABLE curricula (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    program_id INT NOT NULL,
+    version VARCHAR(50) NOT NULL DEFAULT '2026-2027',
+    status ENUM('draft', 'active', 'archived') NOT NULL DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE RESTRICT,
+    UNIQUE KEY unique_curriculum (program_id, version),
+    INDEX idx_prog_status (program_id, status)
+) ENGINE=InnoDB;
+
+-- Curriculum Subjects
+CREATE TABLE curriculum_subjects (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    curriculum_id INT NOT NULL,
+    subject_id INT NULL,
+    year_level VARCHAR(30) NOT NULL,
+    semester INT(2) NOT NULL DEFAULT 1,
+    subject_code VARCHAR(50) NOT NULL,
+    descriptive_title VARCHAR(200) NOT NULL,
+    units DECIMAL(4, 1) NOT NULL DEFAULT 3.0,
+    subject_type VARCHAR(50) NOT NULL DEFAULT 'GenEd Core',
+    prerequisites VARCHAR(255) NULL,
+    display_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (curriculum_id) REFERENCES curricula(id) ON DELETE CASCADE,
+    INDEX idx_curriculum_term (curriculum_id, year_level, semester)
+) ENGINE=InnoDB;
+
 -- Sets
 CREATE TABLE sets (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
+    set_name VARCHAR(50) NOT NULL,
+    program_id INT NULL,
     year_level INT NOT NULL,
+    set_code VARCHAR(20) NULL,
     academic_term_id INT NOT NULL,
     department_id INT NULL,
     status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
@@ -66,7 +137,45 @@ CREATE TABLE sets (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE CASCADE,
     FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
-    UNIQUE KEY unique_set (name, academic_term_id)
+    FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE SET NULL,
+    UNIQUE KEY unique_set (set_name, academic_term_id)
+) ENGINE=InnoDB;
+
+-- Student Details
+CREATE TABLE student_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    student_number VARCHAR(50) NULL UNIQUE,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100) NULL,
+    program_id INT NULL,
+    set_id INT NULL,
+    year_level INT NOT NULL DEFAULT 1,
+    status ENUM('Regular', 'Irregular') NOT NULL DEFAULT 'Regular',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE SET NULL,
+    FOREIGN KEY (set_id) REFERENCES sets(id) ON DELETE SET NULL,
+    INDEX idx_student_number (student_number)
+) ENGINE=InnoDB;
+
+-- Faculty Details
+CREATE TABLE faculty_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    employee_id VARCHAR(50) NULL UNIQUE,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100) NULL,
+    faculty_type ENUM('instructor', 'dean') NOT NULL DEFAULT 'instructor',
+    department_id INT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
+    INDEX idx_faculty_type (faculty_type)
 ) ENGINE=InnoDB;
 
 -- Students (extension of users)
@@ -96,18 +205,18 @@ CREATE TABLE faculty (
 -- Subjects
 CREATE TABLE subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    code VARCHAR(20) NOT NULL,
-    name VARCHAR(200) NOT NULL,
+    subject_code VARCHAR(50) NOT NULL,
+    descriptive_title VARCHAR(200) NOT NULL,
     nature ENUM('Lecture', 'Laboratory', 'Combined') NOT NULL DEFAULT 'Lecture',
     year_level INT NOT NULL,
-    semester ENUM('1', '2') NOT NULL,
+    semester INT(2) NOT NULL DEFAULT 1,
     academic_term_id INT NOT NULL,
     is_archived TINYINT(1) DEFAULT 0,
     archived_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
-    UNIQUE KEY unique_subject (code, academic_term_id),
+    UNIQUE KEY unique_subject (subject_code, academic_term_id),
     INDEX idx_is_archived (is_archived)
 ) ENGINE=InnoDB;
 
@@ -265,7 +374,7 @@ INSERT INTO grading_periods (name, order_num, weight, is_current, academic_term_
 ('Final', 4, 40.00, 1, 2);
 
 -- Insert baseline curriculum subjects
-INSERT INTO subjects (code, name, nature, year_level, semester, academic_term_id) VALUES
+INSERT INTO subjects (subject_code, descriptive_title, nature, year_level, semester, academic_term_id) VALUES
 ('IT101', 'Introduction to Computing', 'Lecture', 1, '1', 1),
 ('IT102', 'Computer Programming 1', 'Combined', 1, '1', 1),
 ('IT103', 'Data Structures and Algorithms', 'Combined', 2, '1', 1),
