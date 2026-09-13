@@ -1,0 +1,105 @@
+/* ==========================================================================
+   Acadtrack UI Component: Modals & Confirmation Dialogs
+   ========================================================================== */
+
+/* 1. Modal Content Box */
+.modal-content {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+}
+
+/* 2. Modal Header */
+.modal-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-header .modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-header .btn-close {
+    padding: 8px;
+    margin: -4px -4px -4px auto;
+    opacity: 0.6;
+    transition: opacity 0.15s ease;
+}
+
+.modal-header .btn-close:hover {
+    opacity: 1;
+}
+
+.modal-header .btn-close:focus {
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+    outline: none;
+}
+
+/* 3. Modal Body */
+.modal-body {
+    padding: 20px 24px;
+    font-size: 13.5px;
+    color: #334155;
+    line-height: 1.55;
+}
+
+.modal-body .form-label {
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* 4. Modal Footer */
+.modal-footer {
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* 5. Modal Dim Backdrop */
+.modal-backdrop.show {
+    opacity: 0.45;
+}
+
+/* 6. Legacy Non-Bootstrap Modal Fallbacks (app/Views/components/modal.php) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.5);
+    z-index: 1040;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.modal-close:hover {
+    color: #0f172a;
+}

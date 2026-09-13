@@ -37,19 +37,19 @@ ob_start();
     </div>
 </div>
 
-<div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
+<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-            <thead class="table-light border-bottom">
+            <thead class="bg-white border-bottom">
                 <tr>
-                    <th class="fw-semibold text-muted small py-3 px-3">Full name</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Email address</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Role &amp; affiliation</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 120px;">Status</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 190px;">Actions</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Full name</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Email address</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Role &amp; affiliation</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Status</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 190px; font-size: 11px;">Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y">
                 <?php if (empty($users['data'])): ?>
                     <tr>
                         <td colspan="5" class="text-center py-5 text-muted small">

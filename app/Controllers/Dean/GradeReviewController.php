@@ -55,13 +55,39 @@ class GradeReviewController
             default => null,
         };
 
-        $gradingSheets = GradingSheet::getAllWithDetails($termId, $statusParam);
+        $allTermSheets = GradingSheet::getAllWithDetails($termId);
+        $totalSubmissions = count($allTermSheets);
+        $pendingCount = 0;
+        $approvedCount = 0;
+        $finalizedCount = 0;
+        $returnedCount = 0;
+        foreach ($allTermSheets as $sh) {
+            $st = $sh['status'] ?? '';
+            if (in_array($st, ['SUBMITTED', 'UNDER_REVIEW'], true)) {
+                $pendingCount++;
+            } elseif ($st === 'APPROVED') {
+                $approvedCount++;
+            } elseif ($st === 'FINALIZED') {
+                $finalizedCount++;
+            } elseif ($st === 'RETURNED') {
+                $returnedCount++;
+            }
+        }
+
+        $gradingSheets = $statusParam === null ? $allTermSheets : GradingSheet::getAllWithDetails($termId, $statusParam);
 
         $html = (new View())->render('dean.grade-review.index', [
             'gradingSheets' => $gradingSheets,
             'academicTerm' => $academicTerm,
             'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
             'statusFilter' => $statusFilter,
+            'metrics' => [
+                'total' => $totalSubmissions,
+                'pending' => $pendingCount,
+                'approved' => $approvedCount,
+                'finalized' => $finalizedCount,
+                'returned' => $returnedCount,
+            ],
         ]);
         $response->html($html);
     }

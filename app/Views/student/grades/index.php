@@ -50,17 +50,17 @@ ob_start();
         ?>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light border-bottom">
+                <thead class="bg-white border-bottom">
                     <tr>
-                        <th class="fw-semibold text-muted small py-3 px-3">Subject code & title</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Subject code &amp; title</th>
                         <?php foreach ($periodNames as $period): ?>
-                            <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 140px;">
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">
                                 <?= htmlspecialchars($period) ?>
                             </th>
                         <?php endforeach; ?>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y">
                     <?php foreach ($summary as $subjectCode => $subject): ?>
                     <tr>
                         <td class="px-3">

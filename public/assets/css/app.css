@@ -2,6 +2,14 @@
    GWC Grading System - Base Styles
    ======================================== */
 
+/* Modular UI Components */
+@import url('components/navbar.css');
+@import url('components/sidebar.css');
+@import url('components/card.css');
+@import url('components/table.css');
+@import url('components/modal.css');
+@import url('components/badge.css');
+
 :root {
     --primary: #2563eb;
     --primary-dark: #1d4ed8;

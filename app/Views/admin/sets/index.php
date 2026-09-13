@@ -54,21 +54,21 @@ ob_start();
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="setsTable">
-            <thead class="bg-light border-bottom">
+            <thead class="bg-white border-bottom">
                 <tr>
                     <?php if (!$isReadOnly): ?>
-                        <th class="py-3 px-3 text-center" style="width: 40px;">
+                        <th class="py-2.5 px-3 text-center" style="width: 40px;">
                             <input type="checkbox" class="form-check-input" id="selectAllCheckbox" onchange="toggleSelectAll(this)">
                         </th>
                     <?php endif; ?>
-                    <th class="py-3 px-3 fw-semibold text-dark small" style="width: 140px;">Section Name</th>
-                    <th class="py-3 px-4 fw-semibold text-dark small">Degree Program</th>
-                    <th class="py-3 px-3 fw-semibold text-dark small text-center" style="width: 110px;">Year Level</th>
-                    <th class="py-3 px-3 fw-semibold text-dark small text-center" style="width: 100px;">Code</th>
-                    <th class="py-3 px-3 fw-semibold text-dark small text-center" style="width: 140px;">Students</th>
-                    <th class="py-3 px-3 fw-semibold text-dark small text-center" style="width: 110px;">Status</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 140px; font-size: 11px;">Section Name</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Degree Program</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 110px; font-size: 11px;">Year Level</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 100px; font-size: 11px;">Code</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">Students</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 110px; font-size: 11px;">Status</th>
                     <?php if (!$isReadOnly): ?>
-                        <th class="py-3 px-4 fw-semibold text-dark small text-end" style="width: 160px;">Actions</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 160px; font-size: 11px;">Actions</th>
                     <?php endif; ?>
                 </tr>
             </thead>

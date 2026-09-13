@@ -98,15 +98,15 @@ ob_start();
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light border-bottom">
+                    <thead class="bg-white border-bottom">
                         <tr>
-                            <th class="fw-semibold text-muted small py-3 px-3">User</th>
-                            <th class="fw-semibold text-muted small py-3 px-3">Role</th>
-                            <th class="fw-semibold text-muted small py-3 px-3 text-center">Status</th>
-                            <th class="fw-semibold text-muted small py-3 px-3 text-end">Action</th>
+                            <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">User</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Role</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 11px;">Status</th>
+                            <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="font-size: 11px;">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y">
                         <?php if (empty($recentUsers)): ?>
                             <tr>
                                 <td colspan="4" class="text-center py-4 text-muted small">No users found in database.</td>

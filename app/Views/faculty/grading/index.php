@@ -122,15 +122,15 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
 
             <div class="table-responsive" style="max-height: 65vh;">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light border-bottom sticky-top">
+                    <thead class="bg-white border-bottom sticky-top">
                         <tr>
-                            <th class="fw-semibold text-muted small py-3 px-3" style="width: 160px;">Student ID</th>
-                            <th class="fw-semibold text-muted small py-3 px-3">Student name</th>
-                            <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 180px;">Raw score (0.00 – 100.00)</th>
-                            <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 140px;">Entry status</th>
+                            <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 160px; font-size: 11px;">Student ID</th>
+                            <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Student name</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-end" style="width: 180px; font-size: 11px;">Raw score (0.00 – 100.00)</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">Entry status</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y">
                         <?php foreach ($students as $student): ?>
                         <?php $score = $grades[$student['id']] ?? ''; ?>
                         <tr>

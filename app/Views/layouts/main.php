@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap/css/bootstrap.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap-icons/bootstrap-icons.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/navbar.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/sidebar.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/card.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/table.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/modal.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/badge.css') ?>">
     <?php if (!empty($additionalCss)): ?>
         <?php foreach ($additionalCss as $css): ?>
             <link rel="stylesheet" href="<?= $css ?>">

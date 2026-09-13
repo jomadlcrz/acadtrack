@@ -1,0 +1,104 @@
+/* ==========================================================================
+   Acadtrack UI Component: Academic Data Tables
+   ========================================================================== */
+
+/* 1. Responsive Table Container */
+.table-responsive {
+    border-radius: 6px;
+    background: #ffffff;
+}
+
+/* 2. Standardized Academic Data Tables */
+.table.align-middle {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+/* 3. High-Contrast Semantic Table Headings */
+.table.align-middle thead,
+.table thead.table-light,
+.table thead.bg-light,
+.table thead.bg-white {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.table.align-middle thead th,
+.table thead.table-light th,
+.table thead.bg-light th,
+.table thead.bg-white th {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    color: #64748b !important;
+    padding: 10px 16px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    border-top: none !important;
+    background-color: #ffffff !important;
+    white-space: nowrap;
+}
+
+/* 4. Table Body Rows & Cells */
+.table.align-middle tbody td {
+    padding: 12px 16px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    vertical-align: middle !important;
+    color: #1e293b;
+    font-size: 13px;
+}
+
+.table.align-middle tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* 5. Row Hover State */
+.table-hover > tbody > tr:hover > * {
+    background-color: #f8fafc !important;
+}
+
+/* 6. Pinned Sticky Headers */
+.table thead.sticky-top th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: inset 0 -1px 0 #e2e8f0;
+}
+
+/* 7. Tabular Numeric Data Alignment */
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+}
+
+/* 8. Dense Academic Grade Encoding Table */
+.table-academic {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13.5px;
+}
+
+.table-academic th {
+    background-color: #1e3a8a;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 12.5px;
+    letter-spacing: 0.01em;
+    padding: 8px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table-academic td {
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--gray-200, #e2e8f0);
+    vertical-align: middle;
+    font-variant-numeric: tabular-nums;
+}
+
+.table-academic tbody tr:hover {
+    background-color: var(--gray-100, #f1f5f9);
+}

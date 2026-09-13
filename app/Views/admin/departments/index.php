@@ -23,17 +23,17 @@ ob_start();
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="departmentsTable">
-            <thead class="bg-light border-bottom">
+            <thead class="bg-white border-bottom">
                 <tr>
-                    <th class="fw-semibold text-dark small py-3 px-4" style="width: 160px;">Department code</th>
-                    <th class="fw-semibold text-dark small py-3 px-4">Department Name</th>
-                    <th class="fw-semibold text-dark small py-3 px-3">Description</th>
-                    <th class="fw-semibold text-dark small py-3 px-3 text-center" style="width: 150px;">Assigned faculty</th>
-                    <th class="fw-semibold text-dark small py-3 px-3 text-center" style="width: 120px;">Status</th>
-                    <th class="fw-semibold text-dark small py-3 px-4 text-end" style="width: 160px;">Actions</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 160px; font-size: 11px;">Department code</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Department Name</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Description</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 150px; font-size: 11px;">Assigned faculty</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Status</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 160px; font-size: 11px;">Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y">
                 <?php if (empty($departments)): ?>
                     <tr id="emptyDeptRow">
                         <td colspan="6" class="text-center py-5 text-muted small">

@@ -76,18 +76,18 @@ ob_start();
     <?php else: ?>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light border-bottom">
+                <thead class="bg-white border-bottom">
                     <tr>
-                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 150px;">Student ID</th>
-                        <th class="fw-semibold text-muted small py-3 px-3">Student name</th>
-                        <th class="fw-semibold text-muted small py-3 px-3">Email address</th>
-                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 120px;">Set</th>
-                        <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 120px;">Year level</th>
-                        <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 120px;">Status</th>
-                        <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 110px;">Actions</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 150px; font-size: 11px;">Student ID</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Student name</th>
+                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Email address</th>
+                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 120px; font-size: 11px;">Set</th>
+                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Year level</th>
+                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Status</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 110px; font-size: 11px;">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y">
                     <?php foreach ($students as $student): ?>
                     <tr>
                         <td class="px-3 fw-semibold font-monospace small text-dark">

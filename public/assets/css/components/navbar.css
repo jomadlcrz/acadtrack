@@ -1,0 +1,139 @@
+/* ==========================================================================
+   Acadtrack UI Component: Institutional Top Navigation Bar
+   ========================================================================== */
+
+.app-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+    padding: 0 24px;
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--gray-200, #e2e8f0);
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.navbar-brand-link:hover {
+    text-decoration: none;
+}
+
+.navbar-brand-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.navbar-brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar-brand-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1e3a8a;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}
+
+.navbar-brand-system {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-500, #64748b);
+    letter-spacing: 0.02em;
+}
+
+.navbar-center {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-term-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.navbar-user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: #1e3a8a;
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.navbar-user-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.navbar-user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-800, #1e293b);
+    line-height: 1.2;
+}
+
+.btn-navbar-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid var(--gray-300, #cbd5e1);
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-600, #475569);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-navbar-logout:hover {
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+    color: #b91c1c;
+}

@@ -111,15 +111,15 @@ $isPending = in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW']);
             <?= csrf_field() ?>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light border-bottom">
+                    <thead class="bg-white border-bottom">
                         <tr>
-                            <th class="fw-semibold text-muted small py-3 px-3" style="width: 60px;">#</th>
-                            <th class="fw-semibold text-muted small py-3 px-3" style="width: 150px;">Student number</th>
-                            <th class="fw-semibold text-muted small py-3 px-3">Student full name</th>
-                            <th class="fw-semibold text-muted small py-3 px-3" style="width: 120px;">Status</th>
-                            <th class="fw-semibold text-muted small py-3 px-3" style="width: 100px;">Year level</th>
-                            <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 140px;"><?= htmlspecialchars($sheet['period_name']) ?> mark</th>
-                            <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 120px;">Remarks</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 60px; font-size: 11px;">#</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 150px; font-size: 11px;">Student Number</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Student Full Name</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Status</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 100px; font-size: 11px;">Year Level</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-end" style="width: 150px; font-size: 11px;"><?= htmlspecialchars($sheet['period_name']) ?> Mark</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Remarks</th>
                         </tr>
                     </thead>
                     <tbody>

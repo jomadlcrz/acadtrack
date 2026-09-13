@@ -34,17 +34,17 @@ ob_start();
     <?php else: ?>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light border-bottom">
+                <thead class="bg-white border-bottom">
                     <tr>
-                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 130px;">Subject code</th>
-                        <th class="fw-semibold text-muted small py-3 px-3">Descriptive title</th>
-                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 120px;">Nature</th>
-                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 140px;">Grading method</th>
-                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 110px;">Year level</th>
-                        <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 310px;">Actions</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 140px; font-size: 11px;">Subject code</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Descriptive title</th>
+                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 120px; font-size: 11px;">Nature</th>
+                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 140px; font-size: 11px;">Grading method</th>
+                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 110px; font-size: 11px;">Year level</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 310px; font-size: 11px;">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y">
                     <?php foreach ($subjects as $subject): ?>
                     <tr>
                         <td class="px-3 fw-semibold text-primary font-monospace"><?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?></td>

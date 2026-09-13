@@ -70,15 +70,15 @@ ob_start();
 
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light border-bottom">
+                <thead class="bg-white border-bottom">
                     <tr>
-                        <th class="fw-semibold text-muted small py-3 px-3">Subject code & title</th>
-                        <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 160px;">Computed average</th>
-                        <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 150px;">Status</th>
-                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 200px;">Remarks</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Subject code &amp; title</th>
+                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 160px; font-size: 11px;">Computed average</th>
+                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 150px; font-size: 11px;">Status</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 200px; font-size: 11px;">Remarks</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y">
                     <?php foreach ($evaluations as $subjectCode => $eval): ?>
                     <?php 
                         $status = strtoupper($eval['status'] ?? '');

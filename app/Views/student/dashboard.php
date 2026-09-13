@@ -93,18 +93,18 @@ ob_start();
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-            <thead class="table-light border-bottom">
+            <thead class="bg-white border-bottom">
                 <tr>
-                    <th class="fw-semibold text-muted small py-3 px-3">Subject code</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Descriptive title</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-center">Prelim</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-center">Midterm</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-center">Semi-final</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-center">Final</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-center">Status</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Subject code</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Descriptive title</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 11px;">Prelim</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 11px;">Midterm</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 11px;">Semi-final</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 11px;">Final</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 11px;">Status</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y">
                 <?php if (empty($grades)): ?>
                     <tr>
                         <td colspan="7" class="text-center py-4 text-muted small">

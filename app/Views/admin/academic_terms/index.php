@@ -21,17 +21,17 @@ ob_start();
 </div>
 
 <!-- Academic Terms Table -->
-<div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
+<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="termsTable">
-            <thead class="bg-light border-bottom">
+            <thead class="bg-white border-bottom">
                 <tr>
-                    <th class="py-3 px-4 fw-semibold text-dark small" style="width: 200px;">School Year</th>
-                    <th class="py-3 px-4 fw-semibold text-dark small">Semester</th>
-                    <th class="py-3 px-3 fw-semibold text-dark small text-center" style="width: 140px;">Curricular Sets</th>
-                    <th class="py-3 px-3 fw-semibold text-dark small text-center" style="width: 140px;">Subjects</th>
-                    <th class="py-3 px-3 fw-semibold text-dark small text-center" style="width: 140px;">Status</th>
-                    <th class="py-3 px-4 fw-semibold text-dark small text-end" style="width: 160px;">Actions</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 200px; font-size: 11px;">School Year</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Semester</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">Curricular Sets</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">Subjects</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">Status</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 160px; font-size: 11px;">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y">

@@ -85,17 +85,17 @@ ob_start();
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
-            <thead class="table-light border-bottom">
+            <thead class="bg-white border-bottom">
                 <tr>
-                    <th class="fw-semibold text-muted small py-3 px-3">Subject code</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Descriptive title</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Nature</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Students</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Grading status</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-end">Actions</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Subject code</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Descriptive title</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Nature</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Students</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Grading status</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="font-size: 11px;">Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y">
                 <?php if (empty($workload)): ?>
                     <tr>
                         <td colspan="6" class="text-center py-4 text-muted small">
