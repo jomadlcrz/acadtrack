@@ -96,7 +96,7 @@ class StudentLateIdAndUniquenessTest extends TestCase
             'first_name' => 'Duplicate',
             'last_name' => 'Student',
             'email' => "duplicate_{$unique}@example.com",
-            'section_id' => 1,
+            'set_id' => 1,
             'student_number' => $targetNumber,
         ]);
 
@@ -153,7 +153,7 @@ class StudentLateIdAndUniquenessTest extends TestCase
             'first_name' => 'NoID',
             'last_name' => 'Student',
             'email' => "no_id_{$unique}@example.com",
-            'section_id' => 1,
+            'set_id' => 1,
             'student_number' => '',
         ]);
         $this->assertTrue($validWithEmpty, 'Empty student_number should be valid');
@@ -162,7 +162,7 @@ class StudentLateIdAndUniquenessTest extends TestCase
             'first_name' => 'NullID',
             'last_name' => 'Student',
             'email' => "null_id_{$unique}@example.com",
-            'section_id' => 1,
+            'set_id' => 1,
             'student_number' => null,
         ]);
         $this->assertTrue($validWithNull, 'Null student_number should be valid');

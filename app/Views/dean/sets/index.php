@@ -1,37 +1,38 @@
 <?php
-$pageTitle = 'Academic Sections';
-$subtitle = 'Manage class cohorts, year-level batches, and student section allocations.';
+$pageTitle = 'Academic Sets';
+$subtitle = 'Manage class batches, year-level groups, and student set allocations.';
 $headerActions = '
 <div class="d-flex align-items-center gap-2">
     <div class="btn-group btn-group-sm" role="group" aria-label="Semester selection">
-        <a href="' . url('/dean/sections?semester=1') . '" class="btn ' . (($selectedSemester ?? '1') === '1' ? 'btn-primary' : 'btn-outline-secondary') . '">
+        <a href="' . url('/dean/sets?semester=1') . '" class="btn ' . (($selectedSemester ?? '1') === '1' ? 'btn-primary' : 'btn-outline-secondary') . '">
             1st Semester
         </a>
-        <a href="' . url('/dean/sections?semester=2') . '" class="btn ' . (($selectedSemester ?? '1') === '2' ? 'btn-primary' : 'btn-outline-secondary') . '">
+        <a href="' . url('/dean/sets?semester=2') . '" class="btn ' . (($selectedSemester ?? '1') === '2' ? 'btn-primary' : 'btn-outline-secondary') . '">
             2nd Semester
         </a>
     </div>
-    <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addSectionModal">
-        <i class="bi bi-plus-circle"></i> Add section
+    <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addSetModal">
+        <i class="bi bi-plus-circle"></i> Add set
     </button>
 </div>';
 ob_start();
+$displaySets = $sets ?? [];
 ?>
 
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark">Class Cohorts Roster</h3>
-            <small class="text-muted">Active section cohorts for <?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></small>
+            <h3 class="h6 mb-0 fw-semibold text-dark">Class Batches Roster</h3>
+            <small class="text-muted">Active set batches for <?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></small>
         </div>
-        <span class="badge bg-light text-dark border"><?= count($sections) ?> sections registered</span>
+        <span class="badge bg-light text-dark border"><?= count($displaySets) ?> sets registered</span>
     </div>
 
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light border-bottom">
                 <tr>
-                    <th class="fw-semibold text-muted small py-3 px-3" style="width: 160px;">Section name</th>
+                    <th class="fw-semibold text-muted small py-3 px-3" style="width: 160px;">Set name</th>
                     <th class="fw-semibold text-muted small py-3 px-3" style="width: 140px;">Year level</th>
                     <th class="fw-semibold text-muted small py-3 px-3">Department / College</th>
                     <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 160px;">Enrolled students</th>
@@ -40,15 +41,15 @@ ob_start();
                 </tr>
             </thead>
             <tbody>
-                <?php if (empty($sections)): ?>
+                <?php if (empty($displaySets)): ?>
                     <tr>
                         <td colspan="6" class="text-center py-5 text-muted small">
                             <i class="bi bi-collection-play d-block fs-3 mb-2 text-secondary"></i>
-                            No academic sections configured for this semester yet. Click "Add section" to create one.
+                            No academic sets configured for this semester yet. Click "Add set" to create one.
                         </td>
                     </tr>
                 <?php else: ?>
-                    <?php foreach ($sections as $sec): ?>
+                    <?php foreach ($displaySets as $sec): ?>
                     <tr>
                         <td class="px-3 fw-semibold text-primary font-monospace">
                             <i class="bi bi-people me-1 text-muted"></i>
@@ -86,22 +87,22 @@ ob_start();
                         <td class="px-3 text-end">
                             <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#editSectionModal<?= $sec['id'] ?>">
+                                    data-bs-target="#editSetModal<?= $sec['id'] ?>">
                                 <i class="bi bi-pencil"></i> Edit
                             </button>
                             <?php if (($sec['status'] ?? 'active') === 'active'): ?>
-                                <form method="POST" action="<?= url('/dean/sections/' . $sec['id'] . '/archive') ?>" class="d-inline" onsubmit="return confirm('Archive section <?= htmlspecialchars(addslashes($sec['name'])) ?>?');">
+                                <form method="POST" action="<?= url('/dean/sets/' . $sec['id'] . '/archive') ?>" class="d-inline" onsubmit="return confirm('Archive set <?= htmlspecialchars(addslashes($sec['name'])) ?>?');">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                                    <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Archive section">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Archive set">
                                         <i class="bi bi-archive"></i> Archive
                                     </button>
                                 </form>
                             <?php else: ?>
-                                <form method="POST" action="<?= url('/dean/sections/' . $sec['id'] . '/restore') ?>" class="d-inline">
+                                <form method="POST" action="<?= url('/dean/sets/' . $sec['id'] . '/restore') ?>" class="d-inline">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                                    <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2 d-inline-flex align-items-center gap-1" title="Restore section">
+                                    <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2 d-inline-flex align-items-center gap-1" title="Restore set">
                                         <i class="bi bi-arrow-counterclockwise"></i> Restore
                                     </button>
                                 </form>
@@ -109,20 +110,20 @@ ob_start();
                         </td>
                     </tr>
 
-                    <!-- Edit Section Modal -->
-                    <div class="modal fade" id="editSectionModal<?= $sec['id'] ?>" tabindex="-1" aria-labelledby="editSectionModalLabel<?= $sec['id'] ?>" aria-hidden="true">
+                    <!-- Edit Set Modal -->
+                    <div class="modal fade" id="editSetModal<?= $sec['id'] ?>" tabindex="-1" aria-labelledby="editSetModalLabel<?= $sec['id'] ?>" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
-                                <form method="POST" action="<?= url('/dean/sections/' . $sec['id']) ?>">
+                                <form method="POST" action="<?= url('/dean/sets/' . $sec['id']) ?>">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
                                     <div class="modal-header">
-                                        <h5 class="modal-title h6 fw-semibold" id="editSectionModalLabel<?= $sec['id'] ?>">Edit Section</h5>
+                                        <h5 class="modal-title h6 fw-semibold" id="editSetModalLabel<?= $sec['id'] ?>">Edit Set</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="mb-3">
-                                            <label for="name_<?= $sec['id'] ?>" class="form-label">Section name <span class="text-danger">*</span></label>
+                                            <label for="name_<?= $sec['id'] ?>" class="form-label">Set name <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control font-monospace" id="name_<?= $sec['id'] ?>" name="name" value="<?= htmlspecialchars($sec['name']) ?>" required style="text-transform: uppercase;">
                                             <div class="form-text">e.g., BSIT-1A, BSIT-2B, BSCS-1A</div>
                                         </div>
@@ -173,23 +174,23 @@ ob_start();
     </div>
 </div>
 
-<!-- Add Section Modal -->
-<div class="modal fade" id="addSectionModal" tabindex="-1" aria-labelledby="addSectionModalLabel" aria-hidden="true">
+<!-- Add Set Modal -->
+<div class="modal fade" id="addSetModal" tabindex="-1" aria-labelledby="addSetModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST" action="<?= url('/dean/sections') ?>">
+            <form method="POST" action="<?= url('/dean/sets') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
                 <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
                 <div class="modal-header">
-                    <h5 class="modal-title h6 fw-semibold" id="addSectionModalLabel">Add New Section</h5>
+                    <h5 class="modal-title h6 fw-semibold" id="addSetModalLabel">Add New Set</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="add_name" class="form-label">Section name <span class="text-danger">*</span></label>
+                        <label for="add_name" class="form-label">Set name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control font-monospace" id="add_name" name="name" placeholder="e.g., BSIT-1A" required style="text-transform: uppercase;">
-                        <div class="form-text">Unique cohort identifier for this semester.</div>
+                        <div class="form-text">Unique batch identifier for this semester.</div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
@@ -224,7 +225,7 @@ ob_start();
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
-                        <i class="bi bi-plus-circle"></i> Save section
+                        <i class="bi bi-plus-circle"></i> Save set
                     </button>
                 </div>
             </form>

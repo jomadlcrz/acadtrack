@@ -41,15 +41,15 @@ ob_start();
         <span class="stat-subtext">View teaching workload <i class="bi bi-arrow-right"></i></span>
     </a>
 
-    <a href="<?= url('/dean/sections') ?>" class="stat-card stat-card-link">
+    <a href="<?= url('/dean/sets') ?>" class="stat-card stat-card-link">
         <div>
             <div class="stat-card-top">
-                <span class="stat-label">Class sections</span>
+                <span class="stat-label">Class sets</span>
                 <div class="stat-icon stat-icon-purple"><i class="bi bi-diagram-3-fill"></i></div>
             </div>
-            <div class="stat-value tabular-nums"><?= number_format($totalSections ?? 0) ?></div>
+            <div class="stat-value tabular-nums"><?= number_format($totalSets ?? 0) ?></div>
         </div>
-        <span class="stat-subtext">Manage section cohorts <i class="bi bi-arrow-right"></i></span>
+        <span class="stat-subtext">Manage set batches <i class="bi bi-arrow-right"></i></span>
     </a>
 </div>
 
@@ -166,8 +166,8 @@ ob_start();
                     <span class="fw-semibold text-dark"><?= $totalSubjects ?? 0 ?> subjects</span>
                 </div>
                 <div class="d-flex justify-content-between py-1 small">
-                    <span class="text-muted">Active sections</span>
-                    <span class="fw-semibold text-dark"><?= $totalSections ?? 0 ?> cohorts</span>
+                    <span class="text-muted">Active sets</span>
+                    <span class="fw-semibold text-dark"><?= $totalSets ?? 0 ?> batches</span>
                 </div>
                 <div class="d-flex justify-content-between py-1 small">
                     <span class="text-muted">Faculty strength</span>

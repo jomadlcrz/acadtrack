@@ -71,8 +71,9 @@ ob_start();
                             <?php elseif ($user['role'] === 'Student'): ?>
                                 <div class="small text-muted mt-1 font-monospace d-flex align-items-center gap-2">
                                     <span><?= !empty($user['student_number']) ? htmlspecialchars($user['student_number']) : 'No ID' ?></span>
-                                    <?php if (!empty($user['section_name'])): ?>
-                                        <span class="badge bg-light text-dark border"><i class="bi bi-collection me-1"></i><?= htmlspecialchars($user['section_name']) ?></span>
+                                    <?php $displaySet = $user['set_name'] ?? ''; ?>
+                                    <?php if (!empty($displaySet)): ?>
+                                        <span class="badge bg-light text-dark border"><i class="bi bi-collection me-1"></i><?= htmlspecialchars($displaySet) ?></span>
                                     <?php endif; ?>
                                 </div>
                             <?php endif; ?>

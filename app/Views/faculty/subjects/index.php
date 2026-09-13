@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'My Assigned Subjects';
-$subtitle = 'Curricular course sections assigned to your instructional teaching workload.';
+$subtitle = 'Curricular course sets assigned to your instructional teaching workload.';
 ob_start();
 ?>
 
@@ -29,7 +29,7 @@ ob_start();
                 <i class="bi bi-book"></i>
             </div>
             <h4 class="h6 fw-semibold text-dark mb-1">No subjects assigned yet</h4>
-            <p class="text-muted small mb-0">You have not been designated to any course sections for <?= htmlspecialchars($academicTerm['name'] ?? 'this term') ?>. Contact the College Dean for curriculum assignments.</p>
+            <p class="text-muted small mb-0">You have not been designated to any course sets for <?= htmlspecialchars($academicTerm['name'] ?? 'this term') ?>. Contact the College Dean for curriculum assignments.</p>
         </div>
     <?php else: ?>
         <div class="table-responsive">

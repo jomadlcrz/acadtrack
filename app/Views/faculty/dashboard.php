@@ -60,7 +60,7 @@ ob_start();
             </div>
             <div>
                 <h4 class="h6 mb-0 fw-semibold">Class roster</h4>
-                <p class="text-muted small mb-0">Manage enrolled students &amp; sections</p>
+                <p class="text-muted small mb-0">Manage enrolled students &amp; sets</p>
             </div>
         </a>
     </div>

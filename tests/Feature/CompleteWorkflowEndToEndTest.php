@@ -131,7 +131,7 @@ class CompleteWorkflowEndToEndTest extends TestCase
         $this->assertSame('Irregular', $student->status);
         $this->assertEquals(3, (int) $student->year_level);
 
-        // Enroll student into course section
+        // Enroll student into course subject
         Student::enroll((int) $student->id, $subjectId, $termId);
 
         $studentRepo = new StudentRepository();

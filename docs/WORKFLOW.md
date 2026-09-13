@@ -112,7 +112,7 @@ sequenceDiagram
 ### Step 2: Dean Assigns Subjects
 * **Actor:** College Dean (or Admin)
 * **Route:** `/dean/faculty-assignments`
-* **Process:** Dean selects a Faculty/Instructor from the department roster and assigns specific curriculum subjects and section course loads they will handle for the academic year.
+* **Process:** Dean selects a Faculty/Instructor from the department roster and assigns specific curriculum subjects and course loads they will handle for the academic year.
 
 ### Step 3: Faculty Sets Up Subject
 * **Actor:** Faculty Member
@@ -125,7 +125,7 @@ sequenceDiagram
 ### Step 4: Faculty Adds/Selects Students
 * **Actor:** Faculty Member
 * **Route:** `/faculty/students`
-* **Process:** Faculty encodes or selects students enrolled in the class section and records:
+* **Process:** Faculty encodes or selects students enrolled in the class set and records:
   * **Enrollment Status:** `Regular` or `Irregular`.
   * **Year Level:** `1st Year`, `2nd Year`, `3rd Year`, or `4th Year`.
 
@@ -185,7 +185,7 @@ sequenceDiagram
 
 ## 5. Exception & Edge Case Protocols
 
-1. **Duplicate Subject Assignment:** Intercepted at controller level; displays dismissible warning banner preventing duplicate instructor assignment to the same section.
+1. **Duplicate Subject Assignment:** Intercepted at controller level; displays dismissible warning banner preventing duplicate instructor assignment to the same subject.
 2. **Incomplete Grade Submissions:** Unfilled score rows prompt validation alerts; instructors must resolve blanks or explicitly assign `INC` (Incomplete) status.
 3. **Returned Grading Sheets:** Highlighted with contextual review banner on `/faculty/grading`, displaying Dean's exact feedback comments and restoring input editability.
 4. **Email Dispatch Failures:** Logged to application error logs; grade publication succeeds independently so students can still view results via portal inquiry even if external mail server is unreachable.

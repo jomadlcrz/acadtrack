@@ -98,7 +98,7 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
                 <i class="bi bi-people"></i>
             </div>
             <h4 class="h6 fw-semibold text-dark mb-1">No enrolled students found</h4>
-            <p class="text-muted small mb-0">There are currently no students registered for this course section.</p>
+            <p class="text-muted small mb-0">There are currently no students registered for this course set.</p>
         </div>
     </div>
 <?php else: ?>

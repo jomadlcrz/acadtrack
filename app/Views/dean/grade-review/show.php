@@ -104,7 +104,7 @@ $isPending = in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW']);
                 <i class="bi bi-person-x"></i>
             </div>
             <h4 class="h6 fw-semibold text-dark mb-1">No enrolled students</h4>
-            <p class="text-muted small mb-0">There are no students enrolled in this course section for the active term.</p>
+            <p class="text-muted small mb-0">There are no students enrolled in this course set for the active term.</p>
         </div>
     <?php else: ?>
         <form id="editGradesForm" method="POST" action="<?= url('/dean/grade-review/' . $sheet['id'] . '/edit') ?>">

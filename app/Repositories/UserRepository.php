@@ -72,12 +72,12 @@ class UserRepository
         $stmt->execute($params);
         $total = (int) $stmt->fetchColumn();
 
-        $sql = "SELECT u.*, d.name AS department_name, d.code AS department_code, sec.name AS section_name
+        $sql = "SELECT u.*, d.name AS department_name, d.code AS department_code, sec.name AS set_name
                 FROM users u
                 LEFT JOIN faculty f ON f.user_id = u.id
                 LEFT JOIN departments d ON d.id = f.department_id
                 LEFT JOIN students s ON s.user_id = u.id
-                LEFT JOIN sections sec ON sec.id = s.section_id
+                LEFT JOIN sets sec ON sec.id = s.set_id
                 {$where}
                 ORDER BY u.last_name, u.first_name
                 LIMIT :limit OFFSET :offset";

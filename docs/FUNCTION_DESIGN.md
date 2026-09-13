@@ -86,7 +86,7 @@ createStudent(
     $status,
     $yearLevel,
     $course,
-    $section,
+    $set,
     $address
 );
 ```

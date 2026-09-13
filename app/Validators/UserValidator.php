@@ -56,8 +56,8 @@ class UserValidator
                 }
             }
 
-            if (empty($data['section_id'])) {
-                $this->errors['section_id'] = 'Assigned section is required for student accounts.';
+            if (empty($data['set_id'])) {
+                $this->errors['set_id'] = 'Assigned set is required for student accounts.';
             }
         } elseif (in_array($role, ['Faculty', 'Dean'], true)) {
             if (empty($data['department_id'])) {

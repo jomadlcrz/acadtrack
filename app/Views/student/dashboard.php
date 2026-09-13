@@ -35,14 +35,14 @@ ob_start();
     <div class="stat-card">
         <div>
             <div class="stat-card-top">
-                <span class="stat-label">Section cohort</span>
+                <span class="stat-label">Set batch</span>
                 <div class="stat-icon stat-icon-purple"><i class="bi bi-diagram-3-fill"></i></div>
             </div>
             <div class="stat-value" style="font-size: 20px; font-weight: 600;">
-                <?= htmlspecialchars($section['name'] ?? 'Unassigned') ?>
+                <?= htmlspecialchars($set['name'] ?? 'Unassigned') ?>
             </div>
         </div>
-        <span class="stat-subtext">Class section assignment</span>
+        <span class="stat-subtext">Class set assignment</span>
     </div>
 
     <a href="<?= url('/student/evaluation') ?>" class="stat-card stat-card-link">

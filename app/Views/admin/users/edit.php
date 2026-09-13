@@ -57,16 +57,16 @@ ob_start();
                         <div class="form-text">Optional for students with late or pending ID. Must be unique if provided.</div>
                     </div>
                     <div class="col-md-6">
-                        <label for="section_id" class="form-label">Assigned section <span class="text-danger">*</span></label>
-                        <select class="form-select" id="section_id" name="section_id" required>
-                            <option value="">Select section...</option>
-                            <?php foreach ($sections ?? [] as $sec): ?>
-                                <option value="<?= $sec['id'] ?>" <?= ((string)($user['student']['section_id'] ?? '') === (string)$sec['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($sec['name']) ?>
+                        <label for="set_id" class="form-label">Assigned set <span class="text-danger">*</span></label>
+                        <select class="form-select" id="set_id" name="set_id" required>
+                            <option value="">Select set...</option>
+                            <?php foreach ($sets ?? [] as $set): ?>
+                                <option value="<?= $set['id'] ?>" <?= ((string)($user['student']['set_id'] ?? '') === (string)$set['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($set['name']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="form-text">Active class section cohort.</div>
+                        <div class="form-text">Active class set batch.</div>
                     </div>
                 </div>
 

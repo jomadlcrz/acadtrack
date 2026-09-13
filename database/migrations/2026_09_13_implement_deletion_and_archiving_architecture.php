@@ -93,6 +93,7 @@ return new class {
         $dropFkIfExists('enrollments', 'enrollments_ibfk_2');
         $dropFkIfExists('enrollments', 'enrollments_ibfk_3');
         $dropFkIfExists('enrollments', 'fk_enrollments_student_restrict');
+        $dropFkIfExists('enrollments', 'fk_enrollments_student_cascade');
         $dropFkIfExists('enrollments', 'fk_enrollments_subject_restrict');
         $dropFkIfExists('enrollments', 'fk_enrollments_term_restrict');
 

@@ -54,8 +54,8 @@ CREATE TABLE departments (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- Sections
-CREATE TABLE sections (
+-- Sets
+CREATE TABLE sets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     year_level INT NOT NULL,
@@ -66,20 +66,20 @@ CREATE TABLE sections (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE CASCADE,
     FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
-    UNIQUE KEY unique_section (name, academic_term_id)
+    UNIQUE KEY unique_set (name, academic_term_id)
 ) ENGINE=InnoDB;
 
 -- Students (extension of users)
 CREATE TABLE students (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
-    section_id INT NULL,
+    set_id INT NULL,
     year_level INT NOT NULL,
     status ENUM('Regular', 'Irregular') NOT NULL DEFAULT 'Regular',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE SET NULL
+    FOREIGN KEY (set_id) REFERENCES sets(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Faculty (extension of users)
@@ -280,15 +280,15 @@ INSERT INTO departments (code, name, description, status) VALUES
 ('CAS', 'College of Arts and Sciences', 'Academic department delivering General Education, Humanities, Social Sciences, and Natural Sciences.', 'active'),
 ('COE', 'College of Engineering', 'Academic department overseeing Computer Engineering and applied technical disciplines.', 'active');
 
--- Insert baseline sections for 1st Semester
-INSERT INTO sections (name, year_level, academic_term_id, department_id, status) VALUES
+-- Insert baseline sets for 1st Semester
+INSERT INTO sets (name, year_level, academic_term_id, department_id, status) VALUES
 ('BSIT-1A', 1, 1, 1, 'active'),
 ('BSIT-1B', 1, 1, 1, 'active'),
 ('BSIT-2A', 2, 1, 1, 'active'),
 ('BSCS-1A', 1, 1, 2, 'active');
 
--- Insert baseline sections for 2nd Semester
-INSERT INTO sections (name, year_level, academic_term_id, department_id, status) VALUES
+-- Insert baseline sets for 2nd Semester
+INSERT INTO sets (name, year_level, academic_term_id, department_id, status) VALUES
 ('BSIT-1A', 1, 2, 1, 'active'),
 ('BSIT-1B', 1, 2, 1, 'active'),
 ('BSIT-2A', 2, 2, 1, 'active'),

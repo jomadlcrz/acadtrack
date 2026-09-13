@@ -38,12 +38,12 @@ ob_start();
             </div>
 
             <div class="col-auto d-flex align-items-center gap-2">
-                <label for="section_id_filter" class="form-label mb-0 fw-semibold small text-muted">Section:</label>
-                <select id="section_id_filter" name="section_id" class="form-select" style="width: auto; min-width: 150px;" onchange="this.form.submit()">
-                    <option value="">All sections</option>
-                    <?php foreach (($sections ?? []) as $sec): ?>
-                        <option value="<?= $sec['id'] ?>" <?= ((int)($selectedSection ?? 0) === (int)$sec['id']) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($sec['name']) ?>
+                <label for="set_id_filter" class="form-label mb-0 fw-semibold small text-muted">Set:</label>
+                <select id="set_id_filter" name="set_id" class="form-select" style="width: auto; min-width: 150px;" onchange="this.form.submit()">
+                    <option value="">All sets</option>
+                    <?php foreach (($sets ?? []) as $set): ?>
+                        <option value="<?= $set['id'] ?>" <?= ((int)($selectedSet ?? 0) === (int)$set['id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($set['name']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -81,7 +81,7 @@ ob_start();
                         <th class="fw-semibold text-muted small py-3 px-3" style="width: 150px;">Student ID</th>
                         <th class="fw-semibold text-muted small py-3 px-3">Student name</th>
                         <th class="fw-semibold text-muted small py-3 px-3">Email address</th>
-                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 120px;">Section</th>
+                        <th class="fw-semibold text-muted small py-3 px-3" style="width: 120px;">Set</th>
                         <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 120px;">Year level</th>
                         <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 120px;">Status</th>
                         <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 110px;">Actions</th>
@@ -100,8 +100,9 @@ ob_start();
                             <?= htmlspecialchars($student['email']) ?>
                         </td>
                         <td class="px-3 small">
-                            <?php if (!empty($student['section_name'])): ?>
-                                <span class="badge bg-light text-dark border font-monospace"><i class="bi bi-collection me-1"></i><?= htmlspecialchars($student['section_name']) ?></span>
+                            <?php $setName = $student['set_name'] ?? ''; ?>
+                            <?php if (!empty($setName)): ?>
+                                <span class="badge bg-light text-dark border font-monospace"><i class="bi bi-collection me-1"></i><?= htmlspecialchars($setName) ?></span>
                             <?php else: ?>
                                 <span class="text-muted">—</span>
                             <?php endif; ?>
@@ -117,13 +118,13 @@ ob_start();
                             <?php endif; ?>
                         </td>
                         <td class="px-3 text-end">
-                            <form method="POST" action="<?= url('/faculty/students/remove') ?>" class="d-inline" onsubmit="return confirm('Remove student from this course section?');">
+                            <form method="POST" action="<?= url('/faculty/students/remove') ?>" class="d-inline" onsubmit="return confirm('Remove student from this course set?');">
                                 <?= csrf_field() ?>
                                 <input type="hidden" name="student_id" value="<?= $student['id'] ?>">
                                 <input type="hidden" name="subject_id" value="<?= $subjectId ?>">
                                 <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
                                 <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                                <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Unenroll from class section">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Unenroll from class set">
                                     <i class="bi bi-person-dash"></i> Unenroll
                                 </button>
                             </form>
@@ -189,12 +190,12 @@ ob_start();
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="add_section_id" class="form-label">Assigned section <span class="text-danger">*</span></label>
-                        <select class="form-select" id="add_section_id" name="section_id" required>
-                            <option value="">Select section...</option>
-                            <?php foreach (($sections ?? []) as $sec): ?>
-                                <option value="<?= $sec['id'] ?>" <?= ((int)($selectedSection ?? 0) === (int)$sec['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($sec['name']) ?>
+                        <label for="add_set_id" class="form-label">Assigned set <span class="text-danger">*</span></label>
+                        <select class="form-select" id="add_set_id" name="set_id" required>
+                            <option value="">Select set...</option>
+                            <?php foreach (($sets ?? []) as $set): ?>
+                                <option value="<?= $set['id'] ?>" <?= ((int)($selectedSet ?? 0) === (int)$set['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($set['name']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -255,12 +256,12 @@ ob_start();
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="enroll_section_id" class="form-label">Assigned section <span class="text-danger">*</span></label>
-                        <select class="form-select" id="enroll_section_id" name="section_id" required>
-                            <option value="">Select section...</option>
-                            <?php foreach (($sections ?? []) as $sec): ?>
-                                <option value="<?= $sec['id'] ?>" <?= ((int)($selectedSection ?? 0) === (int)$sec['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($sec['name']) ?>
+                        <label for="enroll_set_id" class="form-label">Assigned set <span class="text-danger">*</span></label>
+                        <select class="form-select" id="enroll_set_id" name="set_id" required>
+                            <option value="">Select set...</option>
+                            <?php foreach (($sets ?? []) as $set): ?>
+                                <option value="<?= $set['id'] ?>" <?= ((int)($selectedSet ?? 0) === (int)$set['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($set['name']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>

@@ -10,9 +10,9 @@ use App\Core\Session;
 use App\Core\View;
 use App\Models\AcademicTerm;
 use App\Models\Department;
-use App\Models\Section;
+use App\Models\Set;
 
-class SectionController
+class SetController
 {
     public function index(Request $request, Response $response, Session $session): void
     {
@@ -24,11 +24,11 @@ class SectionController
         }
 
         $termId = (int) ($academicTerm['id'] ?? 1);
-        $sections = Section::getByTermWithDetails($termId);
+        $sets = Set::getByTermWithDetails($termId);
         $departments = Department::getActive();
 
-        $html = (new View())->render('dean.sections.index', [
-            'sections' => $sections,
+        $html = (new View())->render('dean.sets.index', [
+            'sets' => $sets,
             'departments' => $departments,
             'academicTerm' => $academicTerm,
             'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
@@ -52,18 +52,18 @@ class SectionController
         }
 
         if (empty($name)) {
-            $session->flash('error', 'Section name is required.');
-            redirect("/dean/sections{$semQuery}");
+            $session->flash('error', 'Set name is required.');
+            redirect("/dean/sets{$semQuery}");
             return;
         }
 
-        if (Section::where('name', $name)->where('academic_term_id', $termId)->exists()) {
-            $session->flash('error', "Section '{$name}' already exists for this academic term.");
-            redirect("/dean/sections{$semQuery}");
+        if (Set::where('name', $name)->where('academic_term_id', $termId)->exists()) {
+            $session->flash('error', "Set '{$name}' already exists for this academic term.");
+            redirect("/dean/sets{$semQuery}");
             return;
         }
 
-        Section::create([
+        Set::create([
             'name' => $name,
             'year_level' => $yearLevel,
             'academic_term_id' => $termId,
@@ -71,84 +71,84 @@ class SectionController
             'status' => $status,
         ]);
 
-        $session->flash('success', "Section '{$name}' created successfully.");
-        redirect("/dean/sections{$semQuery}");
+        $session->flash('success', "Set '{$name}' created successfully.");
+        redirect("/dean/sets{$semQuery}");
     }
 
     public function update(Request $request, Response $response, Session $session, string $id): void
     {
-        $section = Section::find((int) $id);
+        $set = Set::find((int) $id);
         $semester = (string) $request->post('semester', '');
         $semQuery = $semester !== '' ? "?semester={$semester}" : '';
 
-        if (!$section) {
-            $session->flash('error', 'Section not found.');
-            redirect("/dean/sections{$semQuery}");
+        if (!$set) {
+            $session->flash('error', 'Set not found.');
+            redirect("/dean/sets{$semQuery}");
             return;
         }
 
         $name = strtoupper(trim((string) $request->post('name', '')));
-        $yearLevel = (int) $request->post('year_level', $section->year_level);
+        $yearLevel = (int) $request->post('year_level', $set->year_level);
         $deptId = !empty($request->post('department_id')) ? (int) $request->post('department_id') : null;
         $status = in_array($request->post('status'), ['active', 'inactive'], true) ? $request->post('status') : 'active';
 
         if (empty($name)) {
-            $session->flash('error', 'Section name is required.');
-            redirect("/dean/sections{$semQuery}");
+            $session->flash('error', 'Set name is required.');
+            redirect("/dean/sets{$semQuery}");
             return;
         }
 
-        if (Section::where('name', $name)
-            ->where('academic_term_id', $section->academic_term_id)
-            ->where('id', '!=', $section->id)
+        if (Set::where('name', $name)
+            ->where('academic_term_id', $set->academic_term_id)
+            ->where('id', '!=', $set->id)
             ->exists()) {
-            $session->flash('error', "Section '{$name}' already exists for this academic term.");
-            redirect("/dean/sections{$semQuery}");
+            $session->flash('error', "Set '{$name}' already exists for this academic term.");
+            redirect("/dean/sets{$semQuery}");
             return;
         }
 
-        $section->update([
+        $set->update([
             'name' => $name,
             'year_level' => $yearLevel,
             'department_id' => $deptId,
             'status' => $status,
         ]);
 
-        $session->flash('success', "Section '{$name}' updated successfully.");
-        redirect("/dean/sections{$semQuery}");
+        $session->flash('success', "Set '{$name}' updated successfully.");
+        redirect("/dean/sets{$semQuery}");
     }
 
     public function archive(Request $request, Response $response, Session $session, string $id): void
     {
-        $section = Section::find((int) $id);
+        $set = Set::find((int) $id);
         $semester = (string) $request->post('semester', '');
         $semQuery = $semester !== '' ? "?semester={$semester}" : '';
 
-        if (!$section) {
-            $session->flash('error', 'Section not found.');
-            redirect("/dean/sections{$semQuery}");
+        if (!$set) {
+            $session->flash('error', 'Set not found.');
+            redirect("/dean/sets{$semQuery}");
             return;
         }
 
-        $section->update(['status' => 'inactive']);
-        $session->flash('success', "Section '{$section->name}' archived successfully.");
-        redirect("/dean/sections{$semQuery}");
+        $set->update(['status' => 'inactive']);
+        $session->flash('success', "Set '{$set->name}' archived successfully.");
+        redirect("/dean/sets{$semQuery}");
     }
 
     public function restore(Request $request, Response $response, Session $session, string $id): void
     {
-        $section = Section::find((int) $id);
+        $set = Set::find((int) $id);
         $semester = (string) $request->post('semester', '');
         $semQuery = $semester !== '' ? "?semester={$semester}" : '';
 
-        if (!$section) {
-            $session->flash('error', 'Section not found.');
-            redirect("/dean/sections{$semQuery}");
+        if (!$set) {
+            $session->flash('error', 'Set not found.');
+            redirect("/dean/sets{$semQuery}");
             return;
         }
 
-        $section->update(['status' => 'active']);
-        $session->flash('success', "Section '{$section->name}' restored to active status.");
-        redirect("/dean/sections{$semQuery}");
+        $set->update(['status' => 'active']);
+        $session->flash('success', "Set '{$set->name}' restored to active status.");
+        redirect("/dean/sets{$semQuery}");
     }
 }

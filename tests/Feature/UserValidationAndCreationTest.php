@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Faculty;
 use App\Models\Student;
 use App\Models\Department;
-use App\Models\Section;
+use App\Models\Set;
 use App\Validators\UserValidator;
 use App\Controllers\Admin\UserController;
 use App\Core\Request;
@@ -20,7 +20,7 @@ class UserValidationAndCreationTest extends TestCase
 {
     private static array $createdUserIds = [];
     private static ?int $deptId = null;
-    private static ?int $sectionId = null;
+    private static ?int $setId = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -40,8 +40,8 @@ class UserValidationAndCreationTest extends TestCase
         $dept = Department::first();
         self::$deptId = $dept ? (int) $dept->id : null;
 
-        $section = Section::first();
-        self::$sectionId = $section ? (int) $section->id : null;
+        $set = Set::first();
+        self::$setId = $set ? (int) $set->id : null;
     }
 
     public static function tearDownAfterClass(): void
@@ -87,7 +87,7 @@ class UserValidationAndCreationTest extends TestCase
         $this->assertArrayHasKey('email', $validator->errors());
     }
 
-    public function testValidatorRejectsStudentWithoutSection(): void
+    public function testValidatorRejectsStudentWithoutSet(): void
     {
         $validator = new UserValidator();
         $valid = $validator->validate([
@@ -95,11 +95,11 @@ class UserValidationAndCreationTest extends TestCase
             'last_name' => 'Test',
             'email' => 'student_test_' . time() . '@gwc.edu',
             'role' => 'Student',
-            'section_id' => '',
+            'set_id' => '',
         ]);
 
         $this->assertFalse($valid);
-        $this->assertArrayHasKey('section_id', $validator->errors());
+        $this->assertArrayHasKey('set_id', $validator->errors());
     }
 
     public function testValidatorRejectsFacultyWithoutDepartment(): void
@@ -161,7 +161,7 @@ class UserValidationAndCreationTest extends TestCase
             'email' => $existing->email,
             'role' => $existing->role,
             'department_id' => self::$deptId,
-            'section_id' => self::$sectionId,
+            'set_id' => self::$setId,
         ], (int) $existing->id);
 
         $this->assertTrue($valid);
@@ -169,14 +169,14 @@ class UserValidationAndCreationTest extends TestCase
 
     public function testValidatorAcceptsValidStudent(): void
     {
-        $this->assertNotNull(self::$sectionId);
+        $this->assertNotNull(self::$setId);
         $validator = new UserValidator();
         $valid = $validator->validate([
             'first_name' => 'Maria',
             'last_name' => 'Santos',
             'email' => 'maria_test_' . uniqid() . '@gwc.edu',
             'role' => 'Student',
-            'section_id' => self::$sectionId,
+            'set_id' => self::$setId,
         ]);
 
         $this->assertTrue($valid, json_encode($validator->errors()));

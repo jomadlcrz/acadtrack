@@ -189,6 +189,6 @@ Before shipping any new view, layout, or table in the GWC Acadtrack, verify:
 - [ ] **Sidebar Navigation:** Are active sidebar links styled with a slate background (`#e2e8f0`) without generic left borders?
 - [ ] **Density Check:** Can an instructor view at least 15–20 student rows on a 1080p screen without scrolling?
 - [ ] **Contrast Compliance:** Does all body copy and secondary metadata have a contrast ratio of at least $4.5:1$ against its background?
-- [ ] **Sticky Headers:** When scrolling through a 50-student section, do the column headers remain anchored at the top?
+- [ ] **Sticky Headers:** When scrolling through a 50-student set, do the column headers remain anchored at the top?
 - [ ] **Modal Safeguards:** Are destructive or irreversible actions (Dean return with remarks, Sheet submission) protected by explicit confirmation modals?
 - [ ] **Offline Independence:** Are all styles and icons served locally via `public/assets/vendor/` without external CDN dependencies?

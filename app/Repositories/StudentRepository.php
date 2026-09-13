@@ -32,14 +32,14 @@ class StudentRepository
         return (bool) Student::where('id', $id)->update($data);
     }
 
-    public function getBySection(int $sectionId): array
+    public function getBySet(int $setId): array
     {
-        return Student::getBySection($sectionId);
+        return Student::getBySet($setId);
     }
 
-    public function getBySubject(int $subjectId, int $academicTermId, ?int $sectionId = null): array
+    public function getBySubject(int $subjectId, int $academicTermId, ?int $setId = null): array
     {
-        return Student::getBySubject($subjectId, $academicTermId, $sectionId);
+        return Student::getBySubject($subjectId, $academicTermId, $setId);
     }
 
     public function enroll(int $studentId, int $subjectId, int $academicTermId): bool

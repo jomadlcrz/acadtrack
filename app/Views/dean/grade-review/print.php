@@ -123,7 +123,7 @@
         <div class="report-title">Official Grading Sheet &amp; Class Roster</div>
     </div>
 
-    <!-- Metadata Section -->
+    <!-- Metadata Block -->
     <div class="row g-2 mb-3 small">
         <div class="col-7">
             <table class="w-100">

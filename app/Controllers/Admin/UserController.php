@@ -39,10 +39,10 @@ class UserController
     {
         $departments = \App\Models\Department::getActive();
         $academicTerm = \App\Models\AcademicTerm::getActive();
-        $sections = $academicTerm ? \App\Models\Section::getActiveByTerm((int) $academicTerm['id']) : [];
+        $sets = $academicTerm ? \App\Models\Set::getActiveByTerm((int) $academicTerm['id']) : [];
         $html = (new View())->render('admin.users.create', [
             'departments' => $departments,
-            'sections' => $sections,
+            'sets' => $sets,
         ]);
         $response->html($html);
     }
@@ -80,13 +80,13 @@ class UserController
 
         if ($user && $user->id) {
             if ($role === 'Student') {
-                $sectionId = !empty($data['section_id']) ? (int) $data['section_id'] : null;
+                $setId = !empty($data['set_id']) ? (int) $data['set_id'] : null;
                 $yearLevel = !empty($data['year_level']) ? (int) $data['year_level'] : 1;
                 $studentStatus = !empty($data['student_status']) ? (string) $data['student_status'] : 'Regular';
                 \App\Models\Student::firstOrCreate([
                     'user_id' => (int) $user->id,
                 ], [
-                    'section_id' => $sectionId,
+                    'set_id' => $setId,
                     'year_level' => $yearLevel,
                     'status' => $studentStatus,
                 ]);
@@ -107,7 +107,7 @@ class UserController
 
     public function edit(Request $request, Response $response, Session $session, string $id): void
     {
-        $user = \App\Models\User::with(['faculty.department', 'student.section'])->find((int) $id);
+        $user = \App\Models\User::with(['faculty.department', 'student.set'])->find((int) $id);
         if (!$user) {
             $response->statusCode(404)->html('User not found');
             return;
@@ -115,11 +115,11 @@ class UserController
 
         $departments = \App\Models\Department::getActive();
         $academicTerm = \App\Models\AcademicTerm::getActive();
-        $sections = $academicTerm ? \App\Models\Section::getActiveByTerm((int) $academicTerm['id']) : [];
+        $sets = $academicTerm ? \App\Models\Set::getActiveByTerm((int) $academicTerm['id']) : [];
         $html = (new View())->render('admin.users.edit', [
             'user' => $user->toArray(),
             'departments' => $departments,
-            'sections' => $sections,
+            'sets' => $sets,
         ]);
         $response->html($html);
     }
@@ -155,14 +155,14 @@ class UserController
             $studentNumber = trim((string) ($data['student_number'] ?? '')) ?: null;
             $updateData['student_number'] = $studentNumber;
 
-            $sectionId = !empty($data['section_id']) ? (int) $data['section_id'] : null;
+            $setId = !empty($data['set_id']) ? (int) $data['set_id'] : null;
             $yearLevel = !empty($data['year_level']) ? (int) $data['year_level'] : 1;
             $studentStatus = !empty($data['student_status']) ? (string) $data['student_status'] : 'Regular';
 
             \App\Models\Student::updateOrCreate(
                 ['user_id' => (int) $user->id],
                 [
-                    'section_id' => $sectionId,
+                    'set_id' => $setId,
                     'year_level' => $yearLevel,
                     'status' => $studentStatus,
                 ]

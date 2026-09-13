@@ -6,9 +6,9 @@ namespace App\Models;
 
 use App\Core\Model;
 
-class Section extends Model
+class Set extends Model
 {
-    protected $table = 'sections';
+    protected $table = 'sets';
 
     protected $fillable = [
         'name',
@@ -30,7 +30,7 @@ class Section extends Model
 
     public function students()
     {
-        return $this->hasMany(Student::class, 'section_id');
+        return $this->hasMany(Student::class, 'set_id');
     }
 
     public static function getActiveByTerm(int $academicTermId): array

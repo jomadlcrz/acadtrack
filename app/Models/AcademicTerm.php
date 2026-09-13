@@ -25,6 +25,11 @@ class AcademicTerm extends Model
         return $this->hasMany(Subject::class, 'academic_term_id');
     }
 
+    public function sets()
+    {
+        return $this->hasMany(Set::class, 'academic_term_id');
+    }
+
     public static function getActive(): ?array
     {
         $stmt = self::db()->query("

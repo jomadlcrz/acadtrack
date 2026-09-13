@@ -20,9 +20,9 @@
                     <i class="bi bi-building"></i>
                     <span>Departments</span>
                 </a>
-                <a href="<?= url('/dean/sections') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/sections') ? 'active' : '' ?>">
+                <a href="<?= url('/dean/sets') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/sets') ? 'active' : '' ?>">
                     <i class="bi bi-collection-fill"></i>
-                    <span>Sections</span>
+                    <span>Sets</span>
                 </a>
                 <a href="<?= url('/admin/settings') ?>" class="sidebar-link <?= $currentPath === '/admin/settings' ? 'active' : '' ?>">
                     <i class="bi bi-gear-fill"></i>
@@ -45,9 +45,9 @@
                     <i class="bi bi-journal-bookmark-fill"></i>
                     <span>Curriculum Subjects</span>
                 </a>
-                <a href="<?= url('/dean/sections') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/sections') ? 'active' : '' ?>">
+                <a href="<?= url('/dean/sets') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/sets') ? 'active' : '' ?>">
                     <i class="bi bi-collection-fill"></i>
-                    <span>Sections</span>
+                    <span>Sets</span>
                 </a>
                 <a href="<?= url('/dean/faculty-assignments') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/faculty-assignments') ? 'active' : '' ?>">
                     <i class="bi bi-person-badge-fill"></i>

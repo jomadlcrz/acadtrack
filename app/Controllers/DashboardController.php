@@ -13,7 +13,7 @@ use App\Models\User;
 use App\Models\Student;
 use App\Models\Faculty;
 use App\Models\Subject;
-use App\Models\Section;
+use App\Models\Set;
 use App\Models\Department;
 use App\Models\AcademicTerm;
 use App\Models\GradingSheet;
@@ -88,7 +88,7 @@ class DashboardController
         $pendingReviewCount = GradingSheet::where('status', 'SUBMITTED')->count();
         $totalSubjects = Subject::count();
         $totalFaculty = Faculty::count();
-        $totalSections = Section::count();
+        $totalSets = Set::count();
 
         // Pending submissions awaiting review
         $pendingSheets = GradingSheet::db()->query("
@@ -122,7 +122,7 @@ class DashboardController
             'pendingReviewCount' => $pendingReviewCount,
             'totalSubjects' => $totalSubjects,
             'totalFaculty' => $totalFaculty,
-            'totalSections' => $totalSections,
+            'totalSets' => $totalSets,
             'pendingSheets' => $pendingSheets,
             'recentSheets' => $recentSheets,
         ];
@@ -189,17 +189,18 @@ class DashboardController
         $grades = $studentId > 0 ? $gradeService->getStudentGrades($studentId, $termId) : [];
         $summary = $studentId > 0 ? $gradeService->getGradeSummary($studentId, $termId) : [];
 
-        $section = null;
-        if (!empty($student['section_id'])) {
-            $sec = Section::find((int) $student['section_id']);
-            if ($sec) {
-                $section = $sec->toArray();
+        $set = null;
+        $setId = (int) ($student['set_id'] ?? 0);
+        if ($setId > 0) {
+            $s = Set::find($setId);
+            if ($s) {
+                $set = $s->toArray();
             }
         }
 
         return [
             'student' => $student,
-            'section' => $section,
+            'set' => $set,
             'activeTerm' => $activeTerm,
             'enrolledCount' => count($grades),
             'grades' => $grades,

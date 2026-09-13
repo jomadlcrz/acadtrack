@@ -37,8 +37,8 @@ class StudentValidator
             }
         }
 
-        if (empty($data['section_id'])) {
-            $this->errors['section_id'] = 'Section is required.';
+        if (empty($data['set_id'])) {
+            $this->errors['set_id'] = 'Set is required.';
         }
 
         return empty($this->errors);
