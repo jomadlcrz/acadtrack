@@ -34,8 +34,8 @@ ob_start();
     </div>
 
     <div class="d-flex align-items-center gap-2">
-        <button type="button" id="bulkDeleteBtn" class="btn btn-outline-danger btn-sm d-none align-items-center gap-1.5" onclick="submitBulkDelete()">
-            <i class="bi bi-trash"></i> Delete Selected (<span id="selectedCount">0</span>)
+        <button type="button" id="bulkArchiveBtn" class="btn btn-outline-secondary btn-sm d-none align-items-center gap-1.5" onclick="submitBulkArchive()">
+            <i class="bi bi-archive"></i> Archive Selected (<span id="selectedCount">0</span>)
         </button>
         <div class="text-muted small fw-medium text-nowrap" id="setCounter">
             <?= count($sets) ?> <?= count($sets) === 1 ? 'section' : 'sections' ?>
@@ -197,10 +197,10 @@ ob_start();
     </div>
 </div>
 
-<!-- Bulk Delete Form -->
-<form id="bulkDeleteForm" method="POST" action="<?= url('/admin/sets/bulk-delete') ?>">
+<!-- Bulk Archive Form -->
+<form id="bulkArchiveForm" method="POST" action="<?= url('/admin/sets/bulk-archive') ?>">
     <?= csrf_field() ?>
-    <input type="hidden" name="ids" id="bulkDeleteIds">
+    <input type="hidden" name="ids" id="bulkArchiveIds">
 </form>
 
 <!-- Create Sets Modal -->
@@ -401,7 +401,7 @@ function toggleSelectAll(masterCheckbox) {
 
 function updateSelectedCount() {
     const checked = document.querySelectorAll('.set-checkbox:checked');
-    const btn = document.getElementById('bulkDeleteBtn');
+    const btn = document.getElementById('bulkArchiveBtn');
     const countSpan = document.getElementById('selectedCount');
 
     countSpan.textContent = checked.length;
@@ -414,17 +414,17 @@ function updateSelectedCount() {
     }
 }
 
-function submitBulkDelete() {
+function submitBulkArchive() {
     const checked = document.querySelectorAll('.set-checkbox:checked');
     if (checked.length === 0) return;
 
-    if (!confirm(`Are you sure you want to delete or archive ${checked.length} selected sections?`)) {
+    if (!confirm(`Are you sure you want to archive ${checked.length} selected sets?`)) {
         return;
     }
 
     const ids = Array.from(checked).map(cb => cb.value);
-    document.getElementById('bulkDeleteIds').value = ids.join(',');
-    document.getElementById('bulkDeleteForm').submit();
+    document.getElementById('bulkArchiveIds').value = ids.join(',');
+    document.getElementById('bulkArchiveForm').submit();
 }
 
 document.addEventListener('DOMContentLoaded', function() {

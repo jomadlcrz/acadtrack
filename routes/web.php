@@ -71,7 +71,7 @@ $router->get('/admin/program-curricula/{id}/export-csv', [ProgramCurriculumContr
 // Sets routes
 $router->get('/admin/sets', [AdminSetController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean'])]);
 $router->post('/admin/sets', [AdminSetController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
-$router->post('/admin/sets/bulk-delete', [AdminSetController::class, 'bulkDelete'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
+$router->post('/admin/sets/bulk-archive', [AdminSetController::class, 'bulkArchive'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
 $router->post('/admin/sets/{id}', [AdminSetController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
 $router->post('/admin/sets/{id}/archive', [AdminSetController::class, 'archive'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
 $router->post('/admin/sets/{id}/restore', [AdminSetController::class, 'restore'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);

@@ -229,7 +229,7 @@ class SetController
         redirect('/admin/sets');
     }
 
-    public function bulkDelete(Request $request, Response $response, Session $session): void
+    public function bulkArchive(Request $request, Response $response, Session $session): void
     {
         $isJson = str_contains((string) $request->header('Content-Type'), 'application/json');
         $data = $isJson ? json_decode(file_get_contents('php://input'), true) ?? [] : $_POST;
@@ -241,30 +241,22 @@ class SetController
 
         $ids = array_filter(array_map('intval', $ids));
         if (empty($ids)) {
-            $this->respondError($isJson, $response, $session, 'No sections selected.');
+            $this->respondError($isJson, $response, $session, 'No sets selected.');
             return;
         }
 
-        $deleted = 0;
         $archived = 0;
 
         foreach ($ids as $setId) {
             $set = Set::find($setId);
             if (!$set) continue;
 
-            // Check if students are enrolled in this set
-            $hasStudents = Student::where('set_id', $set->id)->exists();
-            if ($hasStudents) {
-                // Safety: Soft-archive rather than hard-delete
-                $set->update(['status' => 'inactive']);
-                $archived++;
-            } else {
-                $set->delete();
-                $deleted++;
-            }
+            // Strict zero hard delete: archive by updating status to inactive
+            $set->update(['status' => 'inactive']);
+            $archived++;
         }
 
-        $msg = "Processed sections: {$deleted} deleted, {$archived} archived (due to student records).";
+        $msg = "{$archived} " . ($archived === 1 ? 'set' : 'sets') . ' archived successfully.';
 
         if ($isJson) {
             $response->json(['success' => true, 'message' => $msg]);
