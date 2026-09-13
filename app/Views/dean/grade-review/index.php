@@ -75,7 +75,7 @@ $statusFilter = $statusFilter ?? 'all';
                     <tr>
                         <td class="px-3">
                             <div class="fw-semibold text-primary font-monospace small">
-                                <?= htmlspecialchars($sheet['subject_code']) ?>
+                                <?= htmlspecialchars($sheet['subject_code'] ?? $sheet['code'] ?? '') ?>
                             </div>
                             <div class="fw-semibold text-dark small">
                                 <?= htmlspecialchars($sheet['subject_name']) ?>
@@ -111,7 +111,7 @@ $statusFilter = $statusFilter ?? 'all';
                             </a>
 
                             <?php if (in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW'])): ?>
-                                <form method="POST" action="<?= url('/dean/grade-review/approve') ?>" class="d-inline ms-1" onsubmit="return confirm('Approve this grading sheet for <?= htmlspecialchars($sheet['subject_code']) ?>?');">
+                                <form method="POST" action="<?= url('/dean/grade-review/approve') ?>" class="d-inline ms-1" onsubmit="return confirm('Approve this grading sheet for <?= htmlspecialchars($sheet['subject_code'] ?? $sheet['code'] ?? '') ?>?');">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="grading_sheet_id" value="<?= $sheet['id'] ?>">
                                     <button type="submit" class="btn btn-sm btn-success py-1 px-2 d-inline-flex align-items-center gap-1">
@@ -140,7 +140,7 @@ $statusFilter = $statusFilter ?? 'all';
                         <input type="hidden" name="grading_sheet_id" value="<?= $sheet['id'] ?>">
                         <div class="modal-header border-bottom">
                             <h5 class="modal-title h6 fw-semibold mb-0" id="confirmModalLabel<?= $sheet['id'] ?>">
-                                Confirm Grading Sheet: <?= htmlspecialchars($sheet['subject_code']) ?>
+                                Confirm Grading Sheet: <?= htmlspecialchars($sheet['subject_code'] ?? $sheet['code'] ?? '') ?>
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>

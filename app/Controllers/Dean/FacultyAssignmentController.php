@@ -34,12 +34,33 @@ class FacultyAssignmentController
         $termId = (int) ($academicTerm['id'] ?? 0);
         $subjects = $this->subjectRepository->getByDean($termId);
         $faculty = (new \App\Models\User())->getFaculty();
+        $assignments = $this->facultyRepository->getAssignmentsForTerm($termId);
+
+        // Group assignments by subject and faculty
+        $assignmentsBySubject = [];
+        $assignmentsByFaculty = [];
+        foreach ($assignments as $a) {
+            $assignmentsBySubject[$a['subject_id']][] = $a;
+            $assignmentsByFaculty[$a['faculty_id']][] = $a;
+        }
+
+        foreach ($subjects as &$s) {
+            $s['assigned_faculty'] = $assignmentsBySubject[$s['id']] ?? [];
+            $s['assigned_faculty_count'] = count($s['assigned_faculty']);
+        }
+        unset($s);
+
+        foreach ($faculty as &$f) {
+            $f['assigned_count'] = count($assignmentsByFaculty[$f['id']] ?? []);
+        }
+        unset($f);
 
         $html = (new View())->render('dean.faculty-assignments.index', [
             'subjects' => $subjects,
             'faculty' => $faculty,
             'academicTerm' => $academicTerm,
             'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
+            'totalAssignments' => count($assignments),
         ]);
         $response->html($html);
     }
@@ -52,13 +73,19 @@ class FacultyAssignmentController
         $semester = (string) $request->post('semester', '');
         $semQuery = $semester !== '' ? "?semester={$semester}" : '';
 
+        if ($facultyId <= 0 || $subjectId <= 0) {
+            $session->flash('error', 'Please select both an instructor and a subject offering.');
+            redirect("/dean/faculty-assignments{$semQuery}");
+            return;
+        }
+
         if ($termId === 0) {
             $academicTerm = \App\Models\AcademicTerm::getActive();
             $termId = (int) ($academicTerm['id'] ?? 1);
         }
 
         $this->facultyRepository->assignSubject($facultyId, $subjectId, $termId);
-        $session->flash('success', 'Faculty assigned successfully.');
+        $session->flash('success', 'Instructor assigned successfully to course offering.');
         redirect("/dean/faculty-assignments{$semQuery}");
     }
 
@@ -70,25 +97,33 @@ class FacultyAssignmentController
         $semester = (string) $request->post('semester', '');
         $semQuery = $semester !== '' ? "?semester={$semester}" : '';
 
+        if ($subjectId <= 0) {
+            $session->flash('error', 'Invalid subject specified.');
+            redirect("/dean/faculty-assignments{$semQuery}");
+            return;
+        }
+
         if ($termId === 0) {
             $academicTerm = \App\Models\AcademicTerm::getActive();
             $termId = (int) ($academicTerm['id'] ?? 1);
         }
 
-        $hasActiveGradingSheets = \App\Models\GradingSheet::where('faculty_id', $facultyId)
-            ->where('subject_id', $subjectId)
+        $sheetQuery = \App\Models\GradingSheet::where('subject_id', $subjectId)
             ->where('academic_term_id', $termId)
-            ->whereIn('status', ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'FINALIZED'])
-            ->exists();
+            ->whereIn('status', ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'FINALIZED']);
 
-        if ($hasActiveGradingSheets) {
+        if ($facultyId > 0) {
+            $sheetQuery->where('faculty_id', $facultyId);
+        }
+
+        if ($sheetQuery->exists()) {
             $session->flash('error', 'Cannot remove faculty assignment because submitted or approved grading sheets exist for this course in this academic term.');
             redirect("/dean/faculty-assignments{$semQuery}");
             return;
         }
 
         $this->facultyRepository->removeAssignment($facultyId, $subjectId, $termId);
-        $session->flash('success', 'Assignment removed.');
+        $session->flash('success', 'Instructor assignment removed successfully.');
         redirect("/dean/faculty-assignments{$semQuery}");
     }
 }

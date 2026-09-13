@@ -143,6 +143,20 @@ class AcademicModulesWorkflowTest extends TestCase
         $this->assertStringContainsString('Create Sections', $html);
         $this->assertStringContainsString('All Programs', $html);
         $this->assertStringContainsString('All Years', $html);
+
+        // Dean read-only verification
+        $_SESSION['user'] = ['role' => 'Dean', 'first_name' => 'College', 'last_name' => 'Dean'];
+        $deanHtml = (new View())->render('admin.sets.index', [
+            'sets' => $sets,
+            'programs' => $programs,
+            'departments' => $departments,
+            'activeTerm' => $term,
+            'isReadOnly' => true,
+        ]);
+        $this->assertStringContainsString('Read-Only View', $deanHtml);
+        $this->assertStringNotContainsString('Create Sections', $deanHtml);
+        $this->assertStringNotContainsString('selectAllCheckbox', $deanHtml);
+        $this->assertStringNotContainsString('Archive Selected', $deanHtml);
     }
 
     public function testProgramCurriculaCreateWizardView(): void
@@ -162,5 +176,53 @@ class AcademicModulesWorkflowTest extends TestCase
         $this->assertStringContainsString('Step 1: Program Information', $html);
         $this->assertStringContainsString('Step 2: Curriculum Subjects', $html);
         $this->assertStringContainsString('Step 3: Review &amp; Finalize', $html);
+    }
+
+    public function testDeanFacultyAssignmentsViewRendering(): void
+    {
+        $_SESSION['user'] = ['role' => 'Dean', 'first_name' => 'College', 'last_name' => 'Dean'];
+
+        $term = AcademicTerm::getActive();
+        $subjectRepo = new \App\Repositories\SubjectRepository();
+        $facultyRepo = new \App\Repositories\FacultyRepository();
+
+        $subjects = $subjectRepo->getByDean((int)$term['id']);
+        $faculty = \App\Models\User::getFaculty();
+        $assignments = $facultyRepo->getAssignmentsForTerm((int)$term['id']);
+
+        $assignmentsBySubject = [];
+        $assignmentsByFaculty = [];
+        foreach ($assignments as $a) {
+            $assignmentsBySubject[$a['subject_id']][] = $a;
+            $assignmentsByFaculty[$a['faculty_id']][] = $a;
+        }
+
+        foreach ($subjects as &$s) {
+            $s['assigned_faculty'] = $assignmentsBySubject[$s['id']] ?? [];
+            $s['assigned_faculty_count'] = count($s['assigned_faculty']);
+        }
+        unset($s);
+
+        foreach ($faculty as &$f) {
+            $f['assigned_count'] = count($assignmentsByFaculty[$f['id']] ?? []);
+        }
+        unset($f);
+
+        $html = (new View())->render('dean.faculty-assignments.index', [
+            'subjects' => $subjects,
+            'faculty' => $faculty,
+            'academicTerm' => $term,
+            'selectedSemester' => (string)($term['semester'] ?? '1'),
+            'totalAssignments' => count($assignments),
+        ]);
+
+        $this->assertNotEmpty($html);
+        $this->assertStringContainsString('Faculty Subject Assignments', $html);
+        $this->assertStringContainsString('Assign Instructor to Course', $html);
+        $this->assertStringContainsString('1st Year Curriculum', $html);
+        $this->assertStringContainsString('Faculty Teaching Workload Summary', $html);
+        $this->assertStringContainsString('assignmentSearch', $html);
+        $this->assertStringContainsString('yearLevelFilter', $html);
+        $this->assertStringContainsString('statusFilter', $html);
     }
 }

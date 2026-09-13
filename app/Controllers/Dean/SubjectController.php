@@ -41,79 +41,25 @@ class SubjectController
 
     public function store(Request $request, Response $response, Session $session): void
     {
-        $validator = new SubjectValidator();
-        $data = $request->all();
-        $data['academic_term_id'] = (new \App\Models\AcademicTerm())->getActive()['id'] ?? 0;
-        $data['subject_code'] = trim((string) ($data['subject_code'] ?? $data['code'] ?? ''));
-        $data['descriptive_title'] = trim((string) ($data['descriptive_title'] ?? $data['name'] ?? ''));
-        $data['code'] = $data['subject_code'];
-        $data['name'] = $data['descriptive_title'];
-
-        if (!$validator->validate($data)) {
-            $session->flash('error', $validator->firstError());
-            redirect('/dean/subjects');
-            return;
-        }
-
-        try {
-            $this->subjectRepository->create($data);
-            $session->flash('success', 'Subject created successfully.');
-        } catch (\PDOException $e) {
-            if ($e->getCode() === '23000' || str_contains($e->getMessage(), '1062')) {
-                $code = htmlspecialchars((string) ($data['subject_code'] ?? ''));
-                $session->flash('error', "Subject code '{$code}' already exists for this academic term.");
-            } else {
-                $session->flash('error', 'Database error: unable to save subject.');
-            }
-        }
+        $session->flash('error', 'Curricular subjects are view-only. Academic curriculum authoring is managed by Administrators.');
         redirect('/dean/subjects');
     }
 
     public function update(Request $request, Response $response, Session $session, string $id): void
     {
-        $data = $request->all();
-        if (isset($data['subject_code']) || isset($data['code'])) {
-            $data['subject_code'] = trim((string) ($data['subject_code'] ?? $data['code'] ?? ''));
-            $data['code'] = $data['subject_code'];
-        }
-        if (isset($data['descriptive_title']) || isset($data['name'])) {
-            $data['descriptive_title'] = trim((string) ($data['descriptive_title'] ?? $data['name'] ?? ''));
-            $data['name'] = $data['descriptive_title'];
-        }
-
-        try {
-            $this->subjectRepository->update((int) $id, $data);
-            $session->flash('success', 'Subject updated successfully.');
-        } catch (\PDOException $e) {
-            if ($e->getCode() === '23000' || str_contains($e->getMessage(), '1062')) {
-                $code = htmlspecialchars((string) ($data['subject_code'] ?? $data['code'] ?? ''));
-                $session->flash('error', "Subject code '{$code}' already exists for this academic term.");
-            } else {
-                $session->flash('error', 'Database error: unable to update subject.');
-            }
-        }
+        $session->flash('error', 'Curricular subjects are view-only. Academic curriculum authoring is managed by Administrators.');
         redirect('/dean/subjects');
     }
 
     public function archive(Request $request, Response $response, Session $session, string $id): void
     {
-        try {
-            $this->subjectRepository->archive((int) $id);
-            $session->flash('success', 'Subject archived successfully. Academic records and grades remain intact.');
-        } catch (\Exception $e) {
-            $session->flash('error', 'Failed to archive subject.');
-        }
+        $session->flash('error', 'Curricular subjects are view-only. Academic curriculum authoring is managed by Administrators.');
         redirect('/dean/subjects');
     }
 
     public function restore(Request $request, Response $response, Session $session, string $id): void
     {
-        try {
-            $this->subjectRepository->restore((int) $id);
-            $session->flash('success', 'Subject restored to active curriculum catalog.');
-        } catch (\Exception $e) {
-            $session->flash('error', 'Failed to restore subject.');
-        }
+        $session->flash('error', 'Curricular subjects are view-only. Academic curriculum authoring is managed by Administrators.');
         redirect('/dean/subjects');
     }
 }

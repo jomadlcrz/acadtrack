@@ -1,69 +1,153 @@
 <?php
 $pageTitle = 'Curricular Subjects';
-$subtitle = 'Manage institutional courses, credit offerings, and academic term placements.';
+$subtitle = 'Academic course offerings organized by year level and semester placement.';
 $currentFilter = $statusFilter ?? 'all';
+$headerActions = '<span class="badge bg-light text-secondary border px-2.5 py-1.5 fs-7 d-inline-flex align-items-center gap-1.5"><i class="bi bi-shield-lock"></i> Read-Only View</span>';
+
+// Organize subjects into Year Level & Semester groupings
+$yearLabels = [
+    1 => '1st Year',
+    2 => '2nd Year',
+    3 => '3rd Year',
+    4 => '4th Year',
+];
+$semLabels = [
+    1 => '1st Semester',
+    2 => '2nd Semester',
+    3 => 'Summer',
+];
+
+$groups = [];
+for ($y = 1; $y <= 4; $y++) {
+    for ($s = 1; $s <= 2; $s++) {
+        $key = "{$y}-{$s}";
+        $groups[$key] = [
+            'year_level' => $y,
+            'semester' => $s,
+            'year_label' => $yearLabels[$y],
+            'sem_label' => $semLabels[$s],
+            'title' => "{$yearLabels[$y]} · {$semLabels[$s]}",
+            'subjects' => [],
+            'total_units' => 0.0,
+        ];
+    }
+}
+
+$otherGroups = [];
+$totalCatalogUnits = 0.0;
+$activeCount = 0;
+$archivedCount = 0;
+
+foreach ($subjects as $subject) {
+    $y = (int) ($subject['year_level'] ?? 1);
+    $s = (int) ($subject['semester'] ?? 1);
+    $key = "{$y}-{$s}";
+    $units = (float) ($subject['units'] ?? 3.0);
+    $totalCatalogUnits += $units;
+
+    if (!empty($subject['is_archived'])) {
+        $archivedCount++;
+    } else {
+        $activeCount++;
+    }
+
+    if (isset($groups[$key])) {
+        $groups[$key]['subjects'][] = $subject;
+        $groups[$key]['total_units'] += $units;
+    } else {
+        $yl = $yearLabels[$y] ?? ($y > 0 ? "{$y}th Year" : 'General / Electives');
+        $sl = $semLabels[$s] ?? ($s === 3 ? 'Summer' : "Semester {$s}");
+        if (!isset($otherGroups[$key])) {
+            $otherGroups[$key] = [
+                'year_level' => $y,
+                'semester' => $s,
+                'year_label' => $yl,
+                'sem_label' => $sl,
+                'title' => "{$yl} · {$sl}",
+                'subjects' => [],
+                'total_units' => 0.0,
+            ];
+        }
+        $otherGroups[$key]['subjects'][] = $subject;
+        $otherGroups[$key]['total_units'] += $units;
+    }
+}
+
+$allGroups = array_merge($groups, $otherGroups);
+
 ob_start();
 ?>
 
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+<!-- Metric KPI Cards (Matching Dashboard Standard) -->
+<div class="dashboard-stats mb-4">
+    <div class="stat-card">
         <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark">Create Curricular Subject</h3>
-            <small class="text-muted">Register a new academic course into the college program curriculum.</small>
+            <div class="stat-card-top">
+                <span class="stat-label">Total courses</span>
+                <div class="stat-icon stat-icon-blue"><i class="bi bi-journal-bookmark-fill"></i></div>
+            </div>
+            <div class="stat-value tabular-nums" id="statTotalCourses"><?= count($subjects) ?></div>
         </div>
+        <span class="stat-subtext">Curriculum catalog</span>
     </div>
 
-    <form method="POST" action="<?= url('/dean/subjects') ?>" novalidate>
-        <?= csrf_field() ?>
-
-        <div class="card-body p-4">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <label for="subject_code" class="form-label">Subject code <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="subject_code" name="subject_code" placeholder="e.g., IT 101" value="<?= htmlspecialchars($_POST['subject_code'] ?? $_POST['code'] ?? '') ?>" required>
-                </div>
-
-                <div class="col-md-5">
-                    <label for="descriptive_title" class="form-label">Descriptive title <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="descriptive_title" name="descriptive_title" placeholder="e.g., Introduction to Computing" value="<?= htmlspecialchars($_POST['descriptive_title'] ?? $_POST['name'] ?? '') ?>" required>
-                </div>
-
-                <div class="col-md-2">
-                    <label for="year_level" class="form-label">Year level <span class="text-danger">*</span></label>
-                    <select class="form-select" id="year_level" name="year_level" required>
-                        <option value="1">1st year</option>
-                        <option value="2">2nd year</option>
-                        <option value="3">3rd year</option>
-                        <option value="4">4th year</option>
-                    </select>
-                </div>
-
-                <div class="col-md-2">
-                    <label for="semester" class="form-label">Semester <span class="text-danger">*</span></label>
-                    <select class="form-select" id="semester" name="semester" required>
-                        <option value="1">1st semester</option>
-                        <option value="2">2nd semester</option>
-                    </select>
-                </div>
+    <div class="stat-card">
+        <div>
+            <div class="stat-card-top">
+                <span class="stat-label">Active offerings</span>
+                <div class="stat-icon stat-icon-green"><i class="bi bi-check-circle-fill"></i></div>
             </div>
+            <div class="stat-value tabular-nums text-success"><?= $activeCount ?></div>
         </div>
+        <span class="stat-subtext">Catalog active</span>
+    </div>
 
-        <div class="card-footer bg-light py-3 border-top d-flex justify-content-end align-items-center gap-2">
-            <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
-                <i class="bi bi-plus-circle"></i> Add subject
-            </button>
+    <div class="stat-card">
+        <div>
+            <div class="stat-card-top">
+                <span class="stat-label">Archived courses</span>
+                <div class="stat-icon stat-icon-purple"><i class="bi bi-archive-fill"></i></div>
+            </div>
+            <div class="stat-value tabular-nums"><?= $archivedCount ?></div>
         </div>
-    </form>
+        <span class="stat-subtext">Inactive historical</span>
+    </div>
+
+    <div class="stat-card">
+        <div>
+            <div class="stat-card-top">
+                <span class="stat-label">Total credit units</span>
+                <div class="stat-icon stat-icon-amber"><i class="bi bi-award-fill"></i></div>
+            </div>
+            <div class="stat-value tabular-nums"><?= number_format($totalCatalogUnits, 1) ?></div>
+        </div>
+        <span class="stat-subtext">Cumulative units</span>
+    </div>
 </div>
 
-<div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
-    <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
-        <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark">Master Course Catalog</h3>
-            <span class="text-muted small"><?= count($subjects) ?> courses registered</span>
+<!-- Search & Filtering Controls Bar -->
+<div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between mb-4">
+    <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1" style="max-width: 720px;">
+        <div class="position-relative flex-grow-1" style="min-width: 240px;">
+            <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 14px;"></i>
+            <input type="text" 
+                   id="subjectSearch" 
+                   class="form-control ps-5" 
+                   placeholder="Search course code or descriptive title..." 
+                   autocomplete="off">
         </div>
 
-        <div class="btn-group btn-group-sm" role="group" aria-label="Filter status">
+        <select class="form-select w-auto" id="yearLevelFilter" onchange="applyFilters()">
+            <option value="ALL">All Year Levels</option>
+            <option value="1">1st Year Only</option>
+            <option value="2">2nd Year Only</option>
+            <option value="3">3rd Year Only</option>
+            <option value="4">4th Year Only</option>
+        </select>
+    </div>
+
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <div class="btn-group btn-group-sm" role="group" aria-label="Status filter">
             <a href="<?= url('/dean/subjects?status=all') ?>" class="btn <?= $currentFilter === 'all' ? 'btn-primary' : 'btn-outline-secondary' ?>">
                 All
             </a>
@@ -74,91 +158,220 @@ ob_start();
                 Archived Only
             </a>
         </div>
-    </div>
-
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-light border-bottom">
-                <tr>
-                    <th class="fw-semibold text-muted small py-3 px-3" style="width: 130px;">Subject code</th>
-                    <th class="fw-semibold text-muted small py-3 px-3">Descriptive title</th>
-                    <th class="fw-semibold text-muted small py-3 px-3" style="width: 110px;">Year level</th>
-                    <th class="fw-semibold text-muted small py-3 px-3" style="width: 120px;">Semester</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-center" style="width: 110px;">Status</th>
-                    <th class="fw-semibold text-muted small py-3 px-3 text-end" style="width: 180px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($subjects)): ?>
-                    <tr>
-                        <td colspan="6" class="text-center py-5 text-muted small">
-                            <i class="bi bi-book-half d-block fs-3 mb-2 text-secondary"></i>
-                            No subjects found matching the selected filter.
-                        </td>
-                    </tr>
-                <?php else: ?>
-                    <?php foreach ($subjects as $subject): ?>
-                        <?php 
-                            $isArchived = !empty($subject['is_archived']);
-                            $hasDeps = ($subject['assigned_faculty_count'] ?? 0) > 0 
-                                || ($subject['enrolled_students_count'] ?? 0) > 0 
-                                || ($subject['grades_count'] ?? 0) > 0;
-                        ?>
-                    <tr class="<?= $isArchived ? 'table-light text-muted' : '' ?>">
-                        <td class="px-3 fw-semibold <?= $isArchived ? 'text-secondary' : 'text-primary' ?> font-monospace">
-                            <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>
-                        </td>
-                        <td class="px-3 fw-semibold <?= $isArchived ? 'text-secondary' : 'text-dark' ?>">
-                            <?= htmlspecialchars($subject['descriptive_title'] ?? $subject['name']) ?>
-                            <?php if ($isArchived && !empty($subject['archived_at'])): ?>
-                                <small class="d-block text-muted fw-normal" style="font-size: 0.75rem;">
-                                     Archived on <?= date('M d, Y', strtotime($subject['archived_at'])) ?>
-                                </small>
-                            <?php endif; ?>
-                        </td>
-                        <td class="px-3 small text-secondary">
-                            <?= htmlspecialchars((string) $subject['year_level']) ?><?= match((int)$subject['year_level']) { 1 => 'st', 2 => 'nd', 3 => 'rd', default => 'th' } ?> year
-                        </td>
-                        <td class="px-3 small text-secondary">
-                            <?= ((int)$subject['semester']) === 1 ? '1st semester' : (((int)$subject['semester']) === 2 ? '2nd semester' : 'Summer') ?>
-                        </td>
-                        <td class="px-3 text-center">
-                            <?php if ($isArchived): ?>
-                                <span class="badge rounded-pill fw-medium" style="background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">
-                                    <i class="bi bi-archive me-1"></i>Archived
-                                </span>
-                            <?php else: ?>
-                                <span class="badge rounded-pill fw-medium" style="background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">
-                                    <i class="bi bi-check-circle me-1"></i>Active
-                                </span>
-                            <?php endif; ?>
-                        </td>
-                        <td class="px-3 text-end">
-                            <div class="d-inline-flex align-items-center gap-1">
-                                <?php if ($isArchived): ?>
-                                    <form method="POST" action="<?= url('/dean/subjects/' . $subject['id'] . '/restore') ?>" class="d-inline">
-                                        <?= csrf_field() ?>
-                                        <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2 d-inline-flex align-items-center gap-1" title="Restore to active catalog">
-                                            <i class="bi bi-arrow-counterclockwise"></i> Restore
-                                        </button>
-                                    </form>
-                                <?php else: ?>
-                                    <form method="POST" action="<?= url('/dean/subjects/' . $subject['id'] . '/archive') ?>" class="d-inline" onsubmit="return confirm('Archive course <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>? The subject will be retired from active offerings, and all existing academic records and grades will remain permanently preserved.');">
-                                        <?= csrf_field() ?>
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Archive Subject">
-                                            <i class="bi bi-archive"></i> Archive
-                                        </button>
-                                    </form>
-                                <?php endif; ?>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+        <div class="text-muted small fw-medium text-nowrap ms-1" id="visibleCounter">
+            <?= count($subjects) ?> <?= count($subjects) === 1 ? 'course' : 'courses' ?>
+        </div>
     </div>
 </div>
+
+<!-- Year Level & Semester Group Containers -->
+<div class="space-y-4" id="groupsContainer">
+    <?php $anyGroupHasSubjects = false; ?>
+    <?php foreach ($allGroups as $groupKey => $group): ?>
+        <?php 
+            $subList = $group['subjects'];
+            if (empty($subList) && $currentFilter !== 'all') {
+                continue; // Skip completely empty containers when filtering
+            }
+            if (!empty($subList)) {
+                $anyGroupHasSubjects = true;
+            }
+        ?>
+        <div class="card shadow-sm border-0 mb-4 subject-group-container" 
+             id="group-<?= htmlspecialchars($groupKey) ?>"
+             data-year="<?= $group['year_level'] ?>"
+             data-sem="<?= $group['semester'] ?>"
+             style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
+            
+            <!-- Group Container Header -->
+            <div class="card-header bg-light py-2.5 px-4 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <h3 class="h6 fw-bold text-dark mb-0">
+                        <?= htmlspecialchars($group['title']) ?>
+                    </h3>
+                </div>
+                <div class="small text-muted d-flex align-items-center gap-2">
+                    <span class="badge bg-white text-dark border px-2 py-0.5">
+                        <span class="group-count" id="count-<?= htmlspecialchars($groupKey) ?>"><?= count($subList) ?></span> <?= count($subList) === 1 ? 'course' : 'courses' ?>
+                    </span>
+                    <span class="text-secondary">&middot;</span>
+                    <span class="fw-semibold text-dark tabular-nums"><?= number_format($group['total_units'], 1) ?> units</span>
+                </div>
+            </div>
+
+            <!-- Group Subjects Table -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-white border-bottom">
+                        <tr>
+                            <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 140px; font-size: 11px;">Subject Code</th>
+                            <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Descriptive Title</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 90px; font-size: 11px;">Units</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 150px; font-size: 11px;">Course Type</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 150px; font-size: 11px;">Assigned Faculty</th>
+                            <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 110px; font-size: 11px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <?php if (empty($subList)): ?>
+                            <tr class="group-empty-row">
+                                <td colspan="6" class="text-center py-4 text-muted small">
+                                    <i class="bi bi-dash-circle me-1 text-secondary"></i>
+                                    No courses registered for this semester placement.
+                                </td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($subList as $subject): ?>
+                                <?php 
+                                    $isArchived = !empty($subject['is_archived']);
+                                    $facultyCount = (int) ($subject['assigned_faculty_count'] ?? 0);
+                                    $units = (float) ($subject['units'] ?? 3.0);
+                                    $sType = (string) ($subject['subject_type'] ?? ($subject['nature'] ?? 'Lecture'));
+                                ?>
+                                <tr class="subject-row <?= $isArchived ? 'table-light text-muted' : '' ?>"
+                                    data-code="<?= strtolower(htmlspecialchars($subject['subject_code'] ?? $subject['code'] ?? '')) ?>"
+                                    data-title="<?= strtolower(htmlspecialchars($subject['descriptive_title'] ?? $subject['name'] ?? '')) ?>"
+                                    data-type="<?= strtolower(htmlspecialchars($sType)) ?>">
+                                    <td class="py-3 px-4">
+                                        <span class="badge bg-light <?= $isArchived ? 'text-secondary' : 'text-primary' ?> border font-monospace px-2.5 py-1 fw-bold">
+                                            <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 fw-medium <?= $isArchived ? 'text-secondary' : 'text-dark' ?>">
+                                        <?= htmlspecialchars($subject['descriptive_title'] ?? $subject['name']) ?>
+                                        <?php if ($isArchived && !empty($subject['archived_at'])): ?>
+                                            <small class="d-block text-muted fw-normal" style="font-size: 0.75rem;">
+                                                <i class="bi bi-archive me-1"></i>Archived on <?= date('M d, Y', strtotime($subject['archived_at'])) ?>
+                                            </small>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="py-3 px-3 text-center tabular-nums fw-semibold text-secondary">
+                                        <?= number_format($units, 1) ?>
+                                    </td>
+                                    <td class="py-3 px-3 text-center">
+                                        <span class="badge bg-light text-secondary border px-2 py-0.5 small fw-normal">
+                                            <?= htmlspecialchars($sType) ?>
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-3 text-center">
+                                        <?php if ($facultyCount > 0): ?>
+                                            <span class="badge bg-light text-dark border px-2 py-1 small">
+                                                <i class="bi bi-person-badge text-primary me-1"></i><?= $facultyCount ?> <?= $facultyCount === 1 ? 'faculty' : 'faculties' ?>
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="text-muted small">Unassigned</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="py-3 px-3 text-center">
+                                        <?php if ($isArchived): ?>
+                                            <span class="badge rounded-pill fw-medium" style="background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">
+                                                <i class="bi bi-archive me-1"></i>Archived
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="badge rounded-pill fw-medium" style="background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">
+                                                <i class="bi bi-check-circle me-1"></i>Active
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <?php endforeach; ?>
+
+    <!-- Global Empty Search Result Card -->
+    <div id="noSearchResultsCard" class="card shadow-sm border-0 text-center py-5 d-none mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
+        <div class="card-body">
+            <i class="bi bi-search d-block fs-2 mb-2 text-secondary"></i>
+            <h4 class="h6 fw-bold text-dark mb-1">No matching courses found</h4>
+            <p class="text-muted small mb-3">Try adjusting your search keywords or year level filter.</p>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetFilters()">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Filters
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function applyFilters() {
+    const q = (document.getElementById('subjectSearch').value || '').trim().toLowerCase();
+    const yearLevel = document.getElementById('yearLevelFilter').value;
+    const containers = document.querySelectorAll('.subject-group-container');
+    const noResultsCard = document.getElementById('noSearchResultsCard');
+    let totalVisibleCourses = 0;
+
+    containers.forEach(container => {
+        const containerYear = container.getAttribute('data-year') || '';
+        const matchYear = yearLevel === 'ALL' || containerYear === yearLevel;
+
+        if (!matchYear) {
+            container.style.display = 'none';
+            return;
+        }
+
+        const rows = container.querySelectorAll('.subject-row');
+        let visibleInContainer = 0;
+
+        rows.forEach(row => {
+            const code = row.getAttribute('data-code') || '';
+            const title = row.getAttribute('data-title') || '';
+            const type = row.getAttribute('data-type') || '';
+            const matches = !q || code.includes(q) || title.includes(q) || type.includes(q);
+
+            if (matches) {
+                row.style.display = '';
+                visibleInContainer++;
+                totalVisibleCourses++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const countBadge = container.querySelector('.group-count');
+        if (countBadge) {
+            countBadge.textContent = visibleInContainer;
+        }
+
+        // Hide container if it has no matching subjects under the search filter
+        if (q && visibleInContainer === 0) {
+            container.style.display = 'none';
+        } else {
+            container.style.display = '';
+        }
+    });
+
+    const visibleCounter = document.getElementById('visibleCounter');
+    if (visibleCounter) {
+        visibleCounter.textContent = totalVisibleCourses + (totalVisibleCourses === 1 ? ' course' : ' courses');
+    }
+
+    if (noResultsCard) {
+        if (totalVisibleCourses === 0) {
+            noResultsCard.classList.remove('d-none');
+        } else {
+            noResultsCard.classList.add('d-none');
+        }
+    }
+}
+
+function resetFilters() {
+    const searchInput = document.getElementById('subjectSearch');
+    const yearSelect = document.getElementById('yearLevelFilter');
+    if (searchInput) searchInput.value = '';
+    if (yearSelect) yearSelect.value = 'ALL';
+    applyFilters();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('subjectSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+    }
+});
+</script>
 
 <?php
 $content = ob_get_clean();

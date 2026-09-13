@@ -220,6 +220,14 @@ class ProgramCurriculumController
                 continue;
             }
 
+            $ylInt = match(true) {
+                str_contains(strtolower($yearLevel), 'first') || $yearLevel === '1' => 1,
+                str_contains(strtolower($yearLevel), 'second') || $yearLevel === '2' => 2,
+                str_contains(strtolower($yearLevel), 'third') || $yearLevel === '3' => 3,
+                str_contains(strtolower($yearLevel), 'fourth') || $yearLevel === '4' => 4,
+                default => (int) $yearLevel ?: 1,
+            };
+
             // Sync with subjects catalog table if it does not exist
             $stmtFindSubject = $pdo->prepare("SELECT id FROM subjects WHERE subject_code = :code LIMIT 1");
             $stmtFindSubject->execute(['code' => $code]);
@@ -233,13 +241,15 @@ class ProgramCurriculumController
                 $stmtInsertSub->execute([
                     'code' => $code,
                     'title' => $title,
-                    'yl' => $yearLevel,
+                    'yl' => $ylInt,
                     'sem' => $semester,
                     'tid' => $termId,
                 ]);
                 $subjectId = (int) $pdo->lastInsertId();
             } else {
                 $subjectId = (int) $subjectRow['id'];
+                $stmtUpdateSubYl = $pdo->prepare("UPDATE subjects SET year_level = :yl, semester = :sem WHERE id = :id AND year_level = 0");
+                $stmtUpdateSubYl->execute(['yl' => $ylInt, 'sem' => $semester, 'id' => $subjectId]);
             }
 
             // Upsert into curriculum_subjects

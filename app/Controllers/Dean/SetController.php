@@ -16,24 +16,7 @@ class SetController
 {
     public function index(Request $request, Response $response, Session $session): void
     {
-        $selectedSem = (string) $request->get('semester', '');
-        if ($selectedSem === '1' || $selectedSem === '2') {
-            $academicTerm = AcademicTerm::getBySemester($selectedSem);
-        } else {
-            $academicTerm = AcademicTerm::getActive();
-        }
-
-        $termId = (int) ($academicTerm['id'] ?? 1);
-        $sets = Set::getByTermWithDetails($termId);
-        $departments = Department::getActive();
-
-        $html = (new View())->render('dean.sets.index', [
-            'sets' => $sets,
-            'departments' => $departments,
-            'academicTerm' => $academicTerm,
-            'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
-        ]);
-        $response->html($html);
+        redirect('/admin/sets');
     }
 
     public function store(Request $request, Response $response, Session $session): void

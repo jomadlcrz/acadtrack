@@ -41,7 +41,7 @@ ob_start();
         <span class="stat-subtext">View teaching workload <i class="bi bi-arrow-right"></i></span>
     </a>
 
-    <a href="<?= url('/dean/sets') ?>" class="stat-card stat-card-link">
+    <a href="<?= url('/admin/sets') ?>" class="stat-card stat-card-link">
         <div>
             <div class="stat-card-top">
                 <span class="stat-label">Class sets</span>
@@ -49,7 +49,7 @@ ob_start();
             </div>
             <div class="stat-value tabular-nums"><?= number_format($totalSets ?? 0) ?></div>
         </div>
-        <span class="stat-subtext">Manage set batches <i class="bi bi-arrow-right"></i></span>
+        <span class="stat-subtext">View class sets <i class="bi bi-arrow-right"></i></span>
     </a>
 </div>
 
@@ -84,7 +84,7 @@ ob_start();
             </div>
             <div>
                 <h4 class="h6 mb-0 fw-semibold">Course catalog</h4>
-                <p class="text-muted small mb-0">Add curriculum courses &amp; units</p>
+                <p class="text-muted small mb-0">View curriculum courses &amp; units</p>
             </div>
         </a>
     </div>

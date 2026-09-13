@@ -127,7 +127,7 @@ class GradingSheet extends Model
     public static function getAllWithDetails(int $academicTermId, ?string $status = null): array
     {
         $sql = "
-            SELECT gs.*, s.subject_code as code, s.descriptive_title as subject_name, 
+            SELECT gs.*, s.subject_code, s.subject_code as code, s.descriptive_title as subject_name, 
                    gp.name as period_name, fd.first_name, fd.last_name
             FROM grading_sheets gs
             JOIN subjects s ON gs.subject_id = s.id

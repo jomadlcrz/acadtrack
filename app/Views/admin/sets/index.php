@@ -1,7 +1,12 @@
 <?php
+$isReadOnly = !empty($isReadOnly) || (strtolower((string) ($_SESSION['user']['role'] ?? '')) === 'dean');
 $pageTitle = 'Sets';
-$subtitle = 'Manage academic class sections, cohorts, and batch-generate student sets.';
-$headerActions = '<button type="button" class="btn text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" data-bs-toggle="modal" data-bs-target="#createSetsModal"><i class="bi bi-plus-lg"></i> Create Sections</button>';
+$subtitle = $isReadOnly 
+    ? 'Read-only view of academic class sections, cohorts, and student sets.' 
+    : 'Manage academic class sections, cohorts, and batch-generate student sets.';
+$headerActions = $isReadOnly 
+    ? '<span class="badge bg-light text-secondary border px-2.5 py-1.5 fs-7 d-inline-flex align-items-center gap-1.5"><i class="bi bi-shield-lock"></i> Read-Only View</span>' 
+    : '<button type="button" class="btn text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" data-bs-toggle="modal" data-bs-target="#createSetsModal"><i class="bi bi-plus-lg"></i> Create Sections</button>';
 ob_start();
 ?>
 
@@ -34,9 +39,11 @@ ob_start();
     </div>
 
     <div class="d-flex align-items-center gap-2">
-        <button type="button" id="bulkArchiveBtn" class="btn btn-outline-secondary btn-sm d-none align-items-center gap-1.5" onclick="submitBulkArchive()">
-            <i class="bi bi-archive"></i> Archive Selected (<span id="selectedCount">0</span>)
-        </button>
+        <?php if (!$isReadOnly): ?>
+            <button type="button" id="bulkArchiveBtn" class="btn btn-outline-secondary btn-sm d-none align-items-center gap-1.5" onclick="submitBulkArchive()">
+                <i class="bi bi-archive"></i> Archive Selected (<span id="selectedCount">0</span>)
+            </button>
+        <?php endif; ?>
         <div class="text-muted small fw-medium text-nowrap" id="setCounter">
             <?= count($sets) ?> <?= count($sets) === 1 ? 'section' : 'sections' ?>
         </div>
@@ -49,24 +56,28 @@ ob_start();
         <table class="table table-hover align-middle mb-0" id="setsTable">
             <thead class="bg-light border-bottom">
                 <tr>
-                    <th class="py-3 px-3 text-center" style="width: 40px;">
-                        <input type="checkbox" class="form-check-input" id="selectAllCheckbox" onchange="toggleSelectAll(this)">
-                    </th>
+                    <?php if (!$isReadOnly): ?>
+                        <th class="py-3 px-3 text-center" style="width: 40px;">
+                            <input type="checkbox" class="form-check-input" id="selectAllCheckbox" onchange="toggleSelectAll(this)">
+                        </th>
+                    <?php endif; ?>
                     <th class="py-3 px-3 fw-semibold text-dark small" style="width: 140px;">Section Name</th>
                     <th class="py-3 px-4 fw-semibold text-dark small">Degree Program</th>
                     <th class="py-3 px-3 fw-semibold text-dark small text-center" style="width: 110px;">Year Level</th>
                     <th class="py-3 px-3 fw-semibold text-dark small text-center" style="width: 100px;">Code</th>
                     <th class="py-3 px-3 fw-semibold text-dark small text-center" style="width: 140px;">Students</th>
                     <th class="py-3 px-3 fw-semibold text-dark small text-center" style="width: 110px;">Status</th>
-                    <th class="py-3 px-4 fw-semibold text-dark small text-end" style="width: 160px;">Actions</th>
+                    <?php if (!$isReadOnly): ?>
+                        <th class="py-3 px-4 fw-semibold text-dark small text-end" style="width: 160px;">Actions</th>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody class="divide-y">
                 <?php if (empty($sets) || $sets->isEmpty()): ?>
                     <tr id="emptySetsRow">
-                        <td colspan="8" class="text-center py-5 text-muted small">
+                        <td colspan="<?= $isReadOnly ? 6 : 8 ?>" class="text-center py-5 text-muted small">
                             <i class="bi bi-collection d-block fs-3 mb-2 text-secondary"></i>
-                            No sections created for the current academic term yet. Click "Create Sections" to generate sections.
+                            <?= $isReadOnly ? 'No sections found for the current academic term.' : 'No sections created for the current academic term yet. Click "Create Sections" to generate sections.' ?>
                         </td>
                     </tr>
                 <?php else: ?>
@@ -88,9 +99,11 @@ ob_start();
                             data-program="<?= htmlspecialchars($progAbbrev) ?>" 
                             data-year="<?= $ylInt ?>"
                             data-search="<?= strtolower(htmlspecialchars($set->name . ' ' . $progAbbrev . ' ' . $progName . ' ' . $set->set_code)) ?>">
-                            <td class="px-3 text-center">
-                                <input type="checkbox" class="form-check-input set-checkbox" value="<?= $set->id ?>" onchange="updateSelectedCount()">
-                            </td>
+                            <?php if (!$isReadOnly): ?>
+                                <td class="px-3 text-center">
+                                    <input type="checkbox" class="form-check-input set-checkbox" value="<?= $set->id ?>" onchange="updateSelectedCount()">
+                                </td>
+                            <?php endif; ?>
                             <td class="py-3 px-3">
                                 <span class="badge bg-light text-primary border font-monospace px-2.5 py-1 fw-bold fs-6">
                                     <?= htmlspecialchars($set->name) ?>
@@ -125,71 +138,75 @@ ob_start();
                                     </span>
                                 <?php endif; ?>
                             </td>
-                            <td class="py-3 px-4 text-end">
-                                <div class="d-inline-flex align-items-center gap-1.5">
-                                    <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#editSetModal<?= $set->id ?>">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <?php if ($isActive): ?>
-                                        <form method="POST" action="<?= url('/admin/sets/' . $set->id . '/archive') ?>" class="d-inline">
-                                            <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Archive Section">
-                                                <i class="bi bi-archive"></i>
-                                            </button>
-                                        </form>
-                                    <?php else: ?>
-                                        <form method="POST" action="<?= url('/admin/sets/' . $set->id . '/restore') ?>" class="d-inline">
-                                            <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2" title="Restore Section">
-                                                <i class="bi bi-arrow-counterclockwise"></i>
-                                            </button>
-                                        </form>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
+                            <?php if (!$isReadOnly): ?>
+                                <td class="py-3 px-4 text-end">
+                                    <div class="d-inline-flex align-items-center gap-1.5">
+                                        <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#editSetModal<?= $set->id ?>">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <?php if ($isActive): ?>
+                                            <form method="POST" action="<?= url('/admin/sets/' . $set->id . '/archive') ?>" class="d-inline">
+                                                <?= csrf_field() ?>
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Archive Section">
+                                                    <i class="bi bi-archive"></i>
+                                                </button>
+                                            </form>
+                                        <?php else: ?>
+                                            <form method="POST" action="<?= url('/admin/sets/' . $set->id . '/restore') ?>" class="d-inline">
+                                                <?= csrf_field() ?>
+                                                <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2" title="Restore Section">
+                                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            <?php endif; ?>
                         </tr>
 
-                        <!-- Edit Set Modal -->
-                        <div class="modal fade" id="editSetModal<?= $set->id ?>" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content border-0 shadow">
-                                    <form method="POST" action="<?= url('/admin/sets/' . $set->id) ?>">
-                                        <?= csrf_field() ?>
-                                        <div class="modal-header border-bottom py-3 px-4">
-                                            <h5 class="modal-title h6 fw-bold mb-0">Edit Section — <?= htmlspecialchars($set->name) ?></h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body p-4 space-y-3">
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-semibold text-dark">Program</label>
-                                                <input type="text" class="form-control bg-light" value="<?= htmlspecialchars($progAbbrev . ' — ' . $progName) ?>" disabled>
+                        <?php if (!$isReadOnly): ?>
+                            <!-- Edit Set Modal -->
+                            <div class="modal fade" id="editSetModal<?= $set->id ?>" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow">
+                                        <form method="POST" action="<?= url('/admin/sets/' . $set->id) ?>">
+                                            <?= csrf_field() ?>
+                                            <div class="modal-header border-bottom py-3 px-4">
+                                                <h5 class="modal-title h6 fw-bold mb-0">Edit Section — <?= htmlspecialchars($set->name) ?></h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <div class="row g-3 mb-3">
-                                                <div class="col-6">
-                                                    <label class="form-label small fw-semibold text-dark">Year Level</label>
-                                                    <input type="text" class="form-control bg-light" value="<?= $ylLabel ?>" disabled>
+                                            <div class="modal-body p-4 space-y-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label small fw-semibold text-dark">Program</label>
+                                                    <input type="text" class="form-control bg-light" value="<?= htmlspecialchars($progAbbrev . ' — ' . $progName) ?>" disabled>
                                                 </div>
-                                                <div class="col-6">
-                                                    <label class="form-label small fw-semibold text-dark">Section Code <span class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control font-monospace" name="set_code" value="<?= htmlspecialchars($set->set_code ?: substr($set->name, -1)) ?>" required style="text-transform: uppercase;">
+                                                <div class="row g-3 mb-3">
+                                                    <div class="col-6">
+                                                        <label class="form-label small fw-semibold text-dark">Year Level</label>
+                                                        <input type="text" class="form-control bg-light" value="<?= $ylLabel ?>" disabled>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="form-label small fw-semibold text-dark">Section Code <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control font-monospace" name="set_code" value="<?= htmlspecialchars($set->set_code ?: substr($set->name, -1)) ?>" required style="text-transform: uppercase;">
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label small fw-semibold text-dark">Status</label>
+                                                    <select class="form-select" name="status">
+                                                        <option value="active" <?= $isActive ? 'selected' : '' ?>>Active</option>
+                                                        <option value="inactive" <?= !$isActive ? 'selected' : '' ?>>Inactive</option>
+                                                    </select>
                                                 </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-semibold text-dark">Status</label>
-                                                <select class="form-select" name="status">
-                                                    <option value="active" <?= $isActive ? 'selected' : '' ?>>Active</option>
-                                                    <option value="inactive" <?= !$isActive ? 'selected' : '' ?>>Inactive</option>
-                                                </select>
+                                            <div class="modal-footer bg-light py-3 px-4 d-flex justify-content-end gap-2">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-sm text-white" style="background-color: #2f4a86; border-color: #2f4a86;">Save Changes</button>
                                             </div>
-                                        </div>
-                                        <div class="modal-footer bg-light py-3 px-4 d-flex justify-content-end gap-2">
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-sm text-white" style="background-color: #2f4a86; border-color: #2f4a86;">Save Changes</button>
-                                        </div>
-                                    </form>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </tbody>
@@ -197,124 +214,132 @@ ob_start();
     </div>
 </div>
 
-<!-- Bulk Archive Form -->
-<form id="bulkArchiveForm" method="POST" action="<?= url('/admin/sets/bulk-archive') ?>">
-    <?= csrf_field() ?>
-    <input type="hidden" name="ids" id="bulkArchiveIds">
-</form>
+<?php if (!$isReadOnly): ?>
+    <!-- Bulk Archive Form -->
+    <form id="bulkArchiveForm" method="POST" action="<?= url('/admin/sets/bulk-archive') ?>">
+        <?= csrf_field() ?>
+        <input type="hidden" name="ids" id="bulkArchiveIds">
+    </form>
 
-<!-- Create Sets Modal -->
-<div class="modal fade" id="createSetsModal" tabindex="-1" aria-labelledby="createSetsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow">
-            <form method="POST" action="<?= url('/admin/sets') ?>" id="createSetsForm">
-                <?= csrf_field() ?>
-                <div class="modal-header border-bottom py-3 px-4">
-                    <h5 class="modal-title h6 fw-bold mb-0" id="createSetsModalLabel">Create Sections</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="row g-3 mb-3">
-                        <div class="col-12 col-md-8">
-                            <label class="form-label small fw-semibold text-dark">Program <span class="text-danger">*</span></label>
-                            <select class="form-select" id="create_program_id" name="program_id" required onchange="updateLivePreview()">
-                                <option value="">-- Select Degree Program --</option>
-                                <?php foreach ($programs as $p): ?>
-                                    <option value="<?= $p->id ?>" data-abbrev="<?= htmlspecialchars($p->program_abbrev) ?>">
-                                        <?= htmlspecialchars($p->program_abbrev) ?> — <?= htmlspecialchars($p->program_name) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <label class="form-label small fw-semibold text-dark">Generation Mode</label>
-                            <select class="form-select" id="create_mode" name="create_mode" onchange="toggleCreateMode(this.value)">
-                                <option value="all">All Selected Years</option>
-                                <option value="custom">Custom per Year</option>
-                            </select>
-                        </div>
+    <!-- Create Sets Modal -->
+    <div class="modal fade" id="createSetsModal" tabindex="-1" aria-labelledby="createSetsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <form method="POST" action="<?= url('/admin/sets') ?>" id="createSetsForm">
+                    <?= csrf_field() ?>
+                    <div class="modal-header border-bottom py-3 px-4">
+                        <h5 class="modal-title h6 fw-bold mb-0" id="createSetsModalLabel">Create Sections</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+                    <div class="modal-body p-4">
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-8">
+                                <label class="form-label small fw-semibold text-dark">Program <span class="text-danger">*</span></label>
+                                <select class="form-select" id="create_program_id" name="program_id" required onchange="updateLivePreview()">
+                                    <option value="">-- Select Degree Program --</option>
+                                    <?php foreach ($programs as $p): ?>
+                                        <option value="<?= $p->id ?>" data-abbrev="<?= htmlspecialchars($p->program_abbrev) ?>">
+                                            <?= htmlspecialchars($p->program_abbrev) ?> — <?= htmlspecialchars($p->program_name) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-semibold text-dark">Generation Mode</label>
+                                <select class="form-select" id="create_mode" name="create_mode" onchange="toggleCreateMode(this.value)">
+                                    <option value="all">All Selected Years</option>
+                                    <option value="custom">Custom per Year</option>
+                                </select>
+                            </div>
+                        </div>
 
-                    <!-- Mode: All Selected Years -->
-                    <div id="modeAllContainer">
-                        <div class="mb-3">
-                            <label class="form-label small fw-semibold text-dark mb-2">Target Year Levels</label>
-                            <div class="d-flex flex-wrap gap-3">
+                        <!-- Mode: All Selected Years -->
+                        <div id="modeAllContainer">
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-dark mb-2">Target Year Levels</label>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <?php for ($y = 1; $y <= 4; $y++): ?>
+                                        <div class="form-check">
+                                            <input class="form-check-input year-checkbox" type="checkbox" name="selected_years[]" value="<?= $y ?>" id="yrCheck<?= $y ?>" checked onchange="updateLivePreview()">
+                                            <label class="form-check-label small fw-medium" for="yrCheck<?= $y ?>">
+                                                <?= $y === 1 ? '1st Year' : ($y === 2 ? '2nd Year' : ($y === 3 ? '3rd Year' : "{$y}th Year")) ?>
+                                            </label>
+                                        </div>
+                                    <?php endfor; ?>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-dark">Section Codes <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control font-monospace" id="create_set_codes" name="set_codes" placeholder="e.g. A, B, C or 1, 2" value="A, B" oninput="updateLivePreview()" style="text-transform: uppercase;">
+                                <div class="form-text small text-muted">Separate multiple section codes with commas or spaces.</div>
+                            </div>
+                        </div>
+
+                        <!-- Mode: Custom per Year -->
+                        <div id="modeCustomContainer" style="display: none;">
+                            <ul class="nav nav-pills mb-3" id="customYearPills" role="tablist">
                                 <?php for ($y = 1; $y <= 4; $y++): ?>
-                                    <div class="form-check">
-                                        <input class="form-check-input year-checkbox" type="checkbox" name="selected_years[]" value="<?= $y ?>" id="yrCheck<?= $y ?>" checked onchange="updateLivePreview()">
-                                        <label class="form-check-label small fw-medium" for="yrCheck<?= $y ?>">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link py-1.5 px-3 small <?= $y === 1 ? 'active' : '' ?>" id="pills-y<?= $y ?>-tab" data-bs-toggle="pill" data-bs-target="#pills-y<?= $y ?>" type="button" role="tab">
                                             <?= $y === 1 ? '1st Year' : ($y === 2 ? '2nd Year' : ($y === 3 ? '3rd Year' : "{$y}th Year")) ?>
-                                        </label>
+                                        </button>
+                                    </li>
+                                <?php endfor; ?>
+                            </ul>
+                            <div class="tab-content" id="customYearTabContent">
+                                <?php for ($y = 1; $y <= 4; $y++): ?>
+                                    <div class="tab-pane fade <?= $y === 1 ? 'show active' : '' ?>" id="pills-y<?= $y ?>" role="tabpanel">
+                                        <label class="form-label small fw-semibold text-dark"><?= $y === 1 ? '1st' : ($y === 2 ? '2nd' : ($y === 3 ? '3rd' : "{$y}th")) ?> Year Section Codes</label>
+                                        <input type="text" class="form-control font-monospace custom-year-code" data-year="<?= $y ?>" name="custom_codes[<?= $y ?>]" placeholder="e.g. A, B" oninput="updateLivePreview()" style="text-transform: uppercase;">
                                     </div>
                                 <?php endfor; ?>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label small fw-semibold text-dark">Section Codes <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control font-monospace" id="create_set_codes" name="set_codes" placeholder="e.g. A, B, C or 1, 2" value="A, B" oninput="updateLivePreview()" style="text-transform: uppercase;">
-                            <div class="form-text small text-muted">Separate multiple section codes with commas or spaces.</div>
+                        <!-- Live Section Preview Box -->
+                        <div class="p-3 bg-light rounded border mt-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-bold text-uppercase text-secondary" style="font-size: 11px;">Sections Preview</span>
+                                <span class="badge bg-white text-dark border px-2 py-0.5" id="previewCountBadge">0 sections to generate</span>
+                            </div>
+                            <div id="previewBadgesContainer" class="d-flex flex-wrap gap-1.5" style="min-height: 38px;">
+                                <span class="text-muted small">Select a program and specify section codes above to see preview.</span>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Mode: Custom per Year -->
-                    <div id="modeCustomContainer" style="display: none;">
-                        <ul class="nav nav-pills mb-3" id="customYearPills" role="tablist">
-                            <?php for ($y = 1; $y <= 4; $y++): ?>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link py-1.5 px-3 small <?= $y === 1 ? 'active' : '' ?>" id="pills-y<?= $y ?>-tab" data-bs-toggle="pill" data-bs-target="#pills-y<?= $y ?>" type="button" role="tab">
-                                        <?= $y === 1 ? '1st Year' : ($y === 2 ? '2nd Year' : ($y === 3 ? '3rd Year' : "{$y}th Year")) ?>
-                                    </button>
-                                </li>
-                            <?php endfor; ?>
-                        </ul>
-                        <div class="tab-content" id="customYearTabContent">
-                            <?php for ($y = 1; $y <= 4; $y++): ?>
-                                <div class="tab-pane fade <?= $y === 1 ? 'show active' : '' ?>" id="pills-y<?= $y ?>" role="tabpanel">
-                                    <label class="form-label small fw-semibold text-dark"><?= $y === 1 ? '1st' : ($y === 2 ? '2nd' : ($y === 3 ? '3rd' : "{$y}th")) ?> Year Section Codes</label>
-                                    <input type="text" class="form-control font-monospace custom-year-code" data-year="<?= $y ?>" name="custom_codes[<?= $y ?>]" placeholder="e.g. A, B" oninput="updateLivePreview()" style="text-transform: uppercase;">
-                                </div>
-                            <?php endfor; ?>
-                        </div>
+                    <div class="modal-footer bg-light py-3 px-4 d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-sm text-white px-3" style="background-color: #2f4a86; border-color: #2f4a86;" id="createSetsSubmitBtn">
+                            Create Sections
+                        </button>
                     </div>
-
-                    <!-- Live Section Preview Box -->
-                    <div class="p-3 bg-light rounded border mt-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="small fw-bold text-uppercase text-secondary" style="font-size: 11px;">Sections Preview</span>
-                            <span class="badge bg-white text-dark border px-2 py-0.5" id="previewCountBadge">0 sections to generate</span>
-                        </div>
-                        <div id="previewBadgesContainer" class="d-flex flex-wrap gap-1.5" style="min-height: 38px;">
-                            <span class="text-muted small">Select a program and specify section codes above to see preview.</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer bg-light py-3 px-4 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-sm text-white px-3" style="background-color: #2f4a86; border-color: #2f4a86;" id="createSetsSubmitBtn">
-                        Create Sections
-                    </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+<?php endif; ?>
 
 <script>
 function toggleCreateMode(mode) {
-    document.getElementById('modeAllContainer').style.display = mode === 'all' ? '' : 'none';
-    document.getElementById('modeCustomContainer').style.display = mode === 'custom' ? '' : 'none';
+    const allC = document.getElementById('modeAllContainer');
+    const customC = document.getElementById('modeCustomContainer');
+    if (allC) allC.style.display = mode === 'all' ? '' : 'none';
+    if (customC) customC.style.display = mode === 'custom' ? '' : 'none';
     updateLivePreview();
 }
 
 function updateLivePreview() {
     const progSelect = document.getElementById('create_program_id');
+    if (!progSelect) return;
     const selectedOpt = progSelect.selectedOptions[0];
     const abbrev = selectedOpt ? (selectedOpt.getAttribute('data-abbrev') || '') : '';
-    const mode = document.getElementById('create_mode').value;
+    const modeEl = document.getElementById('create_mode');
+    const mode = modeEl ? modeEl.value : 'all';
     const container = document.getElementById('previewBadgesContainer');
     const badge = document.getElementById('previewCountBadge');
+
+    if (!container || !badge) return;
 
     if (!abbrev) {
         container.innerHTML = '<span class="text-muted small">Select a degree program to preview generated sections.</span>';
@@ -327,7 +352,8 @@ function updateLivePreview() {
     if (mode === 'all') {
         const checkedYears = [];
         document.querySelectorAll('.year-checkbox:checked').forEach(cb => checkedYears.push(parseInt(cb.value)));
-        const rawCodes = document.getElementById('create_set_codes').value.toUpperCase();
+        const rawCodesEl = document.getElementById('create_set_codes');
+        const rawCodes = rawCodesEl ? rawCodesEl.value.toUpperCase() : '';
         const codes = rawCodes.split(/[,\s]+/).map(s => s.trim()).filter(Boolean);
 
         checkedYears.sort().forEach(yl => {
@@ -383,7 +409,10 @@ function applyFilters() {
         }
     });
 
-    document.getElementById('setCounter').textContent = visibleCount + (visibleCount === 1 ? ' section' : ' sections');
+    const setCounter = document.getElementById('setCounter');
+    if (setCounter) {
+        setCounter.textContent = visibleCount + (visibleCount === 1 ? ' section' : ' sections');
+    }
     if (emptyRow && rows.length > 0) {
         emptyRow.style.display = visibleCount === 0 ? '' : 'none';
     }
@@ -404,13 +433,17 @@ function updateSelectedCount() {
     const btn = document.getElementById('bulkArchiveBtn');
     const countSpan = document.getElementById('selectedCount');
 
-    countSpan.textContent = checked.length;
-    if (checked.length > 0) {
-        btn.classList.remove('d-none');
-        btn.classList.add('d-inline-flex');
-    } else {
-        btn.classList.add('d-none');
-        btn.classList.remove('d-inline-flex');
+    if (countSpan) {
+        countSpan.textContent = checked.length;
+    }
+    if (btn) {
+        if (checked.length > 0) {
+            btn.classList.remove('d-none');
+            btn.classList.add('d-inline-flex');
+        } else {
+            btn.classList.add('d-none');
+            btn.classList.remove('d-inline-flex');
+        }
     }
 }
 
@@ -423,8 +456,12 @@ function submitBulkArchive() {
     }
 
     const ids = Array.from(checked).map(cb => cb.value);
-    document.getElementById('bulkArchiveIds').value = ids.join(',');
-    document.getElementById('bulkArchiveForm').submit();
+    const hiddenIds = document.getElementById('bulkArchiveIds');
+    const form = document.getElementById('bulkArchiveForm');
+    if (hiddenIds && form) {
+        hiddenIds.value = ids.join(',');
+        form.submit();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -432,7 +469,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (searchInput) {
         searchInput.addEventListener('input', applyFilters);
     }
-    updateLivePreview();
+    if (document.getElementById('create_program_id')) {
+        updateLivePreview();
+    }
 });
 </script>
 

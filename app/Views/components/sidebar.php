@@ -53,10 +53,6 @@
                     <i class="bi bi-grid-1x2-fill"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="<?= url('/admin/program-curricula') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/program-curricula') ? 'active' : '' ?>">
-                    <i class="bi bi-journal-bookmark-fill"></i>
-                    <span>Program Curricula</span>
-                </a>
                 <a href="<?= url('/dean/subjects') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/subjects') ? 'active' : '' ?>">
                     <i class="bi bi-journal-text"></i>
                     <span>Curriculum Subjects</span>

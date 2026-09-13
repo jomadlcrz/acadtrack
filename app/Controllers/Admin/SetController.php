@@ -36,11 +36,15 @@ class SetController
             ->orderBy('name', 'asc')
             ->get();
 
+        $userRole = (string) ($session->get('user')['role'] ?? '');
+        $isReadOnly = (strcasecmp($userRole, 'Admin') !== 0);
+
         $html = (new View())->render('admin.sets.index', [
             'sets' => $sets,
             'programs' => $programs,
             'departments' => $departments,
             'activeTerm' => $activeTerm,
+            'isReadOnly' => $isReadOnly,
         ]);
 
         $response->html($html);
@@ -49,6 +53,11 @@ class SetController
     public function store(Request $request, Response $response, Session $session): void
     {
         $isJson = str_contains((string) $request->header('Content-Type'), 'application/json');
+        if (strcasecmp((string) ($session->get('user')['role'] ?? ''), 'Admin') !== 0) {
+            $this->respondError($isJson, $response, $session, 'Unauthorized. Sets management is read-only for Deans.');
+            return;
+        }
+
         $data = $isJson ? json_decode(file_get_contents('php://input'), true) ?? [] : $_POST;
 
         $programId = (int) ($data['program_id'] ?? 0);
@@ -160,6 +169,12 @@ class SetController
 
     public function update(Request $request, Response $response, Session $session, string $id): void
     {
+        if (strcasecmp((string) ($session->get('user')['role'] ?? ''), 'Admin') !== 0) {
+            $session->flash('error', 'Unauthorized. Sets management is read-only for Deans.');
+            redirect('/admin/sets');
+            return;
+        }
+
         $set = Set::with('program')->find((int) $id);
         if (!$set) {
             $session->flash('error', 'Section not found.');
@@ -203,6 +218,12 @@ class SetController
 
     public function archive(Request $request, Response $response, Session $session, string $id): void
     {
+        if (strcasecmp((string) ($session->get('user')['role'] ?? ''), 'Admin') !== 0) {
+            $session->flash('error', 'Unauthorized. Sets management is read-only for Deans.');
+            redirect('/admin/sets');
+            return;
+        }
+
         $set = Set::find((int) $id);
         if (!$set) {
             $session->flash('error', 'Section not found.');
@@ -217,6 +238,12 @@ class SetController
 
     public function restore(Request $request, Response $response, Session $session, string $id): void
     {
+        if (strcasecmp((string) ($session->get('user')['role'] ?? ''), 'Admin') !== 0) {
+            $session->flash('error', 'Unauthorized. Sets management is read-only for Deans.');
+            redirect('/admin/sets');
+            return;
+        }
+
         $set = Set::find((int) $id);
         if (!$set) {
             $session->flash('error', 'Section not found.');
@@ -232,6 +259,11 @@ class SetController
     public function bulkArchive(Request $request, Response $response, Session $session): void
     {
         $isJson = str_contains((string) $request->header('Content-Type'), 'application/json');
+        if (strcasecmp((string) ($session->get('user')['role'] ?? ''), 'Admin') !== 0) {
+            $this->respondError($isJson, $response, $session, 'Unauthorized. Sets management is read-only for Deans.');
+            return;
+        }
+
         $data = $isJson ? json_decode(file_get_contents('php://input'), true) ?? [] : $_POST;
 
         $ids = $data['ids'] ?? [];
