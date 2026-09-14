@@ -1,4 +1,4 @@
--- GWC Grading System Database Schema
+-- Acadtrack Database Schema
 --
 -- For local development with root privileges, you can uncomment the database creation:
 -- CREATE DATABASE IF NOT EXISTS acadtrack CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -390,52 +390,19 @@ INSERT INTO admin_details (user_id, first_name, last_name) VALUES
 
 -- Insert default academic departments
 INSERT INTO departments (id, dept_abbrev, dept_name, description, status) VALUES
-(1, 'CIT', 'College of Information Technology', 'Academic department managing Computer Science, Information Technology, and computing programs.', 'active'),
-(2, 'CS', 'Department of Computer Studies', 'Department providing core computer science, software engineering, and programming curricula.', 'active'),
+(1, 'CITE', 'College of Information Technology Education', 'Academic department managing Information Technology, Computer Science, and computing education programs.', 'active'),
+(2, 'COC', 'College of Criminology', 'Academic department delivering criminal justice, law enforcement administration, and criminology curricula.', 'active'),
 (3, 'CBA', 'College of Business Administration', 'Academic department covering Business Administration, Management, and Accountancy programs.', 'active'),
-(4, 'CAS', 'College of Arts and Sciences', 'Academic department delivering General Education, Humanities, Social Sciences, and Natural Sciences.', 'active'),
-(5, 'COE', 'College of Engineering', 'Academic department overseeing Computer Engineering and applied technical disciplines.', 'active');
+(4, 'COED', 'College of Education', 'Academic department preparing professional educators for elementary and secondary grade levels.', 'active');
 
 -- Insert default academic programs
 INSERT INTO programs (id, program_abbrev, program_name, program_type, program_length, department_id, status, description) VALUES
 (1, 'BSIT', 'Bachelor of Science in Information Technology', 'Bachelors Degree', '4 Years', 1, 'active', 'Prepares students to be IT professionals who are able to perform installation, operation, programming, and maintenance of computer systems.'),
-(2, 'BSCS', 'Bachelor of Science in Computer Science', 'Bachelors Degree', '4 Years', 2, 'active', 'Study of computing concepts, algorithmic foundations, software design, and machine intelligence.'),
-(3, 'BSCrim', 'Bachelor of Science in Criminology', 'Bachelors Degree', '4 Years', NULL, 'active', 'Study of crime causation, criminal law, law enforcement administration, and correctional institutions.'),
+(2, 'BSCS', 'Bachelor of Science in Computer Science', 'Bachelors Degree', '4 Years', 1, 'active', 'Study of computing concepts, algorithmic foundations, software design, and machine intelligence.'),
+(3, 'BSCRIM', 'Bachelor of Science in Criminology', 'Bachelors Degree', '4 Years', 2, 'active', 'Study of crime causation, criminal law, law enforcement administration, and correctional institutions.'),
 (4, 'BSBA', 'Bachelor of Science in Business Administration major in Marketing Management', 'Bachelors Degree', '4 Years', 3, 'active', 'Equips students with principles of modern marketing, consumer behavior, and business development.'),
-(5, 'BEEd', 'Bachelor of Elementary Education', 'Bachelors Degree', '4 Years', 4, 'active', 'Designed to prepare future teachers for early childhood and elementary grade levels.'),
-(6, 'BSEd', 'Bachelor of Secondary Education', 'Bachelors Degree', '4 Years', 4, 'active', 'Prepares educators equipped with professional pedagogical skills for high school instruction.');
-
--- Insert baseline curriculum for BSIT
-INSERT INTO curricula (id, program_id, status) VALUES
-(1, 1, 'active');
-
--- Insert baseline curriculum subjects for BSIT
-INSERT INTO curriculum_subjects (curriculum_id, year_level, semester, subject_code, descriptive_title, units, subject_type, prerequisites, display_order) VALUES
-(1, 'First Year', 1, 'IT101', 'Introduction to Computing', 3.0, 'GenEd Core', 'None', 1),
-(1, 'First Year', 1, 'IT102', 'Computer Programming 1', 3.0, 'Major with Lab', 'None', 2),
-(1, 'First Year', 2, 'IT103', 'Data Structures and Algorithms', 3.0, 'Major with Lab', 'IT102', 3),
-(1, 'First Year', 2, 'IT104', 'Discrete Mathematics', 3.0, 'GenEd Core', 'None', 4),
-(1, 'Second Year', 1, 'IT201', 'Database Management Systems 1', 3.0, 'Major with Lab', 'IT103', 5),
-(1, 'Second Year', 1, 'IT202', 'Web Systems and Technologies 1', 3.0, 'Major with Lab', 'IT102', 6),
-(1, 'Second Year', 2, 'IT203', 'Information Management', 3.0, 'Major with Lab', 'IT201', 7),
-(1, 'Third Year', 1, 'IT301', 'Systems Analysis and Design', 3.0, 'Major without Lab', 'IT203', 8),
-(1, 'Third Year', 2, 'IT302', 'Information Assurance and Security', 3.0, 'Major with Lab', 'IT201', 9),
-(1, 'Fourth Year', 1, 'IT401', 'Capstone Project 1', 3.0, 'Research/Thesis', 'IT301', 10),
-(1, 'Fourth Year', 2, 'IT402', 'Capstone Project 2', 3.0, 'Research/Thesis', 'IT401', 11);
-
--- Insert baseline sets for 1st Semester
-INSERT INTO sets (set_name, program_id, year_level, set_code, academic_term_id, department_id, status) VALUES
-('BSIT-1A', 1, 1, 'A', 1, 1, 'active'),
-('BSIT-1B', 1, 1, 'B', 1, 1, 'active'),
-('BSIT-2A', 1, 2, 'A', 1, 1, 'active'),
-('BSCS-1A', 2, 1, 'A', 1, 2, 'active');
-
--- Insert baseline sets for 2nd Semester
-INSERT INTO sets (set_name, program_id, year_level, set_code, academic_term_id, department_id, status) VALUES
-('BSIT-1A', 1, 1, 'A', 2, 1, 'active'),
-('BSIT-1B', 1, 1, 'B', 2, 1, 'active'),
-('BSIT-2A', 1, 2, 'A', 2, 1, 'active'),
-('BSCS-1A', 2, 1, 'A', 2, 2, 'active');
+(5, 'BEED', 'Bachelor of Elementary Education', 'Bachelors Degree', '4 Years', 4, 'active', 'Designed to prepare future teachers for early childhood and elementary grade levels.'),
+(6, 'BSED', 'Bachelor of Secondary Education', 'Bachelors Degree', '4 Years', 4, 'active', 'Prepares educators equipped with professional pedagogical skills for high school instruction.');
 
 -- Insert default grading periods for 1st Semester
 INSERT INTO grading_periods (name, order_num, weight, is_current, academic_term_id) VALUES
@@ -450,14 +417,6 @@ INSERT INTO grading_periods (name, order_num, weight, is_current, academic_term_
 ('Midterm', 2, 20.00, 0, 2),
 ('Semi-Final', 3, 20.00, 0, 2),
 ('Final', 4, 40.00, 1, 2);
-
--- Insert baseline curriculum subjects
-INSERT INTO subjects (subject_code, descriptive_title, nature, year_level, semester, academic_term_id, is_archived) VALUES
-('IT101', 'Introduction to Computing', 'Lecture', 1, 1, 1, 0),
-('IT102', 'Computer Programming 1', 'Combined', 1, 1, 1, 0),
-('IT103', 'Data Structures and Algorithms', 'Combined', 2, 1, 1, 0),
-('IT201', 'Web Systems and Technologies', 'Combined', 2, 2, 2, 0),
-('IT202', 'Information Management', 'Lecture', 2, 2, 2, 0);
 
 -- Insert baseline institutional accounts (Dean, Faculty, Student)
 -- Dean User (email: dean@gwc.edu, temporary password: dean123)

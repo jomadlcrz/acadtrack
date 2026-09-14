@@ -129,11 +129,15 @@ return new class {
         // 6. Seed default programs if table is empty
         $programCount = Capsule::table('programs')->count();
         if ($programCount === 0) {
-            $deptCite = Capsule::table('departments')->where('code', 'CITE')->orWhere('code', 'CIT')->first();
-            $deptIdCite = $deptCite ? $deptCite->id : 1;
+            $deptCite = Capsule::table('departments')->where('dept_abbrev', 'CITE')->orWhere('code', 'CITE')->first();
+            $deptCoc = Capsule::table('departments')->where('dept_abbrev', 'COC')->orWhere('code', 'COC')->first();
+            $deptCba = Capsule::table('departments')->where('dept_abbrev', 'CBA')->orWhere('code', 'CBA')->first();
+            $deptCoed = Capsule::table('departments')->where('dept_abbrev', 'COED')->orWhere('code', 'COED')->first();
 
-            $deptCoe = Capsule::table('departments')->where('code', 'COE')->first();
-            $deptIdCoe = $deptCoe ? $deptCoe->id : $deptIdCite;
+            $deptIdCite = $deptCite ? $deptCite->id : 1;
+            $deptIdCoc = $deptCoc ? $deptCoc->id : null;
+            $deptIdCba = $deptCba ? $deptCba->id : null;
+            $deptIdCoed = $deptCoed ? $deptCoed->id : null;
 
             $defaultPrograms = [
                 [
@@ -152,18 +156,18 @@ return new class {
                     'name' => 'Bachelor of Science in Computer Science',
                     'program_type' => "Bachelor's Degree",
                     'program_length' => '4 Years',
-                    'department_id' => $deptIdCoe,
+                    'department_id' => $deptIdCite,
                     'status' => 'active',
                     'description' => 'Study of computing concepts, algorithmic foundations, software design, and machine intelligence.',
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s'),
                 ],
                 [
-                    'program_abbrev' => 'BSCrim',
+                    'program_abbrev' => 'BSCRIM',
                     'name' => 'Bachelor of Science in Criminology',
                     'program_type' => "Bachelor's Degree",
                     'program_length' => '4 Years',
-                    'department_id' => null,
+                    'department_id' => $deptIdCoc,
                     'status' => 'active',
                     'description' => 'Study of crime causation, criminal law, law enforcement administration, and correctional institutions.',
                     'created_at' => date('Y-m-d H:i:s'),
@@ -174,29 +178,29 @@ return new class {
                     'name' => 'Bachelor of Science in Business Administration major in Marketing Management',
                     'program_type' => "Bachelor's Degree",
                     'program_length' => '4 Years',
-                    'department_id' => null,
+                    'department_id' => $deptIdCba,
                     'status' => 'active',
                     'description' => 'Equips students with principles of modern marketing, consumer behavior, and business development.',
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s'),
                 ],
                 [
-                    'program_abbrev' => 'BEEd',
+                    'program_abbrev' => 'BEED',
                     'name' => 'Bachelor of Elementary Education',
                     'program_type' => "Bachelor's Degree",
                     'program_length' => '4 Years',
-                    'department_id' => null,
+                    'department_id' => $deptIdCoed,
                     'status' => 'active',
                     'description' => 'Designed to prepare future teachers for early childhood and elementary grade levels.',
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s'),
                 ],
                 [
-                    'program_abbrev' => 'BSEd',
+                    'program_abbrev' => 'BSED',
                     'name' => 'Bachelor of Secondary Education',
                     'program_type' => "Bachelor's Degree",
                     'program_length' => '4 Years',
-                    'department_id' => null,
+                    'department_id' => $deptIdCoed,
                     'status' => 'active',
                     'description' => 'Prepares educators equipped with professional pedagogical skills for high school instruction.',
                     'created_at' => date('Y-m-d H:i:s'),
