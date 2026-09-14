@@ -26,7 +26,14 @@ ob_start();
                     <option value="inactive" <?= ($currentStatus ?? '') === 'inactive' ? 'selected' : '' ?>>Inactive</option>
                 </select>
             </div>
-            <?php if (!empty($currentRole) || !empty($currentStatus)): ?>
+            <div class="col-auto d-flex align-items-center gap-2">
+                <label for="search_input" class="form-label mb-0 fw-semibold small text-muted">Search:</label>
+                <div class="input-group input-group-sm" style="width: 250px;">
+                    <input type="text" id="search_input" name="search" class="form-control" placeholder="Name, email, student ID..." value="<?= htmlspecialchars($currentSearch ?? '') ?>">
+                    <button class="btn btn-outline-secondary" type="submit" title="Search"><i class="bi bi-search"></i></button>
+                </div>
+            </div>
+            <?php if (!empty($currentRole) || !empty($currentStatus) || !empty($currentSearch)): ?>
                 <div class="col-auto">
                     <a href="<?= url('/admin/users') ?>" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1">
                         <i class="bi bi-x-circle"></i> Clear filters
@@ -126,8 +133,11 @@ ob_start();
 </div>
 
 <?php if (!empty($users['data'])): ?>
-    <div class="mt-3">
-        <?php include __DIR__ . '/../../components/pagination.php'; ?>
+    <div class="mt-2">
+        <?php 
+        $pagination = $users;
+        include __DIR__ . '/../../components/pagination.php'; 
+        ?>
     </div>
 <?php endif; ?>
 

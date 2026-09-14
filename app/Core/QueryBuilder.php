@@ -252,7 +252,9 @@ class QueryBuilder
             'total' => $total,
             'page' => $page,
             'per_page' => $perPage,
+            'perPage' => $perPage,
             'last_page' => max(1, $lastPage),
+            'lastPage' => max(1, $lastPage),
         ];
     }
 

@@ -35,13 +35,17 @@ class StudentController
         $subjectId = (int) $request->get('subject_id', !empty($assignedSubjects) ? $assignedSubjects[0]['id'] : 0);
         $setFilter = !empty($request->get('set_id')) ? (int) $request->get('set_id') : null;
 
-        $students = $this->studentRepository->getBySubject($subjectId, $termId, $setFilter);
+        $page = max(1, (int) $request->get('page', 1));
+        $search = trim((string) $request->get('search', ''));
+        $paginated = $this->studentRepository->paginateBySubject($subjectId, $termId, $setFilter, $page, 25, $search);
+        $students = $paginated['data'];
         $availableStudents = $this->studentRepository->getAllAvailable();
         $currentSubject = \App\Models\Subject::find($subjectId);
         $sets = \App\Models\Set::getActiveByTerm($termId);
 
         $html = (new View())->render('faculty.students.index', [
             'students' => $students,
+            'pagination' => $paginated,
             'availableStudents' => $availableStudents,
             'subjectId' => $subjectId,
             'currentSubject' => $currentSubject,
@@ -50,6 +54,7 @@ class StudentController
             'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
             'sets' => $sets,
             'selectedSet' => $setFilter,
+            'currentSearch' => $search,
         ]);
         $response->html($html);
     }

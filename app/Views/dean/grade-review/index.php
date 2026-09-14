@@ -122,17 +122,21 @@ $metrics = $metrics ?? [
             </div>
 
             <div class="col-12 col-xl d-flex flex-wrap align-items-center justify-content-xl-end gap-3">
-                <div class="position-relative flex-grow-1" style="max-width: 380px; min-width: 240px;">
+                <form method="GET" action="<?= url('/dean/grade-review') ?>" class="position-relative flex-grow-1" style="max-width: 380px; min-width: 240px;">
+                    <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
+                    <input type="hidden" name="status" value="<?= htmlspecialchars((string)($statusFilter ?? 'all')) ?>">
                     <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 12px;"></i>
                     <input type="text" 
                            id="gradeReviewSearch" 
+                           name="search"
                            class="form-control form-control-sm ps-5" 
                            placeholder="Search course code, title, or instructor..." 
+                           value="<?= htmlspecialchars($currentSearch ?? '') ?>"
                            autocomplete="off">
-                </div>
+                </form>
 
                 <div class="text-muted small fw-medium text-nowrap" id="visibleCounter">
-                    <?= count($gradingSheets) ?> <?= count($gradingSheets) === 1 ? 'record' : 'records' ?> found
+                    <?= (int)($pagination['total'] ?? count($gradingSheets)) ?> <?= ((int)($pagination['total'] ?? count($gradingSheets))) === 1 ? 'record' : 'records' ?> found
                 </div>
             </div>
         </div>
@@ -265,6 +269,9 @@ $metrics = $metrics ?? [
                 </tbody>
             </table>
         </div>
+        <?php if (!empty($gradingSheets)): ?>
+            <?php include __DIR__ . '/../../components/pagination.php'; ?>
+        <?php endif; ?>
 
         <?php foreach ($gradingSheets as $sheet): ?>
         <?php if ($sheet['status'] === 'APPROVED'): ?>

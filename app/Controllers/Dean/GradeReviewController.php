@@ -74,13 +74,17 @@ class GradeReviewController
             }
         }
 
-        $gradingSheets = $statusParam === null ? $allTermSheets : GradingSheet::getAllWithDetails($termId, $statusParam);
+        $page = max(1, (int) $request->get('page', 1));
+        $search = trim((string) $request->get('search', ''));
+        $paginated = GradingSheet::paginateWithDetails($termId, $statusParam, $page, 15, $search);
 
         $html = (new View())->render('dean.grade-review.index', [
-            'gradingSheets' => $gradingSheets,
+            'gradingSheets' => $paginated['data'],
+            'pagination' => $paginated,
             'academicTerm' => $academicTerm,
             'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
             'statusFilter' => $statusFilter,
+            'currentSearch' => $search,
             'metrics' => [
                 'total' => $totalSubmissions,
                 'pending' => $pendingCount,

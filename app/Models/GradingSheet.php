@@ -149,6 +149,70 @@ class GradingSheet extends Model
         return $stmt->fetchAll();
     }
 
+    public static function paginateWithDetails(int $academicTermId, ?string $status = null, int $page = 1, int $perPage = 15, string $search = ''): array
+    {
+        $page = max(1, $page);
+        $offset = ($page - 1) * $perPage;
+
+        $whereClauses = ['gs.academic_term_id = :academic_term_id'];
+        $params = ['academic_term_id' => $academicTermId];
+
+        if ($status !== null) {
+            $whereClauses[] = 'gs.status = :status';
+            $params['status'] = $status;
+        }
+
+        if ($search !== '') {
+            $whereClauses[] = "CONCAT(s.subject_code, ' ', s.descriptive_title, ' ', COALESCE(fd.first_name, ''), ' ', COALESCE(fd.last_name, ''), ' ', gp.name) LIKE :search";
+            $params['search'] = '%' . $search . '%';
+        }
+
+        $whereSql = implode(' AND ', $whereClauses);
+
+        $countSql = "
+            SELECT COUNT(*)
+            FROM grading_sheets gs
+            JOIN subjects s ON gs.subject_id = s.id
+            JOIN grading_periods gp ON gs.grading_period_id = gp.id
+            JOIN users u ON gs.faculty_id = u.id
+            LEFT JOIN faculty_details fd ON gs.faculty_id = fd.user_id
+            WHERE {$whereSql}
+        ";
+        $stmt = self::db()->prepare($countSql);
+        $stmt->execute($params);
+        $total = (int) $stmt->fetchColumn();
+
+        $dataSql = "
+            SELECT gs.*, s.subject_code, s.subject_code as code, s.descriptive_title as subject_name, 
+                   gp.name as period_name, fd.first_name, fd.last_name
+            FROM grading_sheets gs
+            JOIN subjects s ON gs.subject_id = s.id
+            JOIN grading_periods gp ON gs.grading_period_id = gp.id
+            JOIN users u ON gs.faculty_id = u.id
+            LEFT JOIN faculty_details fd ON gs.faculty_id = fd.user_id
+            WHERE {$whereSql}
+            ORDER BY gs.updated_at DESC
+            LIMIT :limit OFFSET :offset
+        ";
+        $stmt = self::db()->prepare($dataSql);
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return [
+            'data' => $stmt->fetchAll(),
+            'total' => $total,
+            'page' => $page,
+            'perPage' => $perPage,
+            'per_page' => $perPage,
+            'lastPage' => max(1, (int) ceil($total / $perPage)),
+            'last_page' => max(1, (int) ceil($total / $perPage)),
+        ];
+    }
+
     public static function updateStatus(int $id, string $status): bool
     {
         return (bool) self::where('id', $id)->update([

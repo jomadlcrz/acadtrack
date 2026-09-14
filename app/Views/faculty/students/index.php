@@ -48,6 +48,20 @@ ob_start();
                     <?php endforeach; ?>
                 </select>
             </div>
+            <div class="col-auto d-flex align-items-center gap-2">
+                <label for="search_filter" class="form-label mb-0 fw-semibold small text-muted">Search:</label>
+                <div class="input-group input-group-sm" style="width: 220px;">
+                    <input type="text" id="search_filter" name="search" class="form-control" placeholder="Name or student ID..." value="<?= htmlspecialchars($currentSearch ?? '') ?>">
+                    <button class="btn btn-outline-secondary" type="submit" title="Search"><i class="bi bi-search"></i></button>
+                </div>
+            </div>
+            <?php if (!empty($selectedSet) || !empty($currentSearch)): ?>
+                <div class="col-auto">
+                    <a href="<?= url('/faculty/students?semester=' . ($selectedSemester ?? '1') . '&subject_id=' . ($subjectId ?? 0)) ?>" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-x-circle"></i> Clear filters
+                    </a>
+                </div>
+            <?php endif; ?>
             <?php if (!empty($currentSubject)): ?>
                 <div class="col-auto">
                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
@@ -62,7 +76,7 @@ ob_start();
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <h3 class="h6 mb-0 fw-semibold text-dark">Class Enrollment Roster</h3>
-        <span class="text-muted small"><?= count($students) ?> students enrolled</span>
+        <span class="text-muted small"><?= (int)($pagination['total'] ?? count($students)) ?> students enrolled</span>
     </div>
 
     <?php if (empty($students)): ?>
@@ -134,6 +148,9 @@ ob_start();
                 </tbody>
             </table>
         </div>
+        <?php if (!empty($students)): ?>
+            <?php include __DIR__ . '/../../components/pagination.php'; ?>
+        <?php endif; ?>
     <?php endif; ?>
 </div>
 

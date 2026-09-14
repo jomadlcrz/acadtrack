@@ -98,6 +98,68 @@ class Student extends Model
         return $stmt->fetchAll();
     }
 
+    public static function paginateBySubject(int $subjectId, int $academicTermId, ?int $setId = null, int $page = 1, int $perPage = 25, string $search = ''): array
+    {
+        $page = max(1, $page);
+        $offset = ($page - 1) * $perPage;
+
+        $setClause = $setId ? "AND s.set_id = :set_id" : "";
+        $searchClause = "";
+        $params = ['subject_id' => $subjectId, 'academic_term_id' => $academicTermId];
+        if ($setId) {
+            $params['set_id'] = $setId;
+        }
+        if ($search !== '') {
+            $searchClause = "AND CONCAT(COALESCE(sd.first_name, ''), ' ', COALESCE(sd.last_name, ''), ' ', COALESCE(sd.student_number, ''), ' ', u.email) LIKE :search";
+            $params['search'] = '%' . $search . '%';
+        }
+
+        $countStmt = self::db()->prepare("
+            SELECT COUNT(*)
+            FROM students s
+            JOIN users u ON s.user_id = u.id
+            LEFT JOIN student_details sd ON sd.user_id = u.id
+            JOIN enrollments e ON e.student_id = s.id
+            LEFT JOIN sets sec ON sec.id = s.set_id
+            WHERE e.subject_id = :subject_id AND e.academic_term_id = :academic_term_id
+            {$setClause}
+            {$searchClause}
+        ");
+        $countStmt->execute($params);
+        $total = (int) $countStmt->fetchColumn();
+
+        $stmt = self::db()->prepare("
+            SELECT s.*, sd.first_name, sd.last_name, u.email, sd.student_number,
+                   sec.set_name AS set_name
+            FROM students s
+            JOIN users u ON s.user_id = u.id
+            LEFT JOIN student_details sd ON sd.user_id = u.id
+            JOIN enrollments e ON e.student_id = s.id
+            LEFT JOIN sets sec ON sec.id = s.set_id
+            WHERE e.subject_id = :subject_id AND e.academic_term_id = :academic_term_id
+            {$setClause}
+            {$searchClause}
+            ORDER BY sd.last_name, sd.first_name
+            LIMIT :limit OFFSET :offset
+        ");
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return [
+            'data' => $stmt->fetchAll(),
+            'total' => $total,
+            'page' => $page,
+            'perPage' => $perPage,
+            'per_page' => $perPage,
+            'lastPage' => max(1, (int) ceil($total / $perPage)),
+            'last_page' => max(1, (int) ceil($total / $perPage)),
+        ];
+    }
+
     public static function enroll(int $studentId, int $subjectId, int $academicTermId): bool
     {
         $stmt = self::db()->prepare("

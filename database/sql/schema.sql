@@ -13,7 +13,9 @@ CREATE TABLE academic_years (
     school_year VARCHAR(20) NOT NULL,
     is_active TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_ay_school_year (school_year),
+    INDEX idx_ay_active (is_active)
 ) ENGINE=InnoDB;
 
 -- Academic Terms (Semesters)
@@ -28,7 +30,9 @@ CREATE TABLE academic_terms (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (academic_year_id) REFERENCES academic_years(id) ON DELETE CASCADE,
-    INDEX idx_is_archived (is_archived)
+    INDEX idx_is_archived (is_archived),
+    INDEX idx_terms_active_sem (is_active, semester),
+    INDEX idx_terms_year_sem (academic_year_id, semester)
 ) ENGINE=InnoDB;
 
 -- Users
@@ -41,7 +45,8 @@ CREATE TABLE users (
     deactivated_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_email (email)
+    INDEX idx_email (email),
+    INDEX idx_users_status (status)
 ) ENGINE=InnoDB;
 
 -- Roles
@@ -88,7 +93,8 @@ CREATE TABLE departments (
     description TEXT NULL,
     status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_departments_status (status)
 ) ENGINE=InnoDB;
 
 -- Programs (Academic Degrees)
@@ -153,7 +159,9 @@ CREATE TABLE sets (
     FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE CASCADE,
     FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
     FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE SET NULL,
-    UNIQUE KEY unique_set (set_name, academic_term_id)
+    UNIQUE KEY unique_set (set_name, academic_term_id),
+    INDEX idx_sets_term_year (academic_term_id, year_level),
+    INDEX idx_sets_term_status (academic_term_id, status)
 ) ENGINE=InnoDB;
 
 -- Student Details
@@ -173,7 +181,11 @@ CREATE TABLE student_details (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE SET NULL,
     FOREIGN KEY (set_id) REFERENCES sets(id) ON DELETE SET NULL,
-    INDEX idx_student_number (student_number)
+    INDEX idx_student_number (student_number),
+    INDEX idx_sd_name (last_name, first_name),
+    INDEX idx_sd_year_level (year_level),
+    INDEX idx_sd_status (status),
+    INDEX idx_sd_set_prog (set_id, program_id)
 ) ENGINE=InnoDB;
 
 -- Faculty Details
@@ -190,7 +202,9 @@ CREATE TABLE faculty_details (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
-    INDEX idx_faculty_type (faculty_type)
+    INDEX idx_faculty_type (faculty_type),
+    INDEX idx_fd_name (last_name, first_name),
+    INDEX idx_fd_dept_type (department_id, faculty_type)
 ) ENGINE=InnoDB;
 
 -- Students (extension of users)
@@ -232,7 +246,9 @@ CREATE TABLE subjects (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
     UNIQUE KEY unique_subject (subject_code, academic_term_id),
-    INDEX idx_is_archived (is_archived)
+    INDEX idx_is_archived (is_archived),
+    INDEX idx_subjects_term_archived (academic_term_id, is_archived, semester),
+    INDEX idx_subjects_term_year_sem (academic_term_id, year_level, semester)
 ) ENGINE=InnoDB;
 
 -- Faculty-Subject Assignments
@@ -258,7 +274,9 @@ CREATE TABLE enrollments (
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
     FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
-    UNIQUE KEY unique_enrollment (student_id, subject_id, academic_term_id)
+    UNIQUE KEY unique_enrollment (student_id, subject_id, academic_term_id),
+    INDEX idx_enrollments_subject_term (subject_id, academic_term_id),
+    INDEX idx_enrollments_student_term (student_id, academic_term_id)
 ) ENGINE=InnoDB;
 
 -- Grading Periods
@@ -288,7 +306,9 @@ CREATE TABLE grades (
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
     FOREIGN KEY (grading_period_id) REFERENCES grading_periods(id) ON DELETE CASCADE,
     FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
-    UNIQUE KEY unique_grade (student_id, subject_id, grading_period_id, academic_term_id)
+    UNIQUE KEY unique_grade (student_id, subject_id, grading_period_id, academic_term_id),
+    INDEX idx_grades_subject_term_period (subject_id, academic_term_id, grading_period_id),
+    INDEX idx_grades_student_term (student_id, academic_term_id)
 ) ENGINE=InnoDB;
 
 -- Grade History Log (Immutable Audit Trail)
@@ -324,7 +344,9 @@ CREATE TABLE grading_sheets (
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
     FOREIGN KEY (grading_period_id) REFERENCES grading_periods(id) ON DELETE CASCADE,
     FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
-    UNIQUE KEY unique_sheet (faculty_id, subject_id, grading_period_id, academic_term_id)
+    UNIQUE KEY unique_sheet (faculty_id, subject_id, grading_period_id, academic_term_id),
+    INDEX idx_sheets_term_status (academic_term_id, status),
+    INDEX idx_sheets_faculty_term (faculty_id, academic_term_id)
 ) ENGINE=InnoDB;
 
 -- Grading Settings
@@ -361,7 +383,8 @@ CREATE TABLE notifications (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
-    INDEX idx_type (type)
+    INDEX idx_type (type),
+    INDEX idx_notifications_user_status_date (user_id, status, created_at)
 ) ENGINE=InnoDB;
 
 -- Insert default academic year and terms

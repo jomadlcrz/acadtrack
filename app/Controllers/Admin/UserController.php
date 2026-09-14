@@ -24,12 +24,15 @@ class UserController
         $page = (int) $request->get('page', 1);
         $role = (string) $request->get('role', '');
         $status = (string) $request->get('status', '');
-        $users = $this->userRepository->paginate($page, 20, $role, $status);
+        $search = trim((string) $request->get('search', ''));
+        $users = $this->userRepository->paginate($page, 20, $role, $status, $search);
 
         $html = (new View())->render('admin.users.index', [
             'users' => $users,
+            'pagination' => $users,
             'currentRole' => $role,
             'currentStatus' => $status,
+            'currentSearch' => $search,
             'currentUserId' => (int) ($session->get('user')['id'] ?? 0),
         ]);
         $response->html($html);

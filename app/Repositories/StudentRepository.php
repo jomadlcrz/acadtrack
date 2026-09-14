@@ -42,6 +42,11 @@ class StudentRepository
         return Student::getBySubject($subjectId, $academicTermId, $setId);
     }
 
+    public function paginateBySubject(int $subjectId, int $academicTermId, ?int $setId = null, int $page = 1, int $perPage = 25, string $search = ''): array
+    {
+        return Student::paginateBySubject($subjectId, $academicTermId, $setId, $page, $perPage, $search);
+    }
+
     public function enroll(int $studentId, int $subjectId, int $academicTermId): bool
     {
         return Student::enroll($studentId, $subjectId, $academicTermId);

@@ -139,8 +139,9 @@ class UserRepository
         return User::getFaculty();
     }
 
-    public function paginate(int $page = 1, int $perPage = 20, string $role = '', string $status = ''): array
+    public function paginate(int $page = 1, int $perPage = 20, string $role = '', string $status = '', string $search = ''): array
     {
+        $page = max(1, $page);
         $offset = ($page - 1) * $perPage;
         $clauses = [];
         $params = [];
@@ -152,10 +153,26 @@ class UserRepository
             $clauses[] = "u.status = :status";
             $params['status'] = $status;
         }
+        if ($search !== '') {
+            $clauses[] = "CONCAT(
+                u.email, ' ', 
+                COALESCE(ad.first_name, ''), ' ', COALESCE(ad.last_name, ''), ' ', 
+                COALESCE(fd.first_name, ''), ' ', COALESCE(fd.last_name, ''), ' ', 
+                COALESCE(sd.first_name, ''), ' ', COALESCE(sd.last_name, ''), ' ', 
+                COALESCE(sd.student_number, '')
+            ) LIKE :search";
+            $params['search'] = '%' . $search . '%';
+        }
 
         $where = !empty($clauses) ? "WHERE " . implode(" AND ", $clauses) : "";
 
-        $countSql = "SELECT COUNT(*) FROM users u LEFT JOIN user_roles ur ON ur.user_id = u.id LEFT JOIN roles r ON r.id = ur.role_id {$where}";
+        $countSql = "SELECT COUNT(*) FROM users u 
+                     LEFT JOIN user_roles ur ON ur.user_id = u.id 
+                     LEFT JOIN roles r ON r.id = ur.role_id 
+                     LEFT JOIN admin_details ad ON ad.user_id = u.id
+                     LEFT JOIN faculty_details fd ON fd.user_id = u.id
+                     LEFT JOIN student_details sd ON sd.user_id = u.id
+                     {$where}";
         $stmt = Database::getConnection()->prepare($countSql);
         $stmt->execute($params);
         $total = (int) $stmt->fetchColumn();
@@ -191,7 +208,9 @@ class UserRepository
             'total' => $total,
             'page' => $page,
             'perPage' => $perPage,
-            'lastPage' => (int) ceil($total / $perPage),
+            'per_page' => $perPage,
+            'lastPage' => max(1, (int) ceil($total / $perPage)),
+            'last_page' => max(1, (int) ceil($total / $perPage)),
         ];
     }
 }
