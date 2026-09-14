@@ -1,26 +1,40 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Security: Block direct browser access to sensitive files and source code directories
+    # 1. Enforce HTTPS in production environments (excludes local development on localhost / 127.0.0.1)
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # 2. Security: Block direct browser access to sensitive files and source code directories
     RewriteRule ^(\.env|\.git|composer\.(json|lock)|phpunit\.xml) - [F,L,NC]
     RewriteRule ^(app|bootstrap|config|database|docs|routes|skills|tests|vendor)(/.*)?$ - [F,L,NC]
 
-    # If the target file physically exists, serve it directly and stop rewriting
+    # 3. If the target file physically exists, serve it directly and stop rewriting
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
 
-    # 1. External redirect: redirect direct /public/* requests to clean /*
+    # 4. External redirect: redirect direct /public/* requests to clean /*
     RewriteCond %{ENV:REDIRECT_STATUS} ^$
     RewriteCond %{REQUEST_URI} ^/([^/]+)/public/(.*)$
     RewriteRule ^public/(.*)$ /%1/$1 [R=301,L]
+    RewriteCond %{ENV:REDIRECT_STATUS} ^$
+    RewriteCond %{REQUEST_URI} ^/public/(.*)$
+    RewriteRule ^public/(.*)$ /$1 [R=301,L]
 
-    # 2. Static files & assets: map /assets/... to public/assets/...
+    # 5. Static files & assets: map /assets/... to public/assets/...
     RewriteRule ^assets/(.*)$ public/assets/$1 [L]
     RewriteRule ^(favicon\.ico|robots\.txt)$ public/$1 [L]
 
-    # 3. Dynamic routes: send all other requests to public/index.php
+    # 6. Dynamic routes: send all other requests to public/index.php
     RewriteRule ^(.*)$ public/index.php [L,QSA]
 </IfModule>
 
 # Prevent directory browsing
 Options -Indexes
+
+<IfModule mod_headers.c>
+    # Security: HTTP Strict Transport Security (HSTS) when on HTTPS
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+</IfModule>

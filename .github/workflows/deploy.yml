@@ -1,0 +1,66 @@
+name: Deploy to InfinityFree
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+jobs:
+  test-and-deploy:
+    name: Test, Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_mysql, json, session, ctype, tokenizer
+          coverage: none
+
+      - name: Install All Dependencies (For Testing)
+        run: composer install --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Run PHPUnit Tests
+        run: ./vendor/bin/phpunit --no-coverage
+
+      - name: Prepare Production Dependencies (Strip Dev Packages)
+        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Ensure Storage Directory Structure
+        run: |
+          mkdir -p storage/cache storage/logs storage/uploads
+          touch storage/cache/.gitkeep storage/logs/.gitkeep storage/uploads/.gitkeep
+
+      - name: Deploy to InfinityFree via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_TARGET_DIR || '/htdocs/' }}
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github*
+            **/.github*/**
+            **/tests/**
+            phpunit.xml
+            .phpunit.result.cache
+            .env
+            .env.example
+            README.md
+            docs/**
+            skills/**
+            *.md
