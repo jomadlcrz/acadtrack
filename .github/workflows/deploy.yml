@@ -15,6 +15,16 @@ jobs:
     name: Test, Build & Deploy
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: acadtrack
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -28,8 +38,20 @@ jobs:
           extensions: mbstring, pdo, pdo_mysql, json, session, ctype, tokenizer
           coverage: none
 
+      - name: Setup .env for Testing
+        run: |
+          cp .env.example .env
+          sed -i 's/DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=acadtrack/' .env
+          sed -i 's/DB_USERNAME=.*/DB_USERNAME=root/' .env
+          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=/' .env
+
       - name: Install All Dependencies (For Testing)
         run: composer install --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Import Database Schema for Testing
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root acadtrack < database/sql/schema.sql
 
       - name: Run PHPUnit Tests
         run: ./vendor/bin/phpunit --no-coverage
@@ -43,6 +65,10 @@ jobs:
           touch storage/cache/.gitkeep storage/logs/.gitkeep storage/uploads/.gitkeep
 
       - name: Deploy to InfinityFree via FTP
+        if: env.FTP_SERVER != '' && env.FTP_USERNAME != ''
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}

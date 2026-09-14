@@ -459,6 +459,31 @@ INSERT INTO subjects (subject_code, descriptive_title, nature, year_level, semes
 ('IT201', 'Web Systems and Technologies', 'Combined', 2, 2, 2, 0),
 ('IT202', 'Information Management', 'Lecture', 2, 2, 2, 0);
 
+-- Insert baseline institutional accounts (Dean, Faculty, Student)
+-- Dean User (email: dean@gwc.edu, temporary password: dean123)
+INSERT INTO users (id, email, password, status, is_temp_password) VALUES
+(2, 'dean@gwc.edu', '$2y$10$3IypjozAw8yLkp7rV6u0Vehn02qDO71TpyMwdISTvIASSnmvJM23O', 'active', 1);
+INSERT INTO user_roles (user_id, role_id) VALUES (2, 2);
+INSERT INTO faculty_details (user_id, first_name, last_name, faculty_type, department_id) VALUES
+(2, 'College', 'Dean', 'dean', 1);
+INSERT INTO faculty (id, user_id, department_id) VALUES (1, 2, 1);
+
+-- Faculty User (email: faculty@gwc.edu, temporary password: faculty123)
+INSERT INTO users (id, email, password, status, is_temp_password) VALUES
+(3, 'faculty@gwc.edu', '$2y$10$6yixGt.oU8bikt2et9G1peP7irbqvgzRPd3yOg3X9VrQdutUG9su.', 'active', 1);
+INSERT INTO user_roles (user_id, role_id) VALUES (3, 3);
+INSERT INTO faculty_details (user_id, first_name, last_name, faculty_type, department_id) VALUES
+(3, 'John', 'Teacher', 'instructor', 1);
+INSERT INTO faculty (id, user_id, department_id) VALUES (2, 3, 1);
+
+-- Student User (email: student@gwc.edu, temporary password: student123)
+INSERT INTO users (id, email, password, status, is_temp_password) VALUES
+(4, 'student@gwc.edu', '$2y$10$XoYki09fPgi4t/.DBP3H9.bgcl1vxD/avtbjPaaazcgdnwwnMlN4.', 'active', 1);
+INSERT INTO user_roles (user_id, role_id) VALUES (4, 4);
+INSERT INTO student_details (user_id, student_number, first_name, last_name, program_id, set_id, year_level, status) VALUES
+(4, '2026-0001', 'Juan', 'Dela Cruz', 1, 1, 1, 'Regular');
+INSERT INTO students (id, user_id, set_id, year_level, status) VALUES (1, 4, 1, 1, 'Regular');
+
 -- Automated Grade Audit Trigger (Optional: requires MySQL TRIGGER privilege)
 -- Note: Shared and free hosting providers (e.g. InfinityFree) do not grant TRIGGER privileges to MySQL users.
 -- The AcadTrack application layer handles grade modification audit logging automatically as a fallback.
