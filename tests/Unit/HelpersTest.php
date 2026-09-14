@@ -29,19 +29,32 @@ class HelpersTest extends TestCase
 
     public function testBasePathStripsPublicWhenAccessedCleanly(): void
     {
-        $_SERVER['SCRIPT_NAME'] = '/grading-system/public/index.php';
-        $_SERVER['REQUEST_URI'] = '/grading-system/login';
+        $origEnv = $_ENV['APP_URL'] ?? null;
+        $origServer = $_SERVER['APP_URL'] ?? null;
+        unset($_ENV['APP_URL'], $_SERVER['APP_URL']);
+        putenv('APP_URL');
+
+        $_SERVER['SCRIPT_NAME'] = '/acadtrack/public/index.php';
+        $_SERVER['REQUEST_URI'] = '/acadtrack/login';
 
         $base = base_path_url();
-        $this->assertSame('/grading-system', $base);
+        $this->assertSame('/acadtrack', $base);
 
         $loginUrl = url('/login');
-        $this->assertSame('/grading-system/login', $loginUrl);
+        $this->assertSame('/acadtrack/login', $loginUrl);
         $this->assertStringNotContainsString('/public', $loginUrl);
 
         $assetUrl = asset('css/app.css');
-        $this->assertSame('/grading-system/assets/css/app.css', $assetUrl);
+        $this->assertSame('/acadtrack/assets/css/app.css', $assetUrl);
         $this->assertStringNotContainsString('/public', $assetUrl);
+
+        if ($origEnv !== null) {
+            $_ENV['APP_URL'] = $origEnv;
+            putenv("APP_URL={$origEnv}");
+        }
+        if ($origServer !== null) {
+            $_SERVER['APP_URL'] = $origServer;
+        }
     }
 
     public function testBasePathSupportsAcadtrack(): void

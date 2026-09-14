@@ -111,7 +111,6 @@ CREATE TABLE programs (
 CREATE TABLE curricula (
     id INT AUTO_INCREMENT PRIMARY KEY,
     program_id INT NOT NULL,
-    version VARCHAR(50) NOT NULL DEFAULT '2026-2027',
     status ENUM('draft', 'active', 'archived') NOT NULL DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -444,8 +443,8 @@ INSERT INTO users (id, email, password, status, is_temp_password) VALUES
 (4, 'student@gwc.edu', '$2y$10$XoYki09fPgi4t/.DBP3H9.bgcl1vxD/avtbjPaaazcgdnwwnMlN4.', 'active', 1);
 INSERT INTO user_roles (user_id, role_id) VALUES (4, 4);
 INSERT INTO student_details (user_id, student_number, first_name, last_name, program_id, set_id, year_level, status) VALUES
-(4, '2026-0001', 'Juan', 'Dela Cruz', 1, 1, 1, 'Regular');
-INSERT INTO students (id, user_id, set_id, year_level, status) VALUES (1, 4, 1, 1, 'Regular');
+(4, '2026-0001', 'Juan', 'Dela Cruz', 1, NULL, 1, 'Regular');
+INSERT INTO students (id, user_id, set_id, year_level, status) VALUES (1, 4, NULL, 1, 'Regular');
 
 -- Automated Grade Audit Trigger (Optional: requires MySQL TRIGGER privilege)
 -- Note: Shared and free hosting providers (e.g. InfinityFree) do not grant TRIGGER privileges to MySQL users.

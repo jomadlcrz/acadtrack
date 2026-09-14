@@ -487,14 +487,14 @@ When database actions conflict with unique constraints (e.g., duplicate subject 
    - Controllers wrap state-changing repository calls (`create`, `update`, `delete`) in `try ... catch (\PDOException $e)` blocks.
    - Specific constraint codes (such as SQLSTATE `23000` / MySQL error `1062 Duplicate entry`) are translated into clear, contextual messages (e.g., *"Subject code 'CS102' already exists for this academic term."*).
    - The message is stored in the session flash (`$session->flash('error', $message)`).
-   - The user is redirected back to the originating page via HTTP 302, where [components/alert.php](file:///C:/xampp/htdocs/grading-system/app/Views/components/alert.php) renders a dismissible alert banner.
+   - The user is redirected back to the originating page via HTTP 302, where [components/alert.php](file:///C:/xampp/htdocs/acadtrack/app/Views/components/alert.php) renders a dismissible alert banner.
 
 ### 19.2 Global Exception Interception (`Application::run`)
 
 In the event of an unhandled exception or database error:
-- [Application::run()](file:///C:/xampp/htdocs/grading-system/app/Core/Application.php) catches `\Throwable $e`.
+- [Application::run()](file:///C:/xampp/htdocs/acadtrack/app/Core/Application.php) catches `\Throwable $e`.
 - Mutating requests (`POST`, `PUT`, `DELETE`) automatically extract a user-friendly summary, flash an error message, and redirect safely back to `$_SERVER['HTTP_REFERER']`.
-- Non-mutating requests (`GET`) or unhandled page loads render the dedicated [app/Views/errors/error.php](file:///C:/xampp/htdocs/grading-system/app/Views/errors/error.php) template.
+- Non-mutating requests (`GET`) or unhandled page loads render the dedicated [app/Views/errors/error.php](file:///C:/xampp/htdocs/acadtrack/app/Views/errors/error.php) template.
 - When `APP_DEBUG=true`, technical stack traces are neatly encapsulated in an expandable `<details>` container for developers, keeping the interface clean and secure in production.
 
 ---

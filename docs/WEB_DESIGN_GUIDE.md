@@ -216,7 +216,7 @@ Every grade encoding screen separates safe drafts from irreversible submissions:
 
 ## 8. Anti-Generic Design Compliance
 
-This design specification enforces the rules defined in [docs/ANTI_GENERIC_DESIGN.md](file:///C:/xampp/htdocs/grading-system/docs/ANTI_GENERIC_DESIGN.md):
+This design specification enforces the rules defined in [docs/ANTI_GENERIC_DESIGN.md](file:///C:/xampp/htdocs/acadtrack/docs/ANTI_GENERIC_DESIGN.md):
 1. **No Artificial Bloat:** Spacing strictly adheres to a 4px/8px modular scale.
 2. **No Unstyled Templates:** Every card, button, and badge is styled with institutional pride and purpose.
 3. **Guaranteed Contrast:** All text passes WCAG AA contrast tests with a minimum ratio of $4.5:1$.

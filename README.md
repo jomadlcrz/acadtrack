@@ -29,7 +29,7 @@ A lightweight, server-rendered academic grading and evaluation system built with
 
 ### Accessing the Web Application
 Open your browser at:
-**[http://localhost/grading-system/login](http://localhost/grading-system/login)** (or simply **[http://localhost/grading-system/](http://localhost/grading-system/)**)
+**[http://localhost/acadtrack/login](http://localhost/acadtrack/login)** (or simply **[http://localhost/acadtrack/](http://localhost/acadtrack/)**)
 
 ---
 
