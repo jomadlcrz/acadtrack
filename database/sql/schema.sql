@@ -38,7 +38,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     status ENUM('active', 'inactive') DEFAULT 'active',
     deactivated_at TIMESTAMP NULL DEFAULT NULL,
-    is_temp_password TINYINT(1) NOT NULL DEFAULT 0,
+    is_temp_password TINYINT(1) NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_email (email)
 ) ENGINE=InnoDB;
@@ -376,9 +376,9 @@ INSERT INTO roles (id, role_name, description) VALUES
 (3, 'Faculty', 'Instructor encoding student scores and submitting period grading sheets'),
 (4, 'Student', 'Enrolled student viewing official grades and whole evaluation');
 
--- Insert default admin user (email: admin@gwc.edu, password: GWC_acadtrack@2026)
+-- Insert default admin user (email: admin@gwc.edu, temporary password: GWC_acadtrack@2026)
 INSERT INTO users (id, email, password, status, is_temp_password) VALUES
-(1, 'admin@gwc.edu', '$2y$10$IMk.VC1eTxllDzm.Ufxz1etCBMBG7VgzXaJ1Qqk0f4KZ3WSJqTeu2', 'active', 0);
+(1, 'admin@gwc.edu', '$2y$10$IMk.VC1eTxllDzm.Ufxz1etCBMBG7VgzXaJ1Qqk0f4KZ3WSJqTeu2', 'active', 1);
 
 -- Map admin user to Admin role
 INSERT INTO user_roles (user_id, role_id) VALUES

@@ -37,10 +37,10 @@ Open your browser at:
 
 | Role | Name | Email | Password |
 | :--- | :--- | :--- | :--- |
-| **Admin** | System Admin | `admin@gwc.edu` | `GWC_acadtrack@2026` |
-| **Dean** | College Dean | `dean@gwc.edu` | `dean123` |
-| **Faculty** | John Teacher | `faculty@gwc.edu` | `faculty123` |
-| **Student** | Enrolled Students | *(Provisioned email)* | *Auto-generated temporary password (sent via email; forced change upon login)* |
+| **Admin** | System Admin | `admin@gwc.edu` | `GWC_acadtrack@2026` *(Temporary password; forced change upon first login)* |
+| **Dean** | College Dean | *(Provisioned email)* | *Auto-generated temporary password (sent via email; forced change upon first login)* |
+| **Faculty** | Faculty Member | *(Provisioned email)* | *Auto-generated temporary password (sent via email; forced change upon first login)* |
+| **Student** | Enrolled Students | *(Provisioned email)* | *Auto-generated temporary password (sent via email; forced change upon first login)* |
 
 ---
 
