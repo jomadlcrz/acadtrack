@@ -1,5 +1,6 @@
 /vendor/
 .env
+.env.production
 /storage/logs/*
 !/storage/logs/.gitkeep
 /storage/cache/*
@@ -8,6 +9,7 @@
 !/storage/uploads/.gitkeep
 composer.lock
 *.log
+*.zip
 .DS_Store
 Thumbs.db
 .phpunit.result.cache

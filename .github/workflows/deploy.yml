@@ -58,8 +58,7 @@ jobs:
             **/tests/**
             phpunit.xml
             .phpunit.result.cache
-            .env
-            .env.example
+            .env*
             README.md
             docs/**
             skills/**

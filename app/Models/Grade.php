@@ -95,7 +95,7 @@ class Grade extends Model
     public static function saveGrade(int $studentId, int $subjectId, int $gradingPeriodId, int $academicTermId, float $grade): int
     {
         $existing = self::db()->prepare("
-            SELECT id FROM grades
+            SELECT id, grade FROM grades
             WHERE student_id = :student_id AND subject_id = :subject_id 
               AND grading_period_id = :grading_period_id AND academic_term_id = :academic_term_id
         ");
@@ -108,7 +108,31 @@ class Grade extends Model
         $row = $existing->fetch();
 
         if ($row) {
+            $oldGrade = isset($row['grade']) ? (float)$row['grade'] : null;
             self::where('id', (int)$row['id'])->update(['grade' => $grade, 'updated_at' => date('Y-m-d H:i:s')]);
+
+            // Ensure audit trail is recorded in grade_history_log (application-level fallback for hosts without TRIGGER privilege)
+            if ($oldGrade !== null && abs($oldGrade - $grade) > 0.0001) {
+                try {
+                    $recentLog = GradeHistoryLog::where('grade_id', (int)$row['id'])
+                        ->where('action_performed', 'UPDATE')
+                        ->orderBy('log_id', 'desc')
+                        ->first();
+                    if (!$recentLog || abs((float)$recentLog->new_score - $grade) > 0.0001) {
+                        GradeHistoryLog::create([
+                            'grade_id' => (int)$row['id'],
+                            'student_id' => $studentId,
+                            'old_score' => $oldGrade,
+                            'new_score' => $grade,
+                            'action_performed' => 'UPDATE',
+                            'changed_at' => date('Y-m-d H:i:s'),
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    // Fail gracefully if audit log table is not available
+                }
+            }
+
             return (int)$row['id'];
         }
 
