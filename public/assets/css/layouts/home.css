@@ -280,10 +280,14 @@ body.landing-body {
     padding: 56px 0;
 }
 
-.section-header {
+.section-header,
+.landing-section .section-header {
+    display: block;
     text-align: center;
     max-width: 680px;
     margin: 0 auto 40px auto;
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
 .section-tag {

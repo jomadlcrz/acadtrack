@@ -1,7 +1,7 @@
 <?php
 $pageTitle = 'Academic Terms';
 $subtitle = 'Manage academic school years, semestral terms, and session cycles.';
-$headerActions = '<button type="button" class="btn text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" data-bs-toggle="modal" data-bs-target="#createTermModal"><i class="bi bi-plus-lg"></i> Create Academic Term</button>';
+$headerActions = '<button type="button" class="btn btn-primary d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#createTermModal"><i class="bi bi-plus-lg"></i> Create Academic Term</button>';
 ob_start();
 ?>
 
@@ -80,17 +80,11 @@ ob_start();
                             </td>
                             <td class="py-3 px-3 text-center">
                                 <?php if ($isActive): ?>
-                                    <span class="inline-flex px-2.5 py-1 rounded-pill text-xs fw-semibold" style="background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">
-                                        <i class="bi bi-check-circle-fill me-1"></i> Active
-                                    </span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>
                                 <?php elseif ($isArchived): ?>
-                                    <span class="inline-flex px-2.5 py-1 rounded-pill text-xs fw-semibold" style="background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">
-                                        <i class="bi bi-archive me-1"></i> Archived
-                                    </span>
+                                    <span class="badge bg-secondary-subtle text-secondary border">Archived</span>
                                 <?php else: ?>
-                                    <span class="inline-flex px-2.5 py-1 rounded-pill text-xs fw-semibold text-secondary" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
-                                        Inactive
-                                    </span>
+                                    <span class="badge bg-secondary-subtle text-secondary border">Inactive</span>
                                 <?php endif; ?>
                             </td>
                             <td class="py-3 px-4 text-end">
@@ -178,7 +172,7 @@ ob_start();
                 </div>
                 <div class="modal-footer border-top py-3 px-4 bg-light d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-sm px-3 text-white" style="background-color: #2f4a86; border-color: #2f4a86;">Save Term</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-3">Save Term</button>
                 </div>
             </form>
         </div>

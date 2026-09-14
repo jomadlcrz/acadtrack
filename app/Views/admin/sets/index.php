@@ -133,13 +133,9 @@ ob_start();
                             </td>
                             <td class="py-3 px-3 text-center">
                                 <?php if ($isActive): ?>
-                                    <span class="inline-flex px-2 py-0.5 rounded-pill text-xs fw-semibold" style="background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">
-                                        Active
-                                    </span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>
                                 <?php else: ?>
-                                    <span class="inline-flex px-2 py-0.5 rounded-pill text-xs fw-semibold" style="background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">
-                                        Inactive
-                                    </span>
+                                    <span class="badge bg-secondary-subtle text-secondary border">Inactive</span>
                                 <?php endif; ?>
                             </td>
                             <?php if (!$isReadOnly): ?>

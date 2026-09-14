@@ -8,31 +8,22 @@ ob_start();
 
     <div class="mb-3">
         <label for="email" class="form-label">Email address</label>
-        <div class="input-group">
-            <span class="input-group-text" id="email-addon">
-                <i class="bi bi-envelope" aria-hidden="true"></i>
-            </span>
-            <input 
-                type="email" 
-                id="email" 
-                name="email" 
-                class="form-control" 
-                placeholder="name@gwc.edu" 
-                required 
-                autofocus 
-                autocomplete="email"
-                aria-describedby="email-addon"
-                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
-            >
-        </div>
+        <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            class="form-control" 
+            placeholder="name@gwc.edu" 
+            required 
+            autofocus 
+            autocomplete="email"
+            value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+        >
     </div>
 
     <div class="mb-3">
         <label for="password" class="form-label">Password</label>
         <div class="input-group">
-            <span class="input-group-text" id="password-addon">
-                <i class="bi bi-lock" aria-hidden="true"></i>
-            </span>
             <input 
                 type="password" 
                 id="password" 
@@ -41,7 +32,6 @@ ob_start();
                 placeholder="Enter your password" 
                 required 
                 autocomplete="current-password"
-                aria-describedby="password-addon"
             >
             <button 
                 type="button" 

@@ -48,7 +48,9 @@
 }
 
 /* 4. Compact Section Header (Within Cards or Panels) */
-.section-header {
+.card .section-header,
+.content-card .section-header,
+.card-section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
