@@ -36,10 +36,11 @@ CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    is_temp_password TINYINT(1) NOT NULL DEFAULT 1,
     status ENUM('active', 'inactive') DEFAULT 'active',
     deactivated_at TIMESTAMP NULL DEFAULT NULL,
-    is_temp_password TINYINT(1) NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email)
 ) ENGINE=InnoDB;
 
@@ -71,8 +72,8 @@ CREATE TABLE admin_details (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
     first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
     middle_name VARCHAR(100) NULL,
+    last_name VARCHAR(100) NOT NULL,
     phone_number VARCHAR(20) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -93,13 +94,13 @@ CREATE TABLE departments (
 -- Programs (Academic Degrees)
 CREATE TABLE programs (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    department_id INT NULL,
     program_abbrev VARCHAR(30) NOT NULL UNIQUE,
     program_name VARCHAR(191) NOT NULL UNIQUE,
     program_type VARCHAR(100) NOT NULL DEFAULT 'Bachelors Degree',
     program_length VARCHAR(50) NOT NULL DEFAULT '4 Years',
-    department_id INT NULL,
-    status ENUM('draft', 'active', 'archived') NOT NULL DEFAULT 'active',
     description TEXT NULL,
+    status ENUM('draft', 'active', 'archived') NOT NULL DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
@@ -110,6 +111,7 @@ CREATE TABLE programs (
 CREATE TABLE curricula (
     id INT AUTO_INCREMENT PRIMARY KEY,
     program_id INT NOT NULL,
+    version VARCHAR(50) NOT NULL DEFAULT '2026-2027',
     status ENUM('draft', 'active', 'archived') NOT NULL DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -123,10 +125,10 @@ CREATE TABLE curriculum_subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     curriculum_id INT NOT NULL,
     subject_id INT NULL,
-    year_level VARCHAR(30) NOT NULL,
-    semester INT(2) NOT NULL DEFAULT 1,
     subject_code VARCHAR(50) NOT NULL,
     descriptive_title VARCHAR(200) NOT NULL,
+    year_level VARCHAR(30) NOT NULL,
+    semester INT(2) NOT NULL DEFAULT 1,
     units DECIMAL(4, 1) NOT NULL DEFAULT 3.0,
     subject_type VARCHAR(50) NOT NULL DEFAULT 'GenEd Core',
     prerequisites VARCHAR(255) NULL,
@@ -140,12 +142,12 @@ CREATE TABLE curriculum_subjects (
 -- Sets
 CREATE TABLE sets (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    set_name VARCHAR(50) NOT NULL,
-    program_id INT NULL,
-    year_level INT NOT NULL,
-    set_code VARCHAR(20) NULL,
     academic_term_id INT NOT NULL,
     department_id INT NULL,
+    program_id INT NULL,
+    set_name VARCHAR(50) NOT NULL,
+    set_code VARCHAR(20) NULL,
+    year_level INT NOT NULL,
     status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -159,12 +161,12 @@ CREATE TABLE sets (
 CREATE TABLE student_details (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
-    student_number VARCHAR(50) NULL UNIQUE,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    middle_name VARCHAR(100) NULL,
     program_id INT NULL,
     set_id INT NULL,
+    student_number VARCHAR(50) NULL UNIQUE,
+    first_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100) NULL,
+    last_name VARCHAR(100) NOT NULL,
     year_level INT NOT NULL DEFAULT 1,
     status ENUM('Regular', 'Irregular') NOT NULL DEFAULT 'Regular',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -179,12 +181,12 @@ CREATE TABLE student_details (
 CREATE TABLE faculty_details (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
+    department_id INT NULL,
     employee_id VARCHAR(50) NULL UNIQUE,
     first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
     middle_name VARCHAR(100) NULL,
+    last_name VARCHAR(100) NOT NULL,
     faculty_type ENUM('instructor', 'dean') NOT NULL DEFAULT 'instructor',
-    department_id INT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -219,12 +221,12 @@ CREATE TABLE faculty (
 -- Subjects
 CREATE TABLE subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    academic_term_id INT NOT NULL,
     subject_code VARCHAR(50) NOT NULL,
     descriptive_title VARCHAR(200) NOT NULL,
     nature ENUM('Lecture', 'Laboratory', 'Combined') NOT NULL DEFAULT 'Lecture',
     year_level INT NOT NULL,
     semester INT(2) NOT NULL DEFAULT 1,
-    academic_term_id INT NOT NULL,
     is_archived TINYINT(1) DEFAULT 0,
     archived_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -237,9 +239,9 @@ CREATE TABLE subjects (
 -- Faculty-Subject Assignments
 CREATE TABLE faculty_subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    academic_term_id INT NOT NULL,
     faculty_id INT NOT NULL,
     subject_id INT NOT NULL,
-    academic_term_id INT NOT NULL,
     assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (faculty_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
@@ -250,9 +252,9 @@ CREATE TABLE faculty_subjects (
 -- Enrollments
 CREATE TABLE enrollments (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    academic_term_id INT NOT NULL,
     student_id INT NOT NULL,
     subject_id INT NOT NULL,
-    academic_term_id INT NOT NULL,
     enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
@@ -263,22 +265,23 @@ CREATE TABLE enrollments (
 -- Grading Periods
 CREATE TABLE grading_periods (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    academic_term_id INT NOT NULL,
     name VARCHAR(50) NOT NULL,
     order_num INT NOT NULL,
     weight DECIMAL(5,2) DEFAULT 1.00,
     is_current TINYINT(1) DEFAULT 0,
-    academic_term_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- Grades
 CREATE TABLE grades (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id INT NOT NULL,
-    subject_id INT NOT NULL,
-    grading_period_id INT NOT NULL,
     academic_term_id INT NOT NULL,
+    grading_period_id INT NOT NULL,
+    subject_id INT NOT NULL,
+    student_id INT NOT NULL,
     grade DECIMAL(5,2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -305,17 +308,17 @@ CREATE TABLE grade_history_log (
 -- Grading Sheets
 CREATE TABLE grading_sheets (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    academic_term_id INT NOT NULL,
+    grading_period_id INT NOT NULL,
     faculty_id INT NOT NULL,
     subject_id INT NOT NULL,
-    grading_period_id INT NOT NULL,
-    academic_term_id INT NOT NULL,
     status ENUM('DRAFT', 'SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'FINALIZED', 'RETURNED') DEFAULT 'DRAFT',
+    approved_by INT NULL,
     submitted_at TIMESTAMP NULL,
     approved_at TIMESTAMP NULL,
     returned_at TIMESTAMP NULL,
-    remarks TEXT NULL,
-    approved_by INT NULL,
     confirmed_at TIMESTAMP NULL,
+    remarks TEXT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (faculty_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -356,6 +359,7 @@ CREATE TABLE notifications (
     status ENUM('sent', 'pending', 'failed') NOT NULL DEFAULT 'sent',
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
     INDEX idx_type (type)
