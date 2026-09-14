@@ -14,9 +14,18 @@ try {
 } catch (\Throwable $e) {
     // Gracefully handle if DB is unavailable during render
 }
-$termLabel = $activeTerm 
-    ? (($activeTerm['semester'] === '1' ? '1st Semester' : '2nd Semester') . ' • A.Y. ' . htmlspecialchars($activeTerm['academic_year_name']))
-    : '1st Semester • A.Y. 2025–2026';
+$termLabel = '1st Semester • A.Y. 2026-2027';
+if ($activeTerm) {
+    $sem = (int)($activeTerm['semester'] ?? 1);
+    $semLabel = match ($sem) {
+        1 => '1st Semester',
+        2 => '2nd Semester',
+        3 => 'Summer Term',
+        default => "Semester {$sem}",
+    };
+    $yearLabel = $activeTerm['school_year'] ?? $activeTerm['academic_year_name'] ?? '2026-2027';
+    $termLabel = $semLabel . ' • A.Y. ' . htmlspecialchars((string)$yearLabel);
+}
 ?>
 <header class="app-navbar">
     <div class="navbar-left">

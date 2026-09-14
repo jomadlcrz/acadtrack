@@ -162,7 +162,7 @@ ob_start();
                     </div>
                     <div>
                         <div class="fw-semibold text-dark fs-6"><?= htmlspecialchars($activeTerm['academic_year_name'] ?? '2026-2027') ?></div>
-                        <div class="text-muted small"><?= ($activeTerm['semester'] ?? '1') === '1' ? '1st Semester' : '2nd Semester' ?></div>
+                        <div class="text-muted small"><?= ((int)($activeTerm['semester'] ?? 1)) === 1 ? '1st Semester' : '2nd Semester' ?></div>
                     </div>
                 </div>
                 <hr class="my-2 border-light">

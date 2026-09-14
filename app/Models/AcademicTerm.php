@@ -33,9 +33,9 @@ class AcademicTerm extends Model
     public static function getActive(): ?array
     {
         $stmt = self::db()->query("
-            SELECT at.*, ay.school_year as academic_year_name
+            SELECT at.*, COALESCE(at.school_year, ay.school_year, '2026-2027') as academic_year_name
             FROM academic_terms at
-            JOIN academic_years ay ON at.academic_year_id = ay.id
+            LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
             WHERE at.is_active = 1
             LIMIT 1
         ");

@@ -38,17 +38,36 @@ ob_start();
 
                 <div class="card-body p-4 d-flex flex-column gap-3">
                     <div>
-                        <label for="academic_year" class="form-label fw-medium">Active academic school year <span class="text-danger">*</span></label>
-                        <input 
-                            type="text" 
-                            class="form-control" 
-                            id="academic_year" 
-                            name="academic_year" 
-                            value="<?= htmlspecialchars((string) $schoolYear) ?>" 
-                            placeholder="e.g., 2026-2027" 
-                            required
-                        >
-                        <div class="form-text">Active term: <strong><?= htmlspecialchars($semesterLabel) ?></strong>. Applies to grading sheets and enrollment catalogs.</div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="academic_term_id" class="form-label fw-medium mb-0">Active academic term & school year <span class="text-danger">*</span></label>
+                            <a href="<?= url('/admin/academic-terms') ?>" class="text-decoration-none small text-primary fw-medium">
+                                <i class="bi bi-calendar-range me-1"></i>Manage Terms
+                            </a>
+                        </div>
+                        <select class="form-select" id="academic_term_id" name="academic_term_id" onchange="if(this.value){ window.location.href = '<?= url('/admin/settings') ?>?term_id=' + this.value; }" required>
+                            <?php if (empty($allTerms)): ?>
+                                <option value="" disabled selected>No academic terms configured</option>
+                            <?php else: ?>
+                                <?php foreach ($allTerms as $t): ?>
+                                    <?php 
+                                    $semText = match ((int)($t['semester'] ?? 1)) {
+                                        1 => '1st Semester',
+                                        2 => '2nd Semester',
+                                        3 => 'Summer Term',
+                                        default => 'Semester ' . $t['semester'],
+                                    };
+                                    $isSelected = ((int)($term['id'] ?? 0) === (int)$t['id']);
+                                    ?>
+                                    <option value="<?= (int)$t['id'] ?>" <?= $isSelected ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($t['school_year_display']) ?> &mdash; <?= htmlspecialchars($semText) ?><?= !empty($t['is_active']) ? ' (Active)' : '' ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                        <input type="hidden" name="academic_year" value="<?= htmlspecialchars((string)$schoolYear) ?>">
+                        <div class="form-text">
+                            Active term: <strong class="text-dark"><?= htmlspecialchars($semesterLabel) ?></strong> (<?= htmlspecialchars((string)$schoolYear) ?>). Applies to grading sheets and enrollment catalogs.
+                        </div>
                     </div>
 
                     <div>

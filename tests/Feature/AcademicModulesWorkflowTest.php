@@ -225,4 +225,37 @@ class AcademicModulesWorkflowTest extends TestCase
         $this->assertStringContainsString('yearLevelFilter', $html);
         $this->assertStringContainsString('statusFilter', $html);
     }
+
+    public function testSettingsViewRendersAcademicTermSelectDropdown(): void
+    {
+        $_SESSION['user'] = ['role' => 'Admin', 'first_name' => 'Admin', 'last_name' => 'User'];
+
+        $term = AcademicTerm::getActive();
+        $termsStmt = \App\Core\Database::getConnection()->query("
+            SELECT at.*, 
+                   COALESCE(at.school_year, ay.school_year, '2026-2027') as school_year_display
+            FROM academic_terms at
+            LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
+            WHERE at.is_archived = 0
+            ORDER BY at.semester ASC
+        ");
+        $allTerms = $termsStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $html = (new View())->render('admin.settings.index', [
+            'term' => $term,
+            'allTerms' => $allTerms,
+            'settings' => [
+                'grading_method' => 'zero_based',
+                'prelim_weight' => 20.00,
+                'midterm_weight' => 20.00,
+                'semi_final_weight' => 20.00,
+                'final_weight' => 40.00,
+            ],
+        ]);
+
+        $this->assertNotEmpty($html);
+        $this->assertStringContainsString('Active academic term & school year', $html);
+        $this->assertStringContainsString('<select class="form-select" id="academic_term_id"', $html);
+        $this->assertStringContainsString('/admin/academic-terms', $html);
+    }
 }
