@@ -72,10 +72,19 @@ class GradingController
             $termId
         );
 
+        $currentSubject = null;
+        foreach ($assignedSubjects as $subj) {
+            if ((int) $subj['id'] === $subjectId) {
+                $currentSubject = $subj;
+                break;
+            }
+        }
+
         $html = (new View())->render('faculty.grading.index', [
             'students' => $students,
             'grades' => $gradeMap,
             'subjectId' => $subjectId,
+            'currentSubject' => $currentSubject,
             'periodId' => $periodId,
             'periods' => $periods,
             'academicTerm' => $academicTerm,

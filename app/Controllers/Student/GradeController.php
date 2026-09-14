@@ -24,7 +24,7 @@ class GradeController
     public function index(Request $request, Response $response, Session $session): void
     {
         $user = $session->get('user');
-        $student = Student::findByUserId((int) ($user['id'] ?? 0));
+        $student = Student::findWithDetailsByUserId((int) ($user['id'] ?? 0));
         
         $selectedSem = (string) $request->get('semester', '');
         if ($selectedSem === '1' || $selectedSem === '2') {
@@ -33,10 +33,11 @@ class GradeController
             $academicTerm = AcademicTerm::getActive();
         }
 
-        $grades = $this->gradeService->getStudentGrades($student['id'] ?? 0, $academicTerm['id'] ?? 0);
-        $summary = $this->gradeService->getGradeSummary($student['id'] ?? 0, $academicTerm['id'] ?? 0);
+        $grades = $this->gradeService->getStudentGrades((int) ($student['id'] ?? 0), (int) ($academicTerm['id'] ?? 0));
+        $summary = $this->gradeService->getGradeSummary((int) ($student['id'] ?? 0), (int) ($academicTerm['id'] ?? 0));
 
         $html = (new View())->render('student.grades.index', [
+            'student' => $student,
             'grades' => $grades,
             'summary' => $summary,
             'academicTerm' => $academicTerm,

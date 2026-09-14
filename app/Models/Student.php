@@ -45,6 +45,22 @@ class Student extends Model
         return $result ?: null;
     }
 
+    public static function findWithDetailsByUserId(int $userId): ?array
+    {
+        $stmt = self::db()->prepare("
+            SELECT s.*, sd.first_name, sd.last_name, sd.student_number, u.email, sec.set_name
+            FROM students s
+            JOIN users u ON s.user_id = u.id
+            LEFT JOIN student_details sd ON sd.user_id = u.id
+            LEFT JOIN sets sec ON sec.id = s.set_id
+            WHERE s.user_id = :user_id
+            LIMIT 1
+        ");
+        $stmt->execute(['user_id' => $userId]);
+        $result = $stmt->fetch();
+        return $result ?: null;
+    }
+
     public static function getBySet(int $setId): array
     {
         $stmt = self::db()->prepare("
