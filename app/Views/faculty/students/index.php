@@ -1,109 +1,123 @@
 <?php
+$hasSubjects = !empty($assignedSubjects);
 $pageTitle = 'Enrolled Students';
 $subtitle = 'Class enrollment roster and student classification for the active course offering.';
 $headerActions = '
-    <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+    <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addStudentModal"' . (!$hasSubjects ? ' disabled title="Assign a subject first before adding students"' : '') . '>
         <i class="bi bi-person-plus"></i> Add new student
     </button>
-    <button type="button" class="btn btn-outline-primary d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#enrollExistingModal">
+    <button type="button" class="btn btn-outline-primary d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#enrollExistingModal"' . (!$hasSubjects ? ' disabled title="Assign a subject first before enrolling students"' : '') . '>
         <i class="bi bi-person-check"></i> Select existing student
-    </button>
-    <a href="' . url('/faculty/subjects') . '" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2">
-        <i class="bi bi-arrow-left"></i> Back to subjects
-    </a>';
+    </button>';
 ob_start();
 ?>
 
-<!-- Course Selector Toolbar -->
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-    <div class="card-body py-3 px-4">
-        <form method="GET" action="<?= url('/faculty/students') ?>" class="row g-3 align-items-center">
-            <div class="col-auto d-flex align-items-center gap-2">
-                <label for="semester_select" class="form-label mb-0 fw-semibold small text-muted">Semester:</label>
-                <select id="semester_select" name="semester" class="form-select" style="width: auto; min-width: 150px;" onchange="this.form.submit()">
-                    <option value="1" <?= ($selectedSemester ?? '1') === '1' ? 'selected' : '' ?>>1st Semester</option>
-                    <option value="2" <?= ($selectedSemester ?? '1') === '2' ? 'selected' : '' ?>>2nd Semester</option>
-                </select>
-            </div>
+<!-- Search, Filter & Statistics Bar -->
+<div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between mb-4">
+    <form method="GET" action="<?= url('/faculty/students') ?>" class="d-flex flex-wrap align-items-center gap-2 flex-grow-1" id="studentsFilterForm">
+        <div class="position-relative flex-grow-1" style="min-width: 220px; max-width: 320px;">
+            <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 14px;"></i>
+            <input type="text" 
+                   id="studentSearch" 
+                   name="search"
+                   class="form-control ps-5" 
+                   placeholder="Search by name, ID, or email..." 
+                   value="<?= htmlspecialchars($currentSearch ?? '') ?>"
+                   autocomplete="off"
+                   <?= !$hasSubjects ? 'disabled' : '' ?>>
+        </div>
 
-            <div class="col-auto d-flex align-items-center gap-2">
-                <label for="subject_id_select" class="form-label mb-0 fw-semibold small text-muted">Active subject:</label>
-                <select id="subject_id_select" name="subject_id" class="form-select" style="min-width: 280px;" onchange="this.form.submit()">
-                    <?php foreach (($assignedSubjects ?? []) as $sub): ?>
-                        <option value="<?= $sub['id'] ?>" <?= ((int)$sub['id'] === (int)($subjectId ?? 0)) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($sub['code'] . ' - ' . $sub['name']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+        <select id="semester_select" name="semester" class="form-select w-auto" onchange="this.form.submit()">
+            <option value="1" <?= ($selectedSemester ?? '1') === '1' ? 'selected' : '' ?>>1st Semester</option>
+            <option value="2" <?= ($selectedSemester ?? '1') === '2' ? 'selected' : '' ?>>2nd Semester</option>
+        </select>
 
-            <div class="col-auto d-flex align-items-center gap-2">
-                <label for="set_id_filter" class="form-label mb-0 fw-semibold small text-muted">Set:</label>
-                <select id="set_id_filter" name="set_id" class="form-select" style="width: auto; min-width: 150px;" onchange="this.form.submit()">
-                    <option value="">All sets</option>
-                    <?php foreach (($sets ?? []) as $set): ?>
-                        <option value="<?= $set['id'] ?>" <?= ((int)($selectedSet ?? 0) === (int)$set['id']) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($set['name']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-auto d-flex align-items-center gap-2">
-                <label for="search_filter" class="form-label mb-0 fw-semibold small text-muted">Search:</label>
-                <div class="input-group input-group-sm" style="width: 220px;">
-                    <input type="text" id="search_filter" name="search" class="form-control" placeholder="Name or student ID..." value="<?= htmlspecialchars($currentSearch ?? '') ?>">
-                    <button class="btn btn-outline-secondary" type="submit" title="Search"><i class="bi bi-search"></i></button>
-                </div>
-            </div>
-            <?php if (!empty($selectedSet) || !empty($currentSearch)): ?>
-                <div class="col-auto">
-                    <a href="<?= url('/faculty/students?semester=' . ($selectedSemester ?? '1') . '&subject_id=' . ($subjectId ?? 0)) ?>" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
-                        <i class="bi bi-x-circle"></i> Clear filters
-                    </a>
-                </div>
+        <select id="subject_id_select" name="subject_id" class="form-select w-auto" style="min-width: 200px; max-width: 280px;" onchange="this.form.submit()" <?= !$hasSubjects ? 'disabled' : '' ?>>
+            <?php if (!$hasSubjects): ?>
+                <option value="">No subjects assigned</option>
+            <?php else: ?>
+                <?php foreach ($assignedSubjects as $sub): ?>
+                    <option value="<?= $sub['id'] ?>" <?= ((int)$sub['id'] === (int)($subjectId ?? 0)) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($sub['code'] . ' - ' . $sub['name']) ?>
+                    </option>
+                <?php endforeach; ?>
             <?php endif; ?>
-            <?php if (!empty($currentSubject)): ?>
-                <div class="col-auto">
-                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
-                        <?= htmlspecialchars($currentSubject['nature'] ?? 'Lecture') ?>
-                    </span>
-                </div>
-            <?php endif; ?>
-        </form>
+        </select>
+
+        <select id="set_id_filter" name="set_id" class="form-select w-auto" onchange="window.fetchStudents()" <?= !$hasSubjects ? 'disabled' : '' ?>>
+            <option value="">All Sets</option>
+            <?php foreach (($sets ?? []) as $set): ?>
+                <option value="<?= $set['id'] ?>" <?= ((int)($selectedSet ?? 0) === (int)$set['id']) ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($set['name']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <?php if (!empty($currentSubject)): ?>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 fs-7">
+                <?= htmlspecialchars($currentSubject['nature'] ?? 'Lecture') ?>
+            </span>
+        <?php endif; ?>
+    </form>
+
+    <div class="text-muted small fw-medium text-nowrap" id="studentCounter">
+        <?php $totalCount = (int)($pagination['total'] ?? count($students)); ?>
+        <?= number_format($totalCount) ?> <?= $totalCount === 1 ? 'student enrolled' : 'students enrolled' ?>
     </div>
 </div>
 
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
-    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <h3 class="h6 mb-0 fw-semibold text-dark">Class Enrollment Roster</h3>
-        <span class="text-muted small"><?= (int)($pagination['total'] ?? count($students)) ?> students enrolled</span>
-    </div>
-
-    <?php if (empty($students)): ?>
-        <?php
-        $icon = 'bi-people';
-        $iconColor = 'blue';
-        $title = 'No students enrolled';
-        $message = 'Use "Add new student" or "Select existing student" above to enroll students into this class.';
-        include __DIR__ . '/../../components/empty-state.php';
-        ?>
-    <?php else: ?>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-white border-bottom">
-                    <tr>
-                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 150px; font-size: 11px;">Student ID</th>
-                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Student name</th>
-                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Email address</th>
-                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 120px; font-size: 11px;">Set</th>
-                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Year level</th>
-                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Status</th>
-                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 110px; font-size: 11px;">Actions</th>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="studentsTable">
+            <thead class="bg-white border-bottom">
+                <tr>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 150px; font-size: 11px;">Student ID</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Student name</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Email address</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 120px; font-size: 11px;">Set</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Year level</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Status</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 110px; font-size: 11px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                <?php if (!$hasSubjects): ?>
+                    <tr id="emptyStudentRow">
+                        <td colspan="7" class="p-0">
+                            <?php
+                            $icon = 'bi-journal-x';
+                            $iconColor = 'amber';
+                            $title = 'No subjects assigned for this semester';
+                            $message = 'You do not have any teaching subjects assigned for ' . (($selectedSemester ?? '1') === '2' ? '2nd Semester' : '1st Semester') . '. Switch semesters or contact your Dean or Administrator.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="divide-y">
+                <?php elseif (empty($students)): ?>
+                    <tr id="emptyStudentRow">
+                        <td colspan="7" class="p-0">
+                            <?php
+                            $icon = 'bi-people';
+                            $iconColor = 'blue';
+                            $title = 'No students enrolled';
+                            $message = 'Use "Add new student" or "Select existing student" above to enroll students into this class.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
+                        </td>
+                    </tr>
+                <?php else: ?>
+                    <tr id="emptySearchRow" style="display: none;">
+                        <td colspan="7" class="p-0">
+                            <?php
+                            $icon = 'bi-search';
+                            $title = 'No matching students found';
+                            $message = 'No enrolled students match your search query.';
+                            include __DIR__ . '/../../components/empty-state.php';
+                            ?>
+                        </td>
+                    </tr>
                     <?php foreach ($students as $student): ?>
-                    <tr>
+                    <tr class="student-row" data-search="<?= strtolower(htmlspecialchars(($student['student_number'] ?? '') . ' ' . $student['first_name'] . ' ' . $student['last_name'] . ' ' . $student['email'] . ' ' . ($student['set_name'] ?? ''))) ?>">
                         <td class="px-3 fw-semibold font-monospace small text-dark">
                             <?= !empty($student['student_number']) ? htmlspecialchars($student['student_number']) : 'No ID' ?>
                         </td>
@@ -145,12 +159,15 @@ ob_start();
                         </td>
                     </tr>
                     <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-        <?php if (!empty($students)): ?>
-            <?php include __DIR__ . '/../../components/pagination.php'; ?>
-        <?php endif; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="studentsPagination" class="mt-2">
+    <?php if (!empty($students)): ?>
+        <?php include __DIR__ . '/../../components/pagination.php'; ?>
     <?php endif; ?>
 </div>
 
@@ -294,6 +311,119 @@ ob_start();
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('studentSearch');
+    const filterForm = document.getElementById('studentsFilterForm');
+
+    let debounceTimer = null;
+    let abortCtrl = null;
+
+    function applyClientFilter() {
+        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+        const rows = document.querySelectorAll('.student-row');
+        const emptySearchRow = document.getElementById('emptySearchRow');
+        let visibleCount = 0;
+
+        rows.forEach(function(row) {
+            const searchData = row.getAttribute('data-search') || '';
+            if (!query || searchData.includes(query)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (emptySearchRow && rows.length > 0) {
+            emptySearchRow.style.display = (visibleCount === 0 && query) ? '' : 'none';
+        }
+    }
+
+    window.fetchStudents = function(pageUrl) {
+        if (abortCtrl) {
+            abortCtrl.abort();
+        }
+        abortCtrl = new AbortController();
+
+        let targetUrl;
+        if (pageUrl) {
+            targetUrl = pageUrl;
+        } else {
+            const formData = new FormData(filterForm);
+            const params = new URLSearchParams();
+            for (const [k, v] of formData.entries()) {
+                const val = typeof v === 'string' ? v.trim() : v;
+                if (val) params.set(k, val);
+            }
+            targetUrl = filterForm.action + (params.toString() ? '?' + params.toString() : '');
+        }
+
+        fetch(targetUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            signal: abortCtrl.signal
+        })
+        .then(res => res.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const newTable = doc.getElementById('studentsTable');
+            const currentTable = document.getElementById('studentsTable');
+            if (newTable && currentTable) {
+                currentTable.innerHTML = newTable.innerHTML;
+            }
+
+            const newCounter = doc.getElementById('studentCounter');
+            const currentCounter = document.getElementById('studentCounter');
+            if (newCounter && currentCounter) {
+                currentCounter.innerHTML = newCounter.innerHTML;
+            }
+
+            const newPagination = doc.getElementById('studentsPagination');
+            const currentPagination = document.getElementById('studentsPagination');
+            if (currentPagination) {
+                currentPagination.innerHTML = newPagination ? newPagination.innerHTML : '';
+            }
+
+            window.history.replaceState(null, '', targetUrl);
+        })
+        .catch(err => {
+            if (err.name !== 'AbortError') {
+                console.error('Fetch error:', err);
+            }
+        });
+    };
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            applyClientFilter();
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function() {
+                window.fetchStudents();
+            }, 300);
+        });
+    }
+
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearTimeout(debounceTimer);
+            window.fetchStudents();
+        });
+    }
+
+    // Intercept pagination clicks for seamless page changes
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('#studentsPagination a.page-link');
+        if (link && link.getAttribute('href') && !link.getAttribute('href').startsWith('#')) {
+            e.preventDefault();
+            window.fetchStudents(link.getAttribute('href'));
+        }
+    });
+});
+</script>
 
 <?php
 $content = ob_get_clean();
