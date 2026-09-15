@@ -30,7 +30,7 @@ class PasswordResetService
 
         $token = bin2hex(random_bytes(32));
         $now = date('Y-m-d H:i:s');
-        $expiresAt = date('Y-m-d H:i:s', time() + 3600); // 60 minutes validity
+        $expiresAt = date('Y-m-d H:i:s', time() + 900); // 15 minutes validity
 
         PasswordReset::create([
             'email' => $email,
@@ -176,7 +176,7 @@ class PasswordResetService
             </div>
 
             <div class="notice">
-                <strong>Important Notice:</strong> This password reset link is valid for <strong>60 minutes</strong> from when it was requested and can only be used once.
+                <strong>Important Notice:</strong> This password reset link is valid for <strong>15 minutes</strong> from when it was requested and can only be used once.
             </div>
 
             <p style="margin-bottom: 0;">If you did not request a password reset, you can safely disregard this email. Your account credentials remain secure.</p>

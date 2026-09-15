@@ -226,20 +226,35 @@ class AuthController
         }
 
         if (empty($password) || empty($confirmPassword)) {
-            $session->flash('error', 'Please fill in both password fields.');
-            redirect('/reset-password?token=' . urlencode($token));
+            $html = (new \App\Core\View())->render('auth.reset-password', [
+                'token' => $token,
+                'error' => 'Please fill in both password fields.',
+                'success' => null,
+                'info' => null,
+            ]);
+            $response->html($html);
             return;
         }
 
         if (strlen($password) < 8) {
-            $session->flash('error', 'Password must be at least 8 characters long.');
-            redirect('/reset-password?token=' . urlencode($token));
+            $html = (new \App\Core\View())->render('auth.reset-password', [
+                'token' => $token,
+                'error' => 'Password must be at least 8 characters long.',
+                'success' => null,
+                'info' => null,
+            ]);
+            $response->html($html);
             return;
         }
 
         if ($password !== $confirmPassword) {
-            $session->flash('error', 'Passwords do not match.');
-            redirect('/reset-password?token=' . urlencode($token));
+            $html = (new \App\Core\View())->render('auth.reset-password', [
+                'token' => $token,
+                'error' => 'Passwords do not match.',
+                'success' => null,
+                'info' => null,
+            ]);
+            $response->html($html);
             return;
         }
 
@@ -251,8 +266,14 @@ class AuthController
             return;
         }
 
-        $session->flash('success', 'Your password has been reset. You can now sign in.');
-        redirect('/login');
+        $html = (new \App\Core\View())->render('auth.reset-password', [
+            'token' => $token,
+            'success' => 'Your password has been reset. You can now sign in.',
+            'isSuccess' => true,
+            'error' => null,
+            'info' => null,
+        ]);
+        $response->html($html);
     }
 
     public function logout(Request $request, Response $response, Session $session): void
