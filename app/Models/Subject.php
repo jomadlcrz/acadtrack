@@ -109,14 +109,32 @@ class Subject extends Model
         return ((int) ($row['total_deps'] ?? 0)) > 0;
     }
 
-    public static function getByDean(int $academicTermId, ?string $statusFilter = null): array
+    public static function getByDean(int $academicTermId, ?string $statusFilter = null, ?int $semester = null): array
     {
-        $whereSql = "s.academic_term_id = :academic_term_id2";
-        if ($statusFilter === 'active') {
-            $whereSql .= " AND s.is_archived = 0";
-        } elseif ($statusFilter === 'archived') {
-            $whereSql .= " AND s.is_archived = 1";
+        $params = ['academic_term_id' => $academicTermId];
+        $whereConditions = [];
+
+        if ($semester !== null && $semester > 0) {
+            $whereConditions[] = "s.academic_term_id = :academic_term_id2 AND s.semester = :semester";
+            $params['academic_term_id2'] = $academicTermId;
+            $params['semester'] = $semester;
+        } else {
+            $whereConditions[] = "(s.academic_term_id = :academic_term_id2 OR s.academic_term_id IN (
+                SELECT at.id FROM academic_terms at WHERE at.academic_year_id = (
+                    SELECT at2.academic_year_id FROM academic_terms at2 WHERE at2.id = :academic_term_id3
+                )
+            ))";
+            $params['academic_term_id2'] = $academicTermId;
+            $params['academic_term_id3'] = $academicTermId;
         }
+
+        if ($statusFilter === 'active') {
+            $whereConditions[] = "s.is_archived = 0";
+        } elseif ($statusFilter === 'archived') {
+            $whereConditions[] = "s.is_archived = 1";
+        }
+
+        $whereSql = implode(" AND ", $whereConditions);
 
         $stmt = self::db()->prepare("
             SELECT s.*, 
@@ -133,7 +151,7 @@ class Subject extends Model
             GROUP BY s.id
             ORDER BY s.is_archived ASC, s.subject_code ASC
         ");
-        $stmt->execute(['academic_term_id' => $academicTermId, 'academic_term_id2' => $academicTermId]);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 

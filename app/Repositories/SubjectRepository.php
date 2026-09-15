@@ -45,9 +45,9 @@ class SubjectRepository
         return $subject->restore();
     }
 
-    public function getByDean(int $academicTermId, ?string $statusFilter = null): array
+    public function getByDean(int $academicTermId, ?string $statusFilter = null, ?int $semester = null): array
     {
-        return Subject::getByDean($academicTermId, $statusFilter);
+        return Subject::getByDean($academicTermId, $statusFilter, $semester);
     }
 
     public function getActive(): array

@@ -234,6 +234,9 @@ class ProgramCurriculumController
             $subjectRow = $stmtFindSubject->fetch(PDO::FETCH_ASSOC);
 
             if (!$subjectRow) {
+                $matchingTerm = AcademicTerm::getBySemester((string) $semester);
+                $targetTermId = $matchingTerm['id'] ?? $termId;
+
                 $stmtInsertSub = $pdo->prepare("
                     INSERT INTO subjects (subject_code, descriptive_title, nature, year_level, semester, academic_term_id, is_archived, created_at, updated_at)
                     VALUES (:code, :title, 'Lecture', :yl, :sem, :tid, 0, NOW(), NOW())
@@ -243,7 +246,7 @@ class ProgramCurriculumController
                     'title' => $title,
                     'yl' => $ylInt,
                     'sem' => $semester,
-                    'tid' => $termId,
+                    'tid' => $targetTermId,
                 ]);
                 $subjectId = (int) $pdo->lastInsertId();
             } else {

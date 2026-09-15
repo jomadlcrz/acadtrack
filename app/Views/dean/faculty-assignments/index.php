@@ -1,6 +1,7 @@
 <?php
 $pageTitle = 'Faculty Subject Assignments';
-$subtitle = 'Designate accredited faculty instructors to curricular course offerings for ' . htmlspecialchars($academicTerm['name'] ?? 'the active semester') . '.';
+$termDisplay = $termLabel ?? (($academicTerm['academic_year_name'] ?? '2026-2027') . ' · ' . (($selectedSemester ?? '1') === '2' ? '2nd Semester' : '1st Semester'));
+$subtitle = 'Designate accredited faculty instructors to curricular course offerings for ' . htmlspecialchars($termDisplay) . '.';
 
 // Calculate Executive Metrics
 $totalSubjects = count($subjects);
@@ -418,7 +419,7 @@ ob_start();
                     </div>
                     <div>
                         <h5 class="modal-title h6 fw-bold mb-0" id="facultyWorkloadModalLabel">Faculty Teaching Workload Summary</h5>
-                        <small class="text-muted" style="font-size: 12px;"><?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?> &bull; Semester <?= htmlspecialchars((string)($selectedSemester ?? '1')) ?></small>
+                        <small class="text-muted" style="font-size: 12px;"><?= htmlspecialchars($termDisplay) ?></small>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

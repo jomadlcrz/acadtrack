@@ -32,7 +32,8 @@ class FacultyAssignmentController
         }
 
         $termId = (int) ($academicTerm['id'] ?? 0);
-        $subjects = $this->subjectRepository->getByDean($termId);
+        $semInt = (int) ($academicTerm['semester'] ?? ($selectedSem !== '' ? (int)$selectedSem : 1));
+        $subjects = $this->subjectRepository->getByDean($termId, null, $semInt);
         $faculty = (new \App\Models\User())->getFaculty();
         $assignments = $this->facultyRepository->getAssignmentsForTerm($termId);
 
@@ -55,11 +56,15 @@ class FacultyAssignmentController
         }
         unset($f);
 
+        $academicYearName = $academicTerm['academic_year_name'] ?? ($academicTerm['school_year'] ?? '2026-2027');
+        $termLabel = $academicYearName . ' · ' . ($semInt === 2 ? '2nd Semester' : '1st Semester');
+
         $html = (new View())->render('dean.faculty-assignments.index', [
             'subjects' => $subjects,
             'faculty' => $faculty,
             'academicTerm' => $academicTerm,
-            'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
+            'termLabel' => $termLabel,
+            'selectedSemester' => (string) $semInt,
             'totalAssignments' => count($assignments),
         ]);
         $response->html($html);
