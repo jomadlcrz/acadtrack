@@ -1,21 +1,22 @@
 <?php
-$pageTitle = 'Set Permanent Password';
-$authBadge = 'Security Onboarding';
+$pageTitle = 'Reset Password';
 $authHeading = 'Set new password';
-$authSubheading = 'Create a permanent password to secure your institutional account before continuing.';
+$authSubheading = 'Choose a strong password with at least 8 characters.';
 ob_start();
 ?>
 
-<form method="POST" action="<?= url('/change-password') ?>" class="auth-form" id="changePasswordForm" novalidate>
+<form method="POST" action="<?= url('/reset-password') ?>" class="auth-form" id="resetPasswordForm" novalidate>
     <?= csrf_field() ?>
+    <input type="hidden" name="token" value="<?= htmlspecialchars((string) ($token ?? '')) ?>">
 
+    <!-- New Password Field -->
     <div class="mb-3">
-        <label for="new_password" class="form-label">New password</label>
+        <label for="password" class="form-label">New password</label>
         <div class="input-group">
             <input 
                 type="password" 
-                id="new_password" 
-                name="new_password" 
+                id="password" 
+                name="password" 
                 class="form-control border-end-0" 
                 placeholder="Enter new password" 
                 required 
@@ -25,18 +26,17 @@ ob_start();
             <button 
                 type="button" 
                 class="btn btn-toggle-pwd border-start-0" 
-                data-target="new_password" 
+                data-target="password" 
                 title="Show or hide password"
                 aria-label="Toggle password visibility"
+                tabindex="-1"
             >
-                <i class="bi bi-eye" aria-hidden="true"></i>
+                <i class="bi bi-eye text-muted" aria-hidden="true"></i>
             </button>
-        </div>
-        <div class="form-text text-muted" style="font-size: 12px; margin-top: 4px;">
-            Must be at least 8 characters long and different from your temporary password.
         </div>
     </div>
 
+    <!-- Confirm Password Field -->
     <div class="mb-3">
         <label for="confirm_password" class="form-label">Confirm new password</label>
         <div class="input-group">
@@ -56,25 +56,26 @@ ob_start();
                 data-target="confirm_password" 
                 title="Show or hide password"
                 aria-label="Toggle password visibility"
+                tabindex="-1"
             >
-                <i class="bi bi-eye" aria-hidden="true"></i>
+                <i class="bi bi-eye text-muted" aria-hidden="true"></i>
             </button>
         </div>
     </div>
 
-    <button type="submit" class="btn-auth-submit" id="submitBtn">
-        Update password
+    <!-- Submit Button -->
+    <button type="submit" class="btn-auth-submit mt-4" id="submitBtn">
+        <span>Reset password</span>
     </button>
+    
+    <!-- Return to Sign In -->
+    <div class="text-center mt-3 pt-2">
+        <a href="<?= url('/login') ?>" class="auth-link-subtle d-inline-flex align-items-center gap-1.5">
+            <i class="bi bi-arrow-left"></i>
+            <span>Back to sign in</span>
+        </a>
+    </div>
 </form>
-
-<div class="auth-cancel-wrap">
-    <form method="POST" action="<?= url('/logout') ?>" class="d-inline">
-        <?= csrf_field() ?>
-        <button type="submit" class="auth-cancel-btn">
-            Cancel and sign out
-        </button>
-    </form>
-</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -86,11 +87,23 @@ document.addEventListener('DOMContentLoaded', function() {
             if (input && icon) {
                 const isPassword = input.getAttribute('type') === 'password';
                 input.setAttribute('type', isPassword ? 'text' : 'password');
-                icon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+                icon.className = isPassword ? 'bi bi-eye-slash text-primary' : 'bi bi-eye text-muted';
                 input.focus();
             }
         });
     });
+
+    const resetForm = document.getElementById('resetPasswordForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (resetForm && submitBtn) {
+        resetForm.addEventListener('submit', function() {
+            if (resetForm.checkValidity()) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Updating password...';
+            }
+        });
+    }
 });
 </script>
 

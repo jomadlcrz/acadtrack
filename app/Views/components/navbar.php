@@ -61,7 +61,7 @@ if ($activeTerm) {
                 <?= csrf_field() ?>
                 <button type="submit" class="btn-navbar-logout" title="Sign out of your session">
                     <i class="bi bi-box-arrow-right"></i>
-                    <span>Log out</span>
+                    <span>Sign out</span>
                 </button>
             </form>
         <?php endif; ?>

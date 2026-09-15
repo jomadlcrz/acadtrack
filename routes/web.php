@@ -32,6 +32,10 @@ $router->get('/', [HomeController::class, 'index']);
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login'], [new CsrfMiddleware()]);
 $router->post('/logout', [AuthController::class, 'logout']);
+$router->get('/forgot-password', [AuthController::class, 'showForgotPassword']);
+$router->post('/forgot-password', [AuthController::class, 'forgotPassword'], [new CsrfMiddleware()]);
+$router->get('/reset-password', [AuthController::class, 'showResetPassword']);
+$router->post('/reset-password', [AuthController::class, 'resetPassword'], [new CsrfMiddleware()]);
 $router->get('/change-password', [AuthController::class, 'showChangePassword'], [new AuthMiddleware()]);
 $router->post('/change-password', [AuthController::class, 'changePassword'], [new AuthMiddleware(), new CsrfMiddleware()]);
 

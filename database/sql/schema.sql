@@ -387,6 +387,18 @@ CREATE TABLE notifications (
     INDEX idx_notifications_user_status_date (user_id, status, created_at)
 ) ENGINE=InnoDB;
 
+-- Password Resets
+CREATE TABLE IF NOT EXISTS password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    token VARCHAR(64) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NULL DEFAULT NULL,
+    used_at TIMESTAMP NULL DEFAULT NULL,
+    INDEX idx_password_resets_email (email),
+    INDEX idx_password_resets_token (token)
+) ENGINE=InnoDB;
+
 -- Insert default academic year and terms
 INSERT INTO academic_years (id, school_year, is_active) VALUES
 (1, '2026-2027', 1);

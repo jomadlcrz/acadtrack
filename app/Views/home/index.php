@@ -24,7 +24,6 @@
                     <span class="landing-system-tag">Acadtrack</span>
                 </div>
             </a>
-
         </div>
     </header>
 
@@ -40,7 +39,7 @@
                     </p>
                     <div class="hero-actions">
                         <a href="<?= url('/login') ?>" class="btn-hero-primary">
-                            <span>Log In to Portal</span>
+                            <span>Sign In to Portal</span>
                         </a>
                     </div>
                 </div>
@@ -101,7 +100,7 @@
                         <div class="workflow-step-num">5</div>
                         <h4 class="workflow-step-title">FINALIZED</h4>
                         <p class="workflow-step-desc">
-                            Grades lock into permanent academic records. Students log in to view their Whole Evaluation.
+                            Grades lock into permanent academic records. Students sign in to view their Whole Evaluation.
                         </p>
                     </div>
                 </div>
@@ -112,37 +111,20 @@
     <!-- 4. Institutional Footer -->
     <footer class="landing-footer">
         <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-5">
-                    <div class="footer-brand">
-                        <img src="<?= asset('images/gwc.png') ?>" alt="GWC Logo" class="footer-logo">
-                        <h3 class="footer-title">Golden West Colleges, Inc.</h3>
-                    </div>
-                    <p class="footer-desc">
-                        Acadtrack &mdash; Providing dependable, transparent, and accurate grade computation and curriculum tracking for the academic community of Golden West Colleges, Inc.
-                    </p>
-                </div>
-                <div class="col-6 col-lg-3 offset-lg-1">
-                    <h4 class="footer-heading">Portals</h4>
-                    <ul class="footer-links">
-                        <li><a href="<?= url('/login') ?>"><i class="bi bi-chevron-right me-1"></i> Dean Review Portal</a></li>
-                        <li><a href="<?= url('/login') ?>"><i class="bi bi-chevron-right me-1"></i> Faculty Grading Portal</a></li>
-                        <li><a href="<?= url('/login') ?>"><i class="bi bi-chevron-right me-1"></i> Student Grade Inquiry</a></li>
-                        <li><a href="<?= url('/login') ?>"><i class="bi bi-chevron-right me-1"></i> System Administration</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <h4 class="footer-heading">Academic System</h4>
-                    <ul class="footer-links">
-                        <li><a href="#lifecycle"><i class="bi bi-chevron-right me-1"></i> Workflow Lifecycle</a></li>
-                        <li><a href="<?= url('/login') ?>"><i class="bi bi-chevron-right me-1"></i> Log In to Portal</a></li>
-                    </ul>
-                </div>
+            <div class="footer-brand">
+                <img src="<?= asset('images/gwc.png') ?>" alt="GWC Logo" class="footer-logo">
+                <h3 class="footer-title">Golden West Colleges, Inc.</h3>
             </div>
+            <p class="footer-desc">
+                Acadtrack &mdash; Providing dependable, transparent, and accurate grade computation and curriculum tracking for the academic community of Golden West Colleges, Inc.
+            </p>
 
             <div class="footer-bottom">
                 <div>
                     &copy; <?= date('Y') ?> Golden West Colleges, Inc. All rights reserved.
+                </div>
+                <div>
+                    San Jose Drive, Alaminos, Pangasinan
                 </div>
             </div>
         </div>
