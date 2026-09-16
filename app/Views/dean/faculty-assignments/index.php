@@ -241,10 +241,8 @@ ob_start();
                                     data-faculty="<?= htmlspecialchars($facultySearchString) ?>"
                                     data-status="<?= $isAssigned ? 'ASSIGNED' : 'UNASSIGNED' ?>">
                                     
-                                    <td class="py-3 px-4">
-                                        <span class="badge bg-light text-primary border font-monospace px-2.5 py-1 fw-bold">
-                                            <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>
-                                        </span>
+                                    <td class="py-3 px-4 fw-bold text-dark font-monospace">
+                                        <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>
                                     </td>
 
                                     <td class="py-3 px-4">

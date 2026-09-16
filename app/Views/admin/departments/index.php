@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Institutional Departments';
+$pageTitle = 'Departments';
 $subtitle = 'Manage academic colleges, faculties, and departmental divisions.';
 $headerActions = '<button type="button" class="btn text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" data-bs-toggle="modal" data-bs-target="#addDepartmentModal"><i class="bi bi-plus-lg"></i> New Department</button>';
 ob_start();
@@ -27,7 +27,6 @@ ob_start();
                 <tr>
                     <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 160px; font-size: 11px;">Department code</th>
                     <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Department Name</th>
-                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Description</th>
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 150px; font-size: 11px;">Assigned faculty</th>
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Status</th>
                     <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 160px; font-size: 11px;">Actions</th>
@@ -36,7 +35,7 @@ ob_start();
             <tbody class="divide-y">
                 <?php if (empty($departments)): ?>
                     <tr id="emptyDeptRow">
-                        <td colspan="6" class="p-0">
+                        <td colspan="5" class="p-0">
                             <?php
                             $icon = 'bi-building-x';
                             $title = 'No departments created yet';
@@ -48,9 +47,8 @@ ob_start();
                 <?php else: ?>
                     <?php foreach ($departments as $dept): ?>
                     <tr class="dept-row" data-search="<?= strtolower(htmlspecialchars($dept['code'] . ' ' . $dept['name'])) ?>">
-                        <td class="px-3 fw-semibold text-primary font-monospace"><?= htmlspecialchars($dept['code']) ?></td>
-                        <td class="px-3 fw-semibold text-dark"><?= htmlspecialchars($dept['name']) ?></td>
-                        <td class="px-3 text-muted small"><?= htmlspecialchars($dept['description'] ?? '—') ?></td>
+                        <td class="py-3 px-4 fw-bold text-dark font-monospace"><?= htmlspecialchars($dept['code']) ?></td>
+                        <td class="px-4 fw-semibold text-dark"><?= htmlspecialchars($dept['name']) ?></td>
                         <td class="px-3 text-center">
                             <?php $facCount = (int) ($dept['faculty_count'] ?? 0); ?>
                             <?php if ($facCount > 0): ?>
@@ -136,7 +134,7 @@ ob_start();
                     </div>
                     <?php endforeach; ?>
                     <tr id="emptyDeptRow" style="display: none;">
-                        <td colspan="6" class="p-0">
+                        <td colspan="5" class="p-0">
                             <?php
                             $icon = 'bi-search';
                             $title = 'No departments found';
@@ -165,7 +163,7 @@ ob_start();
                     <div class="mb-3">
                         <label for="add_code" class="form-label">Department code <span class="text-danger">*</span></label>
                         <input type="text" class="form-control font-monospace" id="add_code" name="code" placeholder="e.g., CIT" required style="text-transform: uppercase;">
-                        <div class="form-text">Unique uppercase institutional code.</div>
+                        <div class="form-text">Unique uppercase department code.</div>
                     </div>
                     <div class="mb-3">
                         <label for="add_name" class="form-label">Department name <span class="text-danger">*</span></label>

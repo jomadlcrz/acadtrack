@@ -209,10 +209,8 @@ ob_start();
                                     data-code="<?= strtolower(htmlspecialchars($subject['subject_code'] ?? $subject['code'] ?? '')) ?>"
                                     data-title="<?= strtolower(htmlspecialchars($subject['descriptive_title'] ?? $subject['name'] ?? '')) ?>"
                                     data-type="<?= strtolower(htmlspecialchars($sType)) ?>">
-                                    <td class="py-3 px-4">
-                                        <span class="badge bg-light <?= $isArchived ? 'text-secondary' : 'text-primary' ?> border font-monospace px-2.5 py-1 fw-bold">
-                                            <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>
-                                        </span>
+                                    <td class="py-3 px-4 fw-bold <?= $isArchived ? 'text-secondary' : 'text-dark' ?> font-monospace">
+                                        <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>
                                     </td>
                                     <td class="py-3 px-4 fw-medium <?= $isArchived ? 'text-secondary' : 'text-dark' ?>">
                                         <?= htmlspecialchars($subject['descriptive_title'] ?? $subject['name']) ?>

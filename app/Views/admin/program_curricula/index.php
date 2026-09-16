@@ -137,10 +137,8 @@ ob_start();
                             <tbody class="divide-y">
                                 <?php foreach ($group['subjects'] as $sub): ?>
                                     <tr class="curriculum-subject-row" data-search="<?= strtolower(htmlspecialchars($sub->subject_code . ' ' . $sub->descriptive_title . ' ' . $sub->subject_type)) ?>">
-                                        <td class="py-3 px-4">
-                                            <span class="badge bg-light text-dark border font-monospace px-2 py-1 fw-bold">
-                                                <?= htmlspecialchars($sub->subject_code) ?>
-                                            </span>
+                                        <td class="py-3 px-4 fw-bold text-dark font-monospace">
+                                            <?= htmlspecialchars($sub->subject_code) ?>
                                         </td>
                                         <td class="py-3 px-4 fw-medium text-dark">
                                             <?= htmlspecialchars($sub->descriptive_title) ?>

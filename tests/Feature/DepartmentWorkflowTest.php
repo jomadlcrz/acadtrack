@@ -140,7 +140,7 @@ class DepartmentWorkflowTest extends TestCase
         ]);
 
         $this->assertNotEmpty($html);
-        $this->assertStringContainsString('Institutional Departments', $html);
+        $this->assertStringContainsString('Departments', $html);
         $this->assertStringContainsString('College of Information Technology Education', $html);
         $this->assertStringContainsString('Department code', $html);
     }

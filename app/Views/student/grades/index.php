@@ -64,7 +64,7 @@ ob_start();
                     <?php foreach ($summary as $subjectCode => $subject): ?>
                     <tr>
                         <td class="px-3">
-                            <div class="fw-semibold text-primary font-monospace small">
+                            <div class="fw-semibold text-dark font-monospace small">
                                 <?= htmlspecialchars($subjectCode) ?>
                             </div>
                             <div class="fw-semibold text-dark small">

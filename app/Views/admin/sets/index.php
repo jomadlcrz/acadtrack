@@ -108,10 +108,8 @@ ob_start();
                                     <input type="checkbox" class="form-check-input set-checkbox" value="<?= $set->id ?>" onchange="updateSelectedCount()">
                                 </td>
                             <?php endif; ?>
-                            <td class="py-3 px-3">
-                                <span class="badge bg-light text-primary border font-monospace px-2.5 py-1 fw-bold fs-6">
-                                    <?= htmlspecialchars($set->name) ?>
-                                </span>
+                            <td class="py-3 px-3 fw-bold text-dark font-monospace">
+                                <?= htmlspecialchars($set->name) ?>
                             </td>
                             <td class="py-3 px-4">
                                 <div class="fw-semibold text-dark"><?= htmlspecialchars($progName ?: $progAbbrev) ?></div>
@@ -387,7 +385,7 @@ function updateLivePreview() {
         container.innerHTML = '<span class="text-muted small">Enter section codes (e.g. A, B) to preview.</span>';
     } else {
         container.innerHTML = generated.map(name => `
-            <span class="badge bg-white text-primary border font-monospace px-2.5 py-1.5 fw-semibold shadow-xs">
+            <span class="badge bg-white text-dark border font-monospace px-2.5 py-1.5 fw-semibold shadow-xs">
                 ${name}
             </span>
         `).join('');

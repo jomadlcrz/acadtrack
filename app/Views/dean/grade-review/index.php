@@ -183,7 +183,7 @@ $metrics = $metrics ?? [
                     ?>
                     <tr class="grade-review-row" data-search="<?= htmlspecialchars($searchHaystack) ?>">
                         <td class="py-2.5 px-4">
-                            <div class="fw-bold text-primary font-monospace fs-7 mb-0.5">
+                            <div class="fw-bold text-dark font-monospace fs-7 mb-0.5">
                                 <?= htmlspecialchars($code) ?>
                             </div>
                             <div class="fw-semibold text-dark fs-7">

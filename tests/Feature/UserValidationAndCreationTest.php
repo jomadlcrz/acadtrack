@@ -19,6 +19,7 @@ use App\Core\Session;
 class UserValidationAndCreationTest extends TestCase
 {
     private static array $createdUserIds = [];
+    private static array $cleanupSetIds = [];
     private static ?int $deptId = null;
     private static ?int $setId = null;
 
@@ -41,6 +42,16 @@ class UserValidationAndCreationTest extends TestCase
         self::$deptId = $dept ? (int) $dept->id : null;
 
         $set = Set::first();
+        if (!$set) {
+            $term = \App\Models\AcademicTerm::getActive();
+            $set = Set::create([
+                'name' => 'TEST-VALID-SET',
+                'academic_term_id' => (int) ($term['id'] ?? 1),
+                'year_level' => 1,
+                'status' => 'active',
+            ]);
+            self::$cleanupSetIds[] = (int) $set->id;
+        }
         self::$setId = $set ? (int) $set->id : null;
     }
 
@@ -50,6 +61,10 @@ class UserValidationAndCreationTest extends TestCase
             Student::where('user_id', $uid)->delete();
             Faculty::where('user_id', $uid)->delete();
             User::where('id', $uid)->delete();
+        }
+
+        if (!empty(self::$cleanupSetIds)) {
+            Set::whereIn('id', self::$cleanupSetIds)->delete();
         }
     }
 

@@ -125,7 +125,7 @@ ob_start();
                             <?php foreach ($pendingSheets as $ps): ?>
                                 <tr>
                                     <td class="px-3">
-                                        <div class="fw-semibold font-monospace text-primary"><?= htmlspecialchars($ps['subject_code']) ?></div>
+                                        <div class="fw-semibold font-monospace text-dark"><?= htmlspecialchars($ps['subject_code']) ?></div>
                                         <div class="text-dark small"><?= htmlspecialchars($ps['subject_name']) ?></div>
                                     </td>
                                     <td class="px-3 text-muted small">

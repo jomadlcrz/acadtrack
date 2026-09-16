@@ -119,7 +119,7 @@ ob_start();
                 <?php else: ?>
                     <?php foreach ($grades as $g): ?>
                         <tr>
-                            <td class="px-3 fw-semibold font-monospace text-primary">
+                            <td class="px-3 fw-semibold font-monospace text-dark">
                                 <?= htmlspecialchars($g['code'] ?? '') ?>
                             </td>
                             <td class="px-3 fw-semibold text-dark">

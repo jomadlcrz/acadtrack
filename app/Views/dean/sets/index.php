@@ -55,7 +55,7 @@ $displaySets = $sets ?? [];
                 <?php else: ?>
                     <?php foreach ($displaySets as $sec): ?>
                     <tr>
-                        <td class="px-3 fw-semibold text-primary font-monospace">
+                        <td class="px-3 fw-semibold text-dark font-monospace">
                             <i class="bi bi-people me-1 text-muted"></i>
                             <?= htmlspecialchars($sec['name']) ?>
                         </td>

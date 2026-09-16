@@ -47,7 +47,7 @@ ob_start();
                 <tbody class="divide-y">
                     <?php foreach ($subjects as $subject): ?>
                     <tr>
-                        <td class="px-3 fw-semibold text-primary font-monospace"><?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?></td>
+                        <td class="px-3 fw-semibold text-dark font-monospace"><?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?></td>
                         <td class="px-3 fw-semibold text-dark">
                             <?= htmlspecialchars($subject['descriptive_title'] ?? $subject['name']) ?>
                         </td>

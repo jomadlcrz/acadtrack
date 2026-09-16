@@ -110,7 +110,7 @@ ob_start();
                 <?php else: ?>
                     <?php foreach ($workload as $item): ?>
                         <tr>
-                            <td class="px-3 fw-semibold font-monospace text-primary">
+                            <td class="px-3 fw-semibold font-monospace text-dark">
                                 <?= htmlspecialchars($item['code']) ?>
                             </td>
                             <td class="px-3 fw-semibold text-dark">
