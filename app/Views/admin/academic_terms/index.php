@@ -28,8 +28,6 @@ ob_start();
                 <tr>
                     <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 200px; font-size: 11px;">School Year</th>
                     <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Semester</th>
-                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">Curricular Sets</th>
-                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">Subjects</th>
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">Status</th>
                     <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 160px; font-size: 11px;">Actions</th>
                 </tr>
@@ -37,7 +35,7 @@ ob_start();
             <tbody class="divide-y">
                 <?php if (empty($terms)): ?>
                     <tr id="emptyRow">
-                        <td colspan="6" class="p-0">
+                        <td colspan="4" class="p-0">
                             <?php
                             $icon = 'bi-calendar-x';
                             $title = 'No academic terms created yet';
@@ -67,16 +65,6 @@ ob_start();
                             </td>
                             <td class="py-3 px-4 fw-medium text-secondary">
                                 <?= $semLabel ?>
-                            </td>
-                            <td class="py-3 px-3 text-center">
-                                <span class="badge bg-light text-dark border px-2.5 py-1">
-                                    <i class="bi bi-collection me-1 text-muted"></i><?= (int)($term['sets_count'] ?? 0) ?> sets
-                                </span>
-                            </td>
-                            <td class="py-3 px-3 text-center">
-                                <span class="badge bg-light text-dark border px-2.5 py-1">
-                                    <i class="bi bi-book me-1 text-muted"></i><?= (int)($term['subjects_count'] ?? 0) ?> subjects
-                                </span>
                             </td>
                             <td class="py-3 px-3 text-center">
                                 <?php if ($isActive): ?>
@@ -118,7 +106,7 @@ ob_start();
                         </tr>
                     <?php endforeach; ?>
                     <tr id="emptyRow" style="display: none;">
-                        <td colspan="6" class="p-0">
+                        <td colspan="4" class="p-0">
                             <?php
                             $icon = 'bi-search';
                             $title = 'No academic terms found';

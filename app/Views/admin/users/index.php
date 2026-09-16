@@ -83,14 +83,14 @@ ob_start();
                             <span class="badge badge-<?= strtolower($user['role']) ?>"><?= htmlspecialchars($user['role']) ?></span>
                             <?php if (in_array($user['role'], ['Faculty', 'Dean'], true) && !empty($user['department_name'])): ?>
                                 <div class="small text-muted mt-1">
-                                    <i class="bi bi-building me-1 text-primary"></i><?= htmlspecialchars($user['department_name']) ?> (<?= htmlspecialchars($user['department_code']) ?>)
+                                    <?= htmlspecialchars($user['department_name']) ?> (<?= htmlspecialchars($user['department_code']) ?>)
                                 </div>
                             <?php elseif ($user['role'] === 'Student'): ?>
                                 <div class="small text-muted mt-1 font-monospace d-flex align-items-center gap-2">
                                     <span><?= !empty($user['student_number']) ? htmlspecialchars($user['student_number']) : 'No ID' ?></span>
                                     <?php $displaySet = $user['set_name'] ?? ''; ?>
                                     <?php if (!empty($displaySet)): ?>
-                                        <span class="badge bg-light text-dark border"><i class="bi bi-collection me-1"></i><?= htmlspecialchars($displaySet) ?></span>
+                                        <span class="badge bg-light text-dark border"><?= htmlspecialchars($displaySet) ?></span>
                                     <?php endif; ?>
                                 </div>
                             <?php endif; ?>

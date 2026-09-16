@@ -41,7 +41,7 @@ ob_start();
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label for="academic_term_id" class="form-label fw-medium mb-0">Active academic term & school year <span class="text-danger">*</span></label>
                             <a href="<?= url('/admin/academic-terms') ?>" class="text-decoration-none small text-primary fw-medium">
-                                <i class="bi bi-calendar-range me-1"></i>Manage Terms
+                                Manage Terms
                             </a>
                         </div>
                         <select class="form-select" id="academic_term_id" name="academic_term_id" onchange="if(this.value){ window.location.href = '<?= url('/admin/settings') ?>?term_id=' + this.value; }" required>

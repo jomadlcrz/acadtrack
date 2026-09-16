@@ -250,7 +250,7 @@ ob_start();
                                             <?= htmlspecialchars($subject['descriptive_title'] ?? $subject['name']) ?>
                                         </div>
                                         <div class="small text-muted d-flex align-items-center gap-2">
-                                            <span><i class="bi bi-award me-1"></i><?= number_format($units, 1) ?> Units</span>
+                                            <span><?= number_format($units, 1) ?> Units</span>
                                             <span>&bull;</span>
                                             <span><?= htmlspecialchars($sType) ?></span>
                                         </div>
