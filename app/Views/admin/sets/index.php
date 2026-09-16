@@ -56,26 +56,18 @@ ob_start();
         <table class="table table-hover align-middle mb-0" id="setsTable">
             <thead class="bg-white border-bottom">
                 <tr>
-                    <?php if (!$isReadOnly): ?>
-                        <th class="py-2.5 px-3 text-center" style="width: 40px;">
-                            <input type="checkbox" class="form-check-input" id="selectAllCheckbox" onchange="toggleSelectAll(this)">
-                        </th>
-                    <?php endif; ?>
-                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 140px; font-size: 11px;">Section Name</th>
-                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Degree Program</th>
-                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 110px; font-size: 11px;">Year Level</th>
-                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 100px; font-size: 11px;">Code</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 140px; font-size: 11px;">Set</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Program</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 130px; font-size: 11px;">Year Level</th>
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">Students</th>
-                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 110px; font-size: 11px;">Status</th>
-                    <?php if (!$isReadOnly): ?>
-                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 160px; font-size: 11px;">Actions</th>
-                    <?php endif; ?>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Status</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 140px; font-size: 11px;">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y">
                 <?php if (empty($sets) || $sets->isEmpty()): ?>
                     <tr id="emptySetsRow">
-                        <td colspan="<?= $isReadOnly ? 6 : 8 ?>" class="p-0">
+                        <td colspan="6" class="p-0">
                             <?php
                             $icon = 'bi-collection';
                             $title = 'No sections found';
@@ -88,7 +80,9 @@ ob_start();
                     <?php foreach ($sets as $set): ?>
                         <?php
                             $progAbbrev = $set->program ? $set->program->program_abbrev : (explode('-', $set->name)[0] ?? '');
+                            $progType = $set->program->program_type ?? "Bachelor's Degree";
                             $progName = $set->program ? $set->program->program_name : '';
+                            $progTitle = trim($progAbbrev . ' ' . $progType);
                             $ylInt = (int) $set->year_level;
                             $ylLabel = match($ylInt) {
                                 1 => '1st Year',
@@ -98,35 +92,42 @@ ob_start();
                                 default => "Year {$ylInt}",
                             };
                             $isActive = ($set->status ?? 'active') === 'active';
+                            $rawCode = trim((string)($set->set_code ?: ''));
+                            if (empty($rawCode) && !empty($set->name)) {
+                                $parts = explode('-', $set->name);
+                                $last = end($parts);
+                                $rawCode = preg_replace('/^\d+/', '', $last);
+                                if (empty($rawCode)) {
+                                    $rawCode = substr($set->name, -1);
+                                }
+                            }
+                            $setDisplay = str_starts_with(strtolower($rawCode), 'set ') ? $rawCode : 'Set ' . $rawCode;
                         ?>
                         <tr class="set-row" 
                             data-program="<?= htmlspecialchars($progAbbrev) ?>" 
                             data-year="<?= $ylInt ?>"
-                            data-search="<?= strtolower(htmlspecialchars($set->name . ' ' . $progAbbrev . ' ' . $progName . ' ' . $set->set_code)) ?>">
-                            <?php if (!$isReadOnly): ?>
-                                <td class="px-3 text-center">
-                                    <input type="checkbox" class="form-check-input set-checkbox" value="<?= $set->id ?>" onchange="updateSelectedCount()">
-                                </td>
-                            <?php endif; ?>
-                            <td class="py-3 px-3 fw-bold text-dark font-monospace">
-                                <?= htmlspecialchars($set->name) ?>
+                            data-search="<?= strtolower(htmlspecialchars($setDisplay . ' ' . $set->name . ' ' . $progTitle . ' ' . $progName)) ?>">
+                            <td class="py-3 px-4 fw-bold text-dark font-monospace">
+                                <?= htmlspecialchars($setDisplay) ?>
                             </td>
                             <td class="py-3 px-4">
-                                <div class="fw-semibold text-dark"><?= htmlspecialchars($progName ?: $progAbbrev) ?></div>
-                                <div class="text-muted small"><?= htmlspecialchars($progAbbrev) ?></div>
+                                <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                    <span class="fw-bold text-dark"><?= htmlspecialchars($progAbbrev) ?></span>
+                                    <?php if (!empty($progType)): ?>
+                                        <span class="text-secondary small"><?= htmlspecialchars($progType) ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if (!empty($progName)): ?>
+                                    <div class="text-muted small"><?= htmlspecialchars($progName) ?></div>
+                                <?php endif; ?>
                             </td>
-                            <td class="py-3 px-3 text-center small text-secondary">
+                            <td class="py-3 px-3 text-center fw-medium text-secondary">
                                 <?= $ylLabel ?>
                             </td>
                             <td class="py-3 px-3 text-center">
-                                <span class="badge bg-white text-dark border font-monospace px-2 py-0.5">
-                                    <?= htmlspecialchars($set->set_code ?: substr($set->name, -1)) ?>
-                                </span>
-                            </td>
-                            <td class="py-3 px-3 text-center">
                                 <?php $sCount = (int) ($set->students_count ?? 0); ?>
-                                <span class="badge <?= $sCount > 0 ? 'bg-primary-subtle text-primary border border-primary-subtle' : 'bg-light text-muted border' ?> px-2.5 py-1">
-                                    <i class="bi bi-people me-1"></i><?= $sCount ?> <?= $sCount === 1 ? 'student' : 'students' ?>
+                                <span class="badge bg-light text-dark border px-2.5 py-1">
+                                    <i class="bi bi-people me-1 text-muted"></i><?= $sCount ?> <?= $sCount === 1 ? 'student' : 'students' ?>
                                 </span>
                             </td>
                             <td class="py-3 px-3 text-center">
@@ -136,14 +137,14 @@ ob_start();
                                     <span class="badge bg-secondary-subtle text-secondary border">Inactive</span>
                                 <?php endif; ?>
                             </td>
-                            <?php if (!$isReadOnly): ?>
-                                <td class="py-3 px-4 text-end">
-                                    <div class="d-inline-flex align-items-center gap-1.5">
-                                        <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#editSetModal<?= $set->id ?>">
+                            <td class="py-3 px-4 text-end">
+                                <div class="d-inline-flex align-items-center gap-1.5">
+                                    <?php if (!$isReadOnly): ?>
+                                        <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#editSetModal<?= $set->id ?>" title="Edit Section">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <?php if ($isActive): ?>
-                                            <form method="POST" action="<?= url('/admin/sets/' . $set->id . '/archive') ?>" class="d-inline">
+                                            <form method="POST" action="<?= url('/admin/sets/' . $set->id . '/archive') ?>" class="d-inline" onsubmit="return confirm('Archive section <?= htmlspecialchars(addslashes($set->name)) ?>?');">
                                                 <?= csrf_field() ?>
                                                 <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Archive Section">
                                                     <i class="bi bi-archive"></i>
@@ -157,9 +158,11 @@ ob_start();
                                                 </button>
                                             </form>
                                         <?php endif; ?>
-                                    </div>
-                                </td>
-                            <?php endif; ?>
+                                    <?php else: ?>
+                                        <span class="text-muted small">—</span>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
                         </tr>
 
                         <?php if (!$isReadOnly): ?>
@@ -207,7 +210,7 @@ ob_start();
                         <?php endif; ?>
                     <?php endforeach; ?>
                     <tr id="emptySetsRow" style="display: none;">
-                        <td colspan="<?= $isReadOnly ? 6 : 8 ?>" class="p-0">
+                        <td colspan="6" class="p-0">
                             <?php
                             $icon = 'bi-search';
                             $title = 'No sections found';

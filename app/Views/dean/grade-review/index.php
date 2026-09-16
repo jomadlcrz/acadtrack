@@ -186,7 +186,7 @@ $metrics = $metrics ?? [
                             <div class="fw-bold text-dark font-monospace fs-7 mb-0.5">
                                 <?= htmlspecialchars($code) ?>
                             </div>
-                            <div class="fw-semibold text-dark fs-7">
+                            <div class="text-secondary small">
                                 <?= htmlspecialchars($sheet['subject_name']) ?>
                             </div>
                         </td>

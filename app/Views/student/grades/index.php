@@ -67,7 +67,7 @@ ob_start();
                             <div class="fw-semibold text-dark font-monospace small">
                                 <?= htmlspecialchars($subjectCode) ?>
                             </div>
-                            <div class="fw-semibold text-dark small">
+                            <div class="text-secondary small">
                                 <?= htmlspecialchars($subject['subject_name']) ?>
                             </div>
                         </td>

@@ -126,7 +126,7 @@ ob_start();
                                 <tr>
                                     <td class="px-3">
                                         <div class="fw-semibold font-monospace text-dark"><?= htmlspecialchars($ps['subject_code']) ?></div>
-                                        <div class="text-dark small"><?= htmlspecialchars($ps['subject_name']) ?></div>
+                                        <div class="text-secondary small"><?= htmlspecialchars($ps['subject_name']) ?></div>
                                     </td>
                                     <td class="px-3 text-muted small">
                                         <?= htmlspecialchars($ps['faculty_first_name'] . ' ' . $ps['faculty_last_name']) ?>
