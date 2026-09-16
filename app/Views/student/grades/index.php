@@ -58,23 +58,10 @@ ob_start();
                                 <?= htmlspecialchars($period) ?>
                             </th>
                         <?php endforeach; ?>
-                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 150px; font-size: 11px;">
-                            Verified Slip
-                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
                     <?php foreach ($summary as $subjectCode => $subject): ?>
-                    <?php
-                        $prelimVal = $subject['periods']['Prelim'] ?? null;
-                        $midtermVal = $subject['periods']['Midterm'] ?? null;
-                        $semiFinalVal = $subject['periods']['Semi-Final'] ?? null;
-                        $finalVal = $subject['periods']['Final'] ?? null;
-
-                        // Calculate weighted or average rating
-                        $scoresArray = array_filter([$prelimVal, $midtermVal, $semiFinalVal, $finalVal], fn($v) => $v !== null && $v !== '');
-                        $ratingVal = count($scoresArray) > 0 ? (array_sum($scoresArray) / count($scoresArray)) : 0;
-                    ?>
                     <tr>
                         <td class="px-3">
                             <div class="fw-semibold text-primary font-monospace small">
@@ -96,23 +83,6 @@ ob_start();
                                 <?php endif; ?>
                             </td>
                         <?php endforeach; ?>
-                        <td class="px-3 text-center">
-                            <button type="button" 
-                                    class="btn btn-sm btn-outline-primary py-1 px-2.5 d-inline-flex align-items-center gap-1.5"
-                                    style="font-size: 11px;"
-                                    title="View authenticated grade pass card"
-                                    onclick="openStudentSubjectPassSlip(
-                                        '<?= htmlspecialchars(addslashes($subjectCode)) ?>',
-                                        '<?= htmlspecialchars(addslashes($subject['subject_name'])) ?>',
-                                        <?= $prelimVal !== null ? (float)$prelimVal : 'null' ?>,
-                                        <?= $midtermVal !== null ? (float)$midtermVal : 'null' ?>,
-                                        <?= $semiFinalVal !== null ? (float)$semiFinalVal : 'null' ?>,
-                                        <?= $finalVal !== null ? (float)$finalVal : 'null' ?>,
-                                        <?= number_format($ratingVal, 2, '.', '') ?>
-                                    )">
-                                <i class="bi bi-patch-check"></i> Pass Slip
-                            </button>
-                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -120,37 +90,6 @@ ob_start();
         </div>
     <?php endif; ?>
 </div>
-
-<?php include __DIR__ . '/../../components/pass-card-modal.php'; ?>
-
-<script>
-function openStudentSubjectPassSlip(subjectCode, subjectTitle, prelim, midterm, semiFinal, final, rating) {
-    const studentName = '<?= htmlspecialchars(addslashes(trim(($student['first_name'] ?? '') . ' ' . ($student['last_name'] ?? '')) ?: 'Student')) ?>';
-    const studentNumber = '<?= htmlspecialchars(addslashes($student['student_number'] ?? '2026-00001')) ?>';
-    const yearLevel = <?= (int)($student['year_level'] ?? 1) ?>;
-    const status = '<?= htmlspecialchars(addslashes($student['status'] ?? 'Regular')) ?>';
-    const schoolYear = '<?= htmlspecialchars(addslashes($academicTerm['academic_year_name'] ?? '2026-2027')) ?>';
-    const semesterLabel = '<?= ($selectedSemester ?? '1') === '2' ? '2nd Semester' : '1st Semester' ?>';
-
-    renderPassCard({
-        studentName: studentName,
-        studentNumber: studentNumber,
-        yearLevel: yearLevel,
-        status: status,
-        subjectCode: subjectCode,
-        subjectTitle: subjectTitle,
-        courseNature: 'Standard Course',
-        facultyName: 'Assigned Department Faculty',
-        schoolYear: schoolYear,
-        semesterLabel: semesterLabel,
-        prelim: prelim,
-        midterm: midterm,
-        semiFinal: semiFinal,
-        final: final,
-        finalRating: rating
-    });
-}
-</script>
 
 <?php
 $content = ob_get_clean();

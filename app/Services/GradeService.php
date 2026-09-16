@@ -29,6 +29,7 @@ class GradeService
             $subjectCode = $grade['subject_code'];
             if (!isset($summary[$subjectCode])) {
                 $summary[$subjectCode] = [
+                    'subject_id' => (int)($grade['subject_id'] ?? 0),
                     'subject_code' => $subjectCode,
                     'subject_name' => $grade['subject_name'],
                     'periods' => [],

@@ -90,6 +90,10 @@
                     <i class="bi bi-table"></i>
                     <span>Grade Encoding</span>
                 </a>
+                <a href="<?= url('/faculty/attendance') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/faculty/attendance') ? 'active' : '' ?>">
+                    <i class="bi bi-clipboard-check"></i>
+                    <span>Attendance</span>
+                </a>
             </div>
 
         <?php elseif ($userRole === 'Student'): ?>

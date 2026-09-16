@@ -45,12 +45,20 @@ class EvaluationController
         foreach ($summary as $subjectCode => $subjectGrades) {
             $evaluations[$subjectCode] = $this->evaluationService->calculateEvaluation($subjectGrades['periods']);
             $evaluations[$subjectCode]['subject_name'] = $subjectGrades['subject_name'];
+            $evaluations[$subjectCode]['subject_id'] = $subjectGrades['subject_id'] ?? 0;
         }
 
+        $studentId = (int) ($student['id'] ?? 0);
+        $attendanceSummary = $studentId > 0 && $termId > 0 
+            ? \App\Models\AttendanceRecord::getStudentOverallSummary($studentId, $termId)
+            : null;
+
         $html = (new View())->render('student.evaluation.show', [
+            'student' => $student,
             'evaluations' => $evaluations,
             'academicTerm' => $academicTerm,
             'selectedSemester' => $selectedSem,
+            'attendanceSummary' => $attendanceSummary,
         ]);
         $response->html($html);
     }

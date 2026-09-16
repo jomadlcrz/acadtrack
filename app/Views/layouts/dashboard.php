@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="<?= asset('css/components/empty-state.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/page-header.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/filter-bar.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/attendance-pass.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/layouts/app-shell.css') ?>">
 </head>
 <body>

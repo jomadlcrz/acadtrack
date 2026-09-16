@@ -180,6 +180,59 @@ ob_start();
                 </div>
             </div>
         </div>
+
+        <!-- Dean's List / Top GWA Performers -->
+        <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 8px; overflow: hidden;">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-award-fill text-warning fs-5"></i>
+                    <h3 class="h6 mb-0 fw-semibold text-dark">Dean's Honor Roll (Top GWA)</h3>
+                </div>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace small">Top 10</span>
+            </div>
+            <div class="card-body p-0">
+                <?php if (empty($deanList)): ?>
+                    <div class="p-4 text-center text-muted small">
+                        No term academic rankings computed yet.
+                    </div>
+                <?php else: ?>
+                    <ul class="list-group list-group-flush small">
+                        <?php foreach ($deanList as $dl): 
+                            $gwaVal = (float)$dl['gwa'];
+                            $distinction = $gwaVal >= 90.0 ? "President's List" : ($gwaVal >= 85.0 ? "Dean's List" : "Honor Roll");
+                            $distClass = $gwaVal >= 90.0 ? "bg-warning-subtle text-warning-emphasis border border-warning-subtle" : "bg-primary-subtle text-primary border border-primary-subtle";
+                            $initials = strtoupper(substr($dl['full_name'] ?? 'S', 0, 1));
+                        ?>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-3 py-2.5">
+                                <div class="d-flex align-items-center gap-2.5">
+                                    <?php if ($dl['rank'] === 1): ?>
+                                        <div class="podium-medal gold" style="width: 28px; height: 28px; font-size: 11px;">#1</div>
+                                    <?php elseif ($dl['rank'] === 2): ?>
+                                        <div class="podium-medal silver" style="width: 28px; height: 28px; font-size: 11px;">#2</div>
+                                    <?php elseif ($dl['rank'] === 3): ?>
+                                        <div class="podium-medal bronze" style="width: 28px; height: 28px; font-size: 11px;">#3</div>
+                                    <?php else: ?>
+                                        <div class="avatar-monogram" style="width: 28px; height: 28px; font-size: 11px;">#<?= $dl['rank'] ?></div>
+                                    <?php endif; ?>
+                                    <div>
+                                        <div class="fw-semibold text-dark"><?= htmlspecialchars($dl['full_name']) ?></div>
+                                        <div class="text-muted font-monospace" style="font-size: 10.5px;">
+                                            <?= htmlspecialchars($dl['student_number']) ?> &bull; <?= htmlspecialchars($dl['set_name'] ?? 'Section') ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold font-monospace tabular-nums text-success"><?= number_format($gwaVal, 2) ?>%</div>
+                                    <span class="badge <?= $distClass ?>" style="font-size: 9.5px; padding: 2px 6px;">
+                                        <?= $distinction ?>
+                                    </span>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 </div>
 

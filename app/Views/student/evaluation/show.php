@@ -51,19 +51,37 @@ ob_start();
 
         <div class="card-body bg-light border-bottom py-3 px-4">
             <div class="row g-3 text-center">
-                <div class="col-md-4">
+                <div class="col-6 col-md-3">
                     <span class="text-muted small d-block">Evaluated subjects</span>
                     <span class="h5 fw-semibold text-dark mb-0"><?= $count ?></span>
                 </div>
-                <div class="col-md-4">
+                <div class="col-6 col-md-3">
                     <span class="text-muted small d-block">General Weighted Average (GWA)</span>
                     <span class="h5 fw-semibold text-primary mb-0 font-monospace"><?= number_format($overallGwa, 2) ?></span>
                 </div>
-                <div class="col-md-4">
+                <div class="col-6 col-md-3">
                     <span class="text-muted small d-block">Academic status</span>
                     <span class="badge <?= ($overallGwa >= 75.0 && $passedCount === $count) ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning-emphasis border border-warning-subtle' ?> fs-6 fw-semibold py-1 px-3">
                         <?= ($overallGwa >= 75.0 && $passedCount === $count) ? 'Good Academic Standing' : 'Academic Warning' ?>
                     </span>
+                </div>
+                <div class="col-6 col-md-3">
+                    <span class="text-muted small d-block">Attendance record</span>
+                    <?php if (!empty($attendanceSummary)): ?>
+                        <?php if (!empty($attendanceSummary['has_warning'])): ?>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle fs-6 fw-semibold py-1 px-3">
+                                ⚠️ <?= $attendanceSummary['absent_count'] + $attendanceSummary['excused_count'] ?> Absences
+                            </span>
+                        <?php else: ?>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle fs-6 fw-semibold py-1 px-3">
+                                <i class="bi bi-check-circle me-1"></i> <?= $attendanceSummary['attendance_percentage'] ?>% Present
+                            </span>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle fs-6 fw-semibold py-1 px-3">
+                            No records
+                        </span>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -75,7 +93,7 @@ ob_start();
                         <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Subject code &amp; title</th>
                         <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 160px; font-size: 11px;">Computed average</th>
                         <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 150px; font-size: 11px;">Status</th>
-                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 200px; font-size: 11px;">Remarks</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Remarks</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">

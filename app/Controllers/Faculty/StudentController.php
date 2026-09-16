@@ -234,4 +234,19 @@ class StudentController
         $session->flash('success', 'Student removed from this course roster.');
         redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
     }
+
+    public function getPassData(Request $request, Response $response): void
+    {
+        $studentId = (int) $request->get('student_id');
+        $subjectId = (int) $request->get('subject_id');
+        $termId = (int) $request->get('term_id');
+
+        if ($studentId <= 0 || $subjectId <= 0 || $termId <= 0) {
+            $response->json(['error' => 'Missing parameters'], 400);
+            return;
+        }
+
+        $pass = (new \App\Services\EvaluationService())->getDigitalPass($studentId, $subjectId, $termId);
+        $response->json($pass ?: ['error' => 'Student not found']);
+    }
 }

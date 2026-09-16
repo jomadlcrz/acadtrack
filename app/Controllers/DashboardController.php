@@ -19,7 +19,9 @@ use App\Models\AcademicTerm;
 use App\Models\GradingSheet;
 use App\Models\GradingSetting;
 use App\Models\Enrollment;
+use App\Models\AttendanceRecord;
 use App\Services\GradeService;
+use App\Services\RankingService;
 
 class DashboardController
 {
@@ -38,12 +40,12 @@ class DashboardController
 
             case 'Dean':
                 $view = 'dean.dashboard';
-                $data = array_merge($data, $this->deanDashboard($user));
+                $data = array_merge($data, $this->deanDashboard($user, $request));
                 break;
 
             case 'Faculty':
                 $view = 'faculty.dashboard';
-                $data = array_merge($data, $this->facultyDashboard($user));
+                $data = array_merge($data, $this->facultyDashboard($user, $request));
                 break;
 
             case 'Student':
@@ -81,10 +83,15 @@ class DashboardController
         ];
     }
 
-    private function deanDashboard(array $user): array
+    private function deanDashboard(array $user, ?Request $request = null): array
     {
-        $activeTerm = AcademicTerm::getActive();
-        $termId = (int) ($activeTerm['id'] ?? 1);
+        $selectedSem = $request ? (string) $request->get('semester', '') : '';
+        if ($selectedSem === '1' || $selectedSem === '2') {
+            $academicTerm = AcademicTerm::getBySemester($selectedSem);
+        } else {
+            $academicTerm = AcademicTerm::getActive();
+        }
+        $termId = (int) ($academicTerm['id'] ?? 1);
         $pendingReviewCount = GradingSheet::where('status', 'SUBMITTED')->count();
         $totalSubjects = Subject::count();
         $totalFaculty = Faculty::count();
@@ -117,21 +124,31 @@ class DashboardController
             LIMIT 6
         ")->fetchAll();
 
+        // Top Performers / Dean's List Qualifiers
+        $deanList = (new RankingService())->getTermTopPerformers($termId, null, 10);
+
         return [
-            'activeTerm' => $activeTerm,
+            'academicTerm' => $academicTerm,
+            'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
             'pendingReviewCount' => $pendingReviewCount,
             'totalSubjects' => $totalSubjects,
             'totalFaculty' => $totalFaculty,
             'totalSets' => $totalSets,
             'pendingSheets' => $pendingSheets,
             'recentSheets' => $recentSheets,
+            'deanList' => $deanList,
         ];
     }
 
-    private function facultyDashboard(array $user): array
+    private function facultyDashboard(array $user, ?Request $request = null): array
     {
-        $activeTerm = AcademicTerm::getActive();
-        $termId = (int) ($activeTerm['id'] ?? 1);
+        $selectedSem = $request ? (string) $request->get('semester', '') : '';
+        if ($selectedSem === '1' || $selectedSem === '2') {
+            $academicTerm = AcademicTerm::getBySemester($selectedSem);
+        } else {
+            $academicTerm = AcademicTerm::getActive();
+        }
+        $termId = (int) ($academicTerm['id'] ?? 1);
         $facultyId = (int) ($user['id'] ?? 0);
 
         $assignedSubjects = Faculty::getAssignedSubjects($facultyId, $termId);
@@ -169,9 +186,31 @@ class DashboardController
             $workload[] = $sub;
         }
 
+        // Top Performers & Analytics for assigned subjects
+        $selectedSubjectId = $request ? (int) $request->get('subject_id', 0) : 0;
+        if ($selectedSubjectId === 0 && !empty($assignedSubjects)) {
+            $selectedSubjectId = (int) ($assignedSubjects[0]['id'] ?? 0);
+        }
+
+        $selectedSetId = ($request && !empty($request->get('set_id'))) ? (int) $request->get('set_id') : null;
+
+        $rankings = null;
+        if ($selectedSubjectId > 0) {
+            $rankingService = new RankingService();
+            $rankings = $rankingService->getSubjectRankings($selectedSubjectId, $termId, $selectedSetId, 10);
+        }
+
+        $sets = Set::getActiveByTerm($termId);
+
         return [
-            'activeTerm' => $activeTerm,
+            'academicTerm' => $academicTerm,
+            'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
             'assignedSubjectsCount' => $assignedSubjectsCount,
+            'assignedSubjects' => $assignedSubjects,
+            'selectedSubjectId' => $selectedSubjectId,
+            'selectedSetId' => $selectedSetId,
+            'sets' => $sets,
+            'rankings' => $rankings,
             'totalStudents' => $totalStudents,
             'submittedCount' => $submittedCount,
             'workload' => $workload,
@@ -198,6 +237,8 @@ class DashboardController
             }
         }
 
+        $overallAttendance = $studentId > 0 ? AttendanceRecord::getStudentOverallSummary($studentId, $termId) : null;
+
         return [
             'student' => $student,
             'set' => $set,
@@ -205,6 +246,7 @@ class DashboardController
             'enrolledCount' => count($grades),
             'grades' => $grades,
             'summary' => $summary,
+            'overallAttendance' => $overallAttendance,
         ];
     }
 }

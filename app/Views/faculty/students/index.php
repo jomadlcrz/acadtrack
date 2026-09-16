@@ -145,7 +145,13 @@ ob_start();
                                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Regular</span>
                             <?php endif; ?>
                         </td>
-                        <td class="px-3 text-end">
+                        <td class="px-3 text-end text-nowrap">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1 me-1"
+                                    onclick="viewStudentPass(<?= $student['id'] ?>, <?= $subjectId ?>, <?= (int)($academicTerm['id'] ?? 1) ?>)"
+                                    title="View Digital Student Pass">
+                                <i class="bi bi-person-badge"></i> Pass
+                            </button>
                             <form method="POST" action="<?= url('/faculty/students/remove') ?>" class="d-inline" onsubmit="return confirm('Remove student from this course set?');">
                                 <?= csrf_field() ?>
                                 <input type="hidden" name="student_id" value="<?= $student['id'] ?>">
@@ -423,7 +429,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+function viewStudentPass(studentId, subjectId, termId) {
+    fetch('<?= url('/faculty/students/pass-data') ?>?student_id=' + studentId + '&subject_id=' + subjectId + '&term_id=' + termId)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            openStudentPassModal(data);
+        })
+        .catch(err => {
+            console.error('Failed to load student pass', err);
+            alert('Failed to load student pass details.');
+        });
+}
 </script>
+
+<?php include __DIR__ . '/../../components/student-pass-modal.php'; ?>
 
 <?php
 $content = ob_get_clean();

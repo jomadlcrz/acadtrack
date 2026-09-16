@@ -19,6 +19,8 @@ use App\Controllers\Faculty\SubjectController as FacultySubjectController;
 use App\Controllers\Faculty\StudentController;
 use App\Controllers\Faculty\GradingController;
 use App\Controllers\Faculty\GradeSubmissionController;
+use App\Controllers\Faculty\AttendanceController;
+use App\Controllers\PublicVerificationController;
 use App\Controllers\Student\GradeController;
 use App\Controllers\Student\EvaluationController;
 use App\Middleware\AuthMiddleware;
@@ -110,11 +112,18 @@ $router->get('/faculty/students', [StudentController::class, 'index'], [new Auth
 $router->post('/faculty/students/add', [StudentController::class, 'addStudent'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->post('/faculty/students/enroll', [StudentController::class, 'enrollExisting'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->post('/faculty/students/remove', [StudentController::class, 'remove'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
+$router->get('/faculty/students/pass-data', [StudentController::class, 'getPassData'], [new AuthMiddleware(), new RoleMiddleware(['Faculty', 'Dean', 'Admin'])]);
 $router->get('/faculty/grading', [GradingController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
 $router->post('/faculty/grading/save', [GradingController::class, 'save'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->post('/faculty/grading/submit', [GradingController::class, 'submit'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
+$router->get('/faculty/attendance', [AttendanceController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
+$router->post('/faculty/attendance/save', [AttendanceController::class, 'save'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
+$router->get('/faculty/attendance/student-history', [AttendanceController::class, 'getStudentHistory'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
 
 // Student routes
 $router->get('/student/dashboard', [DashboardController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Student'])]);
 $router->get('/student/grades', [GradeController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Student'])]);
 $router->get('/student/evaluation', [EvaluationController::class, 'show'], [new AuthMiddleware(), new RoleMiddleware(['Student'])]);
+
+// Public Verification
+$router->get('/verify/student-pass', [PublicVerificationController::class, 'verifyStudentPass']);
