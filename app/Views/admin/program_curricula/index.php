@@ -94,8 +94,8 @@ ob_start();
                         <div class="bg-white border rounded px-3 py-1.5 small text-nowrap">
                             <span class="text-muted">Total Units:</span> <span class="fw-bold text-dark"><?= number_format($totalUnits, 1) ?></span>
                         </div>
-                        <span class="badge text-uppercase <?= ($curriculum->status ?? 'active') === 'active' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning border border-warning-subtle' ?>">
-                            <?= htmlspecialchars($curriculum->status ?? 'active') ?>
+                        <span class="badge text-uppercase <?= ($selectedProgram->status ?? 'active') === 'active' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning border border-warning-subtle' ?>">
+                            <?= htmlspecialchars($selectedProgram->status ?? 'active') ?>
                         </span>
                     </div>
                 </div>

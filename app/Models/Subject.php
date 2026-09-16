@@ -11,8 +11,11 @@ class Subject extends Model
     protected $table = 'subjects';
 
     protected $fillable = [
+        'program_id',
         'subject_code',
         'descriptive_title',
+        'units',
+        'subject_type',
         'code',
         'name',
         'nature',
@@ -24,6 +27,21 @@ class Subject extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function program()
+    {
+        return $this->belongsTo(Program::class, 'program_id');
+    }
+
+    public function prerequisites()
+    {
+        return $this->belongsToMany(Subject::class, 'prerequisites', 'subject_id', 'prerequisite_subject_id');
+    }
+
+    public function dependentSubjects()
+    {
+        return $this->belongsToMany(Subject::class, 'prerequisites', 'prerequisite_subject_id', 'subject_id');
+    }
 
     public function getCodeAttribute(): ?string
     {
@@ -140,8 +158,8 @@ class Subject extends Model
             SELECT s.*, 
                    s.subject_code as code,
                    s.descriptive_title as name,
-                   (SELECT cs.units FROM curriculum_subjects cs WHERE cs.subject_code = s.subject_code OR cs.subject_id = s.id LIMIT 1) as units,
-                   (SELECT cs.subject_type FROM curriculum_subjects cs WHERE cs.subject_code = s.subject_code OR cs.subject_id = s.id LIMIT 1) as subject_type,
+                   s.units,
+                   s.subject_type,
                    COUNT(DISTINCT fs.faculty_id) as assigned_faculty_count,
                    (SELECT COUNT(*) FROM enrollments e WHERE e.subject_id = s.id) as enrolled_students_count,
                    (SELECT COUNT(*) FROM grades g WHERE g.subject_id = s.id) as grades_count

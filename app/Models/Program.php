@@ -36,14 +36,9 @@ class Program extends Model
         return $this->belongsTo(Department::class, 'department_id');
     }
 
-    public function curricula()
+    public function subjects()
     {
-        return $this->hasMany(Curriculum::class, 'program_id');
-    }
-
-    public function activeCurriculum()
-    {
-        return $this->hasOne(Curriculum::class, 'program_id')->where('status', 'active');
+        return $this->hasMany(Subject::class, 'program_id');
     }
 
     public function sets()
@@ -51,8 +46,8 @@ class Program extends Model
         return $this->hasMany(Set::class, 'program_id');
     }
 
-    public static function getAllWithCurricula(): array
+    public static function getAllWithSubjects(): array
     {
-        return self::with(['department', 'curricula.subjects'])->orderBy('program_abbrev')->get()->toArray();
+        return self::with(['department', 'subjects'])->orderBy('program_abbrev')->get()->toArray();
     }
 }

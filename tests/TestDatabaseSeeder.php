@@ -6,10 +6,9 @@ namespace Tests;
 
 use App\Models\AcademicTerm;
 use App\Models\AcademicYear;
-use App\Models\Curriculum;
-use App\Models\CurriculumSubject;
 use App\Models\Department;
 use App\Models\Program;
+use App\Models\Prerequisite;
 use App\Models\Set;
 use App\Models\Student;
 use App\Models\Subject;
@@ -68,25 +67,7 @@ class TestDatabaseSeeder
             Program::updateOrCreate(['id' => $p['id']], $p);
         }
 
-        // 3. Ensure baseline curriculum for BSIT
-        $bsitCurriculum = Curriculum::firstOrCreate(
-            ['program_id' => 1],
-            ['status' => 'active']
-        );
-
-        // 4. Ensure curriculum subjects
-        if (CurriculumSubject::where('curriculum_id', $bsitCurriculum->id)->count() === 0) {
-            $currSubjects = [
-                ['curriculum_id' => $bsitCurriculum->id, 'year_level' => 'First Year', 'semester' => 1, 'subject_code' => 'IT101', 'descriptive_title' => 'Introduction to Computing', 'units' => 3.0, 'subject_type' => 'GenEd Core', 'prerequisites' => 'None', 'display_order' => 1],
-                ['curriculum_id' => $bsitCurriculum->id, 'year_level' => 'First Year', 'semester' => 1, 'subject_code' => 'IT102', 'descriptive_title' => 'Computer Programming 1', 'units' => 3.0, 'subject_type' => 'Major with Lab', 'prerequisites' => 'None', 'display_order' => 2],
-                ['curriculum_id' => $bsitCurriculum->id, 'year_level' => 'First Year', 'semester' => 2, 'subject_code' => 'IT103', 'descriptive_title' => 'Data Structures and Algorithms', 'units' => 3.0, 'subject_type' => 'Major with Lab', 'prerequisites' => 'IT102', 'display_order' => 3],
-            ];
-            foreach ($currSubjects as $cs) {
-                CurriculumSubject::create($cs);
-            }
-        }
-
-        // 5. Ensure baseline sets
+        // 3. Ensure baseline sets
         $sets = [
             ['set_name' => 'BSIT-1A', 'program_id' => 1, 'year_level' => 1, 'set_code' => 'A', 'academic_term_id' => 1, 'department_id' => 1, 'status' => 'active'],
             ['set_name' => 'BSIT-1B', 'program_id' => 1, 'year_level' => 1, 'set_code' => 'B', 'academic_term_id' => 1, 'department_id' => 1, 'status' => 'active'],
@@ -100,19 +81,29 @@ class TestDatabaseSeeder
             );
         }
 
-        // 6. Ensure baseline subjects
+        // 4. Ensure baseline subjects (normalized with program_id, units, subject_type)
         $subjects = [
-            ['subject_code' => 'IT101', 'descriptive_title' => 'Introduction to Computing', 'nature' => 'Lecture', 'year_level' => 1, 'semester' => 1, 'academic_term_id' => 1, 'is_archived' => 0],
-            ['subject_code' => 'IT102', 'descriptive_title' => 'Computer Programming 1', 'nature' => 'Combined', 'year_level' => 1, 'semester' => 1, 'academic_term_id' => 1, 'is_archived' => 0],
-            ['subject_code' => 'IT103', 'descriptive_title' => 'Data Structures and Algorithms', 'nature' => 'Combined', 'year_level' => 2, 'semester' => 1, 'academic_term_id' => 1, 'is_archived' => 0],
-            ['subject_code' => 'IT201', 'descriptive_title' => 'Web Systems and Technologies', 'nature' => 'Combined', 'year_level' => 2, 'semester' => 2, 'academic_term_id' => 2, 'is_archived' => 0],
-            ['subject_code' => 'IT202', 'descriptive_title' => 'Information Management', 'nature' => 'Lecture', 'year_level' => 2, 'semester' => 2, 'academic_term_id' => 2, 'is_archived' => 0],
+            ['program_id' => 1, 'subject_code' => 'IT101', 'descriptive_title' => 'Introduction to Computing', 'units' => 3.0, 'subject_type' => 'GenEd Core', 'nature' => 'Lecture', 'year_level' => 1, 'semester' => 1, 'academic_term_id' => 1, 'is_archived' => 0],
+            ['program_id' => 1, 'subject_code' => 'IT102', 'descriptive_title' => 'Computer Programming 1', 'units' => 3.0, 'subject_type' => 'Major with Lab', 'nature' => 'Combined', 'year_level' => 1, 'semester' => 1, 'academic_term_id' => 1, 'is_archived' => 0],
+            ['program_id' => 1, 'subject_code' => 'IT103', 'descriptive_title' => 'Data Structures and Algorithms', 'units' => 3.0, 'subject_type' => 'Major with Lab', 'nature' => 'Combined', 'year_level' => 2, 'semester' => 1, 'academic_term_id' => 1, 'is_archived' => 0],
+            ['program_id' => 1, 'subject_code' => 'IT201', 'descriptive_title' => 'Web Systems and Technologies', 'units' => 3.0, 'subject_type' => 'Major with Lab', 'nature' => 'Combined', 'year_level' => 2, 'semester' => 2, 'academic_term_id' => 2, 'is_archived' => 0],
+            ['program_id' => 1, 'subject_code' => 'IT202', 'descriptive_title' => 'Information Management', 'units' => 3.0, 'subject_type' => 'GenEd Core', 'nature' => 'Lecture', 'year_level' => 2, 'semester' => 2, 'academic_term_id' => 2, 'is_archived' => 0],
         ];
         foreach ($subjects as $sub) {
             Subject::firstOrCreate(
                 ['subject_code' => $sub['subject_code'], 'academic_term_id' => $sub['academic_term_id']],
                 $sub
             );
+        }
+
+        // 5. Ensure baseline prerequisites
+        $it102 = Subject::where('subject_code', 'IT102')->first();
+        $it103 = Subject::where('subject_code', 'IT103')->first();
+        if ($it102 && $it103) {
+            Prerequisite::firstOrCreate([
+                'subject_id' => $it103->id,
+                'prerequisite_subject_id' => $it102->id,
+            ]);
         }
 
         // 7. Ensure student user Juan Dela Cruz is linked to set BSIT-1A

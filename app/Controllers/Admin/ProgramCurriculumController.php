@@ -10,8 +10,8 @@ use App\Core\Session;
 use App\Core\View;
 use App\Core\Database;
 use App\Models\Program;
-use App\Models\Curriculum;
-use App\Models\CurriculumSubject;
+use App\Models\Subject;
+use App\Models\Prerequisite;
 use App\Models\Department;
 use App\Models\AcademicTerm;
 use PDO;
@@ -20,7 +20,7 @@ class ProgramCurriculumController
 {
     public function index(Request $request, Response $response, Session $session): void
     {
-        $programs = Program::with(['department', 'activeCurriculum'])
+        $programs = Program::with('department')
             ->orderBy('program_abbrev', 'asc')
             ->get();
 
@@ -35,77 +35,99 @@ class ProgramCurriculumController
             $selectedAbbrev = $selectedProgram->program_abbrev;
         }
 
-        $curriculum = null;
         $groupedSubjects = [];
         $totalSubjects = 0;
         $totalUnits = 0.0;
 
         if ($selectedProgram) {
-            $curriculum = Curriculum::where('program_id', $selectedProgram->id)
-                ->where('status', 'active')
-                ->first();
+            $subjects = Subject::where('program_id', $selectedProgram->id)
+                ->where('is_archived', 0)
+                ->orderBy('year_level', 'asc')
+                ->orderBy('semester', 'asc')
+                ->orderBy('subject_code', 'asc')
+                ->get();
 
-            if (!$curriculum) {
-                $curriculum = Curriculum::where('program_id', $selectedProgram->id)->first();
+            $totalSubjects = $subjects->count();
+
+            // Load all prerequisites for these subjects in one grouped batch query
+            $prereqMap = [];
+            if ($subjects->isNotEmpty()) {
+                $subIds = $subjects->pluck('id')->all();
+                $placeholders = implode(',', array_fill(0, count($subIds), '?'));
+                $db = Database::getConnection();
+                $stmtPr = $db->prepare("
+                    SELECT pr.subject_id, p.subject_code 
+                    FROM prerequisites pr
+                    JOIN subjects p ON pr.prerequisite_subject_id = p.id
+                    WHERE pr.subject_id IN ({$placeholders})
+                    ORDER BY p.subject_code ASC
+                ");
+                $stmtPr->execute($subIds);
+                $rows = $stmtPr->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($rows as $r) {
+                    $prereqMap[(int) $r['subject_id']][] = $r['subject_code'];
+                }
             }
 
-            if ($curriculum) {
-                $subjects = CurriculumSubject::where('curriculum_id', $curriculum->id)
-                    ->orderBy('display_order', 'asc')
-                    ->orderBy('subject_code', 'asc')
-                    ->get();
+            // Group by year_level and semester
+            $yearSortMap = [
+                1 => 1, 'First Year' => 1, '1st Year' => 1,
+                2 => 2, 'Second Year' => 2, '2nd Year' => 2,
+                3 => 3, 'Third Year' => 3, '3rd Year' => 3,
+                4 => 4, 'Fourth Year' => 4, '4th Year' => 4,
+                5 => 5, 'Fifth Year' => 5, '5th Year' => 5,
+            ];
 
-                $totalSubjects = $subjects->count();
+            $tempGroups = [];
+            foreach ($subjects as $sub) {
+                $totalUnits += (float) ($sub->units ?? 3.0);
+                $ylVal = $sub->year_level;
+                $yl = is_numeric($ylVal) ? match ((int) $ylVal) {
+                    1 => 'First Year',
+                    2 => 'Second Year',
+                    3 => 'Third Year',
+                    4 => 'Fourth Year',
+                    5 => 'Fifth Year',
+                    default => "Year {$ylVal}",
+                } : ($ylVal ?: 'First Year');
 
-                // Group by year_level and semester
-                $yearSortMap = [
-                    'First Year' => 1, '1st Year' => 1,
-                    'Second Year' => 2, '2nd Year' => 2,
-                    'Third Year' => 3, '3rd Year' => 3,
-                    'Fourth Year' => 4, '4th Year' => 4,
-                    'Fifth Year' => 5, '5th Year' => 5,
-                ];
+                $sem = (int) $sub->semester;
+                $semLabel = match ($sem) {
+                    1 => '1st Semester',
+                    2 => '2nd Semester',
+                    3 => 'Summer',
+                    default => "Semester {$sem}",
+                };
 
-                $tempGroups = [];
-                foreach ($subjects as $sub) {
-                    $totalUnits += (float) $sub->units;
-                    $yl = $sub->year_level ?: 'Unassigned Year';
-                    $sem = (int) $sub->semester;
-                    $semLabel = match ($sem) {
-                        1 => '1st Semester',
-                        2 => '2nd Semester',
-                        3 => 'Summer',
-                        default => "Semester {$sem}",
-                    };
-
-                    $groupKey = "{$yl} · {$semLabel}";
-                    if (!isset($tempGroups[$groupKey])) {
-                        $tempGroups[$groupKey] = [
-                            'year_level' => $yl,
-                            'semester' => $sem,
-                            'semester_label' => $semLabel,
-                            'title' => $groupKey,
-                            'sort_order' => ($yearSortMap[$yl] ?? 99) * 10 + $sem,
-                            'subjects' => [],
-                            'total_units' => 0.0,
-                        ];
-                    }
-
-                    $tempGroups[$groupKey]['subjects'][] = $sub;
-                    $tempGroups[$groupKey]['total_units'] += (float) $sub->units;
+                $groupKey = "{$yl} · {$semLabel}";
+                if (!isset($tempGroups[$groupKey])) {
+                    $tempGroups[$groupKey] = [
+                        'year_level' => $yl,
+                        'semester' => $sem,
+                        'semester_label' => $semLabel,
+                        'title' => $groupKey,
+                        'sort_order' => ($yearSortMap[$yl] ?? 99) * 10 + $sem,
+                        'subjects' => [],
+                        'total_units' => 0.0,
+                    ];
                 }
 
-                // Sort groups in academic progression order
-                uasort($tempGroups, fn($a, $b) => $a['sort_order'] <=> $b['sort_order']);
-                $groupedSubjects = array_values($tempGroups);
+                $subPrereqs = $prereqMap[(int) $sub->id] ?? [];
+                $sub->prerequisites = !empty($subPrereqs) ? implode(', ', $subPrereqs) : '';
+
+                $tempGroups[$groupKey]['subjects'][] = $sub;
+                $tempGroups[$groupKey]['total_units'] += (float) ($sub->units ?? 3.0);
             }
+
+            // Sort groups in academic progression order
+            uasort($tempGroups, fn($a, $b) => $a['sort_order'] <=> $b['sort_order']);
+            $groupedSubjects = array_values($tempGroups);
         }
 
         $html = (new View())->render('admin.program_curricula.index', [
             'programs' => $programs,
             'selectedProgram' => $selectedProgram,
             'selectedAbbrev' => $selectedAbbrev,
-            'curriculum' => $curriculum,
             'groupedSubjects' => $groupedSubjects,
             'totalSubjects' => $totalSubjects,
             'totalUnits' => $totalUnits,
@@ -177,19 +199,6 @@ class ProgramCurriculumController
             ]);
         }
 
-        // Create or locate canonical curriculum for this program
-        $curriculum = Curriculum::where('program_id', $program->id)->first();
-        if (!$curriculum) {
-            $curriculum = Curriculum::create([
-                'program_id' => $program->id,
-                'status' => $status,
-            ]);
-        } else {
-            $curriculum->update([
-                'status' => $status,
-            ]);
-        }
-
         // Active term for subject mapping if needed
         $activeTerm = AcademicTerm::getActive();
         $termId = $activeTerm['id'] ?? 1;
@@ -198,7 +207,8 @@ class ProgramCurriculumController
 
         // Process subjects
         $insertedCount = 0;
-        $order = 1;
+        $pendingPrereqs = [];
+
         foreach ($subjectsInput as $row) {
             $code = strtoupper(trim((string) ($row['subject_code'] ?? $row['code'] ?? '')));
             $title = trim((string) ($row['descriptive_title'] ?? $row['title'] ?? $row['name'] ?? ''));
@@ -228,82 +238,74 @@ class ProgramCurriculumController
                 default => (int) $yearLevel ?: 1,
             };
 
-            // Sync with subjects catalog table if it does not exist
-            $stmtFindSubject = $pdo->prepare("SELECT id FROM subjects WHERE subject_code = :code LIMIT 1");
-            $stmtFindSubject->execute(['code' => $code]);
+            // Upsert into subjects catalog table
+            $stmtFindSubject = $pdo->prepare("SELECT id FROM subjects WHERE program_id = :pid AND subject_code = :code LIMIT 1");
+            $stmtFindSubject->execute(['pid' => $program->id, 'code' => $code]);
             $subjectRow = $stmtFindSubject->fetch(PDO::FETCH_ASSOC);
 
-            if (!$subjectRow) {
-                $matchingTerm = AcademicTerm::getBySemester((string) $semester);
-                $targetTermId = $matchingTerm['id'] ?? $termId;
+            $matchingTerm = AcademicTerm::getBySemester((string) $semester);
+            $targetTermId = $matchingTerm['id'] ?? $termId;
 
-                $stmtInsertSub = $pdo->prepare("
-                    INSERT INTO subjects (subject_code, descriptive_title, nature, year_level, semester, academic_term_id, is_archived, created_at, updated_at)
-                    VALUES (:code, :title, 'Lecture', :yl, :sem, :tid, 0, NOW(), NOW())
+            if ($subjectRow) {
+                $subjectId = (int) $subjectRow['id'];
+                $stmtUpdate = $pdo->prepare("
+                    UPDATE subjects 
+                    SET descriptive_title = :title, units = :units, subject_type = :stype,
+                        year_level = :yl, semester = :sem, is_archived = 0, updated_at = NOW()
+                    WHERE id = :id
                 ");
-                $stmtInsertSub->execute([
+                $stmtUpdate->execute([
+                    'title' => $title,
+                    'units' => $units,
+                    'stype' => $subjectType,
+                    'yl' => $ylInt,
+                    'sem' => $semester,
+                    'id' => $subjectId,
+                ]);
+            } else {
+                $stmtInsert = $pdo->prepare("
+                    INSERT INTO subjects (program_id, subject_code, descriptive_title, units, subject_type, nature, year_level, semester, academic_term_id, is_archived, created_at, updated_at)
+                    VALUES (:pid, :code, :title, :units, :stype, 'Lecture', :yl, :sem, :tid, 0, NOW(), NOW())
+                ");
+                $stmtInsert->execute([
+                    'pid' => $program->id,
                     'code' => $code,
                     'title' => $title,
+                    'units' => $units,
+                    'stype' => $subjectType,
                     'yl' => $ylInt,
                     'sem' => $semester,
                     'tid' => $targetTermId,
                 ]);
                 $subjectId = (int) $pdo->lastInsertId();
-            } else {
-                $subjectId = (int) $subjectRow['id'];
-                $stmtUpdateSubYl = $pdo->prepare("UPDATE subjects SET year_level = :yl, semester = :sem WHERE id = :id AND year_level = 0");
-                $stmtUpdateSubYl->execute(['yl' => $ylInt, 'sem' => $semester, 'id' => $subjectId]);
             }
 
-            // Upsert into curriculum_subjects
-            $stmtFindCS = $pdo->prepare("
-                SELECT id FROM curriculum_subjects 
-                WHERE curriculum_id = :cid AND subject_code = :code 
-                LIMIT 1
-            ");
-            $stmtFindCS->execute(['cid' => $curriculum->id, 'code' => $code]);
-            $csRow = $stmtFindCS->fetch(PDO::FETCH_ASSOC);
+            $pendingPrereqs[] = [
+                'subject_id' => $subjectId,
+                'raw' => $prereqs,
+            ];
 
-            if ($csRow) {
-                $stmtUpdateCS = $pdo->prepare("
-                    UPDATE curriculum_subjects 
-                    SET subject_id = :sid, year_level = :yl, semester = :sem, 
-                        descriptive_title = :title, units = :units, subject_type = :stype, 
-                        prerequisites = :prereqs, display_order = :ord, updated_at = NOW()
-                    WHERE id = :id
-                ");
-                $stmtUpdateCS->execute([
-                    'sid' => $subjectId,
-                    'yl' => $yearLevel,
-                    'sem' => $semester,
-                    'title' => $title,
-                    'units' => $units,
-                    'stype' => $subjectType,
-                    'prereqs' => $prereqs ?: null,
-                    'ord' => $order,
-                    'id' => $csRow['id'],
-                ]);
-            } else {
-                $stmtInsertCS = $pdo->prepare("
-                    INSERT INTO curriculum_subjects 
-                    (curriculum_id, subject_id, year_level, semester, subject_code, descriptive_title, units, subject_type, prerequisites, display_order, created_at, updated_at)
-                    VALUES (:cid, :sid, :yl, :sem, :code, :title, :units, :stype, :prereqs, :ord, NOW(), NOW())
-                ");
-                $stmtInsertCS->execute([
-                    'cid' => $curriculum->id,
-                    'sid' => $subjectId,
-                    'yl' => $yearLevel,
-                    'sem' => $semester,
-                    'code' => $code,
-                    'title' => $title,
-                    'units' => $units,
-                    'stype' => $subjectType,
-                    'prereqs' => $prereqs ?: null,
-                    'ord' => $order,
-                ]);
-            }
             $insertedCount++;
-            $order++;
+        }
+
+        // Second pass: Link prerequisites
+        $stmtDelPr = $pdo->prepare("DELETE FROM prerequisites WHERE subject_id = :sid");
+        $stmtInsPr = $pdo->prepare("INSERT IGNORE INTO prerequisites (subject_id, prerequisite_subject_id) VALUES (:sid, :pid)");
+
+        foreach ($pendingPrereqs as $pItem) {
+            $sid = $pItem['subject_id'];
+            $stmtDelPr->execute(['sid' => $sid]);
+            if (!empty($pItem['raw'])) {
+                $codes = array_filter(array_map('trim', explode(',', $pItem['raw'])));
+                foreach ($codes as $pCode) {
+                    $stmtF = $pdo->prepare("SELECT id FROM subjects WHERE program_id = :pid AND subject_code = :pcode LIMIT 1");
+                    $stmtF->execute(['pid' => $program->id, 'pcode' => $pCode]);
+                    $pId = $stmtF->fetchColumn();
+                    if ($pId) {
+                        $stmtInsPr->execute(['sid' => $sid, 'pid' => $pId]);
+                    }
+                }
+            }
         }
 
         $msg = "Curriculum for '{$program->program_abbrev}' successfully saved with {$insertedCount} subjects.";
@@ -333,10 +335,32 @@ class ProgramCurriculumController
             return;
         }
 
-        $curriculum = Curriculum::where('program_id', $program->id)->first();
-        $subjects = $curriculum 
-            ? CurriculumSubject::where('curriculum_id', $curriculum->id)->orderBy('year_level')->orderBy('semester')->orderBy('display_order')->get()
-            : collect([]);
+        $subjects = Subject::where('program_id', $program->id)
+            ->where('is_archived', 0)
+            ->orderBy('year_level')
+            ->orderBy('semester')
+            ->orderBy('subject_code')
+            ->get();
+
+        // Load prerequisites for export
+        $prereqMap = [];
+        if ($subjects->isNotEmpty()) {
+            $subIds = $subjects->pluck('id')->all();
+            $placeholders = implode(',', array_fill(0, count($subIds), '?'));
+            $db = Database::getConnection();
+            $stmtPr = $db->prepare("
+                SELECT pr.subject_id, p.subject_code 
+                FROM prerequisites pr
+                JOIN subjects p ON pr.prerequisite_subject_id = p.id
+                WHERE pr.subject_id IN ({$placeholders})
+                ORDER BY p.subject_code ASC
+            ");
+            $stmtPr->execute($subIds);
+            $rows = $stmtPr->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $r) {
+                $prereqMap[(int) $r['subject_id']][] = $r['subject_code'];
+            }
+        }
 
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $program->program_abbrev . '-Curriculum.csv"');
@@ -351,14 +375,22 @@ class ProgramCurriculumController
                 3 => 'Summer',
                 default => (string) $s->semester,
             };
+            $ylLabel = match ((int) $s->year_level) {
+                1 => 'First Year',
+                2 => 'Second Year',
+                3 => 'Third Year',
+                4 => 'Fourth Year',
+                default => 'Year ' . $s->year_level,
+            };
+            $prList = $prereqMap[(int) $s->id] ?? [];
             fputcsv($out, [
-                $s->year_level,
+                $ylLabel,
                 $semLabel,
                 $s->subject_code,
                 $s->descriptive_title,
                 $s->units,
                 $s->subject_type,
-                $s->prerequisites ?? '',
+                !empty($prList) ? implode(', ', $prList) : '',
             ]);
         }
         fclose($out);

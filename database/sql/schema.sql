@@ -113,37 +113,6 @@ CREATE TABLE programs (
     INDEX idx_dept_status (department_id, status)
 ) ENGINE=InnoDB;
 
--- Curricula
-CREATE TABLE curricula (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    program_id INT NOT NULL,
-    status ENUM('draft', 'active', 'archived') NOT NULL DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE RESTRICT,
-    UNIQUE KEY unique_program_curriculum (program_id),
-    INDEX idx_prog_status (program_id, status)
-) ENGINE=InnoDB;
-
--- Curriculum Subjects
-CREATE TABLE curriculum_subjects (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    curriculum_id INT NOT NULL,
-    subject_id INT NULL,
-    subject_code VARCHAR(50) NOT NULL,
-    descriptive_title VARCHAR(200) NOT NULL,
-    year_level VARCHAR(30) NOT NULL,
-    semester INT(2) NOT NULL DEFAULT 1,
-    units DECIMAL(4, 1) NOT NULL DEFAULT 3.0,
-    subject_type VARCHAR(50) NOT NULL DEFAULT 'GenEd Core',
-    prerequisites VARCHAR(255) NULL,
-    display_order INT NOT NULL DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (curriculum_id) REFERENCES curricula(id) ON DELETE CASCADE,
-    INDEX idx_curriculum_term (curriculum_id, year_level, semester)
-) ENGINE=InnoDB;
-
 -- Sets
 CREATE TABLE sets (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -235,8 +204,11 @@ CREATE TABLE faculty (
 CREATE TABLE subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     academic_term_id INT NOT NULL,
+    program_id INT NULL,
     subject_code VARCHAR(50) NOT NULL,
     descriptive_title VARCHAR(200) NOT NULL,
+    units DECIMAL(4, 1) NOT NULL DEFAULT 3.0,
+    subject_type VARCHAR(50) NOT NULL DEFAULT 'GenEd Core',
     nature ENUM('Lecture', 'Laboratory', 'Combined') NOT NULL DEFAULT 'Lecture',
     year_level INT NOT NULL,
     semester INT(2) NOT NULL DEFAULT 1,
@@ -245,10 +217,26 @@ CREATE TABLE subjects (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
+    FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE SET NULL,
     UNIQUE KEY unique_subject (subject_code, academic_term_id),
     INDEX idx_is_archived (is_archived),
     INDEX idx_subjects_term_archived (academic_term_id, is_archived, semester),
-    INDEX idx_subjects_term_year_sem (academic_term_id, year_level, semester)
+    INDEX idx_subjects_term_year_sem (academic_term_id, year_level, semester),
+    INDEX idx_subjects_program (program_id)
+) ENGINE=InnoDB;
+
+-- Subject Prerequisites (Normalized 3NF / BCNF)
+CREATE TABLE prerequisites (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject_id INT NOT NULL,
+    prerequisite_subject_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+    FOREIGN KEY (prerequisite_subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_prereq_pair (subject_id, prerequisite_subject_id),
+    INDEX idx_subject_id (subject_id),
+    INDEX idx_prereq_subject_id (prerequisite_subject_id)
 ) ENGINE=InnoDB;
 
 -- Faculty-Subject Assignments

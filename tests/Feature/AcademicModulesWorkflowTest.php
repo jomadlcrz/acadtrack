@@ -8,15 +8,13 @@ use PHPUnit\Framework\TestCase;
 use App\Models\AcademicTerm;
 use App\Models\Department;
 use App\Models\Program;
-use App\Models\Curriculum;
-use App\Models\CurriculumSubject;
+use App\Models\Subject;
 use App\Models\Set;
 use App\Core\View;
 
 class AcademicModulesWorkflowTest extends TestCase
 {
     private static array $cleanupProgramIds = [];
-    private static array $cleanupCurriculumIds = [];
     private static array $cleanupSetIds = [];
 
     public static function setUpBeforeClass(): void
@@ -39,10 +37,6 @@ class AcademicModulesWorkflowTest extends TestCase
     {
         if (!empty(self::$cleanupSetIds)) {
             Set::whereIn('id', self::$cleanupSetIds)->delete();
-        }
-        if (!empty(self::$cleanupCurriculumIds)) {
-            CurriculumSubject::whereIn('curriculum_id', self::$cleanupCurriculumIds)->delete();
-            Curriculum::whereIn('id', self::$cleanupCurriculumIds)->delete();
         }
         if (!empty(self::$cleanupProgramIds)) {
             Program::whereIn('id', self::$cleanupProgramIds)->delete();
@@ -71,24 +65,20 @@ class AcademicModulesWorkflowTest extends TestCase
     {
         $_SESSION['user'] = ['role' => 'Admin', 'first_name' => 'Admin', 'last_name' => 'User'];
 
-        $programs = Program::with(['department', 'activeCurriculum'])->orderBy('program_abbrev', 'asc')->get();
+        $programs = Program::with('department')->orderBy('program_abbrev', 'asc')->get();
         $this->assertTrue($programs->isNotEmpty(), 'Programs catalog should not be empty');
 
         $bsit = $programs->firstWhere('program_abbrev', 'BSIT');
         $this->assertNotNull($bsit, 'BSIT program must exist');
         $this->assertEquals('Bachelor of Science in Information Technology', $bsit->program_name);
 
-        $curriculum = Curriculum::where('program_id', $bsit->id)->first();
-        $this->assertNotNull($curriculum, 'BSIT curriculum should exist');
-
-        $subjects = CurriculumSubject::where('curriculum_id', $curriculum->id)->get();
-        $this->assertTrue($subjects->isNotEmpty(), 'BSIT curriculum should have subjects');
+        $subjects = Subject::where('program_id', $bsit->id)->get();
+        $this->assertTrue($subjects->isNotEmpty(), 'BSIT program should have subjects');
 
         $html = (new View())->render('admin.program_curricula.index', [
             'programs' => $programs,
             'selectedProgram' => $bsit,
             'selectedAbbrev' => 'BSIT',
-            'curriculum' => $curriculum,
             'groupedSubjects' => [
                 [
                     'year_level' => 'First Year',
