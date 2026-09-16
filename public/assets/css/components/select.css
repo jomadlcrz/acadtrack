@@ -51,8 +51,8 @@ select.form-control-sm {
 .form-select:focus,
 select.form-control:focus {
     outline: none;
-    border-color: var(--primary, #2563eb);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    border-color: var(--primary, #2f4a86);
+    box-shadow: 0 0 0 3px rgba(47, 74, 134, 0.15);
 }
 
 /* 5. Disabled State */

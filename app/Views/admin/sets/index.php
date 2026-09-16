@@ -6,7 +6,7 @@ $subtitle = $isReadOnly
     : 'Manage academic class sections, cohorts, and batch-generate student sets.';
 $headerActions = $isReadOnly 
     ? '<span class="badge bg-light text-secondary border px-2.5 py-1.5 fs-7 d-inline-flex align-items-center gap-1.5"><i class="bi bi-shield-lock"></i> Read-Only View</span>' 
-    : '<button type="button" class="btn text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" data-bs-toggle="modal" data-bs-target="#createSetsModal"><i class="bi bi-plus-lg"></i> Create Sections</button>';
+    : '<button type="button" class="btn btn-primary text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" data-bs-toggle="modal" data-bs-target="#createSetsModal"><i class="bi bi-plus-lg"></i> Create Sections</button>';
 ob_start();
 ?>
 
@@ -201,7 +201,7 @@ ob_start();
                                             </div>
                                             <div class="modal-footer bg-light py-3 px-4 d-flex justify-content-end gap-2">
                                                 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-sm text-white" style="background-color: #2f4a86; border-color: #2f4a86;">Save Changes</button>
+                                                <button type="submit" class="btn btn-sm btn-primary text-white" style="background-color: #2f4a86; border-color: #2f4a86;">Save Changes</button>
                                             </div>
                                         </form>
                                     </div>
@@ -321,8 +321,8 @@ ob_start();
                     </div>
                     <div class="modal-footer bg-light py-3 px-4 d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-sm text-white px-3" style="background-color: #2f4a86; border-color: #2f4a86;" id="createSetsSubmitBtn">
-                            Create Sections
+                        <button type="submit" class="btn btn-sm btn-primary text-white px-3" style="background-color: #2f4a86; border-color: #2f4a86;" id="createSetsSubmitBtn">
+                            <i class="bi bi-magic me-1"></i>Generate &amp; Save Sections
                         </button>
                     </div>
                 </form>

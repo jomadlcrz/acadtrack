@@ -29,21 +29,21 @@
 
 .btn:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+    box-shadow: 0 0 0 3px rgba(47, 74, 134, 0.25);
 }
 
 /* 2. Solid Color Variants */
 .btn-primary {
-    background-color: var(--primary, #2563eb) !important;
-    border-color: var(--primary, #2563eb) !important;
+    background-color: var(--primary, #2f4a86) !important;
+    border-color: var(--primary, #2f4a86) !important;
     color: #ffffff !important;
 }
 
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active {
-    background-color: var(--primary-dark, #1d4ed8) !important;
-    border-color: var(--primary-dark, #1d4ed8) !important;
+    background-color: var(--primary-dark, #243a6b) !important;
+    border-color: var(--primary-dark, #243a6b) !important;
     color: #ffffff !important;
 }
 
@@ -120,18 +120,18 @@
 /* 3. High-Contrast Outline Variants */
 .btn-outline-primary {
     background-color: transparent !important;
-    border-color: var(--primary, #2563eb) !important;
-    color: var(--primary, #2563eb) !important;
+    border-color: var(--primary, #2f4a86) !important;
+    color: var(--primary, #2f4a86) !important;
 }
 
 .btn-outline-primary:hover,
 .btn-outline-primary:focus,
 .btn-outline-primary:active,
 .btn-outline-primary.active {
-    background-color: var(--primary, #2563eb) !important;
-    border-color: var(--primary, #2563eb) !important;
+    background-color: var(--primary, #2f4a86) !important;
+    border-color: var(--primary, #2f4a86) !important;
     color: #ffffff !important;
-    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 2px 4px rgba(47, 74, 134, 0.2);
 }
 
 .btn-outline-secondary {
@@ -213,7 +213,7 @@
 .btn-link {
     background: none !important;
     border: none !important;
-    color: var(--primary, #2563eb) !important;
+    color: var(--primary, #2f4a86) !important;
     padding: 0 !important;
     box-shadow: none !important;
 }

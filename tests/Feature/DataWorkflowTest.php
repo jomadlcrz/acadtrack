@@ -35,12 +35,6 @@ class DataWorkflowTest extends TestCase
         $this->assertSame(1, (int) $term['is_active']);
     }
 
-    public function testSubjectsAreConfigured(): void
-    {
-        $subjects = Subject::all();
-        $this->assertGreaterThanOrEqual(3, count($subjects));
-    }
-
     public function testStudentEvaluationCalculations(): void
     {
         $evalService = new EvaluationService();

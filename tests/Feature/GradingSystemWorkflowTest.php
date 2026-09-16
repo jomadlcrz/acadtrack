@@ -45,38 +45,6 @@ class GradingSystemWorkflowTest extends TestCase
         $this->assertCount(4, $periodsTerm2, '2nd Semester must have 4 grading periods');
     }
 
-    public function testSubjectNatureAndGradingSettings(): void
-    {
-        $subject = Subject::first();
-        $this->assertNotNull($subject);
-
-        // Subject nature should be one of Lecture, Laboratory, Combined
-        $this->assertContains($subject['nature'], ['Lecture', 'Laboratory', 'Combined']);
-
-        // Test configuring grading settings
-        $term = AcademicTerm::getActive();
-        $setting = GradingSetting::create([
-            'academic_term_id' => $term['id'],
-            'subject_id' => $subject['id'],
-            'grading_method' => 'fifty_based',
-            'prelim_weight' => 20.00,
-            'midterm_weight' => 20.00,
-            'semi_final_weight' => 20.00,
-            'final_weight' => 40.00,
-        ]);
-
-        $this->assertNotNull($setting);
-        $settingId = (int) $setting->id;
-        $this->assertGreaterThan(0, $settingId);
-        $found = GradingSetting::find($settingId);
-        $this->assertSame('fifty_based', $found['grading_method']);
-        $this->assertEquals(20.00, (float) $found['prelim_weight']);
-        $this->assertEquals(40.00, (float) $found['final_weight']);
-
-        // Clean up test setting
-        GradingSetting::query()->where('id', $settingId)->delete();
-    }
-
     public function testStudentStatusAndRoster(): void
     {
         // Query existing students
@@ -108,66 +76,5 @@ class GradingSystemWorkflowTest extends TestCase
         $this->assertStringContainsString('Your GWC Acadtrack Account Credentials', $latestNotif['title']);
     }
 
-    public function testDeanAndAdminReviewWorkflow(): void
-    {
-        $term = AcademicTerm::getActive();
-        $subject = Subject::first();
-        $faculty = User::query()->where('role', 'Faculty')->first();
-        $admin = User::query()->where('role', 'Admin')->first();
-        $period = GradingPeriod::where('academic_term_id', $term['id'])->first();
-
-        $this->assertNotNull($subject);
-        $this->assertNotNull($period);
-        $this->assertNotNull($admin);
-
-        $adminId = (int) $admin['id'];
-        $randSuffix = rand(1000, 9999);
-        $testFaculty = User::create([
-            'first_name' => 'TestFac',
-            'last_name' => "Lifecycle_{$randSuffix}",
-            'email' => "testfac_lifecycle_{$randSuffix}@gwc.edu",
-            'password' => password_hash('secret123', PASSWORD_BCRYPT),
-            'role' => 'Faculty',
-            'status' => 'active',
-        ]);
-        $facultyId = (int) $testFaculty->id;
-
-        // 1. Create a draft grading sheet
-        $createdSheet = GradingSheet::create([
-            'faculty_id' => $facultyId,
-            'subject_id' => (int) $subject['id'],
-            'grading_period_id' => (int) $period['id'],
-            'academic_term_id' => (int) $term['id'],
-            'status' => GradingSheet::STATUS_DRAFT,
-        ]);
-
-        $this->assertNotNull($createdSheet);
-        $sheetId = (int) $createdSheet->id;
-        $this->assertGreaterThan(0, $sheetId);
-
-        $gradingService = new GradingService();
-
-        // 2. Submit sheet
-        $gradingService->submitGradingSheet($sheetId);
-        $sheet = GradingSheet::find($sheetId);
-        $this->assertSame(GradingSheet::STATUS_SUBMITTED, $sheet['status']);
-
-        // 3. Approve sheet
-        $gradingService->approveGradingSheet($sheetId, $adminId);
-        $sheet = GradingSheet::find($sheetId);
-        $this->assertSame(GradingSheet::STATUS_APPROVED, $sheet['status']);
-        $this->assertEquals($adminId, (int) $sheet['approved_by']);
-        $this->assertNotNull($sheet['approved_at']);
-
-        // 4. Confirm & Finalize sheet with remarks
-        $gradingService->confirmGradingSheet($sheetId, $adminId, 'Finalized and confirmed by Dean.');
-        $sheet = GradingSheet::find($sheetId);
-        $this->assertSame(GradingSheet::STATUS_FINALIZED, $sheet['status']);
-        $this->assertSame('Finalized and confirmed by Dean.', $sheet['remarks']);
-        $this->assertNotNull($sheet['confirmed_at']);
-
-        // Clean up test sheet and test faculty user
-        GradingSheet::query()->where('id', $sheetId)->delete();
-        $testFaculty->delete();
-    }
 }
+

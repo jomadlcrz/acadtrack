@@ -1,7 +1,7 @@
 <?php
 $pageTitle = 'Departments';
 $subtitle = 'Manage academic colleges, faculties, and departmental divisions.';
-$headerActions = '<button type="button" class="btn text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" data-bs-toggle="modal" data-bs-target="#addDepartmentModal"><i class="bi bi-plus-lg"></i> New Department</button>';
+$headerActions = '<button type="button" class="btn btn-primary text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" data-bs-toggle="modal" data-bs-target="#addDepartmentModal"><i class="bi bi-plus-lg"></i> New Department</button>';
 ob_start();
 ?>
 
@@ -183,7 +183,7 @@ ob_start();
                 </div>
                 <div class="modal-footer bg-light py-3 px-4">
                     <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-sm text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;">
+                    <button type="submit" class="btn btn-sm btn-primary text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;">
                         <i class="bi bi-check-lg"></i> Save Department
                     </button>
                 </div>

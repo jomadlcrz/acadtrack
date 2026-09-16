@@ -41,8 +41,8 @@
 .page-item.active .page-link {
     z-index: 3;
     color: #ffffff;
-    background-color: var(--primary, #2563eb);
-    border-color: var(--primary, #2563eb);
+    background-color: var(--primary, #2f4a86);
+    border-color: var(--primary, #2f4a86);
     font-weight: 600;
 }
 
