@@ -89,5 +89,15 @@ jobs:
             docs/**
             skills/**
             *.md
+            scripts/**
+
+      - name: Trigger Remote Database Migrations
+        if: env.FTP_SERVER != '' && env.FTP_USERNAME != ''
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+        run: |
+          npm install puppeteer --no-save
+          node scripts/trigger-deploy-migration.js
+
 
 
