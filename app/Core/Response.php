@@ -20,20 +20,39 @@ class Response
         return $this->statusCode;
     }
 
+    private string $body = '';
+
+    public function getBody(): string
+    {
+        return $this->body;
+    }
+
     public function json(mixed $data, int $code = 200): void
     {
+        $this->statusCode = $code;
+        $this->body = (string) json_encode($data);
         http_response_code($code);
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit;
+        if (!headers_sent()) {
+            header('Content-Type: application/json');
+        }
+        echo $this->body;
+        if (php_sapi_name() !== 'cli' && !defined('PHPUNIT_RUNNING')) {
+            exit;
+        }
     }
 
     public function html(string $content, int $code = 200): void
     {
+        $this->statusCode = $code;
+        $this->body = $content;
         http_response_code($code);
-        header('Content-Type: text/html; charset=UTF-8');
-        echo $content;
-        exit;
+        if (!headers_sent()) {
+            header('Content-Type: text/html; charset=UTF-8');
+        }
+        echo $this->body;
+        if (php_sapi_name() !== 'cli' && !defined('PHPUNIT_RUNNING')) {
+            exit;
+        }
     }
 
     public function redirect(string $url, int $code = 302): void

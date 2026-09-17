@@ -20,6 +20,10 @@
                     <i class="bi bi-gear-fill"></i>
                     <span>Institutional Settings</span>
                 </a>
+                <a href="<?= url('/admin/archives') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/archives') ? 'active' : '' ?>">
+                    <i class="bi bi-archive-fill"></i>
+                    <span>Archives</span>
+                </a>
             </div>
 
             <div class="sidebar-group">

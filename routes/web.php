@@ -11,6 +11,7 @@ use App\Controllers\Admin\SettingsController;
 use App\Controllers\Admin\AcademicTermController;
 use App\Controllers\Admin\ProgramCurriculumController;
 use App\Controllers\Admin\SetController as AdminSetController;
+use App\Controllers\Admin\ArchiveController;
 use App\Controllers\Dean\FacultyAssignmentController;
 use App\Controllers\Dean\SubjectController as DeanSubjectController;
 use App\Controllers\Dean\SetController;
@@ -88,6 +89,14 @@ $router->post('/admin/sets/{id}/restore', [AdminSetController::class, 'restore']
 
 $router->get('/admin/settings', [SettingsController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/settings', [SettingsController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+
+// Centralized Archives Hub (Admin only)
+$router->get('/admin/archives', [ArchiveController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+$router->post('/admin/archives/subjects/{id}/restore', [ArchiveController::class, 'restoreSubject'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/archives/sets/{id}/restore', [ArchiveController::class, 'restoreSet'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/archives/academic-terms/{id}/restore', [ArchiveController::class, 'restoreAcademicTerm'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/archives/departments/{id}/restore', [ArchiveController::class, 'restoreDepartment'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/archives/users/{id}/restore', [ArchiveController::class, 'restoreUser'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 
 // Dean routes
 $router->get('/dean/dashboard', [DashboardController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Dean', 'Admin'])]);

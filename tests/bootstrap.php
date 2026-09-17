@@ -14,4 +14,6 @@ new \App\Core\Database(
     (string) env('DB_PASSWORD', '')
 );
 
+define('PHPUNIT_RUNNING', true);
+
 \Tests\TestDatabaseSeeder::seedIfNeeded();
