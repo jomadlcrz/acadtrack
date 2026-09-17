@@ -19,6 +19,9 @@ $database = new Database(
     env('DB_USERNAME'),
     (string) env('DB_PASSWORD', '')
 );
+
+\App\Services\AutoMigrationService::runIfNeeded();
+
 $router = new Router();
 
 require_once __DIR__ . '/../routes/web.php';
