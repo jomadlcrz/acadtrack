@@ -179,6 +179,31 @@ class SetWorkflowTest extends TestCase
         $loadedSetA = Set::with('students')->find($setA->id);
         $this->assertTrue($loadedSetA->students->contains('id', $studentA->id));
         $this->assertFalse($loadedSetA->students->contains('id', $studentB->id));
+
+        // 6. Test Subject Enrollment and filtering by set
+        $subject = \App\Models\Subject::first();
+        $this->assertNotNull($subject, 'Subject should exist for test');
+
+        Student::enroll((int) $studentA->id, (int) $subject->id, $termId);
+        Student::enroll((int) $studentB->id, (int) $subject->id, $termId);
+
+        // Unfiltered roster contains both
+        $allEnrolled = Student::getBySubject((int) $subject->id, $termId);
+        $enrolledIds = array_column($allEnrolled, 'id');
+        $this->assertContains((int) $studentA->id, $enrolledIds);
+        $this->assertContains((int) $studentB->id, $enrolledIds);
+
+        // Filtered by Set A contains student A and NOT student B
+        $setAEnrolled = Student::getBySubject((int) $subject->id, $termId, (int) $setA->id);
+        $setAIds = array_column($setAEnrolled, 'id');
+        $this->assertContains((int) $studentA->id, $setAIds);
+        $this->assertNotContains((int) $studentB->id, $setAIds);
+
+        // Filtered by Set B contains student B and NOT student A
+        $setBEnrolled = Student::getBySubject((int) $subject->id, $termId, (int) $setB->id);
+        $setBIds = array_column($setBEnrolled, 'id');
+        $this->assertContains((int) $studentB->id, $setBIds);
+        $this->assertNotContains((int) $studentA->id, $setBIds);
     }
 
     public function testAssignedSetIsRequiredForStudent(): void

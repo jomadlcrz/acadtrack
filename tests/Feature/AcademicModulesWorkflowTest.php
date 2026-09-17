@@ -73,6 +73,7 @@ class AcademicModulesWorkflowTest extends TestCase
         $this->assertEquals('Bachelor of Science in Information Technology', $bsit->program_name);
 
         $subjects = Subject::where('program_id', $bsit->id)->get();
+        $this->assertTrue($subjects->isNotEmpty(), 'BSIT program should have subjects');
 
         $html = (new View())->render('admin.program_curricula.index', [
             'programs' => $programs,

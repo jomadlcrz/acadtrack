@@ -10,7 +10,6 @@ use App\Models\Student;
 use App\Models\Faculty;
 use App\Models\Subject;
 use App\Models\AcademicTerm;
-use App\Models\Department;
 use App\Models\GradingPeriod;
 use App\Models\GradingSheet;
 use App\Models\Notification;
@@ -40,19 +39,19 @@ class EloquentOrmTest extends TestCase
 
     public function testEloquentModelQueriesAndCollections(): void
     {
-        $departments = Department::where('status', 'active')->get();
-        $this->assertInstanceOf(Collection::class, $departments);
-        $this->assertGreaterThanOrEqual(1, $departments->count());
+        $subjects = Subject::where('academic_term_id', 1)->get();
+        $this->assertInstanceOf(Collection::class, $subjects);
+        $this->assertGreaterThanOrEqual(1, $subjects->count());
 
         // Test Collection methods (pluck, first)
-        $codes = $departments->pluck('dept_abbrev')->all();
+        $codes = $subjects->pluck('code')->all();
         $this->assertIsArray($codes);
         $this->assertNotEmpty($codes);
 
         // Test Model instance property and array access
-        $firstDept = $departments->first();
-        $this->assertInstanceOf(Department::class, $firstDept);
-        $this->assertSame($firstDept->dept_abbrev, $firstDept['dept_abbrev']);
+        $firstSubject = $subjects->first();
+        $this->assertInstanceOf(Subject::class, $firstSubject);
+        $this->assertSame($firstSubject->code, $firstSubject['code']);
     }
 
     public function testEloquentRelationships(): void
