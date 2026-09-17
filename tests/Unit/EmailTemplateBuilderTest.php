@@ -36,7 +36,7 @@ class EmailTemplateBuilderTest extends TestCase
 
         // Verify Branding & Layout Consistency
         $this->assertStringContainsString('Golden West Colleges, Inc.', $html);
-        $this->assertStringContainsString('GWC Acadtrack', $html);
+        $this->assertStringContainsString('Acadtrack &mdash; Academic Portal', $html);
         $this->assertStringContainsString('Acadtrack Password Recovery', $html);
         $this->assertStringContainsString('Reset Password', $html);
         $this->assertStringContainsString('15 minutes', $html);
