@@ -8,7 +8,7 @@ ob_start();
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; max-width: 760px;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark">Account Profile & Privilege Level</h3>
+            <h3 class="h6 mb-0 fw-semibold text-dark">Account Profile &amp; Privilege Level</h3>
             <small class="text-muted">Changes take effect immediately across all active sessions.</small>
         </div>
         <span class="badge badge-<?= strtolower($user['role']) ?>"><?= htmlspecialchars($user['role']) ?></span>
@@ -18,6 +18,7 @@ ob_start();
         <?= csrf_field() ?>
 
         <div class="card-body p-4">
+            <!-- Row 1: Name -->
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <label for="first_name" class="form-label">First name <span class="text-danger">*</span></label>
@@ -29,27 +30,15 @@ ob_start();
                 </div>
             </div>
 
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="email_display" class="form-label">Email address</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                        <input type="email" class="form-control bg-light" id="email_display" value="<?= htmlspecialchars($user['email']) ?>" readonly disabled>
-                    </div>
-                    <div class="form-text">Primary institutional account identifier (cannot be modified).</div>
-                </div>
-
-                <div class="col-md-6">
-                    <label for="role_display" class="form-label">System role</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                        <input type="text" class="form-control bg-light" id="role_display" value="<?= htmlspecialchars($user['role']) ?>" readonly disabled>
-                    </div>
-                    <div class="form-text">Role privileges are locked to protect institutional records.</div>
-                </div>
+            <!-- Row 2: Email Address -->
+            <div class="mb-3">
+                <label for="email_display" class="form-label">Email address</label>
+                <input type="email" class="form-control bg-light" id="email_display" value="<?= htmlspecialchars($user['email']) ?>" readonly disabled>
+                <div class="form-text">Primary institutional account identifier (cannot be modified).</div>
             </div>
 
             <?php if ($user['role'] === 'Student'): ?>
+                <!-- Row 3 (Student): ID & Assigned Set -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label for="student_number" class="form-label">Student ID number <span class="text-muted">(Optional / Late ID)</span></label>
@@ -70,6 +59,7 @@ ob_start();
                     </div>
                 </div>
 
+                <!-- Row 4 (Student): Year Level & Enrollment Status -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label for="year_level" class="form-label">Year level <span class="text-danger">*</span></label>
@@ -90,7 +80,9 @@ ob_start();
                         </select>
                     </div>
                 </div>
+
             <?php elseif (in_array($user['role'], ['Faculty', 'Dean'], true)): ?>
+                <!-- Row 3 (Faculty/Dean): Department -->
                 <div class="mb-3">
                     <label for="department_id" class="form-label">Faculty department / College <span class="text-danger">*</span></label>
                     <select class="form-select" id="department_id" name="department_id" required>

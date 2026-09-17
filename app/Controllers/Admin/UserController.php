@@ -43,9 +43,11 @@ class UserController
         $departments = \App\Models\Department::getActive();
         $academicTerm = \App\Models\AcademicTerm::getActive();
         $sets = $academicTerm ? \App\Models\Set::getActiveByTerm((int) $academicTerm['id']) : [];
+        $selectedRole = (string) $request->get('role', 'Student');
         $html = (new View())->render('admin.users.create', [
             'departments' => $departments,
             'sets' => $sets,
+            'selectedRole' => $selectedRole,
         ]);
         $response->html($html);
     }
