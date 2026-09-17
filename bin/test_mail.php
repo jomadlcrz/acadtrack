@@ -74,7 +74,8 @@ try {
 
     $mailer->isHTML(true);
     $mailer->Subject = 'Acadtrack - Gmail SMTP Test Verification';
-    $mailer->Body = "<h2>Acadtrack SMTP Test Successful!</h2><p>Your Google App Password is authenticated and operational.</p><p>Sent at: " . date('Y-m-d H:i:s') . "</p>";
+    $htmlBody = \App\Services\EmailTemplateBuilder::smtpDiagnostic($recipient, date('Y-m-d H:i:s'));
+    $mailer->Body = $htmlBody;
     $mailer->AltBody = "Acadtrack SMTP Test Successful! Your Google App Password is authenticated and operational. Sent at: " . date('Y-m-d H:i:s');
 
     $mailer->send();

@@ -34,12 +34,8 @@ class NotificationService
             'sent_at' => date('Y-m-d H:i:s'),
         ]);
 
-        $htmlBody = "<p>Dear <strong>" . htmlspecialchars($name) . "</strong>,</p>"
-            . "<p>Your student account on the <strong>GWC Acadtrack</strong> platform has been provisioned.</p>"
-            . "<ul><li><strong>Login Email:</strong> " . htmlspecialchars($email) . "</li>"
-            . "<li><strong>Temporary Password:</strong> " . htmlspecialchars($plainPassword) . "</li></ul>"
-            . "<p><em>Note: For security reasons, you will be required to set a new password upon your first sign in.</em></p>"
-            . "<p>Golden West Colleges, Inc.</p>";
+        $loginUrl = EmailTemplateBuilder::getAppUrl('/login');
+        $htmlBody = EmailTemplateBuilder::studentCredentials($name, $email, $plainPassword, $loginUrl);
 
         return $this->emailService->send($email, $title, $htmlBody);
     }
@@ -51,6 +47,7 @@ class NotificationService
         $subjectCode = $subject['subject_code'] ?? $subject['code'] ?? '';
 
         $students = Student::getBySubject($subjectId, $academicTermId);
+        $portalUrl = EmailTemplateBuilder::getAppUrl('/student/evaluation');
 
         foreach ($students as $student) {
             $userId = (int) ($student['user_id'] ?? 0);
@@ -74,10 +71,7 @@ class NotificationService
                 'sent_at' => date('Y-m-d H:i:s'),
             ]);
 
-            $htmlBody = "<p>Dear <strong>" . htmlspecialchars($name) . "</strong>,</p>"
-                . "<p>Official grades for <strong>" . htmlspecialchars($subjectCode . ' - ' . $subjectTitle) . "</strong> (" . htmlspecialchars($periodName) . ") have been approved and published.</p>"
-                . "<p>Log in to your student portal to inspect your period marks and comprehensive academic evaluation.</p>"
-                . "<p><em>Golden West Colleges, Inc.</em></p>";
+            $htmlBody = EmailTemplateBuilder::gradesPublished($name, $subjectCode, $subjectTitle, $periodName, $portalUrl);
 
             $this->emailService->send($email, $title, $htmlBody);
         }

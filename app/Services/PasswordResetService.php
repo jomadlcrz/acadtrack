@@ -136,63 +136,6 @@ class PasswordResetService
      */
     private function buildEmailTemplate(string $email, string $resetUrl): string
     {
-        $safeUrl = htmlspecialchars($resetUrl, ENT_QUOTES, 'UTF-8');
-        $safeEmail = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
-
-        return <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Reset Your Acadtrack Password</title>
-    <style>
-        body { margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1e293b; }
-        .wrapper { width: 100%; max-width: 580px; margin: 30px auto; background-color: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; }
-        .header { background-color: #0f2744; padding: 28px 32px; text-align: left; }
-        .header-brand { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #93c5fd; font-weight: 600; margin-bottom: 4px; }
-        .header-title { font-size: 20px; color: #ffffff; font-weight: 700; margin: 0; }
-        .content { padding: 36px 32px; line-height: 1.6; font-size: 14.5px; color: #334155; }
-        .greeting { font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 16px; }
-        .btn-box { text-align: center; margin: 32px 0; }
-        .btn { display: inline-block; background-color: #1e40af; color: #ffffff !important; text-decoration: none; padding: 12px 28px; font-size: 14px; font-weight: 600; border-radius: 6px; }
-        .notice { font-size: 13px; color: #64748b; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px 16px; margin: 24px 0; }
-        .fallback { font-size: 12.5px; color: #64748b; word-break: break-all; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e2e8f0; }
-        .footer { background-color: #f8fafc; padding: 20px 32px; font-size: 12px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; }
-    </style>
-</head>
-<body>
-    <div class="wrapper">
-        <div class="header">
-            <div class="header-brand">Golden West Colleges, Inc.</div>
-            <h1 class="header-title">Acadtrack Password Recovery</h1>
-        </div>
-        <div class="content">
-            <div class="greeting">Hello,</div>
-            <p>We received a request to reset the password for your Acadtrack account registered under <strong>{$safeEmail}</strong>.</p>
-            <p>To choose a new password and regain access to your account, click the button below:</p>
-            
-            <div class="btn-box">
-                <a href="{$safeUrl}" class="btn" target="_blank" rel="noopener">Reset Password</a>
-            </div>
-
-            <div class="notice">
-                <strong>Important Notice:</strong> This password reset link is valid for <strong>15 minutes</strong> from when it was requested and can only be used once.
-            </div>
-
-            <p style="margin-bottom: 0;">If you did not request a password reset, you can safely disregard this email. Your account credentials remain secure.</p>
-
-            <div class="fallback">
-                If the button above does not work, copy and paste the following URL into your web browser:<br>
-                <a href="{$safeUrl}" style="color: #1e40af;">{$safeUrl}</a>
-            </div>
-        </div>
-        <div class="footer">
-            Golden West Colleges, Inc. &bull; San Jose Drive, Alaminos, Pangasinan<br>
-            &copy; 2026 Acadtrack &mdash; Academic Grading &amp; Records Management Portal
-        </div>
-    </div>
-</body>
-</html>
-HTML;
+        return EmailTemplateBuilder::passwordReset($email, $resetUrl);
     }
 }

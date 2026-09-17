@@ -52,9 +52,11 @@ class EmailService
     {
         try {
             $this->mailer->clearAddresses();
+            $this->mailer->clearAttachments();
             $this->mailer->addAddress($to);
             $this->mailer->isHTML(true);
             $this->mailer->Subject = $subject;
+
             $this->mailer->Body = $htmlBody;
             $this->mailer->AltBody = strip_tags($htmlBody);
             $this->mailer->send();
