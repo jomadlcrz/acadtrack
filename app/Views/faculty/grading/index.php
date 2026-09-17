@@ -379,17 +379,17 @@ $activeGradingMethod = $currentSubject['grading_method'] ?? 'zero_based';
             </div>
 
             <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-between align-items-center">
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetCalculatorInputs()">
+                <button type="button" class="btn btn-outline-secondary" onclick="resetCalculatorInputs()">
                     <i class="bi bi-arrow-counterclockwise me-1"></i> Clear inputs
                 </button>
                 <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Close
                     </button>
-                    <button type="button" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5" id="btnApplyGrade" onclick="applyCalculatedGrade(false)">
+                    <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-1.5" id="btnApplyGrade" onclick="applyCalculatedGrade(false)">
                         <i class="bi bi-check2-circle"></i> Apply to student
                     </button>
-                    <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5" id="btnApplyNextGrade" onclick="applyCalculatedGrade(true)">
+                    <button type="button" class="btn btn-outline-primary d-inline-flex align-items-center gap-1.5" id="btnApplyNextGrade" onclick="applyCalculatedGrade(true)">
                         <i class="bi bi-arrow-right-circle"></i> Apply &amp; Next
                     </button>
                 </div>

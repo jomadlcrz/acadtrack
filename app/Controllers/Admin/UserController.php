@@ -116,6 +116,12 @@ class UserController
             return;
         }
 
+        if ($user->role === 'Admin') {
+            $session->flash('error', 'Administrator accounts cannot be modified.');
+            redirect('/admin/users');
+            return;
+        }
+
         $departments = \App\Models\Department::getActive();
         $academicTerm = \App\Models\AcademicTerm::getActive();
         $sets = $academicTerm ? \App\Models\Set::getActiveByTerm((int) $academicTerm['id']) : [];
@@ -132,6 +138,12 @@ class UserController
         $user = \App\Models\User::find((int) $id);
         if (!$user) {
             $response->statusCode(404)->html('User not found');
+            return;
+        }
+
+        if ($user->role === 'Admin') {
+            $session->flash('error', 'Administrator accounts cannot be modified.');
+            redirect('/admin/users');
             return;
         }
 

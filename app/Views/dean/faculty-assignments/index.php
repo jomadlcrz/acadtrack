@@ -396,8 +396,8 @@ ob_start();
                 </div>
 
                 <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5 shadow-sm">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5 shadow-sm">
                         <i class="bi bi-check-circle"></i> Confirm Assignment
                     </button>
                 </div>
@@ -494,8 +494,8 @@ ob_start();
                 <?php endif; ?>
             </div>
 
-            <div class="modal-footer bg-light py-2.5 px-4 border-top">
-                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

@@ -40,7 +40,7 @@ ob_start();
     </div>
 </div>
 
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
+<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="usersTable">
             <thead class="bg-white border-bottom">
@@ -107,27 +107,43 @@ ob_start();
                             <?php endif; ?>
                         </td>
                         <td class="px-3 text-end text-nowrap">
-                            <a href="<?= url('/admin/users/' . $user['id'] . '/edit') ?>" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1">
-                                <i class="bi bi-pencil"></i> Edit
-                            </a>
                             <?php if ($user['role'] === 'Admin'): ?>
-                                <span class="badge bg-light text-secondary border py-1 px-2 d-inline-flex align-items-center gap-1" title="Administrator accounts cannot be deactivated to prevent system lockout">
+                                <span class="badge bg-light text-secondary border py-1.5 px-2.5 d-inline-flex align-items-center gap-1.5" title="Administrator accounts are protected and cannot be edited or deactivated">
                                     <i class="bi bi-shield-check text-primary"></i> Protected
                                 </span>
-                            <?php elseif (($user['status'] ?? 'active') === 'inactive'): ?>
-                                <form method="POST" action="<?= url('/admin/users/' . $user['id'] . '/activate') ?>" class="d-inline" onsubmit="return confirm('Are you sure you want to activate this user account?');">
-                                    <?= csrf_field() ?>
-                                    <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2 d-inline-flex align-items-center gap-1" title="Activate account">
-                                        <i class="bi bi-person-check"></i> Activate
-                                    </button>
-                                </form>
                             <?php else: ?>
-                                <form method="POST" action="<?= url('/admin/users/' . $user['id'] . '/deactivate') ?>" class="d-inline" onsubmit="return confirm('Are you sure you want to deactivate this user account? The user will immediately be unable to sign in.');">
-                                    <?= csrf_field() ?>
-                                    <button type="submit" class="btn btn-sm btn-outline-warning py-1 px-2 d-inline-flex align-items-center gap-1" title="Deactivate account">
-                                        <i class="bi bi-person-x"></i> Deactivate
+                                <div class="dropdown d-inline-block">
+                                    <button class="btn btn-sm btn-action-trigger" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="Actions">
+                                        <i class="bi bi-three-dots-vertical"></i>
                                     </button>
-                                </form>
+                                    <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
+                                        <li>
+                                            <a class="dropdown-item" href="<?= url('/admin/users/' . $user['id'] . '/edit') ?>">
+                                                <i class="bi bi-pencil text-muted"></i> Edit user
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <?php if (($user['status'] ?? 'active') === 'inactive'): ?>
+                                            <li>
+                                                <form method="POST" action="<?= url('/admin/users/' . $user['id'] . '/activate') ?>" class="m-0" onsubmit="return confirm('Are you sure you want to activate this user account?');">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="dropdown-item text-success">
+                                                        <i class="bi bi-person-check"></i> Activate account
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        <?php else: ?>
+                                            <li>
+                                                <form method="POST" action="<?= url('/admin/users/' . $user['id'] . '/deactivate') ?>" class="m-0" onsubmit="return confirm('Are you sure you want to deactivate this user account? The user will immediately be unable to sign in.');">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-person-x"></i> Deactivate account
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        <?php endif; ?>
+                                    </ul>
+                                </div>
                             <?php endif; ?>
                         </td>
                     </tr>

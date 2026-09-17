@@ -3,6 +3,10 @@
    ========================================================================== */
 
 /* 1. Responsive Table Container */
+.card:has(.table-responsive) {
+    overflow: visible !important;
+}
+
 .table-responsive {
     border-radius: 6px;
     background: #ffffff;

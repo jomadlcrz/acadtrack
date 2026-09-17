@@ -131,6 +131,7 @@ class ProgramCurriculumController
             'groupedSubjects' => $groupedSubjects,
             'totalSubjects' => $totalSubjects,
             'totalUnits' => $totalUnits,
+            'allProgramSubjects' => ($selectedProgram && isset($subjects)) ? $subjects : collect([]),
         ]);
 
         $response->html($html);
@@ -410,6 +411,191 @@ class ProgramCurriculumController
         fputcsv($out, ['First Year', '2nd Semester', 'IT104', 'Data Structures and Algorithms', '3.0', 'Major with Lab', 'IT102']);
         fclose($out);
         exit;
+    }
+
+    public function storeSubject(Request $request, Response $response, Session $session): void
+    {
+        $programId = (int) $request->post('program_id', 0);
+        $program = Program::find($programId);
+        $redirectProgram = $request->post('program', $program?->program_abbrev ?? '');
+
+        $subjectCode = strtoupper(trim((string) $request->post('subject_code', '')));
+        $title = trim((string) $request->post('descriptive_title', ''));
+        $units = (float) $request->post('units', 3.0);
+        $yearLevel = (int) $request->post('year_level', 1);
+        $semester = (int) $request->post('semester', 1);
+        $subjectType = trim((string) $request->post('subject_type', 'GenEd Core'));
+        $prereqs = trim((string) $request->post('prerequisites', ''));
+
+        if (!$program) {
+            $session->flash('error', 'Please specify a valid academic program.');
+            redirect('/admin/program-curricula' . ($redirectProgram ? '?program=' . urlencode($redirectProgram) : ''));
+            return;
+        }
+
+        if (empty($subjectCode) || empty($title)) {
+            $session->flash('error', 'Subject Code and Descriptive Title are required.');
+            redirect('/admin/program-curricula?program=' . urlencode($program->program_abbrev));
+            return;
+        }
+
+        $pdo = Database::getConnection();
+
+        // Check if subject already exists for this program
+        $stmtFind = $pdo->prepare("SELECT id FROM subjects WHERE program_id = :pid AND subject_code = :code LIMIT 1");
+        $stmtFind->execute(['pid' => $program->id, 'code' => $subjectCode]);
+        $existing = $stmtFind->fetch(PDO::FETCH_ASSOC);
+
+        $matchingTerm = AcademicTerm::getBySemester((string) $semester);
+        $activeTerm = AcademicTerm::getActive();
+        $targetTermId = $matchingTerm['id'] ?? ($activeTerm['id'] ?? 1);
+
+        if ($existing) {
+            $subjectId = (int) $existing['id'];
+            $stmtUpdate = $pdo->prepare("
+                UPDATE subjects
+                SET descriptive_title = :title, units = :units, subject_type = :stype,
+                    year_level = :yl, semester = :sem, is_archived = 0, archived_at = NULL, updated_at = NOW()
+                WHERE id = :id
+            ");
+            $stmtUpdate->execute([
+                'title' => $title,
+                'units' => $units,
+                'stype' => $subjectType,
+                'yl' => $yearLevel,
+                'sem' => $semester,
+                'id' => $subjectId,
+            ]);
+        } else {
+            $stmtInsert = $pdo->prepare("
+                INSERT INTO subjects (program_id, subject_code, descriptive_title, units, subject_type, nature, year_level, semester, academic_term_id, is_archived, created_at, updated_at)
+                VALUES (:pid, :code, :title, :units, :stype, 'Lecture', :yl, :sem, :tid, 0, NOW(), NOW())
+            ");
+            $stmtInsert->execute([
+                'pid' => $program->id,
+                'code' => $subjectCode,
+                'title' => $title,
+                'units' => $units,
+                'stype' => $subjectType,
+                'yl' => $yearLevel,
+                'sem' => $semester,
+                'tid' => $targetTermId,
+            ]);
+            $subjectId = (int) $pdo->lastInsertId();
+        }
+
+        // Sync prerequisites
+        $stmtDelPr = $pdo->prepare("DELETE FROM prerequisites WHERE subject_id = :sid");
+        $stmtDelPr->execute(['sid' => $subjectId]);
+
+        if (!empty($prereqs)) {
+            $stmtInsPr = $pdo->prepare("INSERT IGNORE INTO prerequisites (subject_id, prerequisite_subject_id) VALUES (:sid, :pid)");
+            $codes = array_filter(array_map('trim', explode(',', $prereqs)));
+            foreach ($codes as $pCode) {
+                $stmtF = $pdo->prepare("SELECT id FROM subjects WHERE program_id = :pid AND subject_code = :pcode LIMIT 1");
+                $stmtF->execute(['pid' => $program->id, 'pcode' => $pCode]);
+                $pId = $stmtF->fetchColumn();
+                if ($pId) {
+                    $stmtInsPr->execute(['sid' => $subjectId, 'pid' => $pId]);
+                }
+            }
+        }
+
+        $session->flash('success', "Subject '{$subjectCode}' added to curriculum successfully.");
+        redirect('/admin/program-curricula?program=' . urlencode($program->program_abbrev));
+    }
+
+    public function updateSubject(Request $request, Response $response, Session $session, string $id): void
+    {
+        $subject = Subject::find((int) $id);
+        if (!$subject) {
+            $session->flash('error', 'Subject not found.');
+            redirect('/admin/program-curricula');
+            return;
+        }
+
+        $program = Program::find((int) $subject->program_id);
+        $redirectProgram = $request->post('program', $program?->program_abbrev ?? '');
+
+        $subjectCode = strtoupper(trim((string) $request->post('subject_code', $subject->subject_code)));
+        $title = trim((string) $request->post('descriptive_title', $subject->descriptive_title));
+        $units = (float) $request->post('units', $subject->units);
+        $yearLevel = (int) $request->post('year_level', $subject->year_level);
+        $semester = (int) $request->post('semester', $subject->semester);
+        $subjectType = trim((string) $request->post('subject_type', $subject->subject_type));
+        $prereqs = trim((string) $request->post('prerequisites', ''));
+
+        if (empty($subjectCode) || empty($title)) {
+            $session->flash('error', 'Subject Code and Descriptive Title are required.');
+            redirect('/admin/program-curricula' . ($redirectProgram ? '?program=' . urlencode($redirectProgram) : ''));
+            return;
+        }
+
+        $pdo = Database::getConnection();
+
+        // Check if another subject in the same program has this subject code
+        $stmtDup = $pdo->prepare("SELECT id FROM subjects WHERE program_id = :pid AND subject_code = :code AND id != :id LIMIT 1");
+        $stmtDup->execute(['pid' => $subject->program_id, 'code' => $subjectCode, 'id' => $subject->id]);
+        if ($stmtDup->fetch()) {
+            $session->flash('error', "Subject code '{$subjectCode}' already exists in this program curriculum.");
+            redirect('/admin/program-curricula' . ($redirectProgram ? '?program=' . urlencode($redirectProgram) : ''));
+            return;
+        }
+
+        $subject->update([
+            'subject_code' => $subjectCode,
+            'descriptive_title' => $title,
+            'units' => $units,
+            'subject_type' => $subjectType,
+            'year_level' => $yearLevel,
+            'semester' => $semester,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        // Sync prerequisites
+        $stmtDelPr = $pdo->prepare("DELETE FROM prerequisites WHERE subject_id = :sid");
+        $stmtDelPr->execute(['sid' => $subject->id]);
+
+        if (!empty($prereqs)) {
+            $stmtInsPr = $pdo->prepare("INSERT IGNORE INTO prerequisites (subject_id, prerequisite_subject_id) VALUES (:sid, :pid)");
+            $codes = array_filter(array_map('trim', explode(',', $prereqs)));
+            foreach ($codes as $pCode) {
+                $stmtF = $pdo->prepare("SELECT id FROM subjects WHERE program_id = :pid AND subject_code = :pcode LIMIT 1");
+                $stmtF->execute(['pid' => $program?->id ?? $subject->program_id, 'pcode' => $pCode]);
+                $pId = $stmtF->fetchColumn();
+                if ($pId) {
+                    $stmtInsPr->execute(['sid' => $subject->id, 'pid' => $pId]);
+                }
+            }
+        }
+
+        $session->flash('success', "Subject '{$subjectCode}' updated successfully.");
+        redirect('/admin/program-curricula' . ($redirectProgram ? '?program=' . urlencode($redirectProgram) : ''));
+    }
+
+    public function archiveSubject(Request $request, Response $response, Session $session, string $id): void
+    {
+        $subject = Subject::find((int) $id);
+        if (!$subject) {
+            $session->flash('error', 'Subject not found.');
+            redirect('/admin/program-curricula');
+            return;
+        }
+
+        $redirectProgram = $request->post('program', '');
+        if (empty($redirectProgram) && $subject->program_id) {
+            $prog = Program::find((int) $subject->program_id);
+            $redirectProgram = $prog?->program_abbrev ?? '';
+        }
+
+        $code = $subject->subject_code;
+        $subject->update([
+            'is_archived' => 1,
+            'archived_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        $session->flash('success', "Subject '{$code}' archived successfully.");
+        redirect('/admin/program-curricula' . ($redirectProgram ? '?program=' . urlencode($redirectProgram) : ''));
     }
 
     private function respondError(bool $isJson, Response $response, Session $session, string $error): void

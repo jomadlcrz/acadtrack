@@ -144,7 +144,7 @@ $metrics = $metrics ?? [
 </div>
 
 <!-- Grading Sheets Roster Card -->
-<div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
+<div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
             <h3 class="h6 mb-0 fw-semibold text-dark">Grading Sheets Roster</h3>
@@ -170,7 +170,7 @@ $metrics = $metrics ?? [
                         <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 220px; font-size: 11px;">Faculty Instructor</th>
                         <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 170px; font-size: 11px;">Submitted At</th>
                         <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 130px; font-size: 11px;">Status</th>
-                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 240px; font-size: 11px;">Actions</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 80px; font-size: 11px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y" id="gradeReviewTableBody">
@@ -231,26 +231,42 @@ $metrics = $metrics ?? [
                             </span>
                         </td>
                         <td class="py-2.5 px-4 text-end text-nowrap">
-                            <a href="<?= url('/dean/grade-review/' . $sheet['id']) ?>" class="btn btn-sm btn-outline-primary py-1 px-2.5 d-inline-flex align-items-center gap-1 fs-7">
-                                <i class="bi bi-eye"></i> View
-                            </a>
-                            <a href="<?= url('/dean/grade-review/' . $sheet['id'] . '/print') ?>" target="_blank" class="btn btn-sm btn-outline-secondary py-1 px-2.5 d-inline-flex align-items-center gap-1 ms-1 fs-7">
-                                <i class="bi bi-printer"></i> Print
-                            </a>
-
-                            <?php if (in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW'])): ?>
-                                <form method="POST" action="<?= url('/dean/grade-review/approve') ?>" class="d-inline ms-1" onsubmit="return confirm('Approve this grading sheet for <?= htmlspecialchars($code) ?>?');">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="grading_sheet_id" value="<?= $sheet['id'] ?>">
-                                    <button type="submit" class="btn btn-sm btn-success py-1 px-2.5 d-inline-flex align-items-center gap-1 fs-7">
-                                        <i class="bi bi-check-circle"></i> Approve
-                                    </button>
-                                </form>
-                            <?php elseif ($sheet['status'] === 'APPROVED'): ?>
-                                <button type="button" class="btn btn-sm btn-dark py-1 px-2.5 d-inline-flex align-items-center gap-1 ms-1 fs-7" data-bs-toggle="modal" data-bs-target="#confirmModal<?= $sheet['id'] ?>">
-                                    <i class="bi bi-shield-check"></i> Confirm
+                            <div class="dropdown d-inline-block">
+                                <button class="btn btn-sm btn-action-trigger" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="Actions">
+                                    <i class="bi bi-three-dots-vertical"></i>
                                 </button>
-                            <?php endif; ?>
+                                <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
+                                    <li>
+                                        <a class="dropdown-item" href="<?= url('/dean/grade-review/' . $sheet['id']) ?>">
+                                            <i class="bi bi-eye text-primary"></i> View details
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="<?= url('/dean/grade-review/' . $sheet['id'] . '/print') ?>" target="_blank">
+                                            <i class="bi bi-printer text-muted"></i> Print sheet
+                                        </a>
+                                    </li>
+                                    <?php if (in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW'])): ?>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form method="POST" action="<?= url('/dean/grade-review/approve') ?>" class="m-0" onsubmit="return confirm('Approve this grading sheet for <?= htmlspecialchars($code) ?>?');">
+                                                <?= csrf_field() ?>
+                                                <input type="hidden" name="grading_sheet_id" value="<?= $sheet['id'] ?>">
+                                                <button type="submit" class="dropdown-item text-success">
+                                                    <i class="bi bi-check-circle"></i> Approve sheet
+                                                </button>
+                                            </form>
+                                        </li>
+                                    <?php elseif ($sheet['status'] === 'APPROVED'): ?>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <button type="button" class="dropdown-item text-dark" data-bs-toggle="modal" data-bs-target="#confirmModal<?= $sheet['id'] ?>">
+                                                <i class="bi bi-shield-check text-muted"></i> Confirm grades
+                                            </button>
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -298,9 +314,9 @@ $metrics = $metrics ?? [
                                 <textarea class="form-control" id="remarks_<?= $sheet['id'] ?>" name="remarks" rows="3" placeholder="Enter confirmation remarks (e.g. Official semester rating confirmed by the Dean's Office.)"></textarea>
                             </div>
                         </div>
-                        <div class="modal-footer border-top py-3 d-flex justify-content-end gap-2 bg-light">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-sm btn-dark d-inline-flex align-items-center gap-1.5 shadow-sm">
+                        <div class="modal-footer border-top py-2.5 px-4 d-flex justify-content-end gap-2 bg-light">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-dark d-inline-flex align-items-center gap-1.5 shadow-sm">
                                 <i class="bi bi-shield-check"></i> Confirm &amp; Finalize
                             </button>
                         </div>

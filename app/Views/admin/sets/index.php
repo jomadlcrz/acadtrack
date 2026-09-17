@@ -6,7 +6,7 @@ $subtitle = $isReadOnly
     : 'Manage academic class sections, cohorts, and batch-generate student sets.';
 $headerActions = $isReadOnly 
     ? '<span class="badge bg-light text-secondary border px-2.5 py-1.5 fs-7 d-inline-flex align-items-center gap-1.5"><i class="bi bi-shield-lock"></i> Read-Only View</span>' 
-    : '<button type="button" class="btn btn-primary text-white d-inline-flex align-items-center gap-1.5" style="background-color: #2f4a86; border-color: #2f4a86;" data-bs-toggle="modal" data-bs-target="#createSetsModal"><i class="bi bi-plus-lg"></i> Create Sections</button>';
+    : '<button type="button" class="btn btn-primary d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#createSetsModal"><i class="bi bi-plus-lg"></i> Create Sections</button>';
 ob_start();
 ?>
 
@@ -51,7 +51,7 @@ ob_start();
 </div>
 
 <!-- Sets Table Card -->
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
+<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="setsTable">
             <thead class="bg-white border-bottom">
@@ -138,30 +138,42 @@ ob_start();
                                 <?php endif; ?>
                             </td>
                             <td class="py-3 px-4 text-end">
-                                <div class="d-inline-flex align-items-center gap-1.5">
-                                    <?php if (!$isReadOnly): ?>
-                                        <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#editSetModal<?= $set->id ?>" title="Edit Section">
-                                            <i class="bi bi-pencil"></i>
+                                <?php if (!$isReadOnly): ?>
+                                    <div class="dropdown d-inline-block">
+                                        <button class="btn btn-sm btn-action-trigger" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="Actions">
+                                            <i class="bi bi-three-dots-vertical"></i>
                                         </button>
-                                        <?php if ($isActive): ?>
-                                            <form method="POST" action="<?= url('/admin/sets/' . $set->id . '/archive') ?>" class="d-inline" onsubmit="return confirm('Archive section <?= htmlspecialchars(addslashes($set->name)) ?>?');">
-                                                <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Archive Section">
-                                                    <i class="bi bi-archive"></i>
+                                        <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
+                                            <li>
+                                                <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editSetModal<?= $set->id ?>">
+                                                    <i class="bi bi-pencil text-muted"></i> Edit section
                                                 </button>
-                                            </form>
-                                        <?php else: ?>
-                                            <form method="POST" action="<?= url('/admin/sets/' . $set->id . '/restore') ?>" class="d-inline">
-                                                <?= csrf_field() ?>
-                                                <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2" title="Restore Section">
-                                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                                </button>
-                                            </form>
-                                        <?php endif; ?>
-                                    <?php else: ?>
-                                        <span class="text-muted small">—</span>
-                                    <?php endif; ?>
-                                </div>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <?php if ($isActive): ?>
+                                                <li>
+                                                    <form method="POST" action="<?= url('/admin/sets/' . $set->id . '/archive') ?>" class="m-0" onsubmit="return confirm('Archive section <?= htmlspecialchars(addslashes($set->name)) ?>?');">
+                                                        <?= csrf_field() ?>
+                                                        <button type="submit" class="dropdown-item text-danger">
+                                                            <i class="bi bi-archive"></i> Archive section
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            <?php else: ?>
+                                                <li>
+                                                    <form method="POST" action="<?= url('/admin/sets/' . $set->id . '/restore') ?>" class="m-0">
+                                                        <?= csrf_field() ?>
+                                                        <button type="submit" class="dropdown-item text-success">
+                                                            <i class="bi bi-arrow-counterclockwise"></i> Restore section
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            <?php endif; ?>
+                                        </ul>
+                                    </div>
+                                <?php else: ?>
+                                    <span class="text-muted small">—</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
 
@@ -199,9 +211,11 @@ ob_start();
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="modal-footer bg-light py-3 px-4 d-flex justify-content-end gap-2">
-                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-sm btn-primary text-white" style="background-color: #2f4a86; border-color: #2f4a86;">Save Changes</button>
+                                            <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
+                                                    <i class="bi bi-check2"></i> Save Changes
+                                                </button>
                                             </div>
                                         </form>
                                     </div>
@@ -292,7 +306,7 @@ ob_start();
                             <ul class="nav nav-pills mb-3" id="customYearPills" role="tablist">
                                 <?php for ($y = 1; $y <= 4; $y++): ?>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link py-1.5 px-3 small <?= $y === 1 ? 'active' : '' ?>" id="pills-y<?= $y ?>-tab" data-bs-toggle="pill" data-bs-target="#pills-y<?= $y ?>" type="button" role="tab">
+                                        <button class="nav-link py-2 px-3 fw-medium small <?= $y === 1 ? 'active' : '' ?>" id="pills-y<?= $y ?>-tab" data-bs-toggle="pill" data-bs-target="#pills-y<?= $y ?>" type="button" role="tab">
                                             <?= $y === 1 ? '1st Year' : ($y === 2 ? '2nd Year' : ($y === 3 ? '3rd Year' : "{$y}th Year")) ?>
                                         </button>
                                     </li>
@@ -319,10 +333,10 @@ ob_start();
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer bg-light py-3 px-4 d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-sm btn-primary text-white px-3" style="background-color: #2f4a86; border-color: #2f4a86;" id="createSetsSubmitBtn">
-                            <i class="bi bi-magic me-1"></i>Generate &amp; Save Sections
+                    <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5" id="createSetsSubmitBtn">
+                            <i class="bi bi-magic"></i> Generate &amp; Save Sections
                         </button>
                     </div>
                 </form>

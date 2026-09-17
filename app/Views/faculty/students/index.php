@@ -66,7 +66,7 @@ ob_start();
     </div>
 </div>
 
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
+<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="studentsTable">
             <thead class="bg-white border-bottom">
@@ -146,22 +146,33 @@ ob_start();
                             <?php endif; ?>
                         </td>
                         <td class="px-3 text-end text-nowrap">
-                            <button type="button" 
-                                    class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1 me-1"
-                                    onclick="viewStudentPass(<?= $student['id'] ?>, <?= $subjectId ?>, <?= (int)($academicTerm['id'] ?? 1) ?>)"
-                                    title="View Digital Student Pass">
-                                <i class="bi bi-person-badge"></i> Pass
-                            </button>
-                            <form method="POST" action="<?= url('/faculty/students/remove') ?>" class="d-inline" onsubmit="return confirm('Remove student from this course set?');">
-                                <?= csrf_field() ?>
-                                <input type="hidden" name="student_id" value="<?= $student['id'] ?>">
-                                <input type="hidden" name="subject_id" value="<?= $subjectId ?>">
-                                <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
-                                <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                                <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Unenroll from class set">
-                                    <i class="bi bi-person-dash"></i> Unenroll
+                            <div class="dropdown d-inline-block">
+                                <button class="btn btn-sm btn-action-trigger" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="Actions">
+                                    <i class="bi bi-three-dots-vertical"></i>
                                 </button>
-                            </form>
+                                <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
+                                    <li>
+                                        <button type="button" 
+                                                class="dropdown-item"
+                                                onclick="viewStudentPass(<?= $student['id'] ?>, <?= $subjectId ?>, <?= (int)($academicTerm['id'] ?? 1) ?>)">
+                                            <i class="bi bi-person-badge text-primary"></i> Digital Pass
+                                        </button>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form method="POST" action="<?= url('/faculty/students/remove') ?>" class="m-0" onsubmit="return confirm('Remove student from this course set?');">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="student_id" value="<?= $student['id'] ?>">
+                                            <input type="hidden" name="subject_id" value="<?= $subjectId ?>">
+                                            <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
+                                            <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-person-dash"></i> Unenroll student
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>

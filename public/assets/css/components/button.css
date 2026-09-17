@@ -205,6 +205,17 @@
     border-radius: 4px;
 }
 
+/* Modal Action Controls - enforce consistent, comfortable sizing across all dialogs */
+.modal-footer .btn {
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    border-radius: var(--radius, 6px) !important;
+    font-weight: 500 !important;
+    min-height: 38px;
+    line-height: 1.4;
+}
+
+
 .btn-block {
     display: flex;
     width: 100%;
@@ -245,4 +256,95 @@
 .btn-group-sm .btn:last-child {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
+}
+
+/* 6. Action Menu & Kebab Popover / Dropdown */
+.btn-action-trigger {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid var(--gray-200, #e2e8f0);
+    background-color: #ffffff;
+    color: var(--gray-600, #475569);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    line-height: 1;
+}
+
+.btn-action-trigger:hover,
+.btn-action-trigger:focus,
+.btn-action-trigger[aria-expanded="true"] {
+    background-color: var(--gray-100, #f1f5f9);
+    border-color: var(--gray-300, #cbd5e1);
+    color: var(--gray-900, #0f172a);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-action-trigger::after {
+    display: none !important;
+}
+
+.action-dropdown-menu {
+    min-width: 170px;
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+    font-size: 13px;
+    z-index: 1060;
+}
+
+.action-dropdown-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border-radius: 6px;
+    color: #334155;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.action-dropdown-menu .dropdown-item i {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.action-dropdown-menu .dropdown-item:hover,
+.action-dropdown-menu .dropdown-item:focus {
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+
+.action-dropdown-menu .dropdown-item.text-danger:hover,
+.action-dropdown-menu .dropdown-item.text-danger:focus {
+    background-color: #fef2f2 !important;
+    color: #dc2626 !important;
+}
+
+.action-dropdown-menu .dropdown-item.text-success:hover,
+.action-dropdown-menu .dropdown-item.text-success:focus {
+    background-color: #f0fdf4 !important;
+    color: #16a34a !important;
+}
+
+.action-dropdown-menu .dropdown-item.text-primary:hover,
+.action-dropdown-menu .dropdown-item.text-primary:focus {
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+}
+
+.action-dropdown-menu .dropdown-divider {
+    margin: 4px 0;
+    border-top: 1px solid #f1f5f9;
 }

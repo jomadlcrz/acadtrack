@@ -4,7 +4,7 @@ $subtitle = 'Curricular course sets assigned to your instructional teaching work
 ob_start();
 ?>
 
-<div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
+<div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div>
             <h3 class="h6 mb-0 fw-semibold text-dark">Teaching Workload Roster</h3>
@@ -41,7 +41,7 @@ ob_start();
                         <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 120px; font-size: 11px;">Nature</th>
                         <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 140px; font-size: 11px;">Grading method</th>
                         <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 110px; font-size: 11px;">Year level</th>
-                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 310px; font-size: 11px;">Actions</th>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 80px; font-size: 11px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
@@ -69,15 +69,29 @@ ob_start();
                             <?= htmlspecialchars($subject['year_level']) ?><?= match((int)$subject['year_level']) { 1 => 'st', 2 => 'nd', 3 => 'rd', default => 'th' } ?> year
                         </td>
                         <td class="px-3 text-end text-nowrap">
-                            <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#setupModal<?= $subject['id'] ?>">
-                                <i class="bi bi-gear"></i> Set up
-                            </button>
-                            <a href="<?= url('/faculty/grading?subject_id=' . $subject['id'] . '&semester=' . ($selectedSemester ?? '1')) ?>" class="btn btn-sm btn-primary py-1 px-2 d-inline-flex align-items-center gap-1 ms-1">
-                                <i class="bi bi-pencil-square"></i> Enter grades
-                            </a>
-                            <a href="<?= url('/faculty/students?subject_id=' . $subject['id']) ?>" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1 ms-1">
-                                <i class="bi bi-people"></i> View students
-                            </a>
+                            <div class="dropdown d-inline-block">
+                                <button class="btn btn-sm btn-action-trigger" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="Actions">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
+                                    <li>
+                                        <a class="dropdown-item" href="<?= url('/faculty/grading?subject_id=' . $subject['id'] . '&semester=' . ($selectedSemester ?? '1')) ?>">
+                                            <i class="bi bi-pencil-square text-primary"></i> Enter grades
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="<?= url('/faculty/students?subject_id=' . $subject['id']) ?>">
+                                            <i class="bi bi-people text-muted"></i> View students
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#setupModal<?= $subject['id'] ?>">
+                                            <i class="bi bi-gear text-muted"></i> Subject setup
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>

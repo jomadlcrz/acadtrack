@@ -19,7 +19,7 @@ ob_start();
 $displaySets = $sets ?? [];
 ?>
 
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
+<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <div>
             <h3 class="h6 mb-0 fw-semibold text-dark">Class Batches Roster</h3>
@@ -89,28 +89,40 @@ $displaySets = $sets ?? [];
                             <?php endif; ?>
                         </td>
                         <td class="px-3 text-end">
-                            <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#editSetModal<?= $sec['id'] ?>">
-                                <i class="bi bi-pencil"></i> Edit
-                            </button>
-                            <?php if (($sec['status'] ?? 'active') === 'active'): ?>
-                                <form method="POST" action="<?= url('/dean/sets/' . $sec['id'] . '/archive') ?>" class="d-inline" onsubmit="return confirm('Archive set <?= htmlspecialchars(addslashes($sec['name'])) ?>?');">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                                    <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Archive set">
-                                        <i class="bi bi-archive"></i> Archive
-                                    </button>
-                                </form>
-                            <?php else: ?>
-                                <form method="POST" action="<?= url('/dean/sets/' . $sec['id'] . '/restore') ?>" class="d-inline">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                                    <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2 d-inline-flex align-items-center gap-1" title="Restore set">
-                                        <i class="bi bi-arrow-counterclockwise"></i> Restore
-                                    </button>
-                                </form>
-                            <?php endif; ?>
+                            <div class="dropdown d-inline-block">
+                                <button class="btn btn-sm btn-action-trigger" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="Actions">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
+                                    <li>
+                                        <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editSetModal<?= $sec['id'] ?>">
+                                            <i class="bi bi-pencil text-muted"></i> Edit set
+                                        </button>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <?php if (($sec['status'] ?? 'active') === 'active'): ?>
+                                        <li>
+                                            <form method="POST" action="<?= url('/dean/sets/' . $sec['id'] . '/archive') ?>" class="m-0" onsubmit="return confirm('Archive set <?= htmlspecialchars(addslashes($sec['name'])) ?>?');">
+                                                <?= csrf_field() ?>
+                                                <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="bi bi-archive"></i> Archive set
+                                                </button>
+                                            </form>
+                                        </li>
+                                    <?php else: ?>
+                                        <li>
+                                            <form method="POST" action="<?= url('/dean/sets/' . $sec['id'] . '/restore') ?>" class="m-0">
+                                                <?= csrf_field() ?>
+                                                <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
+                                                <button type="submit" class="dropdown-item text-success">
+                                                    <i class="bi bi-arrow-counterclockwise"></i> Restore set
+                                                </button>
+                                            </form>
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
 
@@ -161,10 +173,10 @@ $displaySets = $sets ?? [];
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="modal-footer bg-light">
+                                    <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
                                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
-                                            <i class="bi bi-check2"></i> Save changes
+                                        <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
+                                            <i class="bi bi-check2"></i> Save Changes
                                         </button>
                                     </div>
                                 </form>
@@ -226,10 +238,10 @@ $displaySets = $sets ?? [];
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
+                <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
-                        <i class="bi bi-plus-circle"></i> Save set
+                    <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
+                        <i class="bi bi-plus-lg"></i> Save Set
                     </button>
                 </div>
             </form>

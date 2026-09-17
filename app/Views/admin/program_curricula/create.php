@@ -392,10 +392,10 @@ ob_start();
                     <div id="importValidationErrors" class="alert alert-warning py-2 px-3 small mt-2" style="display: none;"></div>
                 </div>
             </div>
-            <div class="modal-footer bg-light py-2.5 px-4 border-top">
-                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="applyImportBtn" class="btn btn-sm text-white px-3" style="background-color: #2f4a86; border-color: #2f4a86;" disabled onclick="applyImportedSubjects()">
-                    Apply Subjects to Curriculum
+            <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="applyImportBtn" class="btn btn-primary d-inline-flex align-items-center gap-1.5" disabled onclick="applyImportedSubjects()">
+                    <i class="bi bi-check2"></i> Apply Subjects to Curriculum
                 </button>
             </div>
         </div>

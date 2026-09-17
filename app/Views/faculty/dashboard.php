@@ -78,7 +78,7 @@ ob_start();
 </div>
 
 <!-- Workload Courses Table -->
-<div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
+<div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <h3 class="h6 mb-0 fw-semibold text-dark">Active Term Assigned Courses</h3>
         <a href="<?= url('/faculty/subjects') ?>" class="btn btn-sm btn-outline-secondary">Course catalog</a>
@@ -134,12 +134,23 @@ ob_start();
                                 </span>
                             </td>
                             <td class="px-3 text-end">
-                                <a href="<?= url('/faculty/grading?subject_id=' . $item['id']) ?>" class="btn btn-sm btn-primary py-1 px-2 me-1">
-                                    <i class="bi bi-pencil-square"></i> Grades
-                                </a>
-                                <a href="<?= url('/faculty/students?subject_id=' . $item['id']) ?>" class="btn btn-sm btn-outline-secondary py-1 px-2">
-                                    <i class="bi bi-people"></i> Roster
-                                </a>
+                                <div class="dropdown d-inline-block">
+                                    <button class="btn btn-sm btn-action-trigger" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="Actions">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
+                                        <li>
+                                            <a class="dropdown-item" href="<?= url('/faculty/grading?subject_id=' . $item['id']) ?>">
+                                                <i class="bi bi-pencil-square text-primary"></i> Enter grades
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="<?= url('/faculty/students?subject_id=' . $item['id']) ?>">
+                                                <i class="bi bi-people text-muted"></i> Class roster
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>

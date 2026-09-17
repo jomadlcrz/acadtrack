@@ -140,10 +140,10 @@
             </div>
 
             <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-between align-items-center">
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     Close
                 </button>
-                <button type="button" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5" onclick="printPassCardSlip()">
+                <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-1.5" onclick="printPassCardSlip()">
                     <i class="bi bi-printer"></i> Print / Save Grade Slip
                 </button>
             </div>

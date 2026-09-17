@@ -73,6 +73,10 @@ $router->get('/admin/program-curricula/new', [ProgramCurriculumController::class
 $router->get('/admin/program-curricula/template-csv', [ProgramCurriculumController::class, 'downloadTemplateCsv'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/program-curricula', [ProgramCurriculumController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->get('/admin/program-curricula/{id}/export-csv', [ProgramCurriculumController::class, 'exportCsv'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+$router->post('/admin/program-curricula/subjects', [ProgramCurriculumController::class, 'storeSubject'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/program-curricula/subjects/{id}', [ProgramCurriculumController::class, 'updateSubject'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/program-curricula/subjects/{id}/archive', [ProgramCurriculumController::class, 'archiveSubject'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+
 
 // Sets routes
 $router->get('/admin/sets', [AdminSetController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean'])]);

@@ -21,7 +21,7 @@ ob_start();
 </div>
 
 <!-- Academic Terms Table -->
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
+<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="termsTable">
             <thead class="bg-white border-bottom">
@@ -76,32 +76,41 @@ ob_start();
                                 <?php endif; ?>
                             </td>
                             <td class="py-3 px-4 text-end">
-                                <div class="d-inline-flex align-items-center gap-1.5">
-                                    <?php if (!$isActive && !$isArchived): ?>
-                                        <form method="POST" action="<?= url('/admin/academic-terms/' . $term['id'] . '/toggle-active') ?>" class="d-inline">
-                                            <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-sm btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1" title="Set as Current Active Term">
-                                                <i class="bi bi-check2"></i> Activate
-                                            </button>
-                                        </form>
-                                    <?php endif; ?>
-
-                                    <?php if ($isArchived): ?>
-                                        <form method="POST" action="<?= url('/admin/academic-terms/' . $term['id'] . '/restore') ?>" class="d-inline">
-                                            <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2 d-inline-flex align-items-center gap-1" title="Restore Term">
-                                                <i class="bi bi-arrow-counterclockwise"></i> Restore
-                                            </button>
-                                        </form>
-                                    <?php elseif (!$isActive): ?>
-                                        <form method="POST" action="<?= url('/admin/academic-terms/' . $term['id'] . '/archive') ?>" class="d-inline" onsubmit="return confirm('Archive academic term <?= $syDisplay ?> (<?= $semLabel ?>)?');">
-                                            <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2 d-inline-flex align-items-center gap-1" title="Archive Term">
-                                                <i class="bi bi-archive"></i> Archive
-                                            </button>
-                                        </form>
-                                    <?php endif; ?>
-                                </div>
+                                <?php if (!$isActive && !$isArchived): ?>
+                                    <div class="dropdown d-inline-block">
+                                        <button class="btn btn-sm btn-action-trigger" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="Actions">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
+                                            <li>
+                                                <form method="POST" action="<?= url('/admin/academic-terms/' . $term['id'] . '/toggle-active') ?>" class="m-0">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="dropdown-item text-primary">
+                                                        <i class="bi bi-check2"></i> Activate term
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form method="POST" action="<?= url('/admin/academic-terms/' . $term['id'] . '/archive') ?>" class="m-0" onsubmit="return confirm('Archive academic term <?= $syDisplay ?> (<?= $semLabel ?>)?');">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-archive"></i> Archive term
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                <?php elseif ($isArchived): ?>
+                                    <form method="POST" action="<?= url('/admin/academic-terms/' . $term['id'] . '/restore') ?>" class="d-inline">
+                                        <?= csrf_field() ?>
+                                        <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2 d-inline-flex align-items-center gap-1" title="Restore Term">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Restore
+                                        </button>
+                                    </form>
+                                <?php else: ?>
+                                    <span class="text-muted small">—</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -158,9 +167,11 @@ ob_start();
                         <label class="form-check-label small fw-medium" for="set_active">Set as current active institutional term</label>
                     </div>
                 </div>
-                <div class="modal-footer border-top py-3 px-4 bg-light d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-sm px-3">Save Term</button>
+                <div class="modal-footer border-top py-2.5 px-4 bg-light d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
+                        <i class="bi bi-check2"></i> Save Term
+                    </button>
                 </div>
             </form>
         </div>

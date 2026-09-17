@@ -169,12 +169,12 @@
 
             <!-- Modal Action Footer -->
             <div class="modal-footer py-2.5 px-4 bg-light border-top d-flex justify-content-between align-items-center">
-                <a href="#" target="_blank" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5" id="passVerifyDirectLink">
+                <a href="#" target="_blank" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1.5" id="passVerifyDirectLink">
                     <i class="bi bi-box-arrow-up-right"></i> Open Verification Page
                 </a>
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5 shadow-sm" id="btnDownloadPass" onclick="downloadStudentPass()">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-1.5 shadow-sm" id="btnDownloadPass" onclick="downloadStudentPass()">
                         <i class="bi bi-download"></i> Download PNG Pass
                     </button>
                 </div>
