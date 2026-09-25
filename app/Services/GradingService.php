@@ -21,6 +21,16 @@ class GradingService
 
     public function saveGrades(int $facultyId, int $subjectId, int $gradingPeriodId, int $academicTermId, array $studentGrades): void
     {
+        $term = \App\Models\AcademicTerm::find($academicTermId);
+        if ($term && (bool) ($term->is_closed ?? false)) {
+            throw new \DomainException('Cannot modify grades: Academic term has been officially closed and locked.');
+        }
+
+        $period = \App\Models\GradingPeriod::find($gradingPeriodId);
+        if ($period && (bool) ($period->is_closed ?? false)) {
+            throw new \DomainException('Cannot modify grades: This grading period has been officially closed and locked.');
+        }
+
         foreach ($studentGrades as $studentId => $grade) {
             $gradeValue = (float) $grade;
             $this->gradeRepository->saveGrade(
@@ -60,6 +70,16 @@ class GradingService
         $sheet = $this->gradingSheetRepository->findById($gradingSheetId);
         if (!$sheet) {
             throw new \RuntimeException("Grading sheet not found.");
+        }
+
+        $term = \App\Models\AcademicTerm::find((int) ($sheet['academic_term_id'] ?? 0));
+        if ($term && (bool) ($term->is_closed ?? false)) {
+            throw new \DomainException('Cannot submit grading sheet: Academic term has been officially closed and locked.');
+        }
+
+        $period = \App\Models\GradingPeriod::find((int) ($sheet['grading_period_id'] ?? 0));
+        if ($period && (bool) ($period->is_closed ?? false)) {
+            throw new \DomainException('Cannot submit grading sheet: This grading period has been officially closed and locked.');
         }
 
         if ($sheet['status'] !== GradingSheet::STATUS_DRAFT && $sheet['status'] !== GradingSheet::STATUS_RETURNED) {

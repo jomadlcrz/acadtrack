@@ -25,12 +25,18 @@ CREATE TABLE academic_terms (
     school_year VARCHAR(20) NULL,
     semester INT(2) NOT NULL DEFAULT 1,
     is_active TINYINT(1) DEFAULT 0,
+    is_closed TINYINT(1) DEFAULT 0,
+    closed_at TIMESTAMP NULL DEFAULT NULL,
+    closed_by INT NULL DEFAULT NULL,
+    closure_reason VARCHAR(255) NULL DEFAULT NULL,
     is_archived TINYINT(1) DEFAULT 0,
     archived_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (academic_year_id) REFERENCES academic_years(id) ON DELETE CASCADE,
+    FOREIGN KEY (closed_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_is_archived (is_archived),
+    INDEX idx_terms_closed (is_closed),
     INDEX idx_terms_active_sem (is_active, semester),
     INDEX idx_terms_year_sem (academic_year_id, semester)
 ) ENGINE=InnoDB;
@@ -275,9 +281,13 @@ CREATE TABLE grading_periods (
     order_num INT NOT NULL,
     weight DECIMAL(5,2) DEFAULT 1.00,
     is_current TINYINT(1) DEFAULT 0,
+    is_closed TINYINT(1) DEFAULT 0,
+    closed_at TIMESTAMP NULL DEFAULT NULL,
+    closure_reason VARCHAR(255) NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE CASCADE
+    FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE CASCADE,
+    INDEX idx_gp_closed (is_closed)
 ) ENGINE=InnoDB;
 
 -- Grades

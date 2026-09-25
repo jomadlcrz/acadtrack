@@ -248,4 +248,36 @@ class AcademicModulesWorkflowTest extends TestCase
         $this->assertStringContainsString('<select class="form-select" id="academic_term_id"', $html);
         $this->assertStringContainsString('/admin/academic-terms', $html);
     }
+
+    public function testAcademicTermCreationWithAutoFormatAndNormalization(): void
+    {
+        $controller = new \App\Controllers\Admin\AcademicTermController();
+        $session = new \App\Core\Session();
+
+        // 1. Test 4-digit auto expansion (e.g., '2088' -> '2088-2089')
+        $_POST['school_year'] = '2088';
+        $_POST['semester'] = '1';
+        $req = new \App\Core\Request();
+        $res = new \App\Core\Response();
+
+        // Clean up beforehand if exists
+        $pdo = \App\Core\Database::getConnection();
+        $pdo->exec("DELETE FROM academic_terms WHERE school_year = '2088-2089'");
+        $pdo->exec("DELETE FROM academic_years WHERE school_year = '2088-2089'");
+
+        try {
+            $controller->store($req, $res, $session);
+        } catch (\Throwable) {
+            // redirect may terminate or throw depending on environment
+        }
+
+        $created = AcademicTerm::where('school_year', '2088-2089')->first();
+        $this->assertNotNull($created, 'Passing 4-digit year 2088 should auto-format and create 2088-2089');
+        $this->assertSame('2088-2089', $created->school_year);
+
+        // Clean up
+        $pdo->exec("DELETE FROM academic_terms WHERE school_year = '2088-2089'");
+        $pdo->exec("DELETE FROM academic_years WHERE school_year = '2088-2089'");
+        $_POST = [];
+    }
 }

@@ -120,15 +120,19 @@ class GradingController
             return;
         }
 
-        $this->gradingService->saveGrades(
-            (int) $user['id'],
-            $subjectId,
-            $gradingPeriodId,
-            $termId,
-            $data['grades'] ?? []
-        );
+        try {
+            $this->gradingService->saveGrades(
+                (int) $user['id'],
+                $subjectId,
+                $gradingPeriodId,
+                $termId,
+                $data['grades'] ?? []
+            );
+            $session->flash('success', 'Grades saved successfully.');
+        } catch (\DomainException $e) {
+            $session->flash('error', $e->getMessage());
+        }
 
-        $session->flash('success', 'Grades saved successfully.');
         redirect("/faculty/grading?subject_id={$subjectId}&period_id={$gradingPeriodId}{$semQuery}");
     }
 

@@ -28,9 +28,13 @@
 
             <div class="sidebar-group">
                 <span class="sidebar-heading">Academics</span>
-                <a href="<?= url('/admin/academic-terms') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/academic-terms') ? 'active' : '' ?>">
+                <a href="<?= url('/admin/academic-terms') ?>" class="sidebar-link <?= ($currentPath === '/admin/academic-terms' || $currentPath === '/admin/academic-terms/') ? 'active' : '' ?>">
                     <i class="bi bi-calendar3"></i>
                     <span>Academic Terms</span>
+                </a>
+                <a href="<?= url('/admin/academic-terms/closure') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/academic-terms/closure') ? 'active' : '' ?>">
+                    <i class="bi bi-lock-fill"></i>
+                    <span>Term Closure</span>
                 </a>
                 <a href="<?= url('/admin/departments') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/departments') ? 'active' : '' ?>">
                     <i class="bi bi-building"></i>
@@ -72,6 +76,10 @@
                 <a href="<?= url('/dean/grade-review') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/grade-review') ? 'active' : '' ?>">
                     <i class="bi bi-file-earmark-check-fill"></i>
                     <span>Grade Review &amp; Approval</span>
+                </a>
+                <a href="<?= url('/admin/academic-terms/closure') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/academic-terms/closure') ? 'active' : '' ?>">
+                    <i class="bi bi-lock-fill"></i>
+                    <span>Term Closure</span>
                 </a>
             </div>
 

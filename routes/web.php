@@ -9,6 +9,7 @@ use App\Controllers\Admin\UserController;
 use App\Controllers\Admin\DepartmentController;
 use App\Controllers\Admin\SettingsController;
 use App\Controllers\Admin\AcademicTermController;
+use App\Controllers\Admin\TermClosureController;
 use App\Controllers\Admin\ProgramCurriculumController;
 use App\Controllers\Admin\SetController as AdminSetController;
 use App\Controllers\Admin\ArchiveController;
@@ -65,8 +66,17 @@ $router->post('/admin/departments/{id}/restore', [DepartmentController::class, '
 $router->get('/admin/academic-terms', [AcademicTermController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/academic-terms', [AcademicTermController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/academic-terms/{id}/toggle-active', [AcademicTermController::class, 'toggleActive'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/academic-terms/school-years/{id}/update', [AcademicTermController::class, 'updateSchoolYear'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/academic-terms/school-years/{id}/toggle-active', [AcademicTermController::class, 'toggleActiveYear'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/academic-terms/{id}/archive', [AcademicTermController::class, 'archive'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/academic-terms/{id}/restore', [AcademicTermController::class, 'restore'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+
+// Term Closure & Lifecycle routes (Admin and Dean)
+$router->get('/admin/academic-terms/closure', [TermClosureController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean'])]);
+$router->get('/admin/academic-terms/{id}/closure-preview', [TermClosureController::class, 'preview'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean'])]);
+$router->post('/admin/academic-terms/{id}/close', [TermClosureController::class, 'close'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
+$router->post('/admin/academic-terms/{id}/reopen', [TermClosureController::class, 'reopen'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
+$router->post('/admin/academic-terms/periods/{id}/toggle-state', [TermClosureController::class, 'togglePeriod'], [new AuthMiddleware(), new RoleMiddleware(['Admin', 'Dean']), new CsrfMiddleware()]);
 
 // Program Curricula routes (Admin only)
 $router->get('/admin/program-curricula', [ProgramCurriculumController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);

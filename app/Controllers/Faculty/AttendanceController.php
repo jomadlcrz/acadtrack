@@ -182,6 +182,14 @@ class AttendanceController
             return;
         }
 
+        $term = AcademicTerm::find($termId);
+        if ($term && (bool) ($term->is_closed ?? false)) {
+            $session->flash('error', 'Cannot record attendance: Academic term has been officially closed and locked.');
+            $setParam = $setId ? "&set_id={$setId}" : '';
+            redirect("/faculty/attendance?subject_id={$subjectId}&semester={$semester}&date={$date}{$setParam}");
+            return;
+        }
+
         $rawStatuses = $request->post('attendance', []);
         $rawRemarks = $request->post('remarks', []);
 
