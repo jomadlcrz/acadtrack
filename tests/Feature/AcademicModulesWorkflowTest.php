@@ -262,6 +262,7 @@ class AcademicModulesWorkflowTest extends TestCase
 
         // Clean up beforehand if exists
         $pdo = \App\Core\Database::getConnection();
+        $pdo->exec("DELETE FROM term_audit_logs WHERE school_year = '2088-2089'");
         $pdo->exec("DELETE FROM academic_terms WHERE school_year = '2088-2089'");
         $pdo->exec("DELETE FROM academic_years WHERE school_year = '2088-2089'");
 
@@ -276,6 +277,7 @@ class AcademicModulesWorkflowTest extends TestCase
         $this->assertSame('2088-2089', $created->school_year);
 
         // Clean up
+        $pdo->exec("DELETE FROM term_audit_logs WHERE school_year = '2088-2089'");
         $pdo->exec("DELETE FROM academic_terms WHERE school_year = '2088-2089'");
         $pdo->exec("DELETE FROM academic_years WHERE school_year = '2088-2089'");
         $_POST = [];

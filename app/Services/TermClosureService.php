@@ -41,108 +41,200 @@ class TermClosureService
             LEFT JOIN faculty_details fd ON u.id = fd.user_id
             ORDER BY COALESCE(at.school_year, ay.school_year) DESC, at.semester ASC
         ");
+        $terms = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+        $results = [];
+        foreach ($terms as $term) {
+            $results[] = $this->formatClosureTerm($term);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get paginated closures list with optional filters.
+     */
+    public function getClosuresPaginated(array $filters = [], int $page = 1, int $perPage = 10): array
+    {
+        $page = max(1, $page);
+        $perPage = max(1, min(100, $perPage));
+        $offset = ($page - 1) * $perPage;
+
+        $where = [];
+        $params = [];
+
+        if (!empty($filters['school_year']) && $filters['school_year'] !== 'all') {
+            $where[] = "(at.school_year = :sy OR ay.school_year = :sy)";
+            $params['sy'] = $filters['school_year'];
+        }
+
+        if (!empty($filters['semester']) && $filters['semester'] !== 'all') {
+            $where[] = "at.semester = :sem";
+            $params['sem'] = (int) $filters['semester'];
+        }
+
+        $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $countStmt = $this->pdo->prepare("
+            SELECT COUNT(*) 
+            FROM academic_terms at
+            LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
+            {$whereClause}
+        ");
+        foreach ($params as $k => $v) {
+            $countStmt->bindValue($k, $v);
+        }
+        $countStmt->execute();
+        $total = (int) $countStmt->fetchColumn();
+
+        $stmt = $this->pdo->prepare("
+            SELECT at.*,
+                   COALESCE(at.school_year, ay.school_year, '2026-2027') as school_year_display,
+                   ay.school_year as academic_year_name,
+                   u.email as closed_by_email,
+                   CASE 
+                       WHEN ad.first_name IS NOT NULL THEN CONCAT(ad.first_name, ' ', ad.last_name)
+                       WHEN fd.first_name IS NOT NULL THEN CONCAT(fd.first_name, ' ', fd.last_name)
+                       ELSE u.email 
+                   END as closed_by_name
+            FROM academic_terms at
+            LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
+            LEFT JOIN users u ON at.closed_by = u.id
+            LEFT JOIN admin_details ad ON u.id = ad.user_id
+            LEFT JOIN faculty_details fd ON u.id = fd.user_id
+            {$whereClause}
+            ORDER BY COALESCE(at.school_year, ay.school_year) DESC, at.semester ASC
+            LIMIT :limit OFFSET :offset
+        ");
+        foreach ($params as $k => $v) {
+            $stmt->bindValue($k, $v);
+        }
+        $stmt->bindValue('limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
         $terms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $results = [];
         foreach ($terms as $term) {
-            $termId = (int) $term['id'];
-            $semNum = (int) $term['semester'];
-            $semName = match ($semNum) {
-                1 => '1st Semester',
-                2 => '2nd Semester',
-                3 => 'Summer',
-                default => "Semester {$semNum}",
-            };
-
-            // Grading periods
-            $stmtGp = $this->pdo->prepare("
-                SELECT * FROM grading_periods 
-                WHERE academic_term_id = :term_id 
-                ORDER BY order_num ASC
-            ");
-            $stmtGp->execute(['term_id' => $termId]);
-            $periods = $stmtGp->fetchAll(PDO::FETCH_ASSOC);
-
-            // Stats
-            $stmtStats = $this->pdo->prepare("
-                SELECT 
-                    (SELECT COUNT(*) FROM subjects WHERE academic_term_id = :t1 AND (is_archived = 0 OR is_archived IS NULL)) as subjects_count,
-                    (SELECT COUNT(*) FROM sets WHERE academic_term_id = :t2 AND status = 'active') as sets_count,
-                    (SELECT COUNT(DISTINCT s.id) FROM students s JOIN sets st ON s.set_id = st.id WHERE st.academic_term_id = :t3) as students_count,
-                    (SELECT COUNT(*) FROM grades WHERE academic_term_id = :t4) as grades_count,
-                    (SELECT COUNT(*) FROM grading_sheets WHERE academic_term_id = :t5) as sheets_count,
-                    (SELECT COUNT(*) FROM grading_sheets WHERE academic_term_id = :t6 AND status IN ('APPROVED', 'FINALIZED')) as approved_sheets_count,
-                    (SELECT COUNT(*) FROM grading_sheets WHERE academic_term_id = :t7 AND status NOT IN ('APPROVED', 'FINALIZED')) as pending_sheets_count
-            ");
-            $stmtStats->execute([
-                't1' => $termId, 't2' => $termId, 't3' => $termId, 
-                't4' => $termId, 't5' => $termId, 't6' => $termId, 't7' => $termId
-            ]);
-            $stats = $stmtStats->fetch(PDO::FETCH_ASSOC) ?: [];
-
-            $isClosed = (bool) ($term['is_closed'] ?? false);
-            $isActive = (bool) ($term['is_active'] ?? false);
-            $isArchived = (bool) ($term['is_archived'] ?? false);
-
-            $currentYearInt = (int) date('Y');
-            $currentMonth = (int) date('n');
-            $isEnded = false;
-            $syDisplay = $term['school_year_display'] ?? '';
-            if (preg_match('/^(\d{4})-(\d{4})$/', $syDisplay, $m)) {
-                $endY = (int) $m[2];
-                if ($currentYearInt > $endY || ($currentYearInt === $endY && $currentMonth >= 6)) {
-                    $isEnded = true;
-                }
-            }
-
-            $reopenable = !$isEnded;
-
-            $statusKey = 'open';
-            $statusLabel = 'Open';
-            $statusBadge = 'bg-secondary';
-
-            if ($isEnded) {
-                $statusKey = 'ended';
-                $statusLabel = 'Ended';
-                $statusBadge = 'bg-secondary-subtle text-secondary';
-            } elseif ($isClosed) {
-                $statusKey = 'closed';
-                $statusLabel = 'Closed';
-                $statusBadge = 'bg-danger text-white';
-            } elseif ($isActive) {
-                $statusKey = 'active';
-                $statusLabel = 'Active';
-                $statusBadge = 'bg-success text-white';
-            } elseif ($isArchived) {
-                $statusKey = 'archived';
-                $statusLabel = 'Archived';
-                $statusBadge = 'bg-dark text-white';
-            }
-
-            $results[] = [
-                'id' => $termId,
-                'academic_year_id' => (int) $term['academic_year_id'],
-                'school_year' => $syDisplay,
-                'semester' => $semNum,
-                'semester_name' => $semName,
-                'is_active' => $isActive,
-                'is_closed' => $isClosed,
-                'is_archived' => $isArchived,
-                'is_ended' => $isEnded,
-                'reopenable' => $reopenable,
-                'closed_at' => $term['closed_at'],
-                'closed_by' => $term['closed_by'],
-                'closed_by_name' => $term['closed_by_name'],
-                'closure_reason' => $term['closure_reason'],
-                'status_key' => $statusKey,
-                'status_label' => $statusLabel,
-                'status_badge' => $statusBadge,
-                'periods' => $periods,
-                'stats' => $stats,
-            ];
+            $results[] = $this->formatClosureTerm($term);
         }
 
-        return $results;
+        $lastPage = max(1, (int) ceil($total / $perPage));
+
+        return [
+            'data' => $results,
+            'total' => $total,
+            'page' => $page,
+            'current_page' => $page,
+            'per_page' => $perPage,
+            'perPage' => $perPage,
+            'last_page' => $lastPage,
+            'lastPage' => $lastPage,
+            'from' => $total > 0 ? $offset + 1 : 0,
+            'to' => min($total, $offset + count($results)),
+        ];
+    }
+
+    /**
+     * Format a single academic term row into closure table item format.
+     */
+    private function formatClosureTerm(array $term): array
+    {
+        $termId = (int) $term['id'];
+        $semNum = (int) $term['semester'];
+        $semName = match ($semNum) {
+            1 => '1st Semester',
+            2 => '2nd Semester',
+            3 => 'Summer',
+            default => "Semester {$semNum}",
+        };
+
+        // Grading periods
+        $stmtGp = $this->pdo->prepare("
+            SELECT * FROM grading_periods 
+            WHERE academic_term_id = :term_id 
+            ORDER BY order_num ASC
+        ");
+        $stmtGp->execute(['term_id' => $termId]);
+        $periods = $stmtGp->fetchAll(PDO::FETCH_ASSOC);
+
+        // Stats
+        $stmtStats = $this->pdo->prepare("
+            SELECT 
+                (SELECT COUNT(*) FROM subjects WHERE academic_term_id = :t1 AND (is_archived = 0 OR is_archived IS NULL)) as subjects_count,
+                (SELECT COUNT(*) FROM sets WHERE academic_term_id = :t2 AND status = 'active') as sets_count,
+                (SELECT COUNT(DISTINCT s.id) FROM students s JOIN sets st ON s.set_id = st.id WHERE st.academic_term_id = :t3) as students_count,
+                (SELECT COUNT(*) FROM grades WHERE academic_term_id = :t4) as grades_count,
+                (SELECT COUNT(*) FROM grading_sheets WHERE academic_term_id = :t5) as sheets_count,
+                (SELECT COUNT(*) FROM grading_sheets WHERE academic_term_id = :t6 AND status IN ('APPROVED', 'FINALIZED')) as approved_sheets_count,
+                (SELECT COUNT(*) FROM grading_sheets WHERE academic_term_id = :t7 AND status NOT IN ('APPROVED', 'FINALIZED')) as pending_sheets_count
+        ");
+        $stmtStats->execute([
+            't1' => $termId, 't2' => $termId, 't3' => $termId, 
+            't4' => $termId, 't5' => $termId, 't6' => $termId, 't7' => $termId
+        ]);
+        $stats = $stmtStats->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        $isClosed = (bool) ($term['is_closed'] ?? false);
+        $isActive = (bool) ($term['is_active'] ?? false);
+        $isArchived = (bool) ($term['is_archived'] ?? false);
+
+        $currentYearInt = (int) date('Y');
+        $currentMonth = (int) date('n');
+        $isEnded = false;
+        $syDisplay = $term['school_year_display'] ?? '';
+        if (preg_match('/^(\d{4})-(\d{4})$/', $syDisplay, $m)) {
+            $endY = (int) $m[2];
+            if ($currentYearInt > $endY || ($currentYearInt === $endY && $currentMonth >= 6)) {
+                $isEnded = true;
+            }
+        }
+
+        $reopenable = !$isEnded;
+
+        $statusKey = 'open';
+        $statusLabel = 'Open';
+        $statusBadge = 'bg-secondary';
+
+        if ($isEnded) {
+            $statusKey = 'ended';
+            $statusLabel = 'Ended';
+            $statusBadge = 'bg-secondary-subtle text-secondary';
+        } elseif ($isClosed) {
+            $statusKey = 'closed';
+            $statusLabel = 'Closed';
+            $statusBadge = 'bg-danger text-white';
+        } elseif ($isActive) {
+            $statusKey = 'active';
+            $statusLabel = 'Active';
+            $statusBadge = 'bg-success text-white';
+        } elseif ($isArchived) {
+            $statusKey = 'archived';
+            $statusLabel = 'Archived';
+            $statusBadge = 'bg-dark text-white';
+        }
+
+        return [
+            'id' => $termId,
+            'academic_year_id' => (int) $term['academic_year_id'],
+            'school_year' => $syDisplay,
+            'semester' => $semNum,
+            'semester_name' => $semName,
+            'is_active' => $isActive,
+            'is_closed' => $isClosed,
+            'is_archived' => $isArchived,
+            'is_ended' => $isEnded,
+            'reopenable' => $reopenable,
+            'closed_at' => $term['closed_at'],
+            'closed_by' => $term['closed_by'],
+            'closed_by_name' => $term['closed_by_name'],
+            'closure_reason' => $term['closure_reason'],
+            'status_key' => $statusKey,
+            'status_label' => $statusLabel,
+            'status_badge' => $statusBadge,
+            'periods' => $periods,
+            'stats' => $stats,
+        ];
     }
 
     /**
@@ -596,10 +688,14 @@ class TermClosureService
     }
 
     /**
-     * Retrieve audit log entries with optional filters.
+     * Retrieve audit log entries with server-side pagination and filters.
      */
-    public function getAuditLogs(array $filters = [], int $limit = 50, int $offset = 0): array
+    public function getAuditLogsPaginated(array $filters = [], int $page = 1, int $perPage = 10): array
     {
+        $page = max(1, $page);
+        $perPage = max(1, min(100, $perPage));
+        $offset = ($page - 1) * $perPage;
+
         $where = [];
         $params = [];
 
@@ -618,8 +714,32 @@ class TermClosureService
             $params['action'] = $filters['action'];
         }
 
+        if (!empty($filters['performed_by']) && $filters['performed_by'] !== 'all') {
+            $where[] = 'performed_by = :performed_by';
+            $params['performed_by'] = (int) $filters['performed_by'];
+        }
+
+        if (!empty($filters['date_from'])) {
+            $where[] = 'created_at >= :date_from';
+            $params['date_from'] = $filters['date_from'] . ' 00:00:00';
+        }
+
+        if (!empty($filters['date_to'])) {
+            $where[] = 'created_at <= :date_to';
+            $params['date_to'] = $filters['date_to'] . ' 23:59:59';
+        }
+
         $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
+        // 1. Total matching count
+        $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM term_audit_logs {$whereClause}");
+        foreach ($params as $k => $v) {
+            $countStmt->bindValue($k, $v);
+        }
+        $countStmt->execute();
+        $total = (int) $countStmt->fetchColumn();
+
+        // 2. Paginated rows
         $stmt = $this->pdo->prepare("
             SELECT * FROM term_audit_logs
             {$whereClause}
@@ -630,10 +750,48 @@ class TermClosureService
         foreach ($params as $k => $v) {
             $stmt->bindValue($k, $v);
         }
-        $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue('limit', $perPage, PDO::PARAM_INT);
         $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $lastPage = max(1, (int) ceil($total / $perPage));
+
+        return [
+            'data' => $rows,
+            'total' => $total,
+            'page' => $page,
+            'current_page' => $page,
+            'per_page' => $perPage,
+            'perPage' => $perPage,
+            'last_page' => $lastPage,
+            'lastPage' => $lastPage,
+            'from' => $total > 0 ? $offset + 1 : 0,
+            'to' => min($total, $offset + count($rows)),
+        ];
+    }
+
+    /**
+     * Retrieve audit log entries with optional filters (convenience wrapper).
+     */
+    public function getAuditLogs(array $filters = [], int $limit = 50, int $offset = 0): array
+    {
+        $page = (int) floor($offset / max(1, $limit)) + 1;
+        $paginated = $this->getAuditLogsPaginated($filters, $page, $limit);
+        return $paginated['data'];
+    }
+
+    /**
+     * Get distinct audit performers for filter dropdown.
+     */
+    public function getAuditPerformers(): array
+    {
+        $stmt = $this->pdo->query("
+            SELECT DISTINCT performed_by, performer_name, role 
+            FROM term_audit_logs 
+            WHERE performed_by IS NOT NULL 
+            ORDER BY performer_name ASC
+        ");
+        return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
     }
 }

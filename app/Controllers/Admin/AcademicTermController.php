@@ -23,19 +23,81 @@ class AcademicTermController
             $activeTab = 'school-years';
         }
 
-        // 1. Fetch School Years with counts & calendar status (matching reference SchoolYearTable)
-        $stmtYears = $pdo->query("
+        // 1. All School Years (for stats, alert check, and dropdowns)
+        $allYearsStmt = $pdo->query("SELECT * FROM academic_years ORDER BY is_active DESC, school_year DESC");
+        $allSchoolYears = $allYearsStmt ? $allYearsStmt->fetchAll(PDO::FETCH_ASSOC) : [];
+        $totalSchoolYearsCount = count($allSchoolYears);
+
+        $currentYearInt = (int) date('Y');
+        $currentMonth = (int) date('n');
+
+        $activeYear = null;
+        $ongoingCount = 0;
+        foreach ($allSchoolYears as $syItem) {
+            if ((int) ($syItem['is_active'] ?? 0) === 1) {
+                $activeYear = $syItem;
+            }
+            $syName = $syItem['school_year'];
+            if (preg_match('/^(\d{4})-(\d{4})$/', $syName, $m)) {
+                $startY = (int) $m[1];
+                $endY = (int) $m[2];
+                if (!($currentYearInt < $startY || $currentYearInt > $endY || ($currentYearInt === $endY && $currentMonth >= 6))) {
+                    $ongoingCount++;
+                }
+            }
+        }
+        $currentYearName = $activeYear['school_year'] ?? '—';
+
+        // Proactive Missing Current Year check (matching class-scheduling)
+        $expectedStart = ($currentMonth >= 8) ? $currentYearInt : $currentYearInt - 1;
+        $expectedSchoolYear = sprintf('%04d-%04d', $expectedStart, $expectedStart + 1);
+        $existsForToday = false;
+        foreach ($allSchoolYears as $syRow) {
+            if ($syRow['school_year'] === $expectedSchoolYear) {
+                $existsForToday = true;
+                break;
+            }
+        }
+        $missingCurrentYear = !$existsForToday;
+
+        // Server-side paginated School Years (matching SchoolYearTable from class-scheduling)
+        $syPage = max(1, (int) $request->get('sy_page', 1));
+        $syPerPage = 10;
+        $sySearch = trim((string) $request->get('sy_search', ''));
+
+        $syWhere = [];
+        $syParams = [];
+        if ($sySearch !== '') {
+            $syWhere[] = 'ay.school_year LIKE :search';
+            $syParams['search'] = '%' . $sySearch . '%';
+        }
+        $syWhereSql = !empty($syWhere) ? 'WHERE ' . implode(' AND ', $syWhere) : '';
+
+        $syCountStmt = $pdo->prepare("SELECT COUNT(*) FROM academic_years ay {$syWhereSql}");
+        foreach ($syParams as $k => $v) {
+            $syCountStmt->bindValue($k, $v);
+        }
+        $syCountStmt->execute();
+        $totalSyMatching = (int) $syCountStmt->fetchColumn();
+
+        $syOffset = ($syPage - 1) * $syPerPage;
+        $stmtYears = $pdo->prepare("
             SELECT ay.id, ay.school_year, ay.is_active, ay.created_at,
                    COUNT(DISTINCT at.id) as terms_count
             FROM academic_years ay
             LEFT JOIN academic_terms at ON at.academic_year_id = ay.id
+            {$syWhereSql}
             GROUP BY ay.id, ay.school_year, ay.is_active, ay.created_at
             ORDER BY ay.is_active DESC, ay.school_year DESC
+            LIMIT :limit OFFSET :offset
         ");
+        foreach ($syParams as $k => $v) {
+            $stmtYears->bindValue($k, $v);
+        }
+        $stmtYears->bindValue('limit', $syPerPage, PDO::PARAM_INT);
+        $stmtYears->bindValue('offset', $syOffset, PDO::PARAM_INT);
+        $stmtYears->execute();
         $schoolYears = $stmtYears->fetchAll(PDO::FETCH_ASSOC);
-
-        $currentYearInt = (int) date('Y');
-        $currentMonth = (int) date('n');
 
         foreach ($schoolYears as &$sy) {
             $syName = $sy['school_year'];
@@ -55,21 +117,19 @@ class AcademicTermController
         }
         unset($sy);
 
-        $ongoingCount = count(array_filter($schoolYears, fn($y) => $y['calendar_status'] === 'Ongoing'));
-        $activeYear = array_values(array_filter($schoolYears, fn($y) => (int)$y['is_active'] === 1))[0] ?? ($schoolYears[0] ?? null);
-        $currentYearName = $activeYear['school_year'] ?? '—';
-
-        // Proactive Missing Current Year check (matching class-scheduling)
-        $expectedStart = ($currentMonth >= 8) ? $currentYearInt : $currentYearInt - 1;
-        $expectedSchoolYear = sprintf('%04d-%04d', $expectedStart, $expectedStart + 1);
-        $existsForToday = false;
-        foreach ($schoolYears as $syRow) {
-            if ($syRow['school_year'] === $expectedSchoolYear) {
-                $existsForToday = true;
-                break;
-            }
-        }
-        $missingCurrentYear = !$existsForToday;
+        $syLastPage = max(1, (int) ceil($totalSyMatching / $syPerPage));
+        $schoolYearsPagination = [
+            'data' => $schoolYears,
+            'total' => $totalSyMatching,
+            'page' => $syPage,
+            'current_page' => $syPage,
+            'per_page' => $syPerPage,
+            'perPage' => $syPerPage,
+            'last_page' => $syLastPage,
+            'lastPage' => $syLastPage,
+            'from' => $totalSyMatching > 0 ? $syOffset + 1 : 0,
+            'to' => min($totalSyMatching, $syOffset + count($schoolYears)),
+        ];
 
         // 2. Global Reference Semesters (matching reference SemesterTable)
         $semesters = [
@@ -87,9 +147,19 @@ class AcademicTermController
             ],
         ];
 
-        // 3. Term Closures & Lifecycle Data (matching reference TermClosureTable)
+        // 3. Term Closures & Lifecycle Data (Server-side Paginated)
         $closureService = new \App\Services\TermClosureService();
-        $closures = $closureService->getClosures();
+        $closurePage = max(1, (int) $request->get('closure_page', 1));
+        $closurePerPage = 10;
+        $closureSy = (string) $request->get('closure_sy', 'all');
+        $closureSem = (string) $request->get('closure_sem', 'all');
+
+        $closureFilters = [
+            'school_year' => $closureSy,
+            'semester' => $closureSem,
+        ];
+        $closurePagination = $closureService->getClosuresPaginated($closureFilters, $closurePage, $closurePerPage);
+        $closures = $closurePagination['data'];
 
         // 4. Backward compatible terms list
         $stmtTerms = $pdo->query("
@@ -104,26 +174,41 @@ class AcademicTermController
         ");
         $terms = $stmtTerms ? $stmtTerms->fetchAll(\PDO::FETCH_ASSOC) : [];
 
-        // 5. Term Audit Logs (matching reference AcademicTermsAuditLogPage)
+        // 5. Term Audit Logs (Server-side Paginated)
+        $auditPage = max(1, (int) $request->get('audit_page', 1));
+        $auditPerPage = 10;
         $auditFilters = [
             'school_year' => (string) $request->get('audit_sy', 'all'),
             'semester_number' => (string) $request->get('audit_sem', 'all'),
             'action' => (string) $request->get('audit_action', 'all'),
+            'performed_by' => (string) $request->get('audit_performed_by', 'all'),
+            'date_from' => (string) $request->get('audit_date_from', ''),
+            'date_to' => (string) $request->get('audit_date_to', ''),
         ];
-        $auditLogs = $closureService->getAuditLogs($auditFilters);
+        $auditPagination = $closureService->getAuditLogsPaginated($auditFilters, $auditPage, $auditPerPage);
+        $auditLogs = $auditPagination['data'];
+        $auditPerformers = $closureService->getAuditPerformers();
 
         $html = (new View())->render('admin.academic_terms.index', [
             'activeTab' => $activeTab,
             'schoolYears' => $schoolYears,
+            'allSchoolYears' => $allSchoolYears,
+            'totalSchoolYearsCount' => $totalSchoolYearsCount,
+            'schoolYearsPagination' => $schoolYearsPagination,
+            'sySearch' => $sySearch,
             'currentYearName' => $currentYearName,
             'ongoingCount' => $ongoingCount,
             'missingCurrentYear' => $missingCurrentYear,
             'expectedSchoolYear' => $expectedSchoolYear,
             'semesters' => $semesters,
             'closures' => $closures,
+            'closurePagination' => $closurePagination,
+            'closureFilters' => $closureFilters,
             'terms' => $terms,
             'auditLogs' => $auditLogs,
+            'auditPagination' => $auditPagination,
             'auditFilters' => $auditFilters,
+            'auditPerformers' => $auditPerformers,
         ]);
         $response->html($html);
     }

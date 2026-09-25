@@ -8,9 +8,10 @@ $lastPage = max(1, (int) ($pag['last_page'] ?? $pag['lastPage'] ?? ceil($total /
 $startRecord = $total > 0 ? (($page - 1) * $perPage) + 1 : 0;
 $endRecord = min($total, $page * $perPage);
 
-$makePageUrl = function (int $targetPage): string {
+$pageParam = $pageParam ?? 'page';
+$makePageUrl = function (int $targetPage) use ($pageParam): string {
     $params = $_GET;
-    $params['page'] = $targetPage;
+    $params[$pageParam] = $targetPage;
     return '?' . http_build_query($params);
 };
 ?>

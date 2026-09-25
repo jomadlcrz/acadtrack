@@ -33,6 +33,9 @@ class TermClosureWorkflowTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         try {
+            \Illuminate\Database\Capsule\Manager::connection()->getPdo()->exec(
+                "DELETE FROM term_audit_logs WHERE school_year LIKE '208%' OR school_year LIKE '209%' OR details LIKE '%test%' OR details LIKE '%Test%' OR action IN ('period_locked', 'period_unlocked')"
+            );
             AcademicTerm::where('school_year', 'like', '209%')->delete();
             AcademicTerm::whereIn('id', [1, 2])->update([
                 'is_closed' => 0,
@@ -53,6 +56,9 @@ class TermClosureWorkflowTest extends TestCase
     private function cleanupTestData(): void
     {
         try {
+            \Illuminate\Database\Capsule\Manager::connection()->getPdo()->exec(
+                "DELETE FROM term_audit_logs WHERE school_year LIKE '208%' OR school_year LIKE '209%' OR details LIKE '%test%' OR details LIKE '%Test%' OR action IN ('period_locked', 'period_unlocked')"
+            );
             AcademicTerm::where('school_year', 'like', '209%')->delete();
             AcademicTerm::whereIn('id', [1, 2])->update([
                 'is_closed' => 0,

@@ -7,6 +7,20 @@
 -- When importing via hosting panels (InfinityFree, cPanel phpMyAdmin), select your database
 -- from the left sidebar before importing this file directly.
 
+-- Users
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    is_temp_password TINYINT(1) NOT NULL DEFAULT 1,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    deactivated_at TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_email (email),
+    INDEX idx_users_status (status)
+) ENGINE=InnoDB;
+
 -- Academic Years
 CREATE TABLE academic_years (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -39,20 +53,6 @@ CREATE TABLE academic_terms (
     INDEX idx_terms_closed (is_closed),
     INDEX idx_terms_active_sem (is_active, semester),
     INDEX idx_terms_year_sem (academic_year_id, semester)
-) ENGINE=InnoDB;
-
--- Users
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    is_temp_password TINYINT(1) NOT NULL DEFAULT 1,
-    status ENUM('active', 'inactive') DEFAULT 'active',
-    deactivated_at TIMESTAMP NULL DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_email (email),
-    INDEX idx_users_status (status)
 ) ENGINE=InnoDB;
 
 -- Roles

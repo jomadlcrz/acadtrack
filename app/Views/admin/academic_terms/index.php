@@ -97,7 +97,7 @@ ob_start();
                         School years
                     </div>
                     <div class="mt-2 d-flex align-items-baseline gap-2">
-                        <span class="fs-4 fw-bold text-dark font-monospace"><?= count($schoolYears) ?></span>
+                        <span class="fs-4 fw-bold text-dark font-monospace"><?= $totalSchoolYearsCount ?? count($schoolYears) ?></span>
                         <span class="text-muted small">total registered</span>
                     </div>
                 </div>
@@ -131,14 +131,20 @@ ob_start();
         </div>
 
         <!-- Search Input -->
-        <div class="mb-3">
+        <form method="GET" action="<?= url('/admin/academic-terms') ?>" class="mb-3">
+            <input type="hidden" name="tab" value="school-years">
             <div class="input-group" style="max-width: 360px;">
                 <span class="input-group-text bg-white border-end-0 text-muted">
                     <i class="bi bi-search"></i>
                 </span>
-                <input type="text" class="form-control border-start-0 ps-0" id="sySearch" placeholder="Search school year…">
+                <input type="text" class="form-control border-start-0 ps-0" id="sySearch" name="sy_search" value="<?= htmlspecialchars($sySearch ?? '') ?>" placeholder="Search school year…">
+                <?php if (!empty($sySearch)): ?>
+                    <a href="<?= url('/admin/academic-terms?tab=school-years') ?>" class="btn btn-outline-secondary border-start-0" title="Clear search">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                <?php endif; ?>
             </div>
-        </div>
+        </form>
 
         <!-- School Years Table (Matching SchoolYearTable from class-scheduling) -->
         <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 8px;">
@@ -226,6 +232,13 @@ ob_start();
                     </tbody>
                 </table>
             </div>
+            <?php if (!empty($schoolYearsPagination) && ($schoolYearsPagination['last_page'] > 1 || $schoolYearsPagination['total'] > 0)): ?>
+                <?php
+                $pagination = $schoolYearsPagination;
+                $pageParam = 'sy_page';
+                include __DIR__ . '/../../components/pagination.php';
+                ?>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -377,6 +390,13 @@ ob_start();
                     </tbody>
                 </table>
             </div>
+            <?php if (!empty($closurePagination) && ($closurePagination['last_page'] > 1 || $closurePagination['total'] > 0)): ?>
+                <?php
+                $pagination = $closurePagination;
+                $pageParam = 'closure_page';
+                include __DIR__ . '/../../components/pagination.php';
+                ?>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -390,9 +410,9 @@ ob_start();
                 <small class="text-muted">Immutable append-only ledger of term postings, closures, reopening events, and school year updates.</small>
             </div>
             <!-- Audit Filters -->
-            <form method="GET" action="<?= url('/admin/academic-terms') ?>" class="d-flex align-items-center gap-2 m-0">
+            <form method="GET" action="<?= url('/admin/academic-terms') ?>" class="d-flex align-items-center gap-2 m-0 flex-wrap">
                 <input type="hidden" name="tab" value="audit-log">
-                <select name="audit_action" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 170px;">
+                <select name="audit_action" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 160px;">
                     <option value="all" <?= ($auditFilters['action'] ?? 'all') === 'all' ? 'selected' : '' ?>>All Actions</option>
                     <option value="term_closed" <?= ($auditFilters['action'] ?? '') === 'term_closed' ? 'selected' : '' ?>>Term Closed</option>
                     <option value="term_reopened" <?= ($auditFilters['action'] ?? '') === 'term_reopened' ? 'selected' : '' ?>>Term Reopened</option>
@@ -401,15 +421,37 @@ ob_start();
                     <option value="period_locked" <?= ($auditFilters['action'] ?? '') === 'period_locked' ? 'selected' : '' ?>>Period Locked</option>
                     <option value="period_unlocked" <?= ($auditFilters['action'] ?? '') === 'period_unlocked' ? 'selected' : '' ?>>Period Unlocked</option>
                 </select>
-                <select name="audit_sy" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 150px;">
-                    <option value="all" <?= ($auditFilters['school_year'] ?? 'all') === 'all' ? 'selected' : '' ?>>All School Years</option>
-                    <?php foreach ($schoolYears as $syItem): ?>
+                <select name="audit_sy" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 140px;">
+                    <option value="all" <?= ($auditFilters['school_year'] ?? 'all') === 'all' ? 'selected' : '' ?>>All Years</option>
+                    <?php foreach (($allSchoolYears ?? $schoolYears) as $syItem): ?>
                         <option value="<?= htmlspecialchars($syItem['school_year']) ?>" <?= ($auditFilters['school_year'] ?? '') === $syItem['school_year'] ? 'selected' : '' ?>>
                             <?= htmlspecialchars($syItem['school_year']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <?php if (($auditFilters['action'] ?? 'all') !== 'all' || ($auditFilters['school_year'] ?? 'all') !== 'all'): ?>
+                <select name="audit_sem" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 125px;">
+                    <option value="all" <?= ($auditFilters['semester_number'] ?? 'all') === 'all' ? 'selected' : '' ?>>All Sems</option>
+                    <option value="1" <?= ($auditFilters['semester_number'] ?? '') === '1' ? 'selected' : '' ?>>1st Sem</option>
+                    <option value="2" <?= ($auditFilters['semester_number'] ?? '') === '2' ? 'selected' : '' ?>>2nd Sem</option>
+                    <option value="3" <?= ($auditFilters['semester_number'] ?? '') === '3' ? 'selected' : '' ?>>Summer</option>
+                </select>
+                <?php if (!empty($auditPerformers)): ?>
+                    <select name="audit_performed_by" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 140px;">
+                        <option value="all" <?= ($auditFilters['performed_by'] ?? 'all') === 'all' ? 'selected' : '' ?>>All Users</option>
+                        <?php foreach ($auditPerformers as $performer): ?>
+                            <option value="<?= (int) $performer['performed_by'] ?>" <?= ($auditFilters['performed_by'] ?? '') === (string) $performer['performed_by'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($performer['performer_name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                <?php endif; ?>
+                <?php 
+                $hasAuditFilter = ($auditFilters['action'] ?? 'all') !== 'all' 
+                    || ($auditFilters['school_year'] ?? 'all') !== 'all'
+                    || ($auditFilters['semester_number'] ?? 'all') !== 'all'
+                    || ($auditFilters['performed_by'] ?? 'all') !== 'all';
+                ?>
+                <?php if ($hasAuditFilter): ?>
                     <a href="<?= url('/admin/academic-terms?tab=audit-log') ?>" class="btn btn-sm btn-outline-secondary" title="Reset filter">
                         <i class="bi bi-arrow-counterclockwise"></i>
                     </a>
@@ -487,6 +529,13 @@ ob_start();
                     </tbody>
                 </table>
             </div>
+            <?php if (!empty($auditPagination) && ($auditPagination['last_page'] > 1 || $auditPagination['total'] > 0)): ?>
+                <?php
+                $pagination = $auditPagination;
+                $pageParam = 'audit_page';
+                include __DIR__ . '/../../components/pagination.php';
+                ?>
+            <?php endif; ?>
         </div>
     </div>
 
