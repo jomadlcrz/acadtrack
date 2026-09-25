@@ -27,6 +27,15 @@ ob_start();
                     Account Information
                 </div>
 
+                <?php if ($activeRole === 'Student'): ?>
+                    <!-- Row 0 (Student): Student ID Number -->
+                    <div class="mb-3">
+                        <label for="student_number" class="form-label">Student ID number <span class="text-muted fw-normal small">(Optional / Late ID)</span></label>
+                        <input type="text" class="form-control" id="student_number" name="student_number" placeholder="e.g., 2026-0001 (leave blank if pending)" value="<?= htmlspecialchars($_POST['student_number'] ?? '') ?>">
+                        <div class="form-text">Leave blank if pending official student ID issuance.</div>
+                    </div>
+                <?php endif; ?>
+
                 <!-- Row 1: Name -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
@@ -56,25 +65,18 @@ ob_start();
                         Academic Placement
                     </div>
 
-                    <!-- Row 3 (Student): ID & Assigned Set -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label for="student_number" class="form-label">Student ID number <span class="text-muted fw-normal small">(Optional / Late ID)</span></label>
-                            <input type="text" class="form-control" id="student_number" name="student_number" placeholder="e.g., 2026-0001 (leave blank if pending)" value="<?= htmlspecialchars($_POST['student_number'] ?? '') ?>">
-                            <div class="form-text">Leave blank if pending official student ID issuance.</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="set_id" class="form-label">Assigned class set <span class="text-danger">*</span></label>
-                            <select class="form-select" id="set_id" name="set_id" required>
-                                <option value="">Select class set...</option>
-                                <?php foreach ($sets ?? [] as $set): ?>
-                                    <option value="<?= $set['id'] ?>" <?= ((string)($_POST['set_id'] ?? '') === (string)$set['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($set['name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <div class="form-text">Active academic term cohort and schedule.</div>
-                        </div>
+                    <!-- Row 3 (Student): Assigned Set -->
+                    <div class="mb-3">
+                        <label for="set_id" class="form-label">Assigned class set <span class="text-danger">*</span></label>
+                        <select class="form-select" id="set_id" name="set_id" required>
+                            <option value="">Select class set...</option>
+                            <?php foreach ($sets ?? [] as $set): ?>
+                                <option value="<?= $set['id'] ?>" <?= ((string)($_POST['set_id'] ?? '') === (string)$set['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($set['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="form-text">Active academic term cohort and schedule.</div>
                     </div>
 
                     <!-- Row 4 (Student): Year Level & Enrollment Status -->

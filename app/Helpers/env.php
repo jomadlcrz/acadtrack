@@ -8,7 +8,10 @@ if (!function_exists('env')) {
      */
     function env(string $key, mixed $default = null): mixed
     {
-        $value = $_ENV[$key] ?? getenv($key);
+        $value = getenv($key);
+        if ($value === false) {
+            $value = $_ENV[$key] ?? $_SERVER[$key] ?? null;
+        }
 
         if ($value === false || $value === null) {
             return $default;
