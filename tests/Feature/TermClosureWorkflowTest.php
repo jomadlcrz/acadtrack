@@ -302,6 +302,28 @@ class TermClosureWorkflowTest extends TestCase
         $this->assertStringContainsString('Operational Sequence', $content);
     }
 
+    public function testAcademicTermIndexRendersCleanly(): void
+    {
+        $_SESSION['user'] = ['id' => 1, 'email' => 'admin@gwc.edu', 'role' => 'Admin'];
+        $_SESSION['role'] = 'Admin';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/admin/academic-terms';
+
+        $controller = new \App\Controllers\Admin\AcademicTermController();
+        $req = new \App\Core\Request();
+        $res = new \App\Core\Response();
+        $session = new \App\Core\Session();
+
+        ob_start();
+        $controller->index($req, $res, $session);
+        $output = ob_get_clean();
+
+        $body = $res->getBody();
+        $this->assertNotEmpty($body);
+        $this->assertStringContainsString('Academic Terms', $body);
+        $this->assertStringContainsString('Audit Log', $body);
+    }
+
     public function testSetModificationsBlockedOnClosedTerm(): void
     {
         $term = AcademicTerm::create([
@@ -347,6 +369,54 @@ class TermClosureWorkflowTest extends TestCase
         $preview = $this->service->getTermPreview(1);
         $this->assertNotNull($preview);
         $this->assertArrayHasKey('closed_by_name', $preview['term']);
+    }
+
+    public function testTermAuditLogRecordedOnClosureAndReopen(): void
+    {
+        \Illuminate\Database\Capsule\Manager::connection()->getPdo()->exec(
+            "DELETE FROM term_audit_logs WHERE school_year = '2097-2098'"
+        );
+
+        $testTerm = AcademicTerm::create([
+            'academic_year_id' => 1,
+            'school_year' => '2097-2098',
+            'semester' => 1,
+            'is_active' => 0,
+            'is_closed' => 0,
+        ]);
+
+        $admin = User::first();
+        $adminId = $admin ? (int) $admin->id : 1;
+
+        // Close term should record audit log
+        $this->service->closeTerm((int) $testTerm->id, $adminId, 'Testing audit log creation');
+
+        $logs = $this->service->getAuditLogs(['school_year' => '2097-2098']);
+        $this->assertNotEmpty($logs);
+        $closeLog = $logs[0];
+        $this->assertEquals('term_closed', $closeLog['action']);
+        $this->assertEquals('Testing audit log creation', $closeLog['details']);
+        $this->assertEquals($adminId, (int) $closeLog['performed_by']);
+
+        // Reopen term should record audit log
+        $this->service->reopenTerm((int) $testTerm->id, $adminId, 'Reopening for grade appeal correction');
+
+        $logsAfterReopen = $this->service->getAuditLogs(['school_year' => '2097-2098']);
+        $this->assertGreaterThanOrEqual(2, count($logsAfterReopen));
+        $reopenLog = $logsAfterReopen[0]; // ordered DESC
+        $this->assertEquals('term_reopened', $reopenLog['action']);
+        $this->assertEquals('Reopening for grade appeal correction', $reopenLog['details']);
+
+        // Filter by action
+        $filtered = $this->service->getAuditLogs(['action' => 'term_reopened', 'school_year' => '2097-2098']);
+        $this->assertCount(1, $filtered);
+        $this->assertEquals('term_reopened', $filtered[0]['action']);
+
+        // Clean up
+        \Illuminate\Database\Capsule\Manager::connection()->getPdo()->exec(
+            "DELETE FROM term_audit_logs WHERE school_year = '2097-2098'"
+        );
+        $testTerm->delete();
     }
 }
 

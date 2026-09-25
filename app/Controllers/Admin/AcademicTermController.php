@@ -19,7 +19,7 @@ class AcademicTermController
     {
         $pdo = Database::getConnection();
         $activeTab = trim((string) $request->get('tab', 'school-years'));
-        if (!in_array($activeTab, ['school-years', 'semesters', 'closure'], true)) {
+        if (!in_array($activeTab, ['school-years', 'semesters', 'closure', 'audit-log'], true)) {
             $activeTab = 'school-years';
         }
 
@@ -102,7 +102,15 @@ class AcademicTermController
             LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
             ORDER BY COALESCE(at.school_year, ay.school_year) DESC, at.semester ASC
         ");
-        $terms = $stmtTerms->fetchAll(PDO::FETCH_ASSOC);
+        $terms = $stmtTerms ? $stmtTerms->fetchAll(\PDO::FETCH_ASSOC) : [];
+
+        // 5. Term Audit Logs (matching reference AcademicTermsAuditLogPage)
+        $auditFilters = [
+            'school_year' => (string) $request->get('audit_sy', 'all'),
+            'semester_number' => (string) $request->get('audit_sem', 'all'),
+            'action' => (string) $request->get('audit_action', 'all'),
+        ];
+        $auditLogs = $closureService->getAuditLogs($auditFilters);
 
         $html = (new View())->render('admin.academic_terms.index', [
             'activeTab' => $activeTab,
@@ -114,6 +122,8 @@ class AcademicTermController
             'semesters' => $semesters,
             'closures' => $closures,
             'terms' => $terms,
+            'auditLogs' => $auditLogs,
+            'auditFilters' => $auditFilters,
         ]);
         $response->html($html);
     }
@@ -228,6 +238,16 @@ class AcademicTermController
             'tid4' => $newTermId,
         ]);
 
+        $userId = (int) ($session->get('user')['id'] ?? 1);
+        (new \App\Services\TermClosureService())->recordAuditLog(
+            action: 'school_year_created',
+            userId: $userId,
+            schoolYear: $schoolYear,
+            semesterNumber: $semester,
+            details: "Created academic term {$schoolYear} semester {$semester}",
+            syId: $yearId
+        );
+
         $session->flash('success', "Academic term for {$schoolYear} successfully created.");
         redirect('/admin/academic-terms');
     }
@@ -306,6 +326,15 @@ class AcademicTermController
         $pdo->prepare("UPDATE academic_terms SET school_year = :name WHERE academic_year_id = :id")
             ->execute(['name' => $schoolYear, 'id' => $yearId]);
 
+        $userId = (int) ($session->get('user')['id'] ?? 1);
+        (new \App\Services\TermClosureService())->recordAuditLog(
+            action: 'school_year_updated',
+            userId: $userId,
+            schoolYear: $schoolYear,
+            details: "Updated school year name to {$schoolYear}",
+            syId: $yearId
+        );
+
         $session->flash('success', "School year updated to {$schoolYear}.");
         redirect('/admin/academic-terms?tab=school-years');
     }
@@ -350,6 +379,15 @@ class AcademicTermController
             $pdo->exec("UPDATE academic_terms SET is_active = 0");
             $pdo->prepare("UPDATE academic_terms SET is_active = 1 WHERE id = :id")->execute(['id' => $termId]);
         }
+
+        $userId = (int) ($session->get('user')['id'] ?? 1);
+        (new \App\Services\TermClosureService())->recordAuditLog(
+            action: 'school_year_updated',
+            userId: $userId,
+            schoolYear: $year['school_year'],
+            details: "Set {$year['school_year']} as current active school year",
+            syId: $yearId
+        );
 
         $session->flash('success', "School year {$year['school_year']} set as current active.");
         redirect('/admin/academic-terms?tab=school-years');

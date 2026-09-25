@@ -344,6 +344,26 @@ class TermClosureService
                 }
             }
 
+            // Record audit log entry
+            $termInfoStmt = $this->pdo->prepare("
+                SELECT at.academic_year_id, at.semester,
+                       COALESCE(at.school_year, ay.school_year, '') as school_year_display
+                FROM academic_terms at
+                LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
+                WHERE at.id = :id
+            ");
+            $termInfoStmt->execute(['id' => $termId]);
+            $termInfo = $termInfoStmt->fetch(PDO::FETCH_ASSOC);
+
+            $this->recordAuditLog(
+                action: 'term_closed',
+                userId: $userId,
+                schoolYear: $termInfo['school_year_display'] ?? null,
+                semesterNumber: isset($termInfo['semester']) ? (int) $termInfo['semester'] : null,
+                details: !empty($reason) ? trim($reason) : 'Term officially closed and posted',
+                syId: isset($termInfo['academic_year_id']) ? (int) $termInfo['academic_year_id'] : null
+            );
+
             $this->pdo->commit();
 
             return [
@@ -412,6 +432,16 @@ class TermClosureService
             ");
             $stmtPeriods->execute(['term_id' => $termId]);
 
+            // Record audit log entry
+            $this->recordAuditLog(
+                action: 'term_reopened',
+                userId: $userId,
+                schoolYear: $termData['school_year_display'] ?? null,
+                semesterNumber: isset($termData['semester']) ? (int) $termData['semester'] : null,
+                details: trim($reason),
+                syId: isset($termData['academic_year_id']) ? (int) $termData['academic_year_id'] : null
+            );
+
             $this->pdo->commit();
 
             return [
@@ -447,6 +477,17 @@ class TermClosureService
             'closure_reason' => $closureReason,
             'id' => $periodId,
         ]);
+
+        // Record audit log entry
+        $gpStmt = $this->pdo->prepare("SELECT name, academic_term_id FROM grading_periods WHERE id = :id");
+        $gpStmt->execute(['id' => $periodId]);
+        $gpRow = $gpStmt->fetch(PDO::FETCH_ASSOC);
+        $gpName = $gpRow['name'] ?? "Period #{$periodId}";
+
+        $this->recordAuditLog(
+            action: $isClosed ? 'period_locked' : 'period_unlocked',
+            details: $isClosed ? "{$gpName} grading period locked: " . ($reason ?? 'Cutoff reached') : "{$gpName} grading period reopened for corrections"
+        );
 
         return [
             'success' => true,
@@ -495,5 +536,104 @@ class TermClosureService
 
         $syName = !empty($row['school_year']) ? $row['school_year'] : ($row['ay_school_year'] ?? '');
         return $this->isSchoolYearEnded((string) $syName);
+    }
+
+    /**
+     * Record an append-only entry to the academic term audit trail.
+     */
+    public function recordAuditLog(
+        string $action,
+        ?int $userId = null,
+        ?string $schoolYear = null,
+        ?int $semesterNumber = null,
+        ?string $details = null,
+        ?int $syId = null,
+        ?string $ipAddress = null
+    ): void {
+        $performerName = 'System';
+        $role = 'System';
+
+        if ($userId) {
+            $stmtUser = $this->pdo->prepare("
+                SELECT u.email, r.role_name,
+                       COALESCE(CONCAT(ad.first_name, ' ', ad.last_name), CONCAT(fd.first_name, ' ', fd.last_name), u.email) as full_name
+                FROM users u
+                LEFT JOIN user_roles ur ON ur.user_id = u.id
+                LEFT JOIN roles r ON r.id = ur.role_id
+                LEFT JOIN admin_details ad ON ad.user_id = u.id
+                LEFT JOIN faculty_details fd ON fd.user_id = u.id
+                WHERE u.id = :id
+                LIMIT 1
+            ");
+            $stmtUser->execute(['id' => $userId]);
+            $userRow = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+            if ($userRow) {
+                $performerName = $userRow['full_name'] ?: $userRow['email'];
+                $role = $userRow['role_name'] ?: 'Admin';
+            }
+        }
+
+        $ip = $ipAddress ?? ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+
+        $stmt = $this->pdo->prepare("
+            INSERT INTO term_audit_logs 
+                (action, sy_id, school_year, semester_number, performed_by, performer_name, role, ip_address, details, created_at)
+            VALUES 
+                (:action, :sy_id, :school_year, :semester_number, :performed_by, :performer_name, :role, :ip_address, :details, NOW())
+        ");
+        $stmt->execute([
+            'action' => $action,
+            'sy_id' => $syId,
+            'school_year' => $schoolYear,
+            'semester_number' => $semesterNumber,
+            'performed_by' => $userId,
+            'performer_name' => $performerName,
+            'role' => $role,
+            'ip_address' => $ip,
+            'details' => $details,
+        ]);
+    }
+
+    /**
+     * Retrieve audit log entries with optional filters.
+     */
+    public function getAuditLogs(array $filters = [], int $limit = 50, int $offset = 0): array
+    {
+        $where = [];
+        $params = [];
+
+        if (!empty($filters['school_year']) && $filters['school_year'] !== 'all') {
+            $where[] = 'school_year = :sy';
+            $params['sy'] = $filters['school_year'];
+        }
+
+        if (!empty($filters['semester_number']) && $filters['semester_number'] !== 'all') {
+            $where[] = 'semester_number = :sem';
+            $params['sem'] = (int) $filters['semester_number'];
+        }
+
+        if (!empty($filters['action']) && $filters['action'] !== 'all') {
+            $where[] = 'action = :action';
+            $params['action'] = $filters['action'];
+        }
+
+        $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $stmt = $this->pdo->prepare("
+            SELECT * FROM term_audit_logs
+            {$whereClause}
+            ORDER BY created_at DESC, id DESC
+            LIMIT :limit OFFSET :offset
+        ");
+
+        foreach ($params as $k => $v) {
+            $stmt->bindValue($k, $v);
+        }
+        $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

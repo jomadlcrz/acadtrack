@@ -56,6 +56,15 @@ ob_start();
                 <i class="bi bi-shield-lock"></i> Term Closure
             </a>
         </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link py-2 px-3.5 fw-medium d-inline-flex align-items-center gap-2 rounded-2 <?= $activeTab === 'audit-log' ? 'active shadow-sm' : 'text-secondary' ?>" 
+               id="tab-audit-log-btn" 
+               href="<?= url('/admin/academic-terms?tab=audit-log') ?>" 
+               role="tab" 
+               aria-selected="<?= $activeTab === 'audit-log' ? 'true' : 'false' ?>">
+                <i class="bi bi-clock-history"></i> Audit Log
+            </a>
+        </li>
     </ul>
 </div>
 
@@ -78,6 +87,7 @@ ob_start();
                 </button>
             </div>
         <?php endif; ?>
+
 
         <!-- Stat Cards (Adopted from class-scheduling AcademicTermsStatCard) -->
         <div class="row g-3 mb-4">
@@ -360,6 +370,116 @@ ob_start();
                                                 </button>
                                             <?php endif; ?>
                                         </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: AUDIT LOG (Adopted from class-scheduling) -->
+    <!-- ========================================== -->
+    <div class="tab-pane fade <?= $activeTab === 'audit-log' ? 'show active' : '' ?>" id="tab-audit-log" role="tabpanel">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+            <div>
+                <h6 class="fw-bold mb-0 text-dark">Academic Terms Audit Trail</h6>
+                <small class="text-muted">Immutable append-only ledger of term postings, closures, reopening events, and school year updates.</small>
+            </div>
+            <!-- Audit Filters -->
+            <form method="GET" action="<?= url('/admin/academic-terms') ?>" class="d-flex align-items-center gap-2 m-0">
+                <input type="hidden" name="tab" value="audit-log">
+                <select name="audit_action" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 170px;">
+                    <option value="all" <?= ($auditFilters['action'] ?? 'all') === 'all' ? 'selected' : '' ?>>All Actions</option>
+                    <option value="term_closed" <?= ($auditFilters['action'] ?? '') === 'term_closed' ? 'selected' : '' ?>>Term Closed</option>
+                    <option value="term_reopened" <?= ($auditFilters['action'] ?? '') === 'term_reopened' ? 'selected' : '' ?>>Term Reopened</option>
+                    <option value="school_year_created" <?= ($auditFilters['action'] ?? '') === 'school_year_created' ? 'selected' : '' ?>>School Year Created</option>
+                    <option value="school_year_updated" <?= ($auditFilters['action'] ?? '') === 'school_year_updated' ? 'selected' : '' ?>>School Year Updated</option>
+                    <option value="period_locked" <?= ($auditFilters['action'] ?? '') === 'period_locked' ? 'selected' : '' ?>>Period Locked</option>
+                    <option value="period_unlocked" <?= ($auditFilters['action'] ?? '') === 'period_unlocked' ? 'selected' : '' ?>>Period Unlocked</option>
+                </select>
+                <select name="audit_sy" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 150px;">
+                    <option value="all" <?= ($auditFilters['school_year'] ?? 'all') === 'all' ? 'selected' : '' ?>>All School Years</option>
+                    <?php foreach ($schoolYears as $syItem): ?>
+                        <option value="<?= htmlspecialchars($syItem['school_year']) ?>" <?= ($auditFilters['school_year'] ?? '') === $syItem['school_year'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($syItem['school_year']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <?php if (($auditFilters['action'] ?? 'all') !== 'all' || ($auditFilters['school_year'] ?? 'all') !== 'all'): ?>
+                    <a href="<?= url('/admin/academic-terms?tab=audit-log') ?>" class="btn btn-sm btn-outline-secondary" title="Reset filter">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                <?php endif; ?>
+            </form>
+        </div>
+
+        <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 8px;">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light border-bottom">
+                        <tr>
+                            <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 180px; font-size: 11px;">Action</th>
+                            <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 200px; font-size: 11px;">Academic Term</th>
+                            <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 200px; font-size: 11px;">Performed By</th>
+                            <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Audit Details / Reason</th>
+                            <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-center" style="width: 180px; font-size: 11px;">Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <?php if (empty($auditLogs)): ?>
+                            <tr>
+                                <td colspan="5" class="py-5 text-center text-muted">
+                                    <i class="bi bi-clock-history fs-2 text-secondary d-block mb-2"></i>
+                                    <p class="mb-0 fw-medium">No audit log entries recorded yet.</p>
+                                    <small class="text-muted">Actions like closing, reopening terms, or creating school years will be permanently audited here.</small>
+                                </td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($auditLogs as $log): ?>
+                                <?php
+                                $actionTone = match ($log['action']) {
+                                    'term_closed' => ['bg' => 'bg-warning-subtle', 'text' => 'text-warning-emphasis', 'border' => 'border-warning-subtle', 'icon' => 'bi-lock-fill', 'label' => 'Term Closed'],
+                                    'term_reopened' => ['bg' => 'bg-success-subtle', 'text' => 'text-success', 'border' => 'border-success-subtle', 'icon' => 'bi-unlock-fill', 'label' => 'Term Reopened'],
+                                    'school_year_created' => ['bg' => 'bg-primary-subtle', 'text' => 'text-primary', 'border' => 'border-primary-subtle', 'icon' => 'bi-plus-circle', 'label' => 'Year Created'],
+                                    'school_year_updated' => ['bg' => 'bg-info-subtle', 'text' => 'text-info-emphasis', 'border' => 'border-info-subtle', 'icon' => 'bi-pencil', 'label' => 'Year Updated'],
+                                    'period_locked' => ['bg' => 'bg-danger-subtle', 'text' => 'text-danger', 'border' => 'border-danger-subtle', 'icon' => 'bi-lock', 'label' => 'Period Locked'],
+                                    'period_unlocked' => ['bg' => 'bg-success-subtle', 'text' => 'text-success', 'border' => 'border-success-subtle', 'icon' => 'bi-unlock', 'label' => 'Period Unlocked'],
+                                    default => ['bg' => 'bg-light', 'text' => 'text-secondary', 'border' => 'border', 'icon' => 'bi-activity', 'label' => ucwords(str_replace('_', ' ', $log['action']))],
+                                };
+
+                                $termDisplay = '—';
+                                if (!empty($log['school_year'])) {
+                                    $semName = !empty($log['semester_number']) ? ($log['semester_number'] == 1 ? '1st Sem' : ($log['semester_number'] == 2 ? '2nd Sem' : "Sem {$log['semester_number']}")) : '';
+                                    $termDisplay = $semName ? "{$semName}, S.Y. {$log['school_year']}" : "S.Y. {$log['school_year']}";
+                                }
+                                ?>
+                                <tr>
+                                    <td class="py-3 px-4">
+                                        <span class="badge <?= $actionTone['bg'] ?> <?= $actionTone['text'] ?> border <?= $actionTone['border'] ?> py-1.5 px-2.5 small d-inline-flex align-items-center gap-1.5">
+                                            <i class="bi <?= $actionTone['icon'] ?>"></i>
+                                            <?= $actionTone['label'] ?>
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 fw-semibold text-dark">
+                                        <?= htmlspecialchars($termDisplay) ?>
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        <div class="fw-semibold text-dark" style="font-size: 13px;">
+                                            <?= htmlspecialchars($log['performer_name'] ?? 'System') ?>
+                                        </div>
+                                        <span class="badge bg-light text-muted border py-0.5 px-1.5" style="font-size: 10px;">
+                                            <?= htmlspecialchars($log['role'] ?? 'Admin') ?>
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-secondary small">
+                                        <?= htmlspecialchars($log['details'] ?? '—') ?>
+                                    </td>
+                                    <td class="py-3 px-4 text-center text-muted small">
+                                        <?= !empty($log['created_at']) ? date('M d, Y h:i A', strtotime($log['created_at'])) : '—' ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
