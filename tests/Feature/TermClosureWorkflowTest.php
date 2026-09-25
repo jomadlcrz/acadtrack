@@ -301,4 +301,52 @@ class TermClosureWorkflowTest extends TestCase
         $this->assertStringContainsString('Term Closure', $content);
         $this->assertStringContainsString('Operational Sequence', $content);
     }
+
+    public function testSetModificationsBlockedOnClosedTerm(): void
+    {
+        $term = AcademicTerm::create([
+            'academic_year_id' => 1,
+            'school_year' => '2098-2099',
+            'semester' => 1,
+            'is_active' => 0,
+            'is_closed' => 1,
+            'closed_at' => date('Y-m-d H:i:s'),
+            'closed_by' => 1,
+            'closure_reason' => 'Term sealed',
+        ]);
+
+        $set = \App\Models\Set::create([
+            'academic_term_id' => (int) $term->id,
+            'program_id' => 1,
+            'department_id' => 1,
+            'name' => 'BSCS-4A-TEST',
+            'set_name' => 'BSCS-4A-TEST',
+            'year_level' => 4,
+            'set_code' => 'TEST',
+            'status' => 'active',
+        ]);
+
+        $_SESSION['user'] = ['id' => 1, 'email' => 'admin@gwc.edu', 'role' => 'Admin'];
+        $_SESSION['role'] = 'Admin';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+
+        $controller = new \App\Controllers\Admin\SetController();
+        $req = new \App\Core\Request([], ['set_code' => 'MOD', 'status' => 'active']);
+        $res = new \App\Core\Response();
+        $session = new \App\Core\Session();
+
+        $controller->update($req, $res, $session, (string) $set->id);
+        $this->assertStringContainsString('closed and sealed', $session->getFlash('error') ?? '');
+
+        $set->delete();
+        $term->delete();
+    }
+
+    public function testTermPreviewReturnsClosedByName(): void
+    {
+        $preview = $this->service->getTermPreview(1);
+        $this->assertNotNull($preview);
+        $this->assertArrayHasKey('closed_by_name', $preview['term']);
+    }
 }
+

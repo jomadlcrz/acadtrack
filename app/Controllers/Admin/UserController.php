@@ -70,6 +70,17 @@ class UserController
         $studentNumber = null;
         if ($role === 'Student') {
             $studentNumber = trim((string) ($data['student_number'] ?? '')) ?: null;
+            if (!empty($data['set_id'])) {
+                $targetSet = \App\Models\Set::find((int) $data['set_id']);
+                if ($targetSet && $targetSet->academic_term_id) {
+                    $termClosureService = new \App\Services\TermClosureService();
+                    if ($termClosureService->isTermClosed((int) $targetSet->academic_term_id)) {
+                        $session->flash('error', 'Cannot assign student to a section belonging to a closed or ended academic term.');
+                        redirect('/admin/users/create');
+                        return;
+                    }
+                }
+            }
         }
 
         $user = \App\Models\User::create([
@@ -173,6 +184,17 @@ class UserController
             $updateData['student_number'] = $studentNumber;
 
             $setId = !empty($data['set_id']) ? (int) $data['set_id'] : null;
+            if ($setId) {
+                $targetSet = \App\Models\Set::find($setId);
+                if ($targetSet && $targetSet->academic_term_id) {
+                    $termClosureService = new \App\Services\TermClosureService();
+                    if ($termClosureService->isTermClosed((int) $targetSet->academic_term_id)) {
+                        $session->flash('error', 'Cannot assign student to a section belonging to a closed or ended academic term.');
+                        redirect('/admin/users/' . $id . '/edit');
+                        return;
+                    }
+                }
+            }
             $yearLevel = !empty($data['year_level']) ? (int) $data['year_level'] : 1;
             $studentStatus = !empty($data['student_status']) ? (string) $data['student_status'] : 'Regular';
 

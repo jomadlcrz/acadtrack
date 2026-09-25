@@ -72,6 +72,12 @@ class SetController
         $termId = (int) ($activeTerm['id'] ?? 1);
         $deptId = $program->department_id;
 
+        $termClosureService = new \App\Services\TermClosureService();
+        if ($termClosureService->isTermClosed($termId)) {
+            $this->respondError($isJson, $response, $session, 'Cannot create sections. This academic term is officially closed and sealed.');
+            return;
+        }
+
         $createMode = $data['create_mode'] ?? 'all'; // 'all' or 'custom'
         $itemsToCreate = [];
 
@@ -182,6 +188,13 @@ class SetController
             return;
         }
 
+        $termClosureService = new \App\Services\TermClosureService();
+        if ($termClosureService->isTermClosed((int) $set->academic_term_id)) {
+            $session->flash('error', 'Cannot modify sections. This academic term is officially closed and sealed.');
+            redirect('/admin/sets');
+            return;
+        }
+
         $setCode = strtoupper(trim((string) $request->post('set_code', $set->set_code ?? '')));
         $status = in_array($request->post('status'), ['active', 'inactive'], true) ? $request->post('status') : 'active';
 
@@ -231,6 +244,13 @@ class SetController
             return;
         }
 
+        $termClosureService = new \App\Services\TermClosureService();
+        if ($termClosureService->isTermClosed((int) $set->academic_term_id)) {
+            $session->flash('error', 'Cannot modify sections. This academic term is officially closed and sealed.');
+            redirect('/admin/sets');
+            return;
+        }
+
         $set->update(['status' => 'inactive']);
         $session->flash('success', "Section '{$set->name}' archived successfully.");
         redirect('/admin/sets');
@@ -247,6 +267,13 @@ class SetController
         $set = Set::find((int) $id);
         if (!$set) {
             $session->flash('error', 'Section not found.');
+            redirect('/admin/sets');
+            return;
+        }
+
+        $termClosureService = new \App\Services\TermClosureService();
+        if ($termClosureService->isTermClosed((int) $set->academic_term_id)) {
+            $session->flash('error', 'Cannot modify sections. This academic term is officially closed and sealed.');
             redirect('/admin/sets');
             return;
         }
@@ -278,10 +305,14 @@ class SetController
         }
 
         $archived = 0;
+        $termClosureService = new \App\Services\TermClosureService();
 
         foreach ($ids as $setId) {
             $set = Set::find($setId);
             if (!$set) continue;
+            if ($termClosureService->isTermClosed((int) $set->academic_term_id)) {
+                continue;
+            }
 
             // Strict zero hard delete: archive by updating status to inactive
             $set->update(['status' => 'inactive']);

@@ -65,6 +65,20 @@ ob_start();
     <!-- TAB 1: SCHOOL YEARS (Matching Reference)   -->
     <!-- ========================================== -->
     <div class="tab-pane fade <?= $activeTab === 'school-years' ? 'show active' : '' ?>" id="tab-school-years" role="tabpanel">
+        <?php if (!empty($missingCurrentYear) && !empty($expectedSchoolYear)): ?>
+            <div class="alert alert-warning border-0 rounded-3 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 p-3 shadow-sm" style="background: #fffbeb; border: 1px solid #fde68a !important; color: #92400e;">
+                <div class="d-flex align-items-center gap-2.5">
+                    <i class="bi bi-exclamation-triangle-fill fs-5 text-warning"></i>
+                    <div>
+                        <strong class="fw-semibold">Missing Current School Year:</strong> Today falls in school year <strong><?= htmlspecialchars($expectedSchoolYear) ?></strong>, but it hasn't been created in the catalog yet.
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-warning text-dark fw-semibold d-inline-flex align-items-center gap-1.5 shadow-sm text-nowrap" onclick="quickCreateSchoolYear('<?= htmlspecialchars($expectedSchoolYear) ?>')">
+                    <i class="bi bi-plus-lg"></i> Create <?= htmlspecialchars($expectedSchoolYear) ?>
+                </button>
+            </div>
+        <?php endif; ?>
+
         <!-- Stat Cards (Adopted from class-scheduling AcademicTermsStatCard) -->
         <div class="row g-3 mb-4">
             <div class="col-12 col-sm-4">
@@ -322,9 +336,12 @@ ob_start();
                                     </td>
                                     <td class="py-3 px-4 text-end">
                                         <div class="d-inline-flex align-items-center gap-1.5">
-                                            <a href="<?= url('/admin/academic-terms/closure') ?>" class="btn btn-sm btn-outline-secondary py-1 px-2.5 small" title="View details">
-                                                View details
-                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-secondary py-1 px-2.5 small d-inline-flex align-items-center gap-1"
+                                                    onclick="openClosureDetails(<?= $closure['id'] ?>)" 
+                                                    title="View details">
+                                                <i class="bi bi-info-circle"></i> View details
+                                            </button>
                                             <?php if ($isEnded): ?>
                                                 <span class="badge bg-light text-muted border py-1.5 px-2 small" title="School year has ended. Historical records are permanent.">
                                                     <i class="bi bi-shield-lock"></i> Permanent
@@ -561,6 +578,117 @@ ob_start();
     </div>
 </div>
 
+<!-- 6. Term Closure Details Audit Modal (Adopted from class-scheduling TermClosureDetailsDrawer) -->
+<div class="modal fade" id="closureDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom py-3 px-4">
+                <div>
+                    <h5 class="modal-title h6 fw-bold mb-0 text-dark" id="detailsTermTitle">Term Lifecycle & Closure Details</h5>
+                    <small class="text-muted" id="detailsTermSubtitle">Academic term audit trail</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div id="detailsLoading" class="text-center py-4">
+                    <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                    <span class="text-muted">Loading term audit details…</span>
+                </div>
+                <div id="detailsContent" style="display: none;">
+                    <!-- Top Status Card -->
+                    <div class="p-3 rounded-3 mb-4 border d-flex align-items-center justify-content-between" id="detailsHeaderCard" style="background: #f8fafc;">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="rounded-3 p-2.5 bg-white border shadow-sm text-primary" style="font-size: 20px;">
+                                <i class="bi bi-shield-lock" id="detailsStatusIcon"></i>
+                            </span>
+                            <div>
+                                <div class="small text-uppercase fw-bold text-muted" style="font-size: 11px;">Lifecycle Status</div>
+                                <div class="fw-bold fs-6 text-dark" id="detailsStatusText">Closed</div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="small text-muted" style="font-size: 11px;">SEALED ON</div>
+                            <div class="fw-semibold text-dark small" id="detailsClosedAt">—</div>
+                        </div>
+                    </div>
+
+                    <!-- Information Grid -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <span class="text-uppercase fw-semibold text-muted small" style="font-size: 11px;">Closed By</span>
+                                <div class="fw-semibold text-dark mt-1" id="detailsClosedBy">—</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <span class="text-uppercase fw-semibold text-muted small" style="font-size: 11px;">Closure Reason</span>
+                                <div class="fw-semibold text-dark mt-1 text-truncate" id="detailsReason" title="">—</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grading Period Workflow Progression -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-dark text-uppercase" style="font-size: 11px; letter-spacing: 0.05em;">
+                            Grading Periods Progression
+                        </label>
+                        <div class="row g-2 text-center" id="detailsPeriodsRow">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Audit Metrics (Sheets, Students, Subjects) -->
+                    <div class="row g-3 mb-4 text-center">
+                        <div class="col-4">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <div class="fs-5 fw-bold text-dark font-monospace" id="detailsSheetsCount">0</div>
+                                <div class="small text-muted">Grade Sheets</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <div class="fs-5 fw-bold text-success font-monospace" id="detailsApprovedSheets">0</div>
+                                <div class="small text-muted">Approved Sheets</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <div class="fs-5 fw-bold text-primary font-monospace" id="detailsStudentsCount">0</div>
+                                <div class="small text-muted">Enrolled Students</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Closure Effects / Guardrails -->
+                    <div>
+                        <label class="form-label small fw-bold text-dark text-uppercase mb-2" style="font-size: 11px; letter-spacing: 0.05em;">
+                            Enforced Institutional Effects
+                        </label>
+                        <ul class="list-group list-group-flush border rounded-3 small">
+                            <li class="list-group-item d-flex align-items-center gap-2.5 py-2.5">
+                                <i class="bi bi-lock-fill text-danger"></i>
+                                <span><strong>Grading Submissions:</strong> Score encoding and approvals permanently frozen.</span>
+                            </li>
+                            <li class="list-group-item d-flex align-items-center gap-2.5 py-2.5">
+                                <i class="bi bi-calendar-check-fill text-warning"></i>
+                                <span><strong>Attendance Records:</strong> Daily student attendance logs sealed as read-only.</span>
+                            </li>
+                            <li class="list-group-item d-flex align-items-center gap-2.5 py-2.5">
+                                <i class="bi bi-people-fill text-info"></i>
+                                <span><strong>Section Enrollment:</strong> Set memberships and curriculum enrollments locked against modification.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top py-2.5 px-4 bg-light d-flex justify-content-end">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // 1. Search Filter for School Years
@@ -619,6 +747,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Quick Create School Year Trigger (from Proactive Alert Banner)
+function quickCreateSchoolYear(yearName) {
+    const input = document.getElementById('school_year');
+    if (input) {
+        input.value = yearName;
+    }
+    const modal = new bootstrap.Modal(document.getElementById('createTermModal'));
+    modal.show();
+}
+
 // Edit School Year Modal Trigger
 function openEditSchoolYearModal(id, currentName) {
     const form = document.getElementById('editSchoolYearForm');
@@ -648,12 +786,12 @@ function openClosurePreview(termId) {
     fetch(`<?= url('/admin/academic-terms/') ?>${termId}/closure-preview`)
         .then(res => res.json())
         .then(data => {
-            if (data.success && data.preview) {
-                const p = data.preview;
+            const p = data.term ? data : (data.preview || {});
+            if (p && p.term) {
                 document.getElementById('previewTermTitle').textContent = `Post ${p.term.semester_name}, ${p.term.school_year}`;
-                document.getElementById('previewTotalSheets').textContent = p.counts.total_sheets;
-                document.getElementById('previewApprovedSheets').textContent = p.counts.approved_sheets;
-                document.getElementById('previewPendingSheets').textContent = p.counts.pending_sheets;
+                document.getElementById('previewTotalSheets').textContent = p.counts ? p.counts.total_sheets : 0;
+                document.getElementById('previewApprovedSheets').textContent = p.counts ? p.counts.approved_sheets || p.counts.completed_sheets : 0;
+                document.getElementById('previewPendingSheets').textContent = p.counts ? p.counts.pending_sheets : 0;
                 document.getElementById('closure_reason').value = p.default_reason || '';
 
                 loadingEl.style.display = 'none';
@@ -663,6 +801,66 @@ function openClosurePreview(termId) {
         .catch(() => {
             alert('Failed to load closure preview audit.');
             previewModal.hide();
+        });
+}
+
+// Term Closure Details Trigger (Adopted from class-scheduling TermClosureDetailsDrawer)
+function openClosureDetails(termId) {
+    const modalEl = document.getElementById('closureDetailsModal');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+
+    const loadingEl = document.getElementById('detailsLoading');
+    const contentEl = document.getElementById('detailsContent');
+    loadingEl.style.display = 'block';
+    contentEl.style.display = 'none';
+
+    fetch(`<?= url('/admin/academic-terms/') ?>${termId}/closure-preview`)
+        .then(res => res.json())
+        .then(data => {
+            const p = data.term ? data : (data.preview || {});
+            if (p && p.term) {
+                document.getElementById('detailsTermTitle').textContent = `${p.term.semester_name}, S.Y. ${p.term.school_year}`;
+                document.getElementById('detailsTermSubtitle').textContent = `Academic Term #${p.term.id} Audit & Verification Record`;
+                
+                const isClosed = p.term.is_closed;
+                document.getElementById('detailsStatusText').textContent = isClosed ? 'Closed & Sealed' : (p.term.is_active ? 'Active & Running' : 'Pending');
+                document.getElementById('detailsStatusIcon').className = isClosed ? 'bi bi-lock-fill text-danger' : 'bi bi-play-circle-fill text-success';
+                
+                document.getElementById('detailsClosedAt').textContent = p.term.closed_at ? new Date(p.term.closed_at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'}) : '—';
+                document.getElementById('detailsClosedBy').textContent = p.term.closed_by_name || 'System Administrator';
+                document.getElementById('detailsReason').textContent = p.term.closure_reason || (isClosed ? 'Standard semester closure' : 'Open term');
+                document.getElementById('detailsReason').title = p.term.closure_reason || '';
+
+                document.getElementById('detailsSheetsCount').textContent = p.counts ? p.counts.total_sheets : 0;
+                document.getElementById('detailsApprovedSheets').textContent = p.counts ? (p.counts.completed_sheets || p.counts.approved_sheets || 0) : 0;
+                document.getElementById('detailsStudentsCount').textContent = p.counts ? p.counts.students : 0;
+
+                // Render Grading Periods progression
+                const periodsContainer = document.getElementById('detailsPeriodsRow');
+                periodsContainer.innerHTML = '';
+                const standardPeriods = ['Prelim', 'Midterm', 'Semi-Final', 'Final'];
+                standardPeriods.forEach(pName => {
+                    const col = document.createElement('div');
+                    col.className = 'col-3';
+                    col.innerHTML = `
+                        <div class="p-2 border rounded-3 bg-white">
+                            <div class="small fw-semibold text-dark">${pName}</div>
+                            <span class="badge ${isClosed ? 'bg-secondary-subtle text-secondary' : 'bg-success-subtle text-success'} border mt-1" style="font-size: 10px;">
+                                ${isClosed ? 'Closed' : 'Active'}
+                            </span>
+                        </div>
+                    `;
+                    periodsContainer.appendChild(col);
+                });
+
+                loadingEl.style.display = 'none';
+                contentEl.style.display = 'block';
+            }
+        })
+        .catch(() => {
+            alert('Failed to load term audit details.');
+            modal.hide();
         });
 }
 

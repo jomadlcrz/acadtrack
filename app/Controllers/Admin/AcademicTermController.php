@@ -59,20 +59,30 @@ class AcademicTermController
         $activeYear = array_values(array_filter($schoolYears, fn($y) => (int)$y['is_active'] === 1))[0] ?? ($schoolYears[0] ?? null);
         $currentYearName = $activeYear['school_year'] ?? '—';
 
+        // Proactive Missing Current Year check (matching class-scheduling)
+        $expectedStart = ($currentMonth >= 8) ? $currentYearInt : $currentYearInt - 1;
+        $expectedSchoolYear = sprintf('%04d-%04d', $expectedStart, $expectedStart + 1);
+        $existsForToday = false;
+        foreach ($schoolYears as $syRow) {
+            if ($syRow['school_year'] === $expectedSchoolYear) {
+                $existsForToday = true;
+                break;
+            }
+        }
+        $missingCurrentYear = !$existsForToday;
+
         // 2. Global Reference Semesters (matching reference SemesterTable)
         $semesters = [
             [
                 'id' => 1,
                 'semester_number' => 1,
                 'display_name' => '1st Semester',
-                'description' => 'First semester of the academic year',
                 'status' => 'Active',
             ],
             [
                 'id' => 2,
                 'semester_number' => 2,
                 'display_name' => '2nd Semester',
-                'description' => 'Second semester of the academic year',
                 'status' => 'Active',
             ],
         ];
@@ -99,6 +109,8 @@ class AcademicTermController
             'schoolYears' => $schoolYears,
             'currentYearName' => $currentYearName,
             'ongoingCount' => $ongoingCount,
+            'missingCurrentYear' => $missingCurrentYear,
+            'expectedSchoolYear' => $expectedSchoolYear,
             'semesters' => $semesters,
             'closures' => $closures,
             'terms' => $terms,

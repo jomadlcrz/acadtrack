@@ -153,9 +153,12 @@ class TermClosureService
         $stmt = $this->pdo->prepare("
             SELECT at.*,
                    COALESCE(at.school_year, ay.school_year, '2026-2027') as school_year_display,
-                   ay.school_year as academic_year_name
+                   ay.school_year as academic_year_name,
+                   COALESCE(CONCAT(ad.first_name, ' ', ad.last_name), u.email, 'Registrar') as closed_by_name
             FROM academic_terms at
             LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
+            LEFT JOIN users u ON at.closed_by = u.id
+            LEFT JOIN admin_details ad ON u.id = ad.user_id
             WHERE at.id = :id
             LIMIT 1
         ");
@@ -263,6 +266,7 @@ class TermClosureService
                 'is_active' => (bool) $term['is_active'],
                 'is_closed' => (bool) $term['is_closed'],
                 'closed_at' => $term['closed_at'],
+                'closed_by_name' => $term['closed_by_name'] ?? 'Registrar',
                 'closure_reason' => $term['closure_reason'],
             ],
             'periods' => $periods,
@@ -448,5 +452,48 @@ class TermClosureService
             'success' => true,
             'message' => $isClosed ? 'Grading period locked.' : 'Grading period opened.',
         ];
+    }
+
+    /**
+     * Determine whether a school year has ended based on calendar cutoffs.
+     */
+    public function isSchoolYearEnded(string $schoolYear): bool
+    {
+        $currentYearInt = (int) date('Y');
+        $currentMonth = (int) date('n');
+
+        if (preg_match('/^(\d{4})-(\d{4})$/', trim($schoolYear), $m)) {
+            $endY = (int) $m[2];
+            return ($currentYearInt > $endY || ($currentYearInt === $endY && $currentMonth >= 6));
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine whether an academic term is closed or belongs to an ended school year.
+     */
+    public function isTermClosed(int $termId): bool
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT at.is_closed, at.school_year, ay.school_year as ay_school_year
+            FROM academic_terms at
+            LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
+            WHERE at.id = :id
+            LIMIT 1
+        ");
+        $stmt->execute(['id' => $termId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return false;
+        }
+
+        if (!empty($row['is_closed'])) {
+            return true;
+        }
+
+        $syName = !empty($row['school_year']) ? $row['school_year'] : ($row['ay_school_year'] ?? '');
+        return $this->isSchoolYearEnded((string) $syName);
     }
 }
