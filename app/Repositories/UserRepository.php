@@ -139,7 +139,7 @@ class UserRepository
         return User::getFaculty();
     }
 
-    public function paginate(int $page = 1, int $perPage = 20, string $role = '', string $status = '', string $search = ''): array
+    public function paginate(int $page = 1, int $perPage = 20, string $role = '', string $status = '', string $search = '', string $enrollmentStatus = ''): array
     {
         $page = max(1, $page);
         $offset = ($page - 1) * $perPage;
@@ -152,6 +152,10 @@ class UserRepository
         if ($status !== '') {
             $clauses[] = "u.status = :status";
             $params['status'] = $status;
+        }
+        if ($enrollmentStatus !== '') {
+            $clauses[] = "sd.status = :enrollment_status";
+            $params['enrollment_status'] = $enrollmentStatus;
         }
         if ($search !== '') {
             $clauses[] = "CONCAT(
@@ -182,6 +186,8 @@ class UserRepository
                        COALESCE(ad.last_name, fd.last_name, sd.last_name, '') AS last_name,
                        COALESCE(r.role_name, 'Student') AS role,
                        sd.student_number,
+                       sd.year_level AS student_year_level,
+                       sd.status AS student_status,
                        fd.faculty_type,
                        d.dept_name AS department_name, d.dept_abbrev AS department_code, sec.set_name AS set_name
                 FROM users u

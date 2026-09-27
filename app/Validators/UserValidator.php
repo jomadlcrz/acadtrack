@@ -56,8 +56,23 @@ class UserValidator
                 }
             }
 
-            if (empty($data['set_id'])) {
-                $this->errors['set_id'] = 'Assigned set is required for student accounts.';
+            $studentStatus = (string) ($data['student_status'] ?? 'Regular');
+            $yearLevel = !empty($data['year_level']) ? (int) $data['year_level'] : 1;
+            $setId = !empty($data['set_id']) ? (int) $data['set_id'] : null;
+
+            if ($studentStatus === 'Regular') {
+                if (empty($setId)) {
+                    $this->errors['set_id'] = 'Assigned set is required for student accounts.';
+                }
+            }
+
+            if (!empty($setId)) {
+                $set = \App\Models\Set::find($setId);
+                if (!$set) {
+                    $this->errors['set_id'] = 'The selected class set does not exist.';
+                } elseif ((int) $set->year_level !== $yearLevel) {
+                    $this->errors['year_level'] = "The selected set '{$set->name}' belongs to Year {$set->year_level}, which does not match Year {$yearLevel}.";
+                }
             }
         } elseif (in_array($role, ['Faculty', 'Dean'], true)) {
             if (empty($data['department_id'])) {
