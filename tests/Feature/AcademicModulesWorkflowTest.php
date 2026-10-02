@@ -97,7 +97,9 @@ class AcademicModulesWorkflowTest extends TestCase
         $this->assertStringContainsString('Bachelor of Science in Information Technology', $html);
         $this->assertStringContainsString('New Curriculum', $html);
         $this->assertStringContainsString('Print', $html);
-        $this->assertStringContainsString('CSV / Excel', $html);
+        $this->assertStringContainsString('Export', $html);
+        $this->assertStringContainsString('exportCurriculumBtn', $html);
+        $this->assertStringContainsString('exportPopoverContent', $html);
     }
 
     public function testSetsViewAndBatchDerivation(): void

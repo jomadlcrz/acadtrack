@@ -319,7 +319,7 @@
                 <div class="legal-attestation-title">Office of the Dean &mdash; College of Information Technology (CITE)</div>
                 <div class="legal-attestation-text">
                     Golden West Colleges, Inc. &bull; San Jose Drive, Alaminos, Pangasinan<br>
-                    Official Inquiries: <a href="mailto:cite@gwc.edu" class="text-decoration-none">cite@gwc.edu</a>
+                    Official Inquiries: <a href="mailto:goldenwestcollege94@gmail.com" class="text-decoration-none">goldenwestcollege94@gmail.com</a>
                 </div>
             </div>
 

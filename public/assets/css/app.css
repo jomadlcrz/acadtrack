@@ -39,8 +39,17 @@
     --gray-800: #1e293b;
     --white: #ffffff;
     --radius: 6px;
-    --shadow: 0 1px 3px rgba(0,0,0,0.1);
-    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow: none;
+    --shadow-md: none;
+
+    /* Bootstrap Overrides for Absolute Border & Radius Consistency */
+    --bs-border-color: #cbd5e1;
+    --bs-border-color-translucent: #cbd5e1;
+    --bs-card-border-color: #cbd5e1;
+    --bs-card-border-radius: 6px;
+    --bs-card-inner-border-radius: 5px;
+    --bs-card-box-shadow: none;
+    --bs-card-bg: #ffffff;
 }
 
 /* 3. Base Resets & Layout Box Model */

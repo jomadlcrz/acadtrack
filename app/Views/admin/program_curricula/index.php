@@ -59,8 +59,8 @@ ob_start();
 <?php else: ?>
 
     <!-- Program Selector & Header Card -->
-    <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-        <div class="p-4 border-bottom bg-white">
+    <div class="card mb-4">
+        <div class="p-4 border-bottom" style="border-bottom: 1px solid #cbd5e1 !important;">
             <div class="row g-3 align-items-end">
                 <div class="col-12 col-md-4">
                     <label for="programSelect" class="form-label text-uppercase text-secondary fw-bold" style="font-size: 11px; letter-spacing: 0.5px;">
@@ -84,9 +84,15 @@ ob_start();
                         <i class="bi bi-printer"></i> Print
                     </button>
                     <?php if ($selectedProgram): ?>
-                        <a href="<?= url('/admin/program-curricula/' . $selectedProgram->id . '/export-csv') ?>" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5">
-                            <i class="bi bi-download"></i> CSV / Excel
-                        </a>
+                        <button type="button" 
+                                id="exportCurriculumBtn" 
+                                class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5" 
+                                data-bs-toggle="popover" 
+                                data-bs-placement="bottom" 
+                                data-bs-html="true" 
+                                title="Export Curriculum">
+                            <i class="bi bi-download"></i> Export
+                        </button>
                         <button type="button" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
                             <i class="bi bi-plus-lg"></i> Add Subject
                         </button>
@@ -96,8 +102,37 @@ ob_start();
         </div>
 
         <?php if ($selectedProgram): ?>
+            <!-- Hidden template for Export Popover -->
+            <div id="exportPopoverContent" class="d-none">
+                <div class="export-popover-inner" style="min-width: 220px;">
+                    <div class="text-uppercase text-muted fw-bold px-2 py-1 mb-1" style="font-size: 11px; letter-spacing: 0.5px;">
+                        Export Format
+                    </div>
+                    <a href="<?= url('/admin/program-curricula/' . $selectedProgram->id . '/export-csv') ?>" 
+                       class="export-popover-item" 
+                       onclick="closeExportPopover();">
+                        <i class="bi bi-filetype-csv text-primary fs-5"></i>
+                        <div>
+                            <div class="fw-semibold text-dark small leading-tight">CSV Document (.csv)</div>
+                            <div class="text-muted text-xs">Standard comma-separated format</div>
+                        </div>
+                    </a>
+                    <button type="button" 
+                            class="export-popover-item border-0 bg-transparent w-100 text-start" 
+                            onclick="exportCurriculumToExcel(); closeExportPopover();">
+                        <i class="bi bi-file-earmark-excel text-success fs-5"></i>
+                        <div>
+                            <div class="fw-semibold text-dark small leading-tight">Excel Workbook (.xlsx)</div>
+                            <div class="text-muted text-xs">Formatted Microsoft Excel sheet</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($selectedProgram): ?>
             <!-- Program Metadata Banner -->
-            <div class="px-4 py-3 bg-light border-bottom">
+            <div class="px-4 py-3 bg-light">
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                     <div>
                         <div class="d-flex align-items-center gap-2">
@@ -148,7 +183,7 @@ ob_start();
     <?php else: ?>
         <div class="space-y-4" id="curriculumGroupsContainer">
             <?php foreach ($groupedSubjects as $group): ?>
-                <div class="card shadow-sm border-0 mb-4 curriculum-group-card" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
+                <div class="card mb-4 curriculum-group-card">
                     <div class="card-header bg-light py-2.5 px-4 border-bottom d-flex justify-content-between align-items-center">
                         <h3 class="h6 fw-bold text-dark mb-0"><?= htmlspecialchars($group['title']) ?></h3>
                         <div class="small text-muted">
@@ -223,11 +258,11 @@ ob_start();
                                     <!-- Edit Subject Modal -->
                                     <div class="modal fade" id="editSubjectModal<?= $sub->id ?>" tabindex="-1" aria-labelledby="editSubjectModalLabel<?= $sub->id ?>" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content border-0 shadow">
+                                            <div class="modal-content" style="border: 1px solid #cbd5e1 !important; box-shadow: none !important; border-radius: 6px;">
                                                 <form method="POST" action="<?= url('/admin/program-curricula/subjects/' . $sub->id) ?>">
                                                     <?= csrf_field() ?>
                                                     <input type="hidden" name="program" value="<?= htmlspecialchars($selectedAbbrev) ?>">
-                                                    <div class="modal-header border-bottom py-3 px-4">
+                                                    <div class="modal-header border-bottom py-3 px-4" style="border-bottom: 1px solid #cbd5e1 !important;">
                                                         <h5 class="modal-title h6 fw-semibold mb-0" id="editSubjectModalLabel<?= $sub->id ?>">
                                                             Edit Subject: <span class="font-monospace text-primary"><?= htmlspecialchars($sub->subject_code) ?></span>
                                                         </h5>
@@ -334,12 +369,12 @@ ob_start();
 <?php if ($selectedProgram): ?>
 <div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content" style="border: 1px solid #cbd5e1 !important; box-shadow: none !important; border-radius: 6px;">
             <form method="POST" action="<?= url('/admin/program-curricula/subjects') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="program_id" value="<?= $selectedProgram->id ?>">
                 <input type="hidden" name="program" value="<?= htmlspecialchars($selectedAbbrev) ?>">
-                <div class="modal-header border-bottom py-3 px-4">
+                <div class="modal-header border-bottom py-3 px-4" style="border-bottom: 1px solid #cbd5e1 !important;">
                     <h5 class="modal-title h6 fw-semibold mb-0" id="addSubjectModalLabel">
                         Add Subject to <span class="text-primary"><?= htmlspecialchars($selectedProgram->program_abbrev) ?></span>
                     </h5>
@@ -454,8 +489,139 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Export Curriculum Popover initialization
+    const exportBtn = document.getElementById('exportCurriculumBtn');
+    if (exportBtn) {
+        const popoverContent = document.getElementById('exportPopoverContent');
+        const popover = new bootstrap.Popover(exportBtn, {
+            html: true,
+            sanitize: false,
+            trigger: 'click',
+            placement: 'bottom',
+            customClass: 'export-popover-menu shadow-sm',
+            content: function() {
+                return popoverContent ? popoverContent.innerHTML : '';
+            }
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!exportBtn.contains(e.target)) {
+                const popoverEl = document.querySelector('.export-popover-menu');
+                if (popoverEl && !popoverEl.contains(e.target)) {
+                    popover.hide();
+                }
+            }
+        });
+    }
 });
+
+<?php
+$exportData = [];
+if (!empty($groupedSubjects)) {
+    foreach ($groupedSubjects as $group) {
+        foreach ($group['subjects'] as $sub) {
+            $exportData[] = [
+                'Year Level' => match((int) $sub->year_level) {
+                    1 => 'First Year',
+                    2 => 'Second Year',
+                    3 => 'Third Year',
+                    4 => 'Fourth Year',
+                    default => 'Year ' . $sub->year_level,
+                },
+                'Semester' => match((int) $sub->semester) {
+                    1 => '1st Semester',
+                    2 => '2nd Semester',
+                    3 => 'Summer',
+                    default => 'Semester ' . $sub->semester,
+                },
+                'Subject Code' => $sub->subject_code,
+                'Descriptive Title' => $sub->descriptive_title,
+                'Units' => (float) $sub->units,
+                'Subject Type' => $sub->subject_type,
+                'Pre-Requisite' => !empty($sub->prerequisites) ? $sub->prerequisites : 'None',
+            ];
+        }
+    }
+}
+?>
+const curriculumExportData = <?= json_encode($exportData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+
+function closeExportPopover() {
+    const btn = document.getElementById('exportCurriculumBtn');
+    if (btn) {
+        const popover = bootstrap.Popover.getInstance(btn);
+        if (popover) {
+            popover.hide();
+        }
+    }
+}
+
+function exportCurriculumToExcel() {
+    if (typeof XLSX === 'undefined') {
+        alert('Spreadsheet export engine is loading. Please try again.');
+        return;
+    }
+
+    if (!curriculumExportData || curriculumExportData.length === 0) {
+        alert('No curriculum subjects to export.');
+        return;
+    }
+
+    const ws = XLSX.utils.json_to_sheet(curriculumExportData);
+    ws['!cols'] = [
+        { wch: 14 }, // Year Level
+        { wch: 14 }, // Semester
+        { wch: 14 }, // Subject Code
+        { wch: 38 }, // Descriptive Title
+        { wch: 8 },  // Units
+        { wch: 18 }, // Subject Type
+        { wch: 20 }, // Pre-Requisite
+    ];
+
+    const wb = XLSX.utils.book_new();
+    const sheetName = '<?= htmlspecialchars(substr($selectedProgram->program_abbrev ?? 'Curriculum', 0, 31)) ?>';
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+    const programAbbrev = '<?= htmlspecialchars(addslashes($selectedProgram->program_abbrev ?? 'Curriculum')) ?>';
+    const filename = `${programAbbrev}-Curriculum.xlsx`;
+    XLSX.writeFile(wb, filename);
+}
 </script>
+
+<!-- SheetJS for client-side Excel export -->
+<script src="<?= asset('vendor/xlsx/xlsx.full.min.js') ?>"></script>
+
+<style>
+.export-popover-menu {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    z-index: 1060;
+    overflow: hidden;
+}
+.export-popover-menu .popover-body {
+    padding: 6px;
+    border-radius: 5px;
+}
+.export-popover-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    color: #1e293b;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+    cursor: pointer;
+}
+.export-popover-item:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    text-decoration: none;
+}
+</style>
 
 <?php
 $content = ob_get_clean();

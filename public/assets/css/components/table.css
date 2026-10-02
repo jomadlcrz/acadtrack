@@ -4,12 +4,19 @@
 
 /* 1. Responsive Table Container */
 .card:has(.table-responsive) {
-    overflow: visible !important;
+    overflow: hidden;
+    border-radius: 6px !important;
 }
 
 .table-responsive {
-    border-radius: 6px;
+    border-radius: 0 0 5px 5px;
     background: #ffffff;
+    box-shadow: none !important;
+    overflow: hidden;
+}
+
+.card > .table-responsive:only-child {
+    border-radius: 5px !important;
 }
 
 /* 2. Standardized Academic Data Tables */
@@ -17,6 +24,7 @@
     width: 100%;
     margin-bottom: 0;
     border-collapse: collapse;
+    box-shadow: none !important;
 }
 
 /* 3. High-Contrast Semantic Table Headings */
@@ -25,7 +33,7 @@
 .table thead.bg-light,
 .table thead.bg-white {
     background-color: #ffffff !important;
-    border-bottom: 1px solid #e2e8f0 !important;
+    border-bottom: 1px solid #cbd5e1 !important;
 }
 
 .table.align-middle thead th,
@@ -38,7 +46,7 @@
     letter-spacing: 0.04em !important;
     color: #64748b !important;
     padding: 10px 16px !important;
-    border-bottom: 1px solid #e2e8f0 !important;
+    border-bottom: 1px solid #cbd5e1 !important;
     border-top: none !important;
     background-color: #ffffff !important;
     white-space: nowrap;

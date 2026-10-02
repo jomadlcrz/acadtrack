@@ -6,7 +6,7 @@ ob_start();
 ?>
 
 <!-- Stepper Progress Bar -->
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 8px;">
+<div class="card mb-4">
     <div class="card-body p-3">
         <div class="d-flex align-items-center justify-content-around">
             <div class="step-indicator active d-flex align-items-center gap-2" id="stepIndicator1">
@@ -41,8 +41,8 @@ ob_start();
     <input type="hidden" name="subjects_json" id="subjectsJsonInput" value="[]">
 
     <!-- STEP 1: Program Information -->
-    <div class="card shadow-sm border-0 mb-4 wizard-step" id="wizardStep1" style="border: 1px solid #e2e8f0 !important; border-radius: 8px;">
-        <div class="card-header bg-white py-3 px-4 border-bottom">
+    <div class="card mb-4 wizard-step" id="wizardStep1">
+        <div class="card-header py-3 px-4 border-bottom">
             <h3 class="h6 fw-bold text-dark mb-0">Step 1: Program Information</h3>
             <small class="text-muted">Define the degree program, department, and academic classification.</small>
         </div>
@@ -117,8 +117,8 @@ ob_start();
     </div>
 
     <!-- STEP 2: Curriculum Subjects -->
-    <div class="card shadow-sm border-0 mb-4 wizard-step" id="wizardStep2" style="display: none; border: 1px solid #e2e8f0 !important; border-radius: 8px;">
-        <div class="card-header bg-white py-3 px-4 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div class="card mb-4 wizard-step" id="wizardStep2" style="display: none;">
+        <div class="card-header py-3 px-4 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
             <div>
                 <h3 class="h6 fw-bold text-dark mb-0">Step 2: Curriculum Subjects</h3>
                 <small class="text-muted">Define courses, credit units, prerequisites, and sequential order.</small>
@@ -186,8 +186,8 @@ ob_start();
     </div>
 
     <!-- STEP 3: Review & Save -->
-    <div class="card shadow-sm border-0 mb-4 wizard-step" id="wizardStep3" style="display: none; border: 1px solid #e2e8f0 !important; border-radius: 8px;">
-        <div class="card-header bg-white py-3 px-4 border-bottom">
+    <div class="card mb-4 wizard-step" id="wizardStep3" style="display: none;">
+        <div class="card-header py-3 px-4 border-bottom">
             <h3 class="h6 fw-bold text-dark mb-0">Step 3: Review &amp; Finalize</h3>
             <small class="text-muted">Verify the curriculum configuration before saving to the institutional catalog.</small>
         </div>
@@ -254,7 +254,7 @@ ob_start();
 <!-- IMPORT SUBJECTS MODAL -->
 <div class="modal fade" id="importSubjectsModal" tabindex="-1" aria-labelledby="importSubjectsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow" style="border-radius: 8px;">
+        <div class="modal-content">
             <div class="modal-header border-bottom py-3 px-4">
                 <div>
                     <h5 class="modal-title fw-bold text-dark mb-0" id="importSubjectsModalLabel">

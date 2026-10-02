@@ -33,13 +33,13 @@ class DepartmentController
         $status = in_array($request->post('status'), ['active', 'inactive'], true) ? $request->post('status') : 'active';
 
         if (empty($code) || empty($name)) {
-            $session->flash('error', 'Department code and department name are required.');
+            $session->flash('error', 'Department abbrev and department name are required.');
             redirect('/admin/departments');
             return;
         }
 
         if (Department::where('dept_abbrev', $code)->exists()) {
-            $session->flash('error', "Department code '{$code}' already exists.");
+            $session->flash('error', "Department abbrev '{$code}' already exists.");
             redirect('/admin/departments');
             return;
         }
@@ -70,13 +70,13 @@ class DepartmentController
         $status = in_array($request->post('status'), ['active', 'inactive'], true) ? $request->post('status') : 'active';
 
         if (empty($code) || empty($name)) {
-            $session->flash('error', 'Department code and department name are required.');
+            $session->flash('error', 'Department abbrev and department name are required.');
             redirect('/admin/departments');
             return;
         }
 
         if (Department::where('dept_abbrev', $code)->where('id', '!=', $department->id)->exists()) {
-            $session->flash('error', "Department code '{$code}' is already assigned to another department.");
+            $session->flash('error', "Department abbrev '{$code}' is already assigned to another department.");
             redirect('/admin/departments');
             return;
         }

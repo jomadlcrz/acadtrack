@@ -13,10 +13,10 @@
 /* 2. Standard Metric KPI Card */
 .stat-card {
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #cbd5e1;
     border-radius: 6px;
     padding: 18px 20px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    box-shadow: none !important;
     text-align: left;
     display: flex;
     flex-direction: column;
@@ -25,8 +25,8 @@
 }
 
 .stat-card:hover {
-    border-color: #cbd5e1;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border-color: #94a3b8;
+    box-shadow: none !important;
 }
 
 /* 3. Interactive Clickable Stat Card Variant */
@@ -133,10 +133,10 @@
 /* 7. Generic Content Card Container */
 .content-card {
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #cbd5e1;
     border-radius: 6px;
     padding: 20px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    box-shadow: none !important;
     margin-bottom: 20px;
 }
 
@@ -146,7 +146,7 @@
     justify-content: space-between;
     padding-bottom: 12px;
     margin-bottom: 16px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid #cbd5e1;
 }
 
 .content-card-title {
@@ -154,4 +154,26 @@
     font-weight: 600;
     color: #0f172a;
     margin: 0;
+}
+
+/* 8. Global Card Reset: Solid Border, No Shadow, Proper Radius Clipping */
+.card {
+    background-color: #ffffff;
+    background-clip: padding-box !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    border-radius: 6px !important;
+    overflow: hidden;
+}
+
+.card-header:first-child {
+    border-top-left-radius: 5px !important;
+    border-top-right-radius: 5px !important;
+    border-bottom: 1px solid #cbd5e1;
+}
+
+.card-footer:last-child {
+    border-bottom-left-radius: 5px !important;
+    border-bottom-right-radius: 5px !important;
+    border-top: 1px solid #cbd5e1;
 }

@@ -12,7 +12,7 @@ ob_start();
         <input type="text" 
                id="deptSearch" 
                class="form-control ps-5" 
-               placeholder="Search by code or department name..." 
+               placeholder="Search by abbrev or department name..." 
                autocomplete="off">
     </div>
     <div class="text-muted small fw-medium" id="deptCounter">
@@ -20,12 +20,12 @@ ob_start();
     </div>
 </div>
 
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
+<div class="card mb-4">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="departmentsTable">
             <thead class="bg-white border-bottom">
                 <tr>
-                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 160px; font-size: 11px;">Department code</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 160px; font-size: 11px;">Department abbrev</th>
                     <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Department Name</th>
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 150px; font-size: 11px;">Assigned faculty</th>
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Status</th>
@@ -114,9 +114,9 @@ ob_start();
                                     </div>
                                     <div class="modal-body">
                                         <div class="mb-3">
-                                            <label for="code_<?= $dept['id'] ?>" class="form-label">Department code <span class="text-danger">*</span></label>
+                                            <label for="code_<?= $dept['id'] ?>" class="form-label">Department abbrev <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control font-monospace" id="code_<?= $dept['id'] ?>" name="code" value="<?= htmlspecialchars($dept['code']) ?>" required style="text-transform: uppercase;">
-                                            <div class="form-text">e.g., CIT, CBA, CAS</div>
+                                            <div class="form-text">e.g., CITE</div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="name_<?= $dept['id'] ?>" class="form-label">Department name <span class="text-danger">*</span></label>
@@ -173,9 +173,9 @@ ob_start();
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="add_code" class="form-label">Department code <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control font-monospace" id="add_code" name="code" placeholder="e.g., CIT" required style="text-transform: uppercase;">
-                        <div class="form-text">Unique uppercase department code.</div>
+                        <label for="add_code" class="form-label">Department abbrev <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control font-monospace" id="add_code" name="code" placeholder="e.g., CITE" required style="text-transform: uppercase;">
+                        <div class="form-text">Unique uppercase department abbrev (e.g., CITE).</div>
                     </div>
                     <div class="mb-3">
                         <label for="add_name" class="form-label">Department name <span class="text-danger">*</span></label>
