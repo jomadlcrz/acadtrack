@@ -41,7 +41,9 @@ class StudentController
         $students = $paginated['data'];
         $availableStudents = $this->studentRepository->getAllAvailable();
         $currentSubject = \App\Models\Subject::find($subjectId);
-        $sets = \App\Models\Set::getActiveByTerm($termId);
+        $sets = $subjectId > 0
+            ? \App\Models\Set::getAssignedBySubject($subjectId, $termId)
+            : \App\Models\Set::getActiveByTerm($termId);
 
         $html = (new View())->render('faculty.students.index', [
             'students' => $students,

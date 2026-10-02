@@ -51,7 +51,7 @@ ob_start();
 </div>
 
 <!-- Sets Table Card -->
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
+<div class="card mb-4" style="border: 1px solid #cbd5e1 !important; border-radius: 6px; box-shadow: none !important;">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0" id="setsTable">
             <thead class="bg-white border-bottom">
@@ -61,13 +61,15 @@ ob_start();
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 130px; font-size: 11px;">Year Level</th>
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">Students</th>
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Status</th>
-                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 140px; font-size: 11px;">Actions</th>
+                    <?php if (!$isReadOnly): ?>
+                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 140px; font-size: 11px;">Actions</th>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody class="divide-y">
                 <?php if (empty($sets) || $sets->isEmpty()): ?>
                     <tr id="emptySetsRow">
-                        <td colspan="6" class="p-0">
+                        <td colspan="<?= $isReadOnly ? '5' : '6' ?>" class="p-0">
                             <?php
                             $icon = 'bi-collection';
                             $title = 'No sections found';
@@ -137,8 +139,8 @@ ob_start();
                                     <span class="badge bg-secondary-subtle text-secondary border">Inactive</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="py-3 px-4 text-end">
-                                <?php if (!$isReadOnly): ?>
+                            <?php if (!$isReadOnly): ?>
+                                <td class="py-3 px-4 text-end">
                                     <div class="dropdown d-inline-block">
                                         <button class="btn btn-sm btn-action-trigger" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="Actions">
                                             <i class="bi bi-three-dots-vertical"></i>
@@ -171,10 +173,8 @@ ob_start();
                                             <?php endif; ?>
                                         </ul>
                                     </div>
-                                <?php else: ?>
-                                    <span class="text-muted small">—</span>
-                                <?php endif; ?>
-                            </td>
+                                </td>
+                            <?php endif; ?>
                         </tr>
 
                         <?php if (!$isReadOnly): ?>

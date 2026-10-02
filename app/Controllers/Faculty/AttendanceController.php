@@ -89,7 +89,9 @@ class AttendanceController
             $historyLogs = AttendanceRecord::getSubjectAttendanceLogs($subjectId, $termId, 10);
         }
 
-        $sets = Set::getActiveByTerm($termId);
+        $sets = $subjectId > 0
+            ? Set::getAssignedBySubject($subjectId, $termId)
+            : Set::getActiveByTerm($termId);
 
         // Pre-calculate attendance stats for today
         $presentCount = 0;

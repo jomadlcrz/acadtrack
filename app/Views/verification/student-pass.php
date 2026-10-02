@@ -3,164 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Academic Credential Verification — College of Information Technology, Golden West Colleges, Inc.">
     <title>Academic Credential Verification &mdash; College of Information Technology</title>
-    <link rel="icon" type="image/x-icon" href="<?= url('favicon.ico') ?>">
+    <link rel="icon" type="image/x-icon" href="<?= url('/favicon.ico') ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= asset('images/favicon-32x32.png') ?>">
     <link rel="icon" type="image/png" sizes="16x16" href="<?= asset('images/favicon-16x16.png') ?>">
     <link rel="apple-touch-icon" sizes="180x180" href="<?= asset('images/apple-touch-icon.png') ?>">
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap/css/bootstrap.min.css') ?>">
-    <link rel="stylesheet" href="<?= asset('vendor/bootstrap-icons/bootstrap-icons.min.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/components/attendance-pass.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/layouts/home.css') ?>">
     <style>
-        body {
+        .verification-wrapper {
+            max-width: 740px;
+            margin: 40px auto 60px auto;
+            padding: 0 16px;
+        }
+        .verification-document {
+            background-color: #ffffff;
+            border: 1px solid var(--gwc-border);
+            border-radius: 6px;
+            box-shadow: none;
+            padding: 40px 40px;
+        }
+        @media (max-width: 576px) {
+            .verification-wrapper {
+                margin: 20px auto 40px auto;
+            }
+            .verification-document {
+                padding: 24px 20px;
+            }
+        }
+        .verification-header {
+            border-bottom: 2px solid var(--gwc-navy);
+            padding-bottom: 20px;
+            margin-bottom: 28px;
+        }
+        .verification-meta-badge {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--gwc-navy);
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+        .verification-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--gwc-navy-dark);
+            line-height: 1.25;
+            margin-bottom: 6px;
+            letter-spacing: -0.015em;
+        }
+        .verification-subtitle {
+            font-size: 14px;
+            color: var(--gwc-text-secondary);
+            margin-bottom: 0;
+        }
+        .verification-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid var(--gwc-border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            background-color: #ffffff;
+        }
+        .verification-table tr:not(:last-child) th,
+        .verification-table tr:not(:last-child) td {
+            border-bottom: 1px solid var(--gwc-border-light);
+        }
+        .verification-table th {
+            width: 32%;
             background-color: #f8fafc;
-            color: #0f172a;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            min-height: 100vh;
+            color: var(--gwc-text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 12px 16px;
+            vertical-align: middle;
+        }
+        .verification-table td {
+            color: var(--gwc-text-primary);
+            font-size: 13px;
+            padding: 12px 16px;
+            vertical-align: middle;
+        }
+        .verification-note {
+            font-size: 13px;
+            color: var(--gwc-text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+            padding: 14px 18px;
+            background-color: #f8fafc;
+            border: 1px solid var(--gwc-border);
+            border-radius: 6px;
+        }
+        .verification-action-bar {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 32px 16px;
-            margin: 0;
+            justify-content: space-between;
+            flex-wrap: gap-2;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gwc-border);
         }
-        .verification-wrapper {
-            max-width: 640px;
-            width: 100%;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(14, 36, 77, 0.1), 0 8px 10px -6px rgba(14, 36, 77, 0.05);
-            border: 1px solid #cbd5e1;
-            overflow: hidden;
-        }
-        .verification-banner {
-            background: linear-gradient(135deg, #08162e 0%, #0e244d 70%, #1a3a6c 100%);
-            color: #ffffff;
-            padding: 24px 28px;
-            position: relative;
-        }
-        .verification-banner::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #c9a84c 0%, #ecd078 50%, #c9a84c 100%);
-        }
-        .verified-seal-circle {
-            width: 68px;
-            height: 68px;
-            border-radius: 50%;
+        .btn-portal-back {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gwc-text-secondary);
+            background-color: #ffffff;
+            border: 1px solid var(--gwc-border);
+            border-radius: 6px;
+            padding: 6px 14px;
+            text-decoration: none;
+            transition: all 0.15s ease-in-out;
+        }
+        .btn-portal-back:hover {
+            color: var(--gwc-navy-dark);
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+            text-decoration: none;
         }
     </style>
 </head>
-<body>
+<body class="landing-body">
 
-<div class="verification-wrapper">
-    <!-- Institutional Header Lockup -->
-    <div class="verification-banner">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div class="d-flex align-items-center gap-3">
-                <img src="<?= asset('images/cite.png') ?>" alt="College of Information Technology Logo" style="width: 48px; height: 48px; object-fit: contain;">
-                <div>
-                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #cbd5e1;">College of Information Technology &mdash; GWC</div>
-                    <div style="font-size: 19px; font-weight: 700; color: #ffffff; letter-spacing: -0.01em;">Academic Credential Verification</div>
+    <!-- Institutional Navigation Header (matches Home Page & Legal) -->
+    <header class="landing-nav">
+        <div class="container">
+            <a href="<?= url('/') ?>" class="landing-brand">
+                <img src="<?= asset('images/cite.png') ?>" alt="College of Information Technology Logo" class="landing-logo">
+                <div class="landing-brand-text">
+                    <span class="landing-college-name">College of Information Technology</span>
+                    <span class="landing-system-tag">Acadtrack &bull; GWC</span>
                 </div>
-            </div>
-            <span class="badge py-1.5 px-3 rounded-pill bg-light text-dark fw-bold small">
-                OFFICIAL RECORD
-            </span>
-        </div>
-    </div>
-
-    <div class="p-4 p-md-5 text-center">
-        <?php if ($isValid && !empty($passData)): ?>
-            <div class="verified-seal-circle bg-success-subtle text-success border border-success-subtle shadow-sm mx-auto">
-                <i class="bi bi-patch-check-fill"></i>
-            </div>
-            <h2 class="h4 fw-bold text-dark mb-1">Authentic Academic Pass</h2>
-            <p class="text-muted small mb-4">
-                This academic pass has been cryptographically validated against College of Information Technology records.
-            </p>
-
-            <div class="card bg-white border p-3.5 text-start mb-4" style="border-radius: 8px; border-color: #e2e8f0 !important;">
-                <div class="row g-2 mb-2 pb-2 border-bottom">
-                    <div class="col-sm-4 text-muted small fw-semibold text-uppercase" style="font-size: 11px;">Student Name</div>
-                    <div class="col-sm-8 fw-bold text-dark"><?= htmlspecialchars($passData['name']) ?></div>
-                </div>
-                <div class="row g-2 mb-2 pb-2 border-bottom">
-                    <div class="col-sm-4 text-muted small fw-semibold text-uppercase" style="font-size: 11px;">Student ID</div>
-                    <div class="col-sm-8 font-monospace fw-semibold text-primary"><?= htmlspecialchars($passData['student_number']) ?></div>
-                </div>
-                <div class="row g-2 mb-2 pb-2 border-bottom">
-                    <div class="col-sm-4 text-muted small fw-semibold text-uppercase" style="font-size: 11px;">Course Subject</div>
-                    <div class="col-sm-8 fw-semibold text-dark"><?= htmlspecialchars($passData['subject_code'] . ' &mdash; ' . $passData['subject_title']) ?></div>
-                </div>
-                <div class="row g-2 mb-2 pb-2 border-bottom">
-                    <div class="col-sm-4 text-muted small fw-semibold text-uppercase" style="font-size: 11px;">Section / Standing</div>
-                    <div class="col-sm-8 text-dark">
-                        <?= htmlspecialchars($passData['set_name']) ?> &bull; <?= htmlspecialchars($passData['year_level']) ?> 
-                        <span class="badge bg-light text-secondary border ms-1 font-monospace"><?= htmlspecialchars($passData['status']) ?></span>
-                    </div>
-                </div>
-                <div class="row g-2 mb-2 pb-2 border-bottom">
-                    <div class="col-sm-4 text-muted small fw-semibold text-uppercase" style="font-size: 11px;">Final Grade &amp; Result</div>
-                    <div class="col-sm-8 d-flex align-items-center gap-2">
-                        <?php if ($passData['final_grade'] !== null): ?>
-                            <span class="fs-5 fw-bold font-monospace text-primary tabular-nums mb-0"><?= number_format($passData['final_grade'], 2) ?>%</span>
-                            <span class="badge <?= $passData['final_grade'] >= 75.0 ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle' ?> px-2.5 py-1 fw-bold">
-                                <?= htmlspecialchars($passData['status_remark']) ?>
-                            </span>
-                        <?php else: ?>
-                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1">INCOMPLETE</span>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <div class="row g-2">
-                    <div class="col-sm-4 text-muted small fw-semibold text-uppercase" style="font-size: 11px;">Attendance Summary</div>
-                    <div class="col-sm-8 text-secondary small">
-                        <?= (int)($passData['attendance']['present_count'] ?? 0) ?> sessions present &bull; 
-                        <?= (int)($passData['attendance']['total_absences'] ?? 0) ?> recorded absences
-                        <?php if (!empty($passData['attendance']['has_warning'])): ?>
-                            <span class="badge bg-danger text-white ms-1 py-0.5 px-2">5+ Absences Warning</span>
-                        <?php else: ?>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle ms-1 py-0.5 px-2">Cleared</span>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-muted d-flex align-items-center justify-content-center gap-1.5" style="font-size: 11px;">
-                <i class="bi bi-clock-history"></i>
-                <span>Cryptographically verified on <?= date('F j, Y \a\t g:i A') ?></span>
-            </div>
-
-        <?php else: ?>
-            <div class="verified-seal-circle bg-danger-subtle text-danger border border-danger-subtle shadow-sm mx-auto">
-                <i class="bi bi-shield-x"></i>
-            </div>
-            <h2 class="h4 fw-bold text-dark mb-1">Credential Not Found</h2>
-            <p class="text-muted small mb-4">
-                The requested digital student pass could not be verified or the verification token is invalid.
-            </p>
-            <div class="alert alert-warning text-start small mb-4" role="alert">
-                <i class="bi bi-exclamation-circle-fill me-1"></i>
-                Please contact the Office of the Registrar or your course instructor to verify enrollment.
-            </div>
-        <?php endif; ?>
-
-        <div class="mt-4 pt-3 border-top">
-            <a href="<?= url('/') ?>" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5">
-                <i class="bi bi-arrow-left"></i> Return to AcadTrack Portal
             </a>
         </div>
-    </div>
-</div>
+    </header>
 
+    <!-- Main Verification Document -->
+    <main class="verification-wrapper">
+        <article class="verification-document">
+            <!-- Document Header -->
+            <div class="verification-header">
+                <span class="verification-meta-badge">Academic Verification</span>
+                <h1 class="verification-title">Student Pass Verification</h1>
+                <p class="verification-subtitle">Digital scholastic pass and enrollment status verification record</p>
+            </div>
+
+            <?php if ($isValid && !empty($passData)): ?>
+                <!-- Valid Pass Record Table -->
+                <div class="table-responsive mb-4">
+                    <table class="verification-table">
+                        <tbody>
+                            <tr>
+                                <th>Student Name</th>
+                                <td class="fw-semibold text-dark"><?= htmlspecialchars($passData['name']) ?></td>
+                            </tr>
+                            <tr>
+                                <th>Student ID</th>
+                                <td class="font-monospace fw-semibold text-dark"><?= htmlspecialchars($passData['student_number']) ?></td>
+                            </tr>
+                            <tr>
+                                <th>Course Subject</th>
+                                <td class="text-dark"><?= htmlspecialchars($passData['subject_code']) ?> &mdash; <?= htmlspecialchars($passData['subject_title']) ?></td>
+                            </tr>
+                            <tr>
+                                <th>Section &bull; Year Level</th>
+                                <td class="text-dark">
+                                    <?= htmlspecialchars($passData['set_name']) ?> &bull; <?= htmlspecialchars($passData['year_level']) ?> (<?= htmlspecialchars($passData['status']) ?>)
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Final Grade &amp; Result</th>
+                                <td class="text-dark">
+                                    <?php if ($passData['final_grade'] !== null): ?>
+                                        <span class="font-monospace fw-semibold tabular-nums"><?= number_format($passData['final_grade'], 2) ?>%</span>
+                                        &bull; <span><?= htmlspecialchars($passData['status_remark']) ?></span>
+                                    <?php else: ?>
+                                        <span class="text-muted">Incomplete</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Attendance Summary</th>
+                                <td class="text-dark">
+                                    <?= (int)($passData['attendance']['present_count'] ?? 0) ?> sessions present &bull; 
+                                    <?= (int)($passData['attendance']['total_absences'] ?? 0) ?> recorded absences
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="verification-note">
+                    This digital pass has been authenticated against the active scholastic records of the College of Information Technology (CITE), Golden West Colleges, Inc.
+                </div>
+
+            <?php else: ?>
+                <!-- Unverified / Not Enrolled Table -->
+                <div class="table-responsive mb-4">
+                    <table class="verification-table">
+                        <tbody>
+                            <tr>
+                                <th>Student Identifier</th>
+                                <td class="font-monospace fw-semibold text-dark"><?= htmlspecialchars($idParam ?: 'Not Specified') ?></td>
+                            </tr>
+                            <?php if (!empty($studentName)): ?>
+                            <tr>
+                                <th>Student Name</th>
+                                <td class="text-dark"><?= htmlspecialchars($studentName) ?></td>
+                            </tr>
+                            <?php endif; ?>
+                            <tr>
+                                <th>Course Subject</th>
+                                <td class="text-dark">
+                                    <?php if ($subject): ?>
+                                        <?= htmlspecialchars($subject->subject_code ?: $subject->code) ?> &mdash; <?= htmlspecialchars($subject->descriptive_title ?: $subject->name) ?>
+                                    <?php else: ?>
+                                        Course Offering #<?= (int) ($subjectId ?? 0) ?>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Academic Term</th>
+                                <td class="text-dark">
+                                    <?= htmlspecialchars(!empty($termName) ? $termName : ($academicTerm->name ?? ('Academic Term #' . (int) ($termId ?? 0)))) ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Verification Status</th>
+                                <td class="text-danger fw-semibold">
+                                    Unverified &mdash; Not Enrolled
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Audit Finding</th>
+                                <td class="text-secondary" style="font-size: 13px; line-height: 1.5;">
+                                    No active enrollment or official scholastic pass is on file for this student in the specified course offering and academic term.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="verification-note">
+                    Official digital passes are issued and validated exclusively for students with authenticated course enrollments and recorded evaluations. If this requires administrative review, please coordinate with the College of Information Technology (CITE) Dean's Office or the College Registrar.
+                </div>
+            <?php endif; ?>
+
+            <!-- Document Actions -->
+            <div class="verification-action-bar">
+                <a href="<?= url('/') ?>" class="btn-portal-back">
+                    Return to AcadTrack Portal
+                </a>
+                <span class="text-muted small">
+                    AcadTrack Verification System &bull; CITE
+                </span>
+            </div>
+        </article>
+    </main>
+
+    <!-- Institutional Footer (matches Home Page & Legal) -->
+    <footer class="landing-footer">
+        <div class="container">
+            <div class="footer-brand">
+                <img src="<?= asset('images/cite.png') ?>" alt="CITE Logo" class="footer-logo">
+                <h3 class="footer-title">College of Information Technology</h3>
+            </div>
+            <p class="footer-desc">
+                Acadtrack &mdash; Providing dependable, transparent, and accurate grade computation and curriculum tracking for the College of Information Technology.
+            </p>
+
+            <div class="footer-bottom">
+                <div>
+                    <div class="mb-1">
+                        <a href="<?= url('/privacy') ?>" class="text-white text-decoration-none me-3 opacity-75 hover-opacity-100">Privacy Notice</a>
+                        <span class="text-white-50">&bull;</span>
+                        <a href="<?= url('/terms') ?>" class="text-white text-decoration-none ms-3 opacity-75 hover-opacity-100">Terms of Academic Service</a>
+                    </div>
+                    <div>
+                        &copy; <?= date('Y') ?> College of Information Technology &mdash; Golden West Colleges, Inc. All rights reserved.
+                    </div>
+                </div>
+                <div>
+                    San Jose Drive, Alaminos, Pangasinan
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="<?= asset('vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
 </body>
 </html>

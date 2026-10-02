@@ -4,7 +4,6 @@
         <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
             <div class="modal-header bg-dark text-white py-3 px-4 border-0 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0f172a, #1e293b) !important;">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary px-2 py-1 text-uppercase" style="letter-spacing: 0.5px; font-size: 10px;">AcadTrack Verified</span>
                     <h5 class="modal-title h6 fw-bold mb-0 text-white" id="passCardModalLabel">
                         Official Student Grade Slip
                     </h5>
@@ -13,18 +12,15 @@
             </div>
 
             <div class="modal-body p-0" id="printablePassCardArea">
-                <div class="pass-card-sheet p-4" style="background: #ffffff; font-family: 'Inter', system-ui, -apple-system, sans-serif;">
+                <div class="pass-card-sheet p-4 p-md-5" style="background: #ffffff; font-family: 'Inter', system-ui, -apple-system, sans-serif;">
                     <!-- Institution Brand Header -->
-                    <div class="d-flex justify-content-between align-items-start pb-3 mb-3 border-bottom flex-wrap gap-2">
+                    <div class="d-flex justify-content-between align-items-start pb-3 mb-4 border-bottom flex-wrap gap-2">
                         <div>
                             <h4 class="h6 mb-0 fw-bold text-dark text-uppercase" style="letter-spacing: 0.5px;">Grade Evaluation &amp; Review System</h4>
                             <small class="text-muted d-block" style="font-size: 11px;">AcadTrack Official Academic Scholastic Record</small>
                         </div>
                         <div class="text-end">
-                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 fw-semibold" style="font-size: 11px;">
-                                <i class="bi bi-patch-check-fill me-1"></i> Authenticated Slip
-                            </span>
-                            <small class="d-block text-muted mt-1 font-monospace" id="passCardTermLabel" style="font-size: 11px;">
+                            <small class="d-block text-muted font-monospace" id="passCardTermLabel" style="font-size: 11px;">
                                 2026-2027 &bull; 1st Semester
                             </small>
                         </div>

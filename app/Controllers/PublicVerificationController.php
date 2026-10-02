@@ -40,17 +40,48 @@ class PublicVerificationController
         $isValid = false;
 
         if ($student && $subjectId > 0 && $termId > 0) {
-            $evalService = new EvaluationService();
-            $passData = $evalService->getDigitalPass((int) $student->id, $subjectId, $termId);
-            if ($passData) {
-                $isValid = true;
+            $isEnrolled = \Illuminate\Database\Capsule\Manager::table('enrollments')
+                ->where('student_id', $student->id)
+                ->where('subject_id', $subjectId)
+                ->where('academic_term_id', $termId)
+                ->exists();
+
+            if ($isEnrolled) {
+                $evalService = new EvaluationService();
+                $passData = $evalService->getDigitalPass((int) $student->id, $subjectId, $termId);
+                if ($passData) {
+                    $isValid = true;
+                }
             }
+        }
+
+        $subject = $subjectId > 0 ? Subject::find($subjectId) : null;
+        $academicTerm = $termId > 0 ? AcademicTerm::find($termId) : null;
+        $termName = '';
+        if ($academicTerm) {
+            $semText = $academicTerm->semester == 1 ? '1st Semester' : ($academicTerm->semester == 2 ? '2nd Semester' : 'Summer');
+            $termName = $semText . ' ' . ($academicTerm->school_year ?? '');
+        } elseif ($termId > 0) {
+            $termName = 'Academic Term #' . $termId;
+        }
+
+        $studentUser = $student ? $student->user : null;
+        $studentName = $studentUser ? trim(($studentUser->first_name ?? '') . ' ' . ($studentUser->last_name ?? '')) : '';
+        if ($studentName === '' && $studentUser) {
+            $studentName = (string) ($studentUser->name ?? '');
         }
 
         $html = (new View())->render('verification.student-pass', [
             'isValid' => $isValid,
             'passData' => $passData,
             'idParam' => $idParam,
+            'student' => $student,
+            'studentName' => $studentName,
+            'subject' => $subject,
+            'subjectId' => $subjectId,
+            'academicTerm' => $academicTerm,
+            'termName' => $termName,
+            'termId' => $termId,
         ]);
 
         $response->html($html);

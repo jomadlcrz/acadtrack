@@ -126,4 +126,43 @@ class Set extends Model
             ->get()
             ->toArray();
     }
+
+    public static function getAssignedBySubject(int $subjectId, int $academicTermId): array
+    {
+        $subject = Subject::find($subjectId);
+        if (!$subject) {
+            return self::getActiveByTerm($academicTermId);
+        }
+
+        $query = self::where('academic_term_id', $academicTermId)->where('status', 'active');
+
+        // Match sets by program and year level of the assigned subject
+        $subQuery = self::where('academic_term_id', $academicTermId)->where('status', 'active');
+        if (!empty($subject->program_id) && !empty($subject->year_level)) {
+            $subQuery->where('program_id', $subject->program_id)
+                     ->where('year_level', $subject->year_level);
+        } elseif (!empty($subject->year_level)) {
+            $subQuery->where('year_level', $subject->year_level);
+        }
+        $matchingIds = $subQuery->pluck('id')->toArray();
+
+        // Also include sets of any students actively enrolled in this subject offering
+        $enrolledSetIds = \Illuminate\Database\Capsule\Manager::table('enrollments')
+            ->join('students', 'enrollments.student_id', '=', 'students.id')
+            ->where('enrollments.subject_id', $subjectId)
+            ->where('enrollments.academic_term_id', $academicTermId)
+            ->whereNotNull('students.set_id')
+            ->pluck('students.set_id')
+            ->toArray();
+
+        $relevantIds = array_values(array_unique(array_merge($matchingIds, $enrolledSetIds)));
+        if (!empty($relevantIds)) {
+            $query->whereIn('id', $relevantIds);
+        }
+
+        return $query->orderBy('year_level', 'asc')
+            ->orderBy('set_name', 'asc')
+            ->get()
+            ->toArray();
+    }
 }

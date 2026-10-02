@@ -123,34 +123,28 @@
 /* --- Digital Student Pass Institutional Certificate --- */
 .pass-certificate-wrapper {
     background: #ffffff;
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
     position: relative;
     border: 1px solid #cbd5e1;
-    box-shadow: 0 10px 25px -5px rgba(14, 36, 77, 0.1), 0 8px 10px -6px rgba(14, 36, 77, 0.06);
+    box-shadow: none !important;
 }
 
 .pass-certificate-header {
     background: linear-gradient(135deg, var(--gwc-navy-dark) 0%, var(--gwc-navy) 65%, #1e3a6a 100%);
-    padding: 24px 28px;
+    padding: 32px 36px;
     position: relative;
     color: #ffffff;
 }
 
 .pass-security-ribbon {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--gwc-gold) 0%, #ecd078 50%, var(--gwc-gold) 100%);
+    display: none;
 }
 
 .pass-emblem {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     object-fit: contain;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
 }
 
 .pass-institution-title {
@@ -159,47 +153,40 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: #cbd5e1;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
 }
 
 .pass-doc-title {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
     color: #ffffff;
     letter-spacing: -0.01em;
+    line-height: 1.25;
 }
 
 .pass-seal-badge {
-    background: rgba(201, 168, 76, 0.15);
-    border: 1px solid var(--gwc-gold);
-    color: #fef08a;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    padding: 6px 14px;
-    border-radius: 20px;
-    text-transform: uppercase;
+    display: none !important;
 }
 
 /* Transcript Slip Tiles */
 .transcript-tile {
-    background: #ffffff;
+    background: #f8fafc;
     border: 1px solid var(--gwc-border-subtle);
     border-radius: 8px;
-    padding: 10px 12px;
+    padding: 16px 12px;
     text-align: center;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    box-shadow: none !important;
 }
 .transcript-tile .tile-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     color: #64748b;
     letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 .transcript-tile .tile-value {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-variant-numeric: tabular-nums;
