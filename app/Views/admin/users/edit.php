@@ -1,33 +1,22 @@
 <?php
-$pageTitle = $user['role'] === 'Student' ? 'Student Registration Record &mdash; Modification' : 'Official Personnel Profile &mdash; Modification';
-$subtitle = 'Official institutional admission record amendment for ' . htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) . '.';
+$pageTitle = $user['role'] === 'Student' ? 'Edit Student Profile' : 'Edit ' . htmlspecialchars($user['role']) . ' Profile';
+$subtitle = 'Update profile information and academic classification for ' . htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) . '.';
 $headerActions = '<div class="d-flex align-items-center gap-2">
-    <a href="' . url('/admin/users') . '" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5"><i class="bi bi-arrow-left"></i> Return to Users Directory</a>
+    <a href="' . url('/admin/users') . '" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5"><i class="bi bi-arrow-left"></i> Back to Users</a>
 </div>';
 ob_start();
 ?>
 
 <!-- Document Form Container -->
-<div class="card shadow-sm border-0 mb-5 mx-auto" style="border: 1px solid #cbd5e1 !important; border-top: 4px solid #1e3a8a !important; border-radius: 8px; max-width: 860px; background: #ffffff;">
+<div class="card shadow-sm border-0 mb-5 mx-auto" style="border: 1px solid #e2e8f0 !important; border-radius: 12px; max-width: 820px; background: #ffffff;">
     
-    <!-- Formal School Form Header -->
-    <div class="text-center py-4 px-4 border-bottom bg-white">
-        <div class="text-uppercase fw-bold mb-0" style="color: #1e3a8a; font-size: 13.5px; letter-spacing: 0.08em;">
-            Golden West Colleges, Inc.
+    <div class="card-header bg-white px-4 py-3 border-bottom d-flex align-items-center justify-content-between" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge badge-<?= strtolower($user['role']) ?> px-2.5 py-1 text-xs fw-semibold"><?= htmlspecialchars($user['role']) ?></span>
+            <span class="text-secondary small">&bull;</span>
+            <span class="text-muted small">Account ID: <strong class="text-dark">#<?= (int)$user['id'] ?></strong></span>
         </div>
-        <div class="text-secondary small fw-medium text-uppercase mb-1" style="font-size: 11px; letter-spacing: 0.06em;">
-            Office of the College Registrar &bull; Admissions and Student Records Division
-        </div>
-        <h1 class="h5 fw-bold text-dark text-uppercase mb-1" style="letter-spacing: 0.03em;">
-            <?= $user['role'] === 'Student' ? 'Official Student Record Amendment' : 'Institutional Personnel Record Amendment' ?>
-        </h1>
-        <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 gap-md-3 text-muted mt-2" style="font-size: 11.5px;">
-            <span><strong class="text-secondary">Document Ref:</strong> GWC-REG-AMD-01</span>
-            <span class="d-none d-sm-inline">&bull;</span>
-            <span><strong class="text-secondary">Account ID:</strong> <?= (int)$user['id'] ?></span>
-            <span class="d-none d-sm-inline">&bull;</span>
-            <span><strong class="text-secondary">Official Role:</strong> <span class="badge badge-<?= strtolower($user['role']) ?> px-2 py-0.5 text-xs"><?= htmlspecialchars($user['role']) ?></span></span>
-        </div>
+        <span class="text-muted small"><span class="text-danger">*</span> Required fields</span>
     </div>
 
     <form method="POST" action="<?= url('/admin/users/' . $user['id']) ?>" id="formalUserEditForm" autocomplete="off">
@@ -35,30 +24,33 @@ ob_start();
 
         <div class="card-body p-4 p-md-5">
 
-            <!-- ================= PERSONAL & IDENTITY ================= -->
-            <div class="formal-section mb-4 pb-3">
-                <div class="mb-3 pb-2 border-bottom">
-                    <div class="fw-bold text-uppercase" style="font-size: 11.5px; letter-spacing: 0.06em; color: #1e3a8a;">
-                        <?= $user['role'] === 'Student' ? 'Student Personal Identification' : 'Personal Identification &amp; Credentials' ?>
+            <!-- Personal Information -->
+            <div class="mb-4 pb-2">
+                <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                    <div class="d-flex align-items-center justify-content-center rounded-2 text-primary" style="width: 28px; height: 28px; background-color: #eff6ff;">
+                        <i class="bi bi-person text-primary" style="font-size: 15px;"></i>
                     </div>
-                    <div class="text-muted" style="font-size: 12px;">Official demographic information and institutional login identity.</div>
+                    <div>
+                        <h6 class="fw-semibold text-dark mb-0" style="font-size: 14px;">Personal Information</h6>
+                        <div class="text-muted" style="font-size: 12px;">Student identity and authorized account details.</div>
+                    </div>
                 </div>
 
                 <?php if ($user['role'] === 'Student'): ?>
                     <!-- Student Identification Number -->
                     <div class="mb-3">
-                        <label for="student_number" class="form-label fw-semibold" style="font-size: 13px;">
-                            Student ID Number <span class="text-muted fw-normal small">(Optional / Pending Official Issuance)</span>
+                        <label for="student_number" class="form-label fw-semibold text-dark" style="font-size: 13px;">
+                            Student ID <span class="text-muted fw-normal small">(Optional)</span>
                         </label>
                         <input type="text" 
                                class="form-control" 
                                id="student_number" 
                                name="student_number" 
-                               placeholder="e.g., 2026-0001" 
+                               placeholder="e.g. 2026-0001" 
                                value="<?= htmlspecialchars($user['student_number'] ?? '') ?>"
                                maxlength="50">
                         <div class="form-text text-muted" style="font-size: 12px;">
-                            Official registrar-assigned identification code. Leave blank if student ID issuance is currently pending at Admissions.
+                            Leave blank if the student number has not yet been issued by Admissions.
                         </div>
                     </div>
                 <?php endif; ?>
@@ -66,7 +58,7 @@ ob_start();
                 <!-- Full Legal Name -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label for="first_name" class="form-label fw-semibold" style="font-size: 13px;">
+                        <label for="first_name" class="form-label fw-semibold text-dark" style="font-size: 13px;">
                             First Name <span class="text-danger">*</span>
                         </label>
                         <input type="text" 
@@ -78,7 +70,7 @@ ob_start();
                                autocomplete="given-name">
                     </div>
                     <div class="col-md-6">
-                        <label for="last_name" class="form-label fw-semibold" style="font-size: 13px;">
+                        <label for="last_name" class="form-label fw-semibold text-dark" style="font-size: 13px;">
                             Last Name <span class="text-danger">*</span>
                         </label>
                         <input type="text" 
@@ -91,26 +83,29 @@ ob_start();
                     </div>
                 </div>
 
-                <!-- Institutional Email Address (Readonly) -->
+                <!-- Email Address (Readonly) -->
                 <div class="mb-1">
-                    <label for="email_display" class="form-label fw-semibold" style="font-size: 13px;">
+                    <label for="email_display" class="form-label fw-semibold text-dark" style="font-size: 13px;">
                         Email Address
                     </label>
                     <input type="email" class="form-control bg-light" id="email_display" value="<?= htmlspecialchars($user['email']) ?>" readonly disabled>
                     <div class="form-text text-muted" style="font-size: 12px;">
-                        Permanent institutional account identifier (cannot be altered after authentication issuance).
+                        Permanent login identifier (cannot be modified after creation).
                     </div>
                 </div>
             </div>
 
             <?php if ($user['role'] === 'Student'): ?>
-                <!-- ================= ACADEMIC ADMISSION & PLACEMENT ================= -->
-                <div class="formal-section mb-4 pb-2">
-                    <div class="mb-3 pb-2 border-bottom">
-                        <div class="fw-bold text-uppercase" style="font-size: 11.5px; letter-spacing: 0.06em; color: #1e3a8a;">
-                            Academic Admission &amp; Enrollment Classification
+                <!-- Academic Classification -->
+                <div class="mt-4 mb-3 pt-3 border-top">
+                    <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                        <div class="d-flex align-items-center justify-content-center rounded-2 text-primary" style="width: 28px; height: 28px; background-color: #eff6ff;">
+                            <i class="bi bi-mortarboard text-primary" style="font-size: 15px;"></i>
                         </div>
-                        <div class="text-muted" style="font-size: 12px;">Official curriculum status, educational level, and designated class section block.</div>
+                        <div>
+                            <h6 class="fw-semibold text-dark mb-0" style="font-size: 14px;">Academic Classification</h6>
+                            <div class="text-muted" style="font-size: 12px;">Enrollment standing, curriculum year level, and cohort section placement.</div>
+                        </div>
                     </div>
 
                     <?php 
@@ -119,45 +114,63 @@ ob_start();
                     $selectedSetId = (string)($_POST['set_id'] ?? $user['student']['set_id'] ?? $user['student_detail']['set_id'] ?? '');
                     ?>
 
-                    <!-- Enrollment Classification Selector -->
-                    <div class="mb-3">
-                        <label class="form-label d-block fw-semibold" style="font-size: 13px;">
-                            Enrollment Classification <span class="text-danger">*</span>
+                    <!-- Enrollment Status Selector -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-dark mb-2" style="font-size: 13px;">
+                            Enrollment Status <span class="text-danger">*</span>
                         </label>
                         <input type="hidden" name="student_status" id="student_status" value="<?= htmlspecialchars($currentStatus) ?>">
                         
-                        <div class="row g-2" role="tablist" id="enrollmentStatusTabs">
+                        <div class="row g-3" role="tablist" id="enrollmentStatusTabs">
                             <!-- Regular Student Option -->
                             <div class="col-sm-6">
                                 <button type="button" 
-                                        class="btn w-100 p-3 text-start border formal-status-card <?= $currentStatus === 'Regular' ? 'active-formal-card' : 'bg-white' ?>" 
+                                        class="btn w-100 p-3 text-start border formal-status-card <?= $currentStatus === 'Regular' ? 'active-formal-card' : '' ?>" 
                                         id="status-regular-tab" 
                                         data-status="Regular"
                                         role="tab"
                                         aria-selected="<?= $currentStatus === 'Regular' ? 'true' : 'false' ?>">
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
-                                        <span class="fw-bold text-dark" style="font-size: 13.5px;">Regular Student</span>
-                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0.5" style="font-size: 11px;">Standard Load</span>
-                                    </div>
-                                    <div class="text-muted small" style="font-size: 12px; line-height: 1.45;">
-                                        Student is enrolled under the full prescribed curriculum load and assigned to a dedicated class section cohort.
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="status-icon-box rounded-2 d-flex align-items-center justify-content-center flex-shrink-0" 
+                                             id="iconBoxRegular"
+                                             style="width: 36px; height: 36px; <?= $currentStatus === 'Regular' ? 'background-color: #1e3a8a; color: #ffffff;' : 'background-color: #f1f5f9; color: #64748b;' ?>">
+                                            <i class="bi bi-mortarboard-fill" style="font-size: 17px;"></i>
+                                        </div>
+                                        <div class="flex-grow-1 min-w-0">
+                                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                                <span class="fw-semibold text-dark" style="font-size: 14px;">Regular</span>
+                                                <i class="bi bi-check-circle-fill text-primary status-check-icon <?= $currentStatus === 'Regular' ? '' : 'd-none' ?>" id="checkRegular" style="font-size: 15px;"></i>
+                                            </div>
+                                            <div class="text-muted small" style="font-size: 12px; line-height: 1.45;">
+                                                Enrolls under standard curriculum load and assigned to a cohort section block.
+                                            </div>
+                                        </div>
                                     </div>
                                 </button>
                             </div>
                             <!-- Irregular Student Option -->
                             <div class="col-sm-6">
                                 <button type="button" 
-                                        class="btn w-100 p-3 text-start border formal-status-card <?= $currentStatus === 'Irregular' ? 'active-formal-card' : 'bg-white' ?>" 
+                                        class="btn w-100 p-3 text-start border formal-status-card <?= $currentStatus === 'Irregular' ? 'active-formal-card' : '' ?>" 
                                         id="status-irregular-tab" 
                                         data-status="Irregular"
                                         role="tab"
                                         aria-selected="<?= $currentStatus === 'Irregular' ? 'true' : 'false' ?>">
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
-                                        <span class="fw-bold text-dark" style="font-size: 13.5px;">Irregular Student</span>
-                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-0.5" style="font-size: 11px;">Modular Schedule</span>
-                                    </div>
-                                    <div class="text-muted small" style="font-size: 12px; line-height: 1.45;">
-                                        Student takes coursework across multiple section schedules. Subject sets are assigned per course upon term enrollment.
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="status-icon-box rounded-2 d-flex align-items-center justify-content-center flex-shrink-0" 
+                                             id="iconBoxIrregular"
+                                             style="width: 36px; height: 36px; <?= $currentStatus === 'Irregular' ? 'background-color: #1e3a8a; color: #ffffff;' : 'background-color: #f1f5f9; color: #64748b;' ?>">
+                                            <i class="bi bi-shuffle" style="font-size: 17px;"></i>
+                                        </div>
+                                        <div class="flex-grow-1 min-w-0">
+                                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                                <span class="fw-semibold text-dark" style="font-size: 14px;">Irregular</span>
+                                                <i class="bi bi-check-circle-fill text-primary status-check-icon <?= $currentStatus === 'Irregular' ? '' : 'd-none' ?>" id="checkIrregular" style="font-size: 15px;"></i>
+                                            </div>
+                                            <div class="text-muted small" style="font-size: 12px; line-height: 1.45;">
+                                                Custom schedule across sections. Subjects are loaded individually during enrollment.
+                                            </div>
+                                        </div>
                                     </div>
                                 </button>
                             </div>
@@ -167,27 +180,27 @@ ob_start();
                     <!-- Curriculum Year Level & Class Section -->
                     <div class="row g-3">
                         <div class="col-md-6" id="yearLevelWrapper">
-                            <label for="year_level" class="form-label fw-semibold" style="font-size: 13px;">
+                            <label for="year_level" class="form-label fw-semibold text-dark" style="font-size: 13px;">
                                 Year Level <span class="text-danger">*</span>
                             </label>
                             <select class="form-select" id="year_level" name="year_level" required>
-                                <option value="1" <?= $currentYearLevel === 1 ? 'selected' : '' ?>>First Year (Freshman)</option>
-                                <option value="2" <?= $currentYearLevel === 2 ? 'selected' : '' ?>>Second Year (Sophomore)</option>
-                                <option value="3" <?= $currentYearLevel === 3 ? 'selected' : '' ?>>Third Year (Junior)</option>
-                                <option value="4" <?= $currentYearLevel === 4 ? 'selected' : '' ?>>Fourth Year (Senior)</option>
+                                <option value="1" <?= $currentYearLevel === 1 ? 'selected' : '' ?>>1st Year (Freshman)</option>
+                                <option value="2" <?= $currentYearLevel === 2 ? 'selected' : '' ?>>2nd Year (Sophomore)</option>
+                                <option value="3" <?= $currentYearLevel === 3 ? 'selected' : '' ?>>3rd Year (Junior)</option>
+                                <option value="4" <?= $currentYearLevel === 4 ? 'selected' : '' ?>>4th Year (Senior)</option>
                             </select>
                             <div class="form-text text-muted" id="yearLevelHelp" style="font-size: 12px;">
-                                <?= $currentStatus === 'Regular' ? 'Filters available section cohorts matching the academic year.' : 'Official curriculum standing.' ?>
+                                <?= $currentStatus === 'Regular' ? 'Filters sections matching this academic year.' : 'Academic curriculum standing.' ?>
                             </div>
                         </div>
 
                         <!-- Regular only: Class Set -->
                         <div class="col-md-6 <?= $currentStatus === 'Irregular' ? 'd-none' : '' ?>" id="setSectionWrapper">
-                            <label for="set_id" class="form-label fw-semibold" style="font-size: 13px;">
-                                Assigned Class Section <span class="text-danger" id="setRequiredMarker">*</span>
+                            <label for="set_id" class="form-label fw-semibold text-dark" style="font-size: 13px;">
+                                Assigned Section <span class="text-danger" id="setRequiredMarker">*</span>
                             </label>
                             <select class="form-select" id="set_id" name="set_id" <?= $currentStatus === 'Regular' ? 'required' : '' ?>>
-                                <option value="">Select class section...</option>
+                                <option value="">Select section...</option>
                                 <?php foreach ($sets ?? [] as $set): ?>
                                     <option value="<?= $set['id'] ?>" 
                                             data-year-level="<?= (int)($set['year_level'] ?? 1) ?>" 
@@ -197,85 +210,78 @@ ob_start();
                                 <?php endforeach; ?>
                             </select>
                             <div class="form-text text-muted" id="setHelpText" style="font-size: 12px;">
-                                Active term curriculum cohort assignment.
+                                Cohort block assigned for the active term.
                             </div>
                             <div id="noSetsAlert" class="alert alert-warning py-2 px-3 mt-2 mb-0 small d-none" style="font-size: 12px;">
-                                <i class="bi bi-exclamation-triangle me-1"></i> No active section cohorts registered for Year <span id="noSetsYearSpan">1</span>.
+                                <i class="bi bi-exclamation-triangle me-1"></i> No active sections found for Year <span id="noSetsYearSpan">1</span>.
                             </div>
                         </div>
 
                         <!-- Irregular student multiple-section notice -->
                         <div class="col-12 <?= $currentStatus === 'Irregular' ? '' : 'd-none' ?>" id="irregularNotice">
-                            <div class="p-3 rounded-2 border text-muted small" style="background-color: #f8fafc !important; border-color: #cbd5e1 !important; font-size: 12.5px; line-height: 1.55;">
-                                <div class="fw-bold text-dark mb-1">
-                                    <i class="bi bi-info-circle text-primary me-1"></i> Registrar Advisory &mdash; Modular Course Load
+                            <div class="p-3 rounded-2 border text-muted small" style="background-color: #f8fafc; border-color: #e2e8f0 !important; font-size: 12.5px; line-height: 1.55;">
+                                <div class="fw-semibold text-dark mb-1">
+                                    <i class="bi bi-info-circle text-primary me-1"></i> Modular Course Scheduling
                                 </div>
-                                Irregular students enroll across multiple course schedules. Class sections and subject schedules are assigned individually per course during academic term subject loading, so no single cohort block is assigned at initial registration.
+                                Irregular students enroll across multiple course schedules. Section blocks are not assigned at initial registration and will be scheduled individually during subject loading.
                             </div>
                         </div>
                     </div>
                 </div>
 
             <?php elseif (in_array($user['role'], ['Faculty', 'Dean'], true)): ?>
-                <!-- ================= DEPARTMENT AFFILIATION ================= -->
-                <div class="formal-section mb-4 pb-2">
-                    <div class="mb-3 pb-2 border-bottom">
-                        <div class="fw-bold text-uppercase" style="font-size: 11.5px; letter-spacing: 0.06em; color: #1e3a8a;">
-                            Collegiate Department Affiliation
+                <!-- Department Affiliation -->
+                <div class="mt-4 mb-3 pt-3 border-top">
+                    <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                        <div class="d-flex align-items-center justify-content-center rounded-2 text-primary" style="width: 28px; height: 28px; background-color: #eff6ff;">
+                            <i class="bi bi-building text-primary" style="font-size: 15px;"></i>
                         </div>
-                        <div class="text-muted" style="font-size: 12px;">Official college division and academic department appointment.</div>
+                        <div>
+                            <h6 class="fw-semibold text-dark mb-0" style="font-size: 14px;">Department Affiliation</h6>
+                            <div class="text-muted" style="font-size: 12px;">Collegiate division and academic department appointment.</div>
+                        </div>
                     </div>
 
                     <div class="mb-1">
-                        <label for="department_id" class="form-label fw-semibold" style="font-size: 13px;">
-                            Academic College / Department <span class="text-danger">*</span>
+                        <label for="department_id" class="form-label fw-semibold text-dark" style="font-size: 13px;">
+                            Academic Department <span class="text-danger">*</span>
                         </label>
                         <select class="form-select" id="department_id" name="department_id" required>
                             <option value="">Select college or academic department...</option>
                             <?php
                             $currentDeptId = $user['faculty']['department_id'] ?? null;
                             foreach ($departments ?? [] as $dept):
+                                $deptCode = strtoupper(trim($dept['code'] ?? $dept['dept_abbrev'] ?? ''));
+                                $isSelected = ((string)$currentDeptId === (string)$dept['id'])
+                                           || (empty($currentDeptId) && $deptCode === 'CITE');
                             ?>
-                                <option value="<?= $dept['id'] ?>" <?= ((string)$currentDeptId === (string)$dept['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($dept['name']) ?> (<?= htmlspecialchars($dept['code']) ?>)
+                                <option value="<?= $dept['id'] ?>" <?= $isSelected ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($dept['name']) ?> (<?= htmlspecialchars($deptCode) ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="form-text text-muted" style="font-size: 12px;">The collegiate division to which this academic officer is officially commissioned.</div>
+                        <div class="form-text text-muted" style="font-size: 12px;">The collegiate department this academic officer belongs to.</div>
                     </div>
                 </div>
             <?php endif; ?>
 
-            <!-- ================= REGISTRAR CERTIFICATION ================= -->
-            <div class="p-3 rounded-2 border bg-light bg-opacity-50 mt-3" style="border-color: #cbd5e1 !important;">
-                <div class="d-flex align-items-start gap-2.5">
-                    <i class="bi bi-shield-check text-primary mt-0.5" style="font-size: 16px;"></i>
-                    <div style="font-size: 12px; line-height: 1.5; color: #475569;">
-                        <strong class="text-dark">Registrar Official Certification:</strong>
-                        Changes made to this student demographic profile or academic cohort status are immediately committed to the institutional registry and active session logs.
-                    </div>
-                </div>
-            </div>
-
         </div>
 
-        <!-- Document Footer Actions -->
-        <div class="card-footer bg-light py-3 px-4 border-top d-flex justify-content-between align-items-center" style="border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+        <!-- Footer Actions -->
+        <div class="card-footer bg-light py-3 px-4 border-top d-flex justify-content-between align-items-center" style="border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
             <a href="<?= url('/admin/users') ?>" class="btn btn-outline-secondary">
-                Cancel and Return
+                Cancel
             </a>
-            <div class="d-flex align-items-center gap-2">
-                <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2 px-3.5 fw-semibold" style="background-color: #1e3a8a; border-color: #1e3a8a;">
-                    <i class="bi bi-check2-circle"></i> Commit Official Changes
-                </button>
-            </div>
+            <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 fw-semibold" style="background-color: #1e3a8a; border-color: #1e3a8a;">
+                <i class="bi bi-check2"></i> Save Changes
+            </button>
         </div>
     </form>
 </div>
 
 <style>
 .formal-status-card {
-    border-radius: 8px;
+    border-radius: 10px;
     border-color: #cbd5e1 !important;
     background-color: #ffffff !important;
     transition: all 0.15s ease-in-out;
@@ -297,6 +303,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var studentStatusInput = document.getElementById('student_status');
     var statusRegularBtn = document.getElementById('status-regular-tab');
     var statusIrregularBtn = document.getElementById('status-irregular-tab');
+    var iconBoxRegular = document.getElementById('iconBoxRegular');
+    var iconBoxIrregular = document.getElementById('iconBoxIrregular');
+    var checkRegular = document.getElementById('checkRegular');
+    var checkIrregular = document.getElementById('checkIrregular');
     var yearLevelSelect = document.getElementById('year_level');
     var yearLevelHelp = document.getElementById('yearLevelHelp');
     var setSectionWrapper = document.getElementById('setSectionWrapper');
@@ -314,23 +324,45 @@ document.addEventListener('DOMContentLoaded', function() {
         if (status === 'Regular') {
             statusRegularBtn.classList.add('active-formal-card');
             statusRegularBtn.setAttribute('aria-selected', 'true');
+            if (iconBoxRegular) {
+                iconBoxRegular.style.backgroundColor = '#1e3a8a';
+                iconBoxRegular.style.color = '#ffffff';
+            }
+            if (checkRegular) checkRegular.classList.remove('d-none');
+
             statusIrregularBtn.classList.remove('active-formal-card');
             statusIrregularBtn.setAttribute('aria-selected', 'false');
+            if (iconBoxIrregular) {
+                iconBoxIrregular.style.backgroundColor = '#f1f5f9';
+                iconBoxIrregular.style.color = '#64748b';
+            }
+            if (checkIrregular) checkIrregular.classList.add('d-none');
 
             if (setSectionWrapper) setSectionWrapper.classList.remove('d-none');
             if (irregularNotice) irregularNotice.classList.add('d-none');
-            if (yearLevelHelp) yearLevelHelp.textContent = 'Filters available section cohorts matching the academic year.';
+            if (yearLevelHelp) yearLevelHelp.textContent = 'Filters sections matching this academic year.';
             setSelect.required = true;
             filterSetsByYearLevel(false);
         } else {
             statusIrregularBtn.classList.add('active-formal-card');
             statusIrregularBtn.setAttribute('aria-selected', 'true');
+            if (iconBoxIrregular) {
+                iconBoxIrregular.style.backgroundColor = '#1e3a8a';
+                iconBoxIrregular.style.color = '#ffffff';
+            }
+            if (checkIrregular) checkIrregular.classList.remove('d-none');
+
             statusRegularBtn.classList.remove('active-formal-card');
             statusRegularBtn.setAttribute('aria-selected', 'false');
+            if (iconBoxRegular) {
+                iconBoxRegular.style.backgroundColor = '#f1f5f9';
+                iconBoxRegular.style.color = '#64748b';
+            }
+            if (checkRegular) checkRegular.classList.add('d-none');
 
             if (setSectionWrapper) setSectionWrapper.classList.add('d-none');
             if (irregularNotice) irregularNotice.classList.remove('d-none');
-            if (yearLevelHelp) yearLevelHelp.textContent = 'Official curriculum standing.';
+            if (yearLevelHelp) yearLevelHelp.textContent = 'Academic curriculum standing.';
             setSelect.value = '';
             setSelect.required = false;
         }

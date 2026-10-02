@@ -117,8 +117,8 @@
 <div class="print-container">
     <!-- Header -->
     <div class="institution-header">
-        <h1 class="institution-title">Golden West Colleges, Inc.</h1>
-        <p class="institution-sub">San Fernando City, La Union, Philippines</p>
+        <h1 class="institution-title">College of Information Technology</h1>
+        <p class="institution-sub">Golden West Colleges, Inc. &bull; San Jose Drive, Alaminos, Pangasinan</p>
         <p class="institution-sub">Office of the Academic Dean &bull; Office of the Registrar</p>
         <div class="report-title">Official Grading Sheet &amp; Class Roster</div>
     </div>

@@ -25,12 +25,7 @@ ob_start();
 
     <!-- Password Field -->
     <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-            <label for="password" class="form-label mb-0">Password</label>
-            <a href="<?= url('/forgot-password') ?>" class="auth-link-subtle" tabindex="5">
-                Forgot password?
-            </a>
-        </div>
+        <label for="password" class="form-label">Password</label>
         <div class="input-group">
             <input 
                 type="password" 
@@ -58,6 +53,20 @@ ob_start();
     <button type="submit" class="btn-auth-submit mt-4" id="submitBtn">
         <span>Sign in</span>
     </button>
+
+    <!-- OR Divider -->
+    <div class="d-flex align-items-center my-3">
+        <div class="flex-grow-1 border-top"></div>
+        <span class="px-3 text-muted small fw-semibold text-uppercase" style="letter-spacing: 0.05em; font-size: 11px;">OR</span>
+        <div class="flex-grow-1 border-top"></div>
+    </div>
+
+    <!-- Forgot Password Link -->
+    <div class="text-center">
+        <a href="<?= url('/forgot-password') ?>" class="auth-link-subtle" tabindex="5">
+            Forgot your password?
+        </a>
+    </div>
 </form>
 
 <script>

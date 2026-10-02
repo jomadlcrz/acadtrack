@@ -2,9 +2,9 @@
 $pageTitle = 'User Management';
 $subtitle = 'Manage institutional accounts, role assignments, and system access.';
 $headerActions = '<div class="d-flex align-items-center gap-2">
-    <a href="' . url('/admin/users/import-template') . '" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5"><i class="bi bi-download"></i> Template</a>
-    <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#importExcelModal"><i class="bi bi-file-earmark-excel"></i> Import Excel</button>
-    <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#selectRoleModal"><i class="bi bi-person-plus"></i> Add user</button>
+    <a href="' . url('/admin/users/import-template') . '" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5"><i class="bi bi-download"></i> Download Template</a>
+    <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#importExcelModal"><i class="bi bi-file-earmark-excel"></i> Import Spreadsheet</button>
+    <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#selectRoleModal" style="background-color: #1e3a8a; border-color: #1e3a8a;"><i class="bi bi-plus-lg"></i> Add User</button>
 </div>';
 ob_start();
 ?>
@@ -89,11 +89,11 @@ ob_start();
         <table class="table table-hover align-middle mb-0" id="usersTable">
             <thead class="bg-white border-bottom">
                 <tr>
-                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Full name</th>
-                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Email address</th>
-                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Role &amp; affiliation</th>
-                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px;">Status</th>
-                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 190px; font-size: 11px;">Actions</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px; letter-spacing: 0.04em;">Full Name</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px; letter-spacing: 0.04em;">Email Address</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px; letter-spacing: 0.04em;">Role &amp; Details</th>
+                    <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 120px; font-size: 11px; letter-spacing: 0.04em;">Status</th>
+                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 190px; font-size: 11px; letter-spacing: 0.04em;">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y">
@@ -378,69 +378,81 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Modal: Select Account Role -->
 <div class="modal fade" id="selectRoleModal" tabindex="-1" aria-labelledby="selectRoleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
-        <div class="modal-content border-0 shadow" style="border: 1px solid #e2e8f0 !important; border-radius: 8px;">
+        <div class="modal-content border-0 shadow" style="border: 1px solid #e2e8f0 !important; border-radius: 10px;">
             <div class="modal-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
                 <div>
                     <h5 class="modal-title h6 fw-semibold text-dark mb-0" id="selectRoleModalLabel">Select User Role</h5>
-                    <small class="text-muted">Choose the account type to proceed to the creation form.</small>
+                    <small class="text-muted">Choose the account type to create.</small>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <div class="d-flex flex-column gap-2" id="roleOptionsList">
+                <div class="d-flex flex-column gap-2.5" id="roleOptionsList">
                     <!-- Student -->
-                    <div class="role-select-item p-3 rounded-2 border d-flex align-items-start gap-3" style="cursor: pointer; border-color: #cbd5e1; transition: border-color 0.15s ease, background-color 0.15s ease;">
-                        <input type="radio" class="form-check-input mt-1 flex-shrink-0" name="account_role" value="Student" checked>
-                        <div class="flex-grow-1">
-                            <div class="d-flex align-items-center justify-content-between mb-1">
-                                <span class="fw-semibold text-dark">Student</span>
+                    <div class="role-select-item p-3 rounded-3 border d-flex align-items-center gap-3" style="cursor: pointer; border-color: #cbd5e1; transition: all 0.15s ease;">
+                        <input type="radio" class="form-check-input flex-shrink-0" name="account_role" value="Student" checked>
+                        <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0" style="width: 38px; height: 38px; background-color: #eff6ff; color: #1e3a8a;">
+                            <i class="bi bi-mortarboard-fill" style="font-size: 18px;"></i>
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex align-items-center justify-content-between mb-0.5">
+                                <span class="fw-semibold text-dark" style="font-size: 13.5px;">Student</span>
                                 <span class="badge badge-student">Student</span>
                             </div>
-                            <div class="text-muted small" style="font-size: 12.5px; line-height: 1.45;">Academic enrollment, class cohort placement, and grade tracking.</div>
+                            <div class="text-muted" style="font-size: 12px; line-height: 1.4;">Class enrollment, grades, and academic records.</div>
                         </div>
                     </div>
 
                     <!-- Faculty -->
-                    <div class="role-select-item p-3 rounded-2 border d-flex align-items-start gap-3" style="cursor: pointer; border-color: #cbd5e1; transition: border-color 0.15s ease, background-color 0.15s ease;">
-                        <input type="radio" class="form-check-input mt-1 flex-shrink-0" name="account_role" value="Faculty">
-                        <div class="flex-grow-1">
-                            <div class="d-flex align-items-center justify-content-between mb-1">
-                                <span class="fw-semibold text-dark">Faculty / Instructor</span>
+                    <div class="role-select-item p-3 rounded-3 border d-flex align-items-center gap-3" style="cursor: pointer; border-color: #cbd5e1; transition: all 0.15s ease;">
+                        <input type="radio" class="form-check-input flex-shrink-0" name="account_role" value="Faculty">
+                        <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0" style="width: 38px; height: 38px; background-color: #f0fdf4; color: #166534;">
+                            <i class="bi bi-person-badge-fill" style="font-size: 18px;"></i>
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex align-items-center justify-content-between mb-0.5">
+                                <span class="fw-semibold text-dark" style="font-size: 13.5px;">Faculty / Instructor</span>
                                 <span class="badge badge-faculty">Faculty</span>
                             </div>
-                            <div class="text-muted small" style="font-size: 12.5px; line-height: 1.45;">Teaching assignment, subject grade encoding, and attendance rosters.</div>
+                            <div class="text-muted" style="font-size: 12px; line-height: 1.4;">Teaching assignments, grading sheets, and student rosters.</div>
                         </div>
                     </div>
 
                     <!-- Dean -->
-                    <div class="role-select-item p-3 rounded-2 border d-flex align-items-start gap-3" style="cursor: pointer; border-color: #cbd5e1; transition: border-color 0.15s ease, background-color 0.15s ease;">
-                        <input type="radio" class="form-check-input mt-1 flex-shrink-0" name="account_role" value="Dean">
-                        <div class="flex-grow-1">
-                            <div class="d-flex align-items-center justify-content-between mb-1">
-                                <span class="fw-semibold text-dark">Academic Dean</span>
+                    <div class="role-select-item p-3 rounded-3 border d-flex align-items-center gap-3" style="cursor: pointer; border-color: #cbd5e1; transition: all 0.15s ease;">
+                        <input type="radio" class="form-check-input flex-shrink-0" name="account_role" value="Dean">
+                        <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0" style="width: 38px; height: 38px; background-color: #faf5ff; color: #6b21a8;">
+                            <i class="bi bi-award-fill" style="font-size: 18px;"></i>
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex align-items-center justify-content-between mb-0.5">
+                                <span class="fw-semibold text-dark" style="font-size: 13.5px;">Academic Dean</span>
                                 <span class="badge badge-dean">Dean</span>
                             </div>
-                            <div class="text-muted small" style="font-size: 12.5px; line-height: 1.45;">Collegiate division leadership, curriculum oversight, and grade approval.</div>
+                            <div class="text-muted" style="font-size: 12px; line-height: 1.4;">Collegiate department management and grading audit reviews.</div>
                         </div>
                     </div>
 
                     <!-- Admin -->
-                    <div class="role-select-item p-3 rounded-2 border d-flex align-items-start gap-3" style="cursor: pointer; border-color: #cbd5e1; transition: border-color 0.15s ease, background-color 0.15s ease;">
-                        <input type="radio" class="form-check-input mt-1 flex-shrink-0" name="account_role" value="Admin">
-                        <div class="flex-grow-1">
-                            <div class="d-flex align-items-center justify-content-between mb-1">
-                                <span class="fw-semibold text-dark">Administrator</span>
+                    <div class="role-select-item p-3 rounded-3 border d-flex align-items-center gap-3" style="cursor: pointer; border-color: #cbd5e1; transition: all 0.15s ease;">
+                        <input type="radio" class="form-check-input flex-shrink-0" name="account_role" value="Admin">
+                        <div class="d-flex align-items-center justify-content-center rounded-2 flex-shrink-0" style="width: 38px; height: 38px; background-color: #f1f5f9; color: #334155;">
+                            <i class="bi bi-shield-lock-fill" style="font-size: 18px;"></i>
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex align-items-center justify-content-between mb-0.5">
+                                <span class="fw-semibold text-dark" style="font-size: 13.5px;">Administrator</span>
                                 <span class="badge badge-admin">Admin</span>
                             </div>
-                            <div class="text-muted small" style="font-size: 12.5px; line-height: 1.45;">Full institutional governance over users, terms, and system logs.</div>
+                            <div class="text-muted" style="font-size: 12px; line-height: 1.4;">System governance, academic terms, and user provisioning.</div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="btnProceedRole" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
-                    Proceed to form <i class="bi bi-arrow-right"></i>
+                <button type="button" id="btnProceedRole" class="btn btn-primary d-inline-flex align-items-center gap-1.5" style="background-color: #1e3a8a; border-color: #1e3a8a;">
+                    Continue <i class="bi bi-arrow-right"></i>
                 </button>
             </div>
         </div>
@@ -454,9 +466,9 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="modal-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
                 <div>
                     <h5 class="modal-title h6 fw-bold text-dark mb-0" id="importExcelModalLabel">
-                        Batch Student Registration &mdash; Excel / CSV Import
+                        Batch Student Registration
                     </h5>
-                    <small class="text-muted" style="font-size: 12px;">Upload official student roster spreadsheet (.xlsx, .xls, or .csv)</small>
+                    <small class="text-muted" style="font-size: 12px;">Upload a student roster spreadsheet (.xlsx, .xls, or .csv) to register multiple accounts.</small>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Golden West Colleges, Inc. — Acadtrack">
-    <title>Acadtrack &mdash; Golden West Colleges, Inc.</title>
+    <meta name="description" content="College of Information Technology — Acadtrack">
+    <title>Acadtrack &mdash; College of Information Technology</title>
     <link rel="icon" type="image/x-icon" href="<?= url('/favicon.ico') ?>">
     <link rel="shortcut icon" type="image/x-icon" href="<?= url('/favicon.ico') ?>">
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap/css/bootstrap.min.css') ?>">
@@ -18,10 +18,10 @@
     <header class="landing-nav">
         <div class="container">
             <a href="<?= url('/') ?>" class="landing-brand">
-                <img src="<?= asset('images/gwc.png') ?>" alt="Golden West Colleges Logo" class="landing-logo">
+                <img src="<?= asset('images/cite.png') ?>" alt="College of Information Technology Logo" class="landing-logo">
                 <div class="landing-brand-text">
-                    <span class="landing-college-name">Golden West Colleges, Inc.</span>
-                    <span class="landing-system-tag">Acadtrack</span>
+                    <span class="landing-college-name">College of Information Technology</span>
+                    <span class="landing-system-tag">Acadtrack &bull; GWC</span>
                 </div>
             </a>
         </div>
@@ -34,7 +34,7 @@
                 <div class="col-lg-8">
                     <h1 class="hero-title">Academic Grading &amp; Curriculum Evaluation Platform</h1>
                     <p class="hero-lead">
-                        A centralized, role-governed academic management platform engineered for Golden West Colleges, Inc. 
+                        A centralized, role-governed academic management platform engineered for the College of Information Technology (CITE). 
                         Streamlines course assignments, student rosters, period-based grading sheets, Dean audit reviews, and curriculum evaluation metrics.
                     </p>
                     <div class="hero-actions">
@@ -112,16 +112,16 @@
     <footer class="landing-footer">
         <div class="container">
             <div class="footer-brand">
-                <img src="<?= asset('images/gwc.png') ?>" alt="GWC Logo" class="footer-logo">
-                <h3 class="footer-title">Golden West Colleges, Inc.</h3>
+                <img src="<?= asset('images/cite.png') ?>" alt="CITE Logo" class="footer-logo">
+                <h3 class="footer-title">College of Information Technology</h3>
             </div>
             <p class="footer-desc">
-                Acadtrack &mdash; Providing dependable, transparent, and accurate grade computation and curriculum tracking for the academic community of Golden West Colleges, Inc.
+                Acadtrack &mdash; Providing dependable, transparent, and accurate grade computation and curriculum tracking for the College of Information Technology.
             </p>
 
             <div class="footer-bottom">
                 <div>
-                    &copy; <?= date('Y') ?> Golden West Colleges, Inc. All rights reserved.
+                    &copy; <?= date('Y') ?> College of Information Technology &mdash; Golden West Colleges, Inc. All rights reserved.
                 </div>
                 <div>
                     San Jose Drive, Alaminos, Pangasinan

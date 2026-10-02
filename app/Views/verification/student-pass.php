@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academic Credential Verification &mdash; Golden West Colleges, Inc.</title>
+    <title>Academic Credential Verification &mdash; College of Information Technology</title>
     <link rel="icon" type="image/x-icon" href="<?= url('favicon.ico') ?>">
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap/css/bootstrap.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap-icons/bootstrap-icons.min.css') ?>">
@@ -63,9 +63,9 @@
     <div class="verification-banner">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
             <div class="d-flex align-items-center gap-3">
-                <img src="<?= asset('images/gwc.png') ?>" alt="Golden West Colleges Logo" style="width: 48px; height: 48px; object-fit: contain;">
+                <img src="<?= asset('images/cite.png') ?>" alt="College of Information Technology Logo" style="width: 48px; height: 48px; object-fit: contain;">
                 <div>
-                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #cbd5e1;">Golden West Colleges, Inc.</div>
+                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #cbd5e1;">College of Information Technology &mdash; GWC</div>
                     <div style="font-size: 19px; font-weight: 700; color: #ffffff; letter-spacing: -0.01em;">Academic Credential Verification</div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
             </div>
             <h2 class="h4 fw-bold text-dark mb-1">Authentic Academic Pass</h2>
             <p class="text-muted small mb-4">
-                This academic pass has been cryptographically validated against Golden West Colleges records.
+                This academic pass has been cryptographically validated against College of Information Technology records.
             </p>
 
             <div class="card bg-white border p-3.5 text-start mb-4" style="border-radius: 8px; border-color: #e2e8f0 !important;">

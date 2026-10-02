@@ -4,7 +4,7 @@
         <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden; background: #ffffff;">
             <div class="modal-header border-0 py-2.5 px-3.5 bg-light d-flex justify-content-between align-items-center">
                 <span class="small fw-semibold text-secondary d-flex align-items-center gap-1.5">
-                    <i class="bi bi-patch-check-fill text-primary"></i> Official Academic Credential &mdash; Golden West Colleges, Inc.
+                    <i class="bi bi-patch-check-fill text-primary"></i> Official Academic Credential &mdash; College of Information Technology
                 </span>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -16,11 +16,11 @@
                         <div class="pass-security-ribbon"></div>
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <div class="d-flex align-items-center gap-3">
-                                <img src="<?= asset('images/gwc.png') ?>" alt="Golden West Colleges Seal" class="pass-emblem">
+                                <img src="<?= asset('images/cite.png') ?>" alt="College of Information Technology Seal" class="pass-emblem">
                                 <div>
-                                    <div class="pass-institution-title">Golden West Colleges, Inc.</div>
+                                    <div class="pass-institution-title">College of Information Technology</div>
                                     <div class="pass-doc-title">Official Digital Student Pass</div>
-                                    <div class="small opacity-75 text-white" style="font-size: 11px;">Office of Academic Affairs &amp; Registrar</div>
+                                    <div class="small opacity-75 text-white" style="font-size: 11px;">Golden West Colleges &bull; Office of Academic Affairs</div>
                                 </div>
                             </div>
                             <div>

@@ -8,8 +8,8 @@ $displaySuccess = $success ?? null;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Golden West Colleges, Inc. — Acadtrack">
-    <title><?= htmlspecialchars($pageTitle ?? 'Sign In') ?> &mdash; Golden West Colleges, Inc.</title>
+    <meta name="description" content="College of Information Technology — Acadtrack">
+    <title><?= htmlspecialchars($pageTitle ?? 'Sign In') ?> &mdash; College of Information Technology</title>
     <link rel="icon" type="image/x-icon" href="<?= url('/favicon.ico') ?>">
     <link rel="shortcut icon" type="image/x-icon" href="<?= url('/favicon.ico') ?>">
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap/css/bootstrap.min.css') ?>">
@@ -23,22 +23,22 @@ $displaySuccess = $success ?? null;
 <body class="auth-body-split">
     <div class="auth-split-wrapper">
         <!-- Left Panel: Institutional Identity -->
-        <aside class="auth-panel-left d-none d-lg-flex">
+        <aside class="auth-panel-left d-none d-lg-flex" style="background-image: linear-gradient(160deg, rgba(8, 22, 46, 0.88) 0%, rgba(14, 36, 77, 0.82) 100%), url('<?= asset('images/gwc_bg.png') ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
             <div class="auth-left-content">
                 <div class="auth-brand-lockup">
-                    <a href="<?= url('/') ?>" class="auth-brand-link" title="Golden West Colleges">
-                        <img src="<?= asset('images/gwc.png') ?>" alt="Golden West Colleges Seal" class="auth-brand-emblem">
+                    <a href="<?= url('/') ?>" class="auth-brand-link" title="College of Information Technology">
+                        <img src="<?= asset('images/cite.png') ?>" alt="College of Information Technology Seal" class="auth-brand-emblem">
                     </a>
                     <div class="auth-brand-text">
-                        <span class="auth-brand-inst">Golden West Colleges, Inc.</span>
+                        <span class="auth-brand-inst">College of Information Technology</span>
                         <span class="auth-brand-sys">Acadtrack</span>
                     </div>
                 </div>
 
                 <div class="auth-hero-statement">
-                    <h1 class="auth-hero-title">School Grade Evaluation &amp; Academic Records</h1>
+                    <h1 class="auth-hero-title">CITE Academic Evaluation &amp; Grade Records</h1>
                     <p class="auth-hero-desc">
-                        Official academic grading and student records portal for Golden West Colleges.
+                        Official academic grading and student curriculum evaluation portal for the College of Information Technology.
                     </p>
                 </div>
 
@@ -56,11 +56,11 @@ $displaySuccess = $success ?? null;
                 <div class="auth-form-card">
                     <!-- Mobile Institutional Brand (Visible only on < 992px) -->
                     <div class="auth-mobile-header-wrap d-flex d-lg-none align-items-center gap-2.5 mb-4 pb-3 border-bottom">
-                        <a href="<?= url('/') ?>" class="auth-mobile-logo-link" title="Golden West Colleges">
-                            <img src="<?= asset('images/gwc.png') ?>" alt="GWC Logo" class="auth-mobile-logo">
+                        <a href="<?= url('/') ?>" class="auth-mobile-logo-link" title="College of Information Technology">
+                            <img src="<?= asset('images/cite.png') ?>" alt="CITE Logo" class="auth-mobile-logo">
                         </a>
                         <div>
-                            <span class="auth-mobile-inst">Golden West Colleges, Inc.</span>
+                            <span class="auth-mobile-inst">College of Information Technology</span>
                             <span class="auth-mobile-sys">Acadtrack</span>
                         </div>
                     </div>
@@ -101,7 +101,7 @@ $displaySuccess = $success ?? null;
 
             <!-- Clean Footer -->
             <footer class="auth-right-footer text-center text-muted small">
-                &copy; <?= date('Y') ?> Golden West Colleges, Inc. All rights reserved.
+                &copy; <?= date('Y') ?> College of Information Technology &mdash; Golden West Colleges, Inc. All rights reserved.
             </footer>
         </main>
     </div>

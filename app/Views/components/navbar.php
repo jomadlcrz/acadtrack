@@ -9,10 +9,10 @@ $firstLetter = strtoupper(substr(trim($firstName) !== '' ? trim($firstName) : (t
 <header class="app-navbar">
     <div class="navbar-left">
         <a href="<?= url('/dashboard') ?>" class="navbar-brand-link" title="Acadtrack Dashboard">
-            <img src="<?= asset('images/gwc.png') ?>" alt="GWC Logo" class="navbar-brand-logo">
+            <img src="<?= asset('images/cite.png') ?>" alt="CITE Logo" class="navbar-brand-logo">
             <div class="navbar-brand-text">
-                <span class="navbar-brand-title">Golden West Colleges, Inc.</span>
-                <span class="navbar-brand-system">Acadtrack</span>
+                <span class="navbar-brand-title">College of Information Technology</span>
+                <span class="navbar-brand-system">Acadtrack &bull; GWC</span>
             </div>
         </a>
     </div>
