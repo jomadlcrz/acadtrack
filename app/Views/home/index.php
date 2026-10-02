@@ -123,7 +123,14 @@
 
             <div class="footer-bottom">
                 <div>
-                    &copy; <?= date('Y') ?> College of Information Technology &mdash; Golden West Colleges, Inc. All rights reserved.
+                    <div class="mb-1">
+                        <a href="<?= url('/privacy') ?>" class="text-white text-decoration-none me-3 opacity-75 hover-opacity-100">Privacy Notice</a>
+                        <span class="text-white-50">&bull;</span>
+                        <a href="<?= url('/terms') ?>" class="text-white text-decoration-none ms-3 opacity-75 hover-opacity-100">Terms of Academic Service</a>
+                    </div>
+                    <div>
+                        &copy; <?= date('Y') ?> College of Information Technology &mdash; Golden West Colleges, Inc. All rights reserved.
+                    </div>
                 </div>
                 <div>
                     San Jose Drive, Alaminos, Pangasinan

@@ -77,10 +77,6 @@
                     <i class="bi bi-file-earmark-check-fill"></i>
                     <span>Grade Review &amp; Approval</span>
                 </a>
-                <a href="<?= url('/admin/academic-terms/closure') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/academic-terms/closure') ? 'active' : '' ?>">
-                    <i class="bi bi-lock-fill"></i>
-                    <span>Term Closure</span>
-                </a>
             </div>
 
         <?php elseif ($userRole === 'Faculty'): ?>

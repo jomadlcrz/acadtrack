@@ -19,7 +19,7 @@ class RoleMiddleware
         $userRole = $_SESSION['user']['role'] ?? null;
 
         if (!$userRole || !in_array($userRole, $this->allowedRoles, true)) {
-            $response->statusCode(403)->html('403 - Forbidden');
+            $response->html('403 - Forbidden', 403);
             return false;
         }
 

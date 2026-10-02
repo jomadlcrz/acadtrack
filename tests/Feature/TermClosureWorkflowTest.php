@@ -424,5 +424,27 @@ class TermClosureWorkflowTest extends TestCase
         );
         $testTerm->delete();
     }
+
+    public function testDeanRoleCannotAccessTermClosureRoute(): void
+    {
+        $middleware = new \App\Middleware\RoleMiddleware(['Admin']);
+        $req = new \App\Core\Request();
+        $res = new \App\Core\Response();
+        $session = new \App\Core\Session();
+
+        // Simulate Dean session
+        $_SESSION['user'] = ['id' => 2, 'email' => 'dean@gwc.edu', 'role' => 'Dean'];
+        ob_start();
+        $canAccess = $middleware->handle($req, $res, $session);
+        ob_end_clean();
+
+        $this->assertFalse($canAccess, 'Dean role must not be allowed to access term closure');
+        $this->assertEquals(403, $res->getStatusCode());
+
+        // Simulate Admin session
+        $_SESSION['user'] = ['id' => 1, 'email' => 'admin@gwc.edu', 'role' => 'Admin'];
+        $adminAccess = $middleware->handle($req, $res, $session);
+        $this->assertTrue($adminAccess, 'Admin role must be allowed to access term closure');
+    }
 }
 

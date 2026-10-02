@@ -635,3 +635,23 @@ body.landing-body {
         text-align: center;
     }
 }
+
+@media (max-width: 480px) {
+    .landing-brand {
+        gap: 10px;
+    }
+
+    .landing-logo {
+        width: 36px;
+        height: 36px;
+    }
+
+    .landing-college-name {
+        font-size: 13.5px;
+        line-height: 1.2;
+    }
+
+    .landing-system-tag {
+        font-size: 11px;
+    }
+}

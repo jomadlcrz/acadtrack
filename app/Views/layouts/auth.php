@@ -103,7 +103,14 @@ $displaySuccess = $success ?? null;
 
             <!-- Clean Footer -->
             <footer class="auth-right-footer text-center text-muted small">
-                &copy; <?= date('Y') ?> College of Information Technology &mdash; Golden West Colleges, Inc. All rights reserved.
+                <div class="mb-1">
+                    <a href="<?= url('/privacy') ?>" class="text-decoration-none text-muted me-2" style="font-size: 0.8rem;">Privacy Notice</a>
+                    <span class="text-muted opacity-50">&bull;</span>
+                    <a href="<?= url('/terms') ?>" class="text-decoration-none text-muted ms-2" style="font-size: 0.8rem;">Terms of Use</a>
+                </div>
+                <div>
+                    &copy; <?= date('Y') ?> College of Information Technology &mdash; Golden West Colleges, Inc. All rights reserved.
+                </div>
             </footer>
         </main>
     </div>
