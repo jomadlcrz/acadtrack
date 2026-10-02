@@ -161,10 +161,19 @@ class ProgramCurriculumController
         $programName = trim((string) ($data['program_name'] ?? ''));
         $programAbbrev = strtoupper(trim((string) ($data['program_abbrev'] ?? '')));
         $departmentId = !empty($data['department_id']) ? (int) $data['department_id'] : null;
-        $programType = trim((string) ($data['program_type'] ?? "Bachelor's Degree"));
-        $programLength = trim((string) ($data['program_length'] ?? '4 Years'));
+
+        $rawProgramType = trim((string) ($data['program_type'] ?? "Bachelor's Degree"));
+        $programType = ($rawProgramType === 'Associate Degree') ? 'Associate Degree' : "Bachelor's Degree";
+
+        if ($programType === 'Associate Degree') {
+            $programLength = '2 Years';
+        } else {
+            $programLength = '4 Years';
+        }
+
         $description = trim((string) ($data['description'] ?? '')) ?: null;
-        $status = in_array($data['status'] ?? 'active', ['active', 'draft', 'archived'], true) ? $data['status'] : 'active';
+        $rawStatus = trim((string) ($data['status'] ?? 'active'));
+        $status = in_array($rawStatus, ['active', 'draft', 'archived'], true) ? $rawStatus : 'active';
 
         $subjectsInput = $data['subjects'] ?? $data['subjects_json'] ?? [];
         if (is_string($subjectsInput)) {

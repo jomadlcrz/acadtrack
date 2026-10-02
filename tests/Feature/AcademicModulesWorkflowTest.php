@@ -106,9 +106,9 @@ class AcademicModulesWorkflowTest extends TestCase
 
         // Test section naming derivation
         $name1A = Set::deriveSetName('BSIT', 1, 'A');
-        $name2B = Set::deriveSetName('BSCS', 2, 'B');
+        $name2B = Set::deriveSetName('BSIT', 2, 'B');
         $this->assertEquals('BSIT-1A', $name1A);
-        $this->assertEquals('BSCS-2B', $name2B);
+        $this->assertEquals('BSIT-2B', $name2B);
 
         $term = AcademicTerm::getActive();
         $termId = (int) ($term['id'] ?? 1);

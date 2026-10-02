@@ -141,7 +141,7 @@ $displaySets = $sets ?? [];
                                         <div class="mb-3">
                                             <label for="name_<?= $sec['id'] ?>" class="form-label">Set name <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control font-monospace" id="name_<?= $sec['id'] ?>" name="name" value="<?= htmlspecialchars($sec['name']) ?>" required style="text-transform: uppercase;">
-                                            <div class="form-text">e.g., BSIT-1A, BSIT-2B, BSCS-1A</div>
+                                            <div class="form-text">e.g., BSIT-1A, BSIT-2B, BSIT-3A</div>
                                         </div>
                                         <div class="row g-3 mb-3">
                                             <div class="col-md-6">

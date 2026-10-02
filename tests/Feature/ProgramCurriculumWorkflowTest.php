@@ -131,4 +131,53 @@ class ProgramCurriculumWorkflowTest extends TestCase
         $this->assertSame(1, (int) $archived->is_archived);
         $this->assertNotNull($archived->archived_at);
     }
+
+    public function testAssociateDegreeEnforcesTwoYearsAndDisallowsFiveYears(): void
+    {
+        $controller = new ProgramCurriculumController();
+        $response = new Response();
+        $session = new Session();
+
+        // 1. Associate Degree should always be 2 Years even if another length is sent
+        $_POST = [
+            'program_name' => 'Associate in Computer Technology',
+            'program_abbrev' => 'ACT_TEST',
+            'program_type' => 'Associate Degree',
+            'program_length' => '4 Years',
+            'subjects' => [],
+        ];
+
+        try {
+            $controller->store(new Request(), $response, $session);
+        } catch (\Throwable $e) {
+            // redirect() calls exit
+        }
+
+        $act = Program::where('program_abbrev', 'ACT_TEST')->first();
+        $this->assertNotNull($act);
+        $this->assertSame('Associate Degree', $act->program_type);
+        $this->assertSame('2 Years', $act->program_length);
+        $act->delete();
+
+        // 2. Bachelor's Degree with attempted 5 Years should normalize to 4 Years
+        $_POST = [
+            'program_name' => 'Bachelor of Technology Test',
+            'program_abbrev' => 'BTECH_TEST',
+            'program_type' => "Bachelor's Degree",
+            'program_length' => '5 Years',
+            'subjects' => [],
+        ];
+
+        try {
+            $controller->store(new Request(), $response, $session);
+        } catch (\Throwable $e) {
+            // redirect() calls exit
+        }
+
+        $btech = Program::where('program_abbrev', 'BTECH_TEST')->first();
+        $this->assertNotNull($btech);
+        $this->assertSame("Bachelor's Degree", $btech->program_type);
+        $this->assertSame('4 Years', $btech->program_length);
+        $btech->delete();
+    }
 }

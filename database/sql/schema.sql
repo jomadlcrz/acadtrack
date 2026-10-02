@@ -468,19 +468,86 @@ INSERT INTO admin_details (user_id, first_name, last_name) VALUES
 
 -- Insert default academic departments
 INSERT INTO departments (id, dept_abbrev, dept_name, description, status) VALUES
-(1, 'CITE', 'College of Information Technology Education', 'Academic department managing Information Technology, Computer Science, and computing education programs.', 'active'),
-(2, 'COC', 'College of Criminology', 'Academic department delivering criminal justice, law enforcement administration, and criminology curricula.', 'active'),
-(3, 'CBA', 'College of Business Administration', 'Academic department covering Business Administration, Management, and Accountancy programs.', 'active'),
-(4, 'COED', 'College of Education', 'Academic department preparing professional educators for elementary and secondary grade levels.', 'active');
+(1, 'CITE', 'College of Information Technology Education', 'Academic department managing Information Technology, Computer Science, and computing education programs.', 'active');
 
 -- Insert default academic programs
 INSERT INTO programs (id, program_abbrev, program_name, program_type, program_length, department_id, status, description) VALUES
-(1, 'BSIT', 'Bachelor of Science in Information Technology', 'Bachelors Degree', '4 Years', 1, 'active', 'Prepares students to be IT professionals who are able to perform installation, operation, programming, and maintenance of computer systems.'),
-(2, 'BSCS', 'Bachelor of Science in Computer Science', 'Bachelors Degree', '4 Years', 1, 'active', 'Study of computing concepts, algorithmic foundations, software design, and machine intelligence.'),
-(3, 'BSCRIM', 'Bachelor of Science in Criminology', 'Bachelors Degree', '4 Years', 2, 'active', 'Study of crime causation, criminal law, law enforcement administration, and correctional institutions.'),
-(4, 'BSBA', 'Bachelor of Science in Business Administration major in Marketing Management', 'Bachelors Degree', '4 Years', 3, 'active', 'Equips students with principles of modern marketing, consumer behavior, and business development.'),
-(5, 'BEED', 'Bachelor of Elementary Education', 'Bachelors Degree', '4 Years', 4, 'active', 'Designed to prepare future teachers for early childhood and elementary grade levels.'),
-(6, 'BSED', 'Bachelor of Secondary Education', 'Bachelors Degree', '4 Years', 4, 'active', 'Prepares educators equipped with professional pedagogical skills for high school instruction.');
+(1, 'BSIT', 'Bachelor of Science in Information Technology', 'Bachelors Degree', '4 Years', 1, 'active', 'Prepares students to be IT professionals who are able to perform installation, operation, programming, and maintenance of computer systems.');
+
+-- Insert baseline CITE subjects
+INSERT INTO subjects (id, academic_term_id, program_id, subject_code, descriptive_title, units, subject_type, nature, year_level, semester, is_archived) VALUES
+(1, 1, 1, 'CC101', 'Introduction to Computing', 3.0, 'Major with Lab', 'Combined', 1, 1, 0),
+(2, 1, 1, 'CC102', 'Fundamentals of Programming (Java)', 3.0, 'Major with Lab', 'Combined', 1, 1, 0),
+(9, 2, 1, 'CC103', 'Intermediate Programming (Adv. Java)', 3.0, 'Major without Lab', 'Lecture', 1, 2, 0),
+(10, 2, 1, 'DS101', 'Discrete Structures', 3.0, 'Major without Lab', 'Lecture', 1, 2, 0),
+(17, 1, 1, 'CC104', 'Data Structures & Algorithms', 3.0, 'Major with Lab', 'Lecture', 2, 1, 0),
+(18, 1, 1, 'GV101', 'Intro to Graphics Design', 3.0, 'Major with Lab', 'Lecture', 2, 1, 0),
+(19, 1, 1, 'HCI101', 'Introduction to Human Computer Interaction 1', 3.0, 'Major without Lab', 'Lecture', 2, 1, 0),
+(21, 1, 1, 'IM101', 'Fundamentals of Database Systems', 3.0, 'Major with Lab', 'Lecture', 2, 1, 0),
+(22, 1, 1, 'OOP101', 'Object Oriented Programming', 3.0, 'Major with Lab', 'Lecture', 2, 1, 0),
+(24, 1, 1, 'SP101', 'Social and Professional Issues', 3.0, 'Major without Lab', 'Lecture', 2, 1, 0),
+(25, 2, 1, 'CC105', 'Information Management 1', 3.0, 'Major with Lab', 'Lecture', 2, 2, 0),
+(27, 2, 1, 'IP101', 'Integrative Programming and Technologies 1', 3.0, 'Major with Lab', 'Lecture', 2, 2, 0),
+(28, 2, 1, 'MS102', 'Quantitative Methods (incl. modeling & Simulation)', 3.0, 'Major without Lab', 'Lecture', 2, 2, 0),
+(29, 2, 1, 'NET101', 'Networking 1', 3.0, 'Major with Lab', 'Lecture', 2, 2, 0),
+(31, 2, 1, 'PT101', 'Platform-based Development (Web Systems)', 3.0, 'Major without Lab', 'Lecture', 2, 2, 0),
+(33, 1, 1, 'CC106', 'Application Dev\'t and Emerging Technologies', 3.0, 'Major with Lab', 'Lecture', 3, 1, 0),
+(34, 1, 1, 'IAS101', 'Information Assurance and Security 1', 3.0, 'Major without Lab', 'Lecture', 3, 1, 0),
+(35, 1, 1, 'IM102', 'Advance Database Systems', 3.0, 'Major with Lab', 'Lecture', 3, 1, 0),
+(36, 1, 1, 'ITELEC1', 'IT Major Elective 1 (Graphics & Visual Computing)', 3.0, 'Major with Lab', 'Lecture', 3, 1, 0),
+(37, 1, 1, 'NET102', 'Networking 2', 3.0, 'Major with Lab', 'Lecture', 3, 1, 0),
+(39, 1, 1, 'SAD311', 'System Analysis and Design', 3.0, 'Research/Thesis', 'Lecture', 3, 1, 0),
+(40, 1, 1, 'SIA101', 'System Integration and Architecture', 3.0, 'Major without Lab', 'Lecture', 3, 1, 0),
+(41, 2, 1, 'CAPS101', 'Capstone Project and Research 1', 3.0, 'Research/Thesis', 'Lecture', 3, 2, 0),
+(43, 2, 1, 'IT312', 'Computer Accounting (with SAP)', 3.0, 'Major with Lab', 'Lecture', 3, 2, 0),
+(44, 2, 1, 'ITELEC2', 'IT Major Elective 2 (Data Warehousing)', 3.0, 'Major with Lab', 'Lecture', 3, 2, 0),
+(45, 2, 1, 'PT102', 'Platform-based Dev\'t (Multimedia Systems)', 3.0, 'Major with Lab', 'Lecture', 3, 2, 0),
+(46, 2, 1, 'PT103', 'Platform-based Development (Android Programming)', 3.0, 'Major with Lab', 'Lecture', 3, 2, 0),
+(47, 2, 1, 'SE101', 'Software Engineering 1', 3.0, 'Major with Lab', 'Lecture', 3, 2, 0),
+(48, 1, 1, 'CAPS102', 'Capstone Project and Research 2', 3.0, 'Research/Thesis', 'Lecture', 4, 1, 0),
+(49, 1, 1, 'ITELEC3', 'IT Major Elective 4 (Web Systems & Development 2)', 3.0, 'Major without Lab', 'Lecture', 4, 1, 0),
+(50, 1, 1, 'ITELEC4', 'IT Major Elective 4 (Web Systems & Development 2)', 3.0, 'Major with Lab', 'Lecture', 4, 1, 0),
+(51, 1, 1, 'OS101', 'Operating System', 3.0, 'Major with Lab', 'Lecture', 4, 1, 0),
+(52, 1, 1, 'SA101', 'System Administration and Maintenance 1', 3.0, 'Major without Lab', 'Lecture', 4, 1, 0),
+(53, 2, 1, 'PRAC101', 'OJT Practicum (486 hours)', 3.0, 'Major without Lab', 'Lecture', 4, 2, 0);
+
+-- Insert baseline CITE prerequisites
+INSERT INTO prerequisites (id, subject_id, prerequisite_subject_id) VALUES
+(1, 9, 2),
+(5, 17, 10),
+(6, 17, 9),
+(7, 19, 1),
+(8, 21, 9),
+(9, 22, 9),
+(11, 24, 1),
+(12, 25, 21),
+(13, 25, 9),
+(15, 27, 19),
+(16, 27, 21),
+(17, 28, 17),
+(18, 29, 9),
+(20, 31, 9),
+(21, 33, 21),
+(22, 33, 25),
+(23, 34, 29),
+(24, 35, 21),
+(25, 35, 25),
+(26, 36, 10),
+(27, 37, 29),
+(28, 40, 27),
+(30, 44, 36),
+(31, 45, 36),
+(32, 46, 17),
+(33, 46, 22),
+(34, 47, 21),
+(35, 47, 31),
+(36, 48, 41),
+(37, 49, 44),
+(38, 49, 35),
+(39, 50, 45),
+(40, 50, 44),
+(41, 51, 17),
+(42, 52, 34);
 
 -- Insert default grading periods for 1st Semester
 INSERT INTO grading_periods (name, order_num, weight, is_current, academic_term_id) VALUES

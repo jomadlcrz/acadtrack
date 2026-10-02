@@ -52,7 +52,7 @@ ob_start();
                 <div class="col-12">
                     <label class="form-label small fw-semibold text-dark">Program Name <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="program_name" name="program_name" placeholder="e.g. Bachelor of Science in Information Technology" required>
-                    <div class="form-text text-muted text-xs">The full title of the degree or academic certificate program.</div>
+                    <div class="form-text text-muted text-xs">The full title of the degree program.</div>
                 </div>
 
                 <!-- Grouped: Department & Program Abbreviation -->
@@ -88,22 +88,18 @@ ob_start();
                 <!-- Program Type, Length, Status -->
                 <div class="col-12 col-md-4">
                     <label class="form-label small fw-semibold text-dark">Program Type</label>
-                    <select class="form-select" id="program_type" name="program_type">
+                    <select class="form-select" id="program_type" name="program_type" onchange="syncProgramTypeAndLength()">
                         <option value="Bachelor's Degree">Bachelor's Degree</option>
                         <option value="Associate Degree">Associate Degree</option>
-                        <option value="Master's Degree">Master's Degree</option>
-                        <option value="Certificate">Certificate</option>
                     </select>
                 </div>
 
                 <div class="col-12 col-md-4">
                     <label class="form-label small fw-semibold text-dark">Program Length</label>
-                    <select class="form-select" id="program_length" name="program_length">
-                        <option value="4 Years">4 Years</option>
-                        <option value="2 Years">2 Years</option>
-                        <option value="3 Years">3 Years</option>
-                        <option value="5 Years">5 Years</option>
+                    <select class="form-select" id="program_length" name="program_length" onchange="handleProgramLengthChange()">
+                        <option value="4 Years" selected>4 Years</option>
                     </select>
+                    <div class="form-text text-muted text-xs" id="program_length_hint">Standard bachelor degree duration (4 Years).</div>
                 </div>
 
                 <div class="col-12 col-md-4">
@@ -413,7 +409,52 @@ if (typeof XLSX === 'undefined') {
 </script>
 
 <script>
-const years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
+function getCurriculumYears() {
+    const pLength = document.getElementById('program_length') ? document.getElementById('program_length').value : '4 Years';
+    if (pLength === '2 Years') {
+        return ["First Year", "Second Year"];
+    }
+    return ["First Year", "Second Year", "Third Year", "Fourth Year"];
+}
+
+function syncProgramTypeAndLength() {
+    const typeSelect = document.getElementById('program_type');
+    const lengthSelect = document.getElementById('program_length');
+    const hint = document.getElementById('program_length_hint');
+    if (!typeSelect || !lengthSelect) return;
+
+    if (typeSelect.value === 'Associate Degree') {
+        lengthSelect.innerHTML = '<option value="2 Years" selected>2 Years</option>';
+        lengthSelect.style.backgroundColor = '#f8fafc';
+        lengthSelect.style.cursor = 'not-allowed';
+        if (hint) {
+            hint.textContent = 'Associate Degree is strictly 2 Years.';
+        }
+    } else {
+        lengthSelect.style.backgroundColor = '';
+        lengthSelect.style.cursor = '';
+        lengthSelect.innerHTML = '<option value="4 Years" selected>4 Years</option>';
+        if (hint) {
+            hint.textContent = 'Standard bachelor degree duration (4 Years).';
+        }
+    }
+    handleProgramLengthChange();
+}
+
+function handleProgramLengthChange() {
+    const validYears = getCurriculumYears();
+    let changed = false;
+    subjectsList.forEach(s => {
+        if (!validYears.includes(s.year_level)) {
+            s.year_level = validYears[validYears.length - 1] || 'First Year';
+            changed = true;
+        }
+    });
+    if (changed || subjectsList.length > 0) {
+        renderSubjectsTable();
+    }
+}
+
 const semesters = ["1st Semester", "2nd Semester", "Summer"];
 const subjectTypes = [
     "GenEd Core",
@@ -472,7 +513,7 @@ function renderSubjectsTable() {
         tr.innerHTML = `
             <td class="p-2">
                 <select class="form-select form-select-sm" onchange="updateSubjectField(${idx}, 'year_level', this.value)">
-                    ${years.map(y => `<option value="${y}" ${sub.year_level === y ? 'selected' : ''}>${y}</option>`).join('')}
+                    ${getCurriculumYears().map(y => `<option value="${y}" ${sub.year_level === y ? 'selected' : ''}>${y}</option>`).join('')}
                 </select>
             </td>
             <td class="p-2">
@@ -614,6 +655,11 @@ function buildReviewStep() {
 }
 
 function submitCurriculum() {
+    const typeSelect = document.getElementById('program_type');
+    const lengthSelect = document.getElementById('program_length');
+    if (typeSelect && typeSelect.value === 'Associate Degree' && lengthSelect) {
+        lengthSelect.value = '2 Years';
+    }
     document.getElementById('subjectsJsonInput').value = JSON.stringify(subjectsList);
     const form = document.getElementById('curriculumWizardForm');
     const submitBtn = document.getElementById('submitCurriculumBtn');

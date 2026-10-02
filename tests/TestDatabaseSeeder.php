@@ -176,9 +176,6 @@ class TestDatabaseSeeder
         // 4. Ensure Baseline Departments
         $departments = [
             ['dept_abbrev' => 'CITE', 'dept_name' => 'College of Information Technology Education', 'status' => 'active'],
-            ['dept_abbrev' => 'COC', 'dept_name' => 'College of Criminology', 'status' => 'active'],
-            ['dept_abbrev' => 'CBA', 'dept_name' => 'College of Business Administration', 'status' => 'active'],
-            ['dept_abbrev' => 'COED', 'dept_name' => 'College of Education', 'status' => 'active'],
         ];
         foreach ($departments as $d) {
             Department::updateOrCreate(['dept_abbrev' => $d['dept_abbrev']], $d);
@@ -186,17 +183,9 @@ class TestDatabaseSeeder
 
         // 5. Ensure Baseline Programs
         $cite = Department::where('dept_abbrev', 'CITE')->first();
-        $coc = Department::where('dept_abbrev', 'COC')->first();
-        $cba = Department::where('dept_abbrev', 'CBA')->first();
-        $coed = Department::where('dept_abbrev', 'COED')->first();
 
         $programs = [
             ['program_abbrev' => 'BSIT', 'program_name' => 'Bachelor of Science in Information Technology', 'department_id' => $cite ? $cite->id : 1, 'status' => 'active'],
-            ['program_abbrev' => 'BSCS', 'program_name' => 'Bachelor of Science in Computer Science', 'department_id' => $cite ? $cite->id : 1, 'status' => 'active'],
-            ['program_abbrev' => 'BSCRIM', 'program_name' => 'Bachelor of Science in Criminology', 'department_id' => $coc ? $coc->id : 2, 'status' => 'active'],
-            ['program_abbrev' => 'BSBA', 'program_name' => 'Bachelor of Science in Business Administration major in Marketing Management', 'department_id' => $cba ? $cba->id : 3, 'status' => 'active'],
-            ['program_abbrev' => 'BEED', 'program_name' => 'Bachelor of Elementary Education', 'department_id' => $coed ? $coed->id : 4, 'status' => 'active'],
-            ['program_abbrev' => 'BSED', 'program_name' => 'Bachelor of Secondary Education', 'department_id' => $coed ? $coed->id : 4, 'status' => 'active'],
         ];
         foreach ($programs as $p) {
             Program::updateOrCreate(['program_abbrev' => $p['program_abbrev']], $p);
@@ -282,12 +271,12 @@ class TestDatabaseSeeder
                     'is_archived' => 0,
                 ],
                 [
-                    'code' => 'GE101',
-                    'name' => 'Understanding the Self',
+                    'code' => 'IT104',
+                    'name' => 'Discrete Mathematics and Structures',
                     'units' => 3.0,
                     'nature' => 'Lecture',
                     'year_level' => 1,
-                    'semester' => 1,
+                    'semester' => 2,
                     'program_id' => 1,
                     'academic_term_id' => $termId,
                     'is_archived' => 0,
