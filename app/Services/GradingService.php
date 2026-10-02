@@ -31,7 +31,15 @@ class GradingService
             throw new \DomainException('Cannot modify grades: This grading period has been officially closed and locked.');
         }
 
+        $sheet = $this->gradingSheetRepository->findByComposite($facultyId, $subjectId, $gradingPeriodId, $academicTermId);
+        if ($sheet && !in_array($sheet['status'], [GradingSheet::STATUS_DRAFT, GradingSheet::STATUS_RETURNED], true)) {
+            throw new \DomainException('Cannot modify grades: this grading sheet has already been submitted for review. Ask the Dean to return it first.');
+        }
+
         foreach ($studentGrades as $studentId => $grade) {
+            if ($grade === '' || $grade === null) {
+                continue;
+            }
             $gradeValue = (float) $grade;
             $this->gradeRepository->saveGrade(
                 (int) $studentId,

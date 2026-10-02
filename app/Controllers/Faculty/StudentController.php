@@ -180,20 +180,7 @@ class StudentController
                 return;
             }
 
-            $updates = [];
-            if ($yearLevel > 0) {
-                $updates['year_level'] = $yearLevel;
-            }
-            if ($setId !== null) {
-                $updates['set_id'] = $setId;
-            }
-            if (in_array($status, ['Regular', 'Irregular'], true)) {
-                $updates['status'] = $status;
-            }
-            if (!empty($updates)) {
-                $student->update($updates);
-            }
-
+            // Student profile (set, year level, status) is owned by the Admin; faculty only roster the student.
             \App\Models\Student::enroll($studentId, $subjectId, $termId);
             $session->flash('success', 'Student enrolled successfully into this class set.');
         } else {
