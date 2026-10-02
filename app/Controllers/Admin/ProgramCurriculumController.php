@@ -173,7 +173,7 @@ class ProgramCurriculumController
 
         $description = trim((string) ($data['description'] ?? '')) ?: null;
         $rawStatus = trim((string) ($data['status'] ?? 'active'));
-        $status = in_array($rawStatus, ['active', 'draft', 'archived'], true) ? $rawStatus : 'active';
+        $status = ($rawStatus === 'archived') ? 'archived' : 'active';
 
         $subjectsInput = $data['subjects'] ?? $data['subjects_json'] ?? [];
         if (is_string($subjectsInput)) {

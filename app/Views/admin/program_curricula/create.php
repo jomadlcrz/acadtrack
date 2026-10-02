@@ -85,8 +85,8 @@ ob_start();
                     </div>
                 </div>
 
-                <!-- Program Type, Length, Status -->
-                <div class="col-12 col-md-4">
+                <!-- Program Type & Length -->
+                <div class="col-12 col-md-6">
                     <label class="form-label small fw-semibold text-dark">Program Type</label>
                     <select class="form-select" id="program_type" name="program_type" onchange="syncProgramTypeAndLength()">
                         <option value="Bachelor's Degree">Bachelor's Degree</option>
@@ -94,20 +94,12 @@ ob_start();
                     </select>
                 </div>
 
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-md-6">
                     <label class="form-label small fw-semibold text-dark">Program Length</label>
                     <select class="form-select" id="program_length" name="program_length" onchange="handleProgramLengthChange()">
                         <option value="4 Years" selected>4 Years</option>
                     </select>
                     <div class="form-text text-muted text-xs" id="program_length_hint">Standard bachelor degree duration (4 Years).</div>
-                </div>
-
-                <div class="col-12 col-md-4">
-                    <label class="form-label small fw-semibold text-dark">Initial Status</label>
-                    <select class="form-select" id="status" name="status">
-                        <option value="active" selected>Active</option>
-                        <option value="draft">Draft</option>
-                    </select>
                 </div>
 
                 <!-- Program Description -->
@@ -615,15 +607,12 @@ function buildReviewStep() {
     const deptName = deptSelect.selectedOptions[0] ? deptSelect.selectedOptions[0].text : 'None';
     const pType = document.getElementById('program_type').value;
     const pLength = document.getElementById('program_length').value;
-    const status = document.getElementById('status').value;
 
     document.getElementById('reviewProgramName').textContent = name || '—';
     document.getElementById('reviewProgramAbbrev').textContent = abbrev || '—';
     document.getElementById('reviewDepartment').textContent = deptName;
     document.getElementById('reviewClassification').textContent = `${pType} · ${pLength}`;
-    document.getElementById('reviewStatus').innerHTML = status === 'active' 
-        ? '<span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>'
-        : '<span class="badge bg-warning-subtle text-warning border border-warning-subtle">Draft</span>';
+    document.getElementById('reviewStatus').innerHTML = '<span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>';
 
     const totalUnits = subjectsList.reduce((sum, s) => sum + (parseFloat(s.units) || 0), 0);
     document.getElementById('reviewTotalSubjects').textContent = subjectsList.length;

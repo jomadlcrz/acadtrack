@@ -112,7 +112,7 @@ CREATE TABLE programs (
     program_type VARCHAR(100) NOT NULL DEFAULT 'Bachelors Degree',
     program_length VARCHAR(50) NOT NULL DEFAULT '4 Years',
     description TEXT NULL,
-    status ENUM('draft', 'active', 'archived') NOT NULL DEFAULT 'active',
+    status ENUM('active', 'archived') NOT NULL DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
