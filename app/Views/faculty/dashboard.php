@@ -254,20 +254,16 @@ ob_start();
                     foreach ($top3 as $idx => $pStudent): 
                         $rankNum = $idx + 1;
                         $medalClass = match($rankNum) { 1 => 'gold', 2 => 'silver', default => 'bronze' };
-                        $initials = strtoupper(substr($pStudent['full_name'] ?? 'S', 0, 1));
                     ?>
                         <div class="podium-card rank-<?= $rankNum ?>">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div class="podium-medal <?= $medalClass ?>">#<?= $rankNum ?></div>
                                 <span class="fs-5 fw-bold font-monospace text-primary tabular-nums"><?= number_format($pStudent['final_grade'], 1) ?>%</span>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="avatar-monogram"><?= $initials ?></div>
-                                <div class="overflow-hidden">
-                                    <div class="fw-bold text-dark text-truncate" style="font-size: 13px;"><?= htmlspecialchars($pStudent['full_name']) ?></div>
-                                    <div class="text-muted font-monospace text-truncate" style="font-size: 11px;">
-                                        <?= htmlspecialchars($pStudent['student_number']) ?> &bull; <?= htmlspecialchars($pStudent['set_name'] ?? 'Section') ?>
-                                    </div>
+                            <div>
+                                <div class="fw-bold text-dark text-truncate" style="font-size: 13px;"><?= htmlspecialchars($pStudent['full_name']) ?></div>
+                                <div class="text-muted font-monospace text-truncate" style="font-size: 11px;">
+                                    <?= htmlspecialchars($pStudent['student_number']) ?> &bull; <?= htmlspecialchars($pStudent['set_name'] ?? 'Section') ?>
                                 </div>
                             </div>
                         </div>

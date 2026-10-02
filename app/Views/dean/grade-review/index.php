@@ -196,17 +196,10 @@ $metrics = $metrics ?? [
                             </span>
                         </td>
                         <td class="py-2.5 px-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="avatar-circle-sm bg-primary-subtle text-primary fw-bold flex-shrink-0" style="width: 28px; height: 28px; font-size: 11px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
-                                    <?= htmlspecialchars($initials) ?>
-                                </div>
-                                <div class="overflow-hidden">
-                                    <div class="fw-medium text-dark fs-7 text-truncate"><?= htmlspecialchars($instructorName) ?></div>
-                                    <?php if (!empty($sheet['email'])): ?>
-                                        <div class="text-muted text-truncate" style="font-size: 11px;"><?= htmlspecialchars($sheet['email']) ?></div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
+                            <div class="fw-medium text-dark fs-7 text-truncate"><?= htmlspecialchars($instructorName) ?></div>
+                            <?php if (!empty($sheet['email'])): ?>
+                                <div class="text-muted text-truncate" style="font-size: 11px;"><?= htmlspecialchars($sheet['email']) ?></div>
+                            <?php endif; ?>
                         </td>
                         <td class="py-2.5 px-3">
                             <?php if (!empty($sheet['submitted_at'])): ?>

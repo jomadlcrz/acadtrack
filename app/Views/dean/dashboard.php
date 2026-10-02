@@ -212,7 +212,7 @@ ob_start();
                                     <?php elseif ($dl['rank'] === 3): ?>
                                         <div class="podium-medal bronze" style="width: 28px; height: 28px; font-size: 11px;">#3</div>
                                     <?php else: ?>
-                                        <div class="avatar-monogram" style="width: 28px; height: 28px; font-size: 11px;">#<?= $dl['rank'] ?></div>
+                                        <div class="badge bg-light text-secondary border fw-bold rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 11px;">#<?= $dl['rank'] ?></div>
                                     <?php endif; ?>
                                     <div>
                                         <div class="fw-semibold text-dark"><?= htmlspecialchars($dl['full_name']) ?></div>

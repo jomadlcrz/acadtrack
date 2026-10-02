@@ -68,7 +68,7 @@ ob_start();
 </form>
 
 <div class="auth-cancel-wrap">
-    <form method="POST" action="<?= url('/logout') ?>" class="d-inline">
+    <form method="POST" action="<?= url('/logout') ?>" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel and sign out?');">
         <?= csrf_field() ?>
         <button type="submit" class="auth-cancel-btn">
             Cancel and sign out
