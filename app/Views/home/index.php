@@ -6,7 +6,9 @@
     <meta name="description" content="College of Information Technology — Acadtrack">
     <title>Acadtrack &mdash; College of Information Technology</title>
     <link rel="icon" type="image/x-icon" href="<?= url('/favicon.ico') ?>">
-    <link rel="shortcut icon" type="image/x-icon" href="<?= url('/favicon.ico') ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= asset('images/favicon-32x32.png') ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= asset('images/favicon-16x16.png') ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= asset('images/apple-touch-icon.png') ?>">
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap/css/bootstrap.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('vendor/bootstrap-icons/bootstrap-icons.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
