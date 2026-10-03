@@ -439,6 +439,48 @@ CREATE TABLE IF NOT EXISTS term_audit_logs (
     FOREIGN KEY (performed_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+-- Audit Logs (Append-Only Staff Activity Log)
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    actor_id INT NULL,
+    actor_name VARCHAR(120) NOT NULL,
+    actor_email VARCHAR(255) NOT NULL DEFAULT '',
+    actor_role VARCHAR(30) NOT NULL DEFAULT '',
+    category VARCHAR(30) NOT NULL,
+    action VARCHAR(80) NOT NULL,
+    target_type VARCHAR(40) NOT NULL DEFAULT '',
+    target_id VARCHAR(64) NOT NULL DEFAULT '',
+    target_label VARCHAR(120) NOT NULL DEFAULT '',
+    summary VARCHAR(500) NOT NULL,
+    ip_address VARCHAR(45) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_audit_created (created_at),
+    INDEX idx_audit_category (category, created_at),
+    INDEX idx_audit_actor (actor_id, created_at),
+    INDEX idx_audit_target (target_type, target_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Student Term Registrations (Per-Term Student Standing & Modular Scheduling Ledger)
+CREATE TABLE IF NOT EXISTS student_term_registrations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    academic_term_id INT NOT NULL,
+    program_id INT UNSIGNED NULL,
+    set_id INT NULL,
+    year_level INT NOT NULL DEFAULT 1,
+    status ENUM('Regular', 'Irregular') NOT NULL DEFAULT 'Regular',
+    registration_status ENUM('enrolled', 'withdrawn', 'completed') NOT NULL DEFAULT 'enrolled',
+    registered_by INT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_student_term (student_id, academic_term_id),
+    INDEX idx_str_term_set (academic_term_id, set_id),
+    INDEX idx_str_term_status (academic_term_id, status),
+    CONSTRAINT fk_str_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    CONSTRAINT fk_str_term FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_str_set FOREIGN KEY (set_id) REFERENCES sets(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Insert default academic year and terms
 INSERT INTO academic_years (id, school_year, is_active) VALUES
 (1, '2026-2027', 1);
