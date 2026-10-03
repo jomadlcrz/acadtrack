@@ -177,17 +177,17 @@ ob_start();
                         </div>
                     </div>
 
-                    <!-- Curriculum Year Level & Class Section -->
+                    <!-- Year Level & Class Section -->
                     <div class="row g-3">
                         <div class="col-md-6" id="yearLevelWrapper">
                             <label for="year_level" class="form-label fw-semibold text-dark" style="font-size: 13px;">
-                                Year Level <span class="text-danger">*</span>
+                                Year level <span class="text-danger">*</span>
                             </label>
                             <select class="form-select" id="year_level" name="year_level" required>
-                                <option value="1" <?= $currentYearLevel === 1 ? 'selected' : '' ?>>1st Year (Freshman)</option>
-                                <option value="2" <?= $currentYearLevel === 2 ? 'selected' : '' ?>>2nd Year (Sophomore)</option>
-                                <option value="3" <?= $currentYearLevel === 3 ? 'selected' : '' ?>>3rd Year (Junior)</option>
-                                <option value="4" <?= $currentYearLevel === 4 ? 'selected' : '' ?>>4th Year (Senior)</option>
+                                <option value="1" <?= $currentYearLevel === 1 ? 'selected' : '' ?>>1st Year</option>
+                                <option value="2" <?= $currentYearLevel === 2 ? 'selected' : '' ?>>2nd Year</option>
+                                <option value="3" <?= $currentYearLevel === 3 ? 'selected' : '' ?>>3rd Year</option>
+                                <option value="4" <?= $currentYearLevel === 4 ? 'selected' : '' ?>>4th Year</option>
                             </select>
                             <div class="form-text text-muted" id="yearLevelHelp" style="font-size: 12px;">
                                 <?= $currentStatus === 'Regular' ? 'Filters sections matching this academic year.' : 'Academic curriculum standing.' ?>
@@ -197,7 +197,7 @@ ob_start();
                         <!-- Regular only: Class Set -->
                         <div class="col-md-6 <?= $currentStatus === 'Irregular' ? 'd-none' : '' ?>" id="setSectionWrapper">
                             <label for="set_id" class="form-label fw-semibold text-dark" style="font-size: 13px;">
-                                Assigned Section <span class="text-danger" id="setRequiredMarker">*</span>
+                                Assigned section <span class="text-danger" id="setRequiredMarker">*</span>
                             </label>
                             <select class="form-select" id="set_id" name="set_id" <?= $currentStatus === 'Regular' ? 'required' : '' ?>>
                                 <option value="">Select section...</option>
@@ -238,16 +238,16 @@ ob_start();
                         </div>
                         <div>
                             <h6 class="fw-semibold text-dark mb-0" style="font-size: 14px;">Department Affiliation</h6>
-                            <div class="text-muted" style="font-size: 12px;">Collegiate division and academic department appointment.</div>
+                            <div class="text-muted" style="font-size: 12px;">Academic department appointment.</div>
                         </div>
                     </div>
 
                     <div class="mb-1">
                         <label for="department_id" class="form-label fw-semibold text-dark" style="font-size: 13px;">
-                            Academic Department <span class="text-danger">*</span>
+                            Department <span class="text-danger">*</span>
                         </label>
                         <select class="form-select" id="department_id" name="department_id" required>
-                            <option value="">Select college or academic department...</option>
+                            <option value="">Select department...</option>
                             <?php
                             $currentDeptId = $user['faculty']['department_id'] ?? null;
                             foreach ($departments ?? [] as $dept):
@@ -260,7 +260,7 @@ ob_start();
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="form-text text-muted" style="font-size: 12px;">The collegiate department this academic officer belongs to.</div>
+                        <div class="form-text text-muted" style="font-size: 12px;">The department this academic officer belongs to.</div>
                     </div>
                 </div>
             <?php endif; ?>

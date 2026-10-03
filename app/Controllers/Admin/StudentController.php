@@ -27,7 +27,7 @@ class StudentController
         $this->registrationService = new StudentRegistrationService();
     }
 
-    public function index(Request $request, Response $response, Session $session): void
+    public function index(Request $request, Response $response, Session $session, ?array $editingUser = null): void
     {
         $terms = AcademicTerm::getAll();
         $termId = (int) $request->get('term_id', 0);
@@ -47,6 +47,16 @@ class StudentController
 
         $students = $this->userRepository->paginateStudents($termId, $filters, (int) $request->get('page', 1), 20);
 
+        if ($editingUser === null && $request->get('edit')) {
+            $editId = (int) $request->get('edit');
+            if ($editId > 0) {
+                $found = \App\Models\User::with(['student.set', 'studentDetail'])->find($editId);
+                if ($found) {
+                    $editingUser = $found->toArray();
+                }
+            }
+        }
+
         $unregistered = (int) Capsule::table('students')
             ->whereNotIn('id', Capsule::table('student_term_registrations')->where('academic_term_id', $termId)->select('student_id'))
             ->count();
@@ -59,6 +69,8 @@ class StudentController
             'students' => $students,
             'filters' => $filters,
             'sets' => Set::getActiveByTerm($termId),
+            'departments' => \App\Models\Department::getActive(),
+            'editingUser' => $editingUser,
             'unregistered' => $unregistered,
             'nextTerm' => $nextTerm ? $nextTerm->toArray() : null,
         ]);

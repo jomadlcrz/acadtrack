@@ -105,6 +105,19 @@ if (!empty($staff['data'])) {
 ?>
 
 <?php
+$renderedModalIds = [];
+foreach ($staff['data'] ?? [] as $user) {
+    $renderedModalIds[(int) $user['id']] = true;
+    include __DIR__ . '/../users/_edit-modal.php';
+}
+if (!empty($editingUser) && empty($renderedModalIds[(int) $editingUser['id']])) {
+    $user = $editingUser;
+    include __DIR__ . '/../users/_edit-modal.php';
+}
+include __DIR__ . '/../users/_edit-modal-scripts.php';
+?>
+
+<?php
 $content = ob_get_clean();
 include __DIR__ . '/../../layouts/dashboard.php';
 ?>

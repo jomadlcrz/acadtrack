@@ -140,9 +140,9 @@ ob_start();
                                         <?php endif; ?>
                                     </td>
                                     <td class="px-3 text-end">
-                                        <a href="<?= url('/admin/users/' . $ru['id'] . '/edit') ?>" class="btn btn-sm btn-outline-primary py-1 px-2">
+                                        <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2" data-bs-toggle="modal" data-bs-target="#editUserModal<?= (int) $ru['id'] ?>">
                                             <i class="bi bi-pencil"></i> Edit
-                                        </a>
+                                        </button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -181,6 +181,13 @@ ob_start();
         </div>
     </div>
 </div>
+
+<?php
+foreach ($recentUsers as $user) {
+    include __DIR__ . '/users/_edit-modal.php';
+}
+include __DIR__ . '/users/_edit-modal-scripts.php';
+?>
 
 <?php
 $content = ob_get_clean();

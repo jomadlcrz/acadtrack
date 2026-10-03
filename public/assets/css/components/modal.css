@@ -103,3 +103,24 @@
 .modal-close:hover {
     color: #0f172a;
 }
+
+/* 7. Modal Viewport Scrollarea & Body Scroll Lock */
+html.modal-open,
+html:has(body.modal-open),
+body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+}
+
+body.modal-open .navbar,
+body.modal-open .app-container,
+body.modal-open .fixed-top,
+body.modal-open .fixed-bottom {
+    padding-right: 0 !important;
+}
+
+.modal {
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+    overflow-y: auto !important;
+}

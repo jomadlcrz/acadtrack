@@ -156,9 +156,10 @@ class UserController
 
     public function edit(Request $request, Response $response, Session $session, string $id): void
     {
-        $user = \App\Models\User::with(['faculty.department', 'student.set'])->find((int) $id);
+        $user = \App\Models\User::with(['faculty.department', 'student.set', 'studentDetail'])->find((int) $id);
         if (!$user) {
-            $response->statusCode(404)->html('User not found');
+            $session->flash('error', 'User not found.');
+            redirect($this->listUrl());
             return;
         }
 
@@ -168,15 +169,13 @@ class UserController
             return;
         }
 
-        $departments = \App\Models\Department::getActive();
-        $academicTerm = \App\Models\AcademicTerm::getActive();
-        $sets = $academicTerm ? \App\Models\Set::getActiveByTerm((int) $academicTerm['id']) : [];
-        $html = (new View())->render('admin.users.edit', [
-            'user' => $user->toArray(),
-            'departments' => $departments,
-            'sets' => $sets,
-        ]);
-        $response->html($html);
+        // Render directory with modal open in-place, keeping the /admin/users/{id}/edit URL in browser
+        if ($user->role === 'Student') {
+            (new StudentController())->index($request, $response, $session, $user->toArray());
+            return;
+        }
+
+        (new StaffController())->index($request, $response, $session, $user->toArray());
     }
 
     public function update(Request $request, Response $response, Session $session, string $id): void

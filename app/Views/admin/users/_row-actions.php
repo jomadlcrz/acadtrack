@@ -12,9 +12,9 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
             <li>
-                <a class="dropdown-item" href="<?= url('/admin/users/' . $user['id'] . '/edit') ?>">
+                <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editUserModal<?= (int) $user['id'] ?>">
                     <i class="bi bi-pencil text-muted"></i> Edit account
-                </a>
+                </button>
             </li>
             <li><hr class="dropdown-divider"></li>
             <?php if (($user['status'] ?? 'active') === 'inactive'): ?>

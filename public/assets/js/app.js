@@ -22,3 +22,14 @@ function openModal(modalId) {
     }
 }
 
+// Synchronize modal-open class to documentElement to lock background scroll
+document.addEventListener('show.bs.modal', function() {
+    document.documentElement.classList.add('modal-open');
+});
+
+document.addEventListener('hidden.bs.modal', function() {
+    if (!document.querySelector('.modal.show')) {
+        document.documentElement.classList.remove('modal-open');
+    }
+});
+

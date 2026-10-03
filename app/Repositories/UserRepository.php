@@ -265,8 +265,8 @@ class UserRepository
         $total = (int) $stmt->fetchColumn();
 
         $stmt = Database::getConnection()->prepare(
-            "SELECT u.id, u.email, u.status, COALESCE(sd.first_name, '') AS first_name, COALESCE(sd.last_name, '') AS last_name,
-                    sd.student_number, r.year_level, r.status AS student_status, r.registration_status, st.set_name
+            "SELECT u.id, u.email, u.status, 'Student' AS role, COALESCE(sd.first_name, '') AS first_name, COALESCE(sd.last_name, '') AS last_name,
+                    sd.student_number, r.year_level, r.status AS student_status, r.registration_status, r.set_id, st.set_name
              {$from}
              ORDER BY r.year_level, sd.last_name, sd.first_name
              LIMIT :limit OFFSET :offset"
@@ -331,6 +331,7 @@ class UserRepository
             "SELECT u.id, u.email, u.status, r.role_name AS role,
                     COALESCE(ad.first_name, fd.first_name, '') AS first_name,
                     COALESCE(ad.last_name, fd.last_name, '') AS last_name,
+                    fd.department_id,
                     d.dept_name AS department_name, d.dept_abbrev AS department_code
              {$from}
              ORDER BY COALESCE(ad.last_name, fd.last_name, ''), COALESCE(ad.first_name, fd.first_name, '')

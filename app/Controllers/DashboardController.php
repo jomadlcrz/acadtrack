@@ -69,7 +69,7 @@ class DashboardController
         $totalStudents = \App\Models\UserRole::where('role_id', 4)->count();
         $totalFaculty = \App\Models\UserRole::whereIn('role_id', [2, 3])->count();
         $totalDepts = Department::count();
-        $recentUsers = User::orderBy('id', 'desc')->limit(5)->get()->toArray();
+        $recentUsers = User::with(['faculty.department', 'student.set', 'studentDetail'])->orderBy('id', 'desc')->limit(5)->get()->toArray();
         $gradingSetting = GradingSetting::first();
 
         return [
@@ -79,6 +79,8 @@ class DashboardController
             'totalFaculty' => $totalFaculty,
             'totalDepts' => $totalDepts,
             'recentUsers' => $recentUsers,
+            'departments' => Department::getActive(),
+            'sets' => $activeTerm ? Set::getActiveByTerm((int) $activeTerm['id']) : [],
             'gradingSetting' => $gradingSetting ? $gradingSetting->toArray() : null,
         ];
     }

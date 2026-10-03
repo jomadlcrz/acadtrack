@@ -1,6 +1,6 @@
 <!-- Modal: Batch Excel / CSV Import -->
 <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow" style="border: 1px solid #cbd5e1 !important; border-radius: 8px;">
             <div class="modal-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
                 <div>
