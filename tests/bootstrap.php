@@ -17,3 +17,13 @@ new \App\Core\Database(
 define('PHPUNIT_RUNNING', true);
 
 \Tests\TestDatabaseSeeder::seedIfNeeded();
+
+// Tests write to the real database; drop any activity-log rows created during this run.
+$auditLogBaseline = (int) \Illuminate\Database\Capsule\Manager::table('audit_logs')->max('id');
+register_shutdown_function(static function () use ($auditLogBaseline): void {
+    try {
+        \Illuminate\Database\Capsule\Manager::table('audit_logs')->where('id', '>', $auditLogBaseline)->delete();
+    } catch (\Throwable $e) {
+        // best effort
+    }
+});

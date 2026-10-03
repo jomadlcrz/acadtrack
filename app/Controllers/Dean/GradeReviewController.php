@@ -149,10 +149,22 @@ class GradeReviewController
         }
 
         $studentGrades = $request->post('grades', []);
+        $changes = [];
         if (is_array($studentGrades)) {
             foreach ($studentGrades as $studentId => $gradeValue) {
                 if ($gradeValue === '' || $gradeValue === null) {
                     continue;
+                }
+                $old = \App\Models\Grade::where('student_id', (int) $studentId)
+                    ->where('subject_id', (int) $sheet['subject_id'])
+                    ->where('grading_period_id', (int) $sheet['grading_period_id'])
+                    ->where('academic_term_id', (int) $sheet['academic_term_id'])
+                    ->value('grade');
+                if ($old === null || abs((float) $old - (float) $gradeValue) > 0.0001) {
+                    $student = \App\Models\Student::find((int) $studentId);
+                    $detail = $student ? \App\Models\StudentDetail::where('user_id', $student->user_id)->first() : null;
+                    $name = $detail ? trim($detail->first_name . ' ' . $detail->last_name) : "student #{$studentId}";
+                    $changes[] = $name . ': ' . ($old === null ? 'none' : rtrim(rtrim((string) $old, '0'), '.')) . ' to ' . (float) $gradeValue;
                 }
                 $this->gradeRepository->saveGrade(
                     (int) $studentId,
@@ -162,6 +174,18 @@ class GradeReviewController
                     (float) $gradeValue
                 );
             }
+        }
+
+        if (!empty($changes)) {
+            $shown = implode('; ', array_slice($changes, 0, 5)) . (count($changes) > 5 ? '; and ' . (count($changes) - 5) . ' more' : '');
+            \App\Services\ActivityLogService::record([
+                'category' => \App\Services\ActivityLogService::CATEGORY_GRADES,
+                'action' => 'Grades Adjusted',
+                'target_type' => 'grading_sheet',
+                'target_id' => $sheetId,
+                'target_label' => $sheet['subject_code'] . ' - ' . $sheet['period_name'],
+                'summary' => 'Adjusted ' . count($changes) . ' grade(s) in the ' . $sheet['period_name'] . ' sheet for ' . $sheet['subject_code'] . ". {$shown}.",
+            ]);
         }
 
         $session->flash('success', 'Student grade adjustments recorded successfully.');

@@ -56,11 +56,11 @@ class UserValidator
                 }
             }
 
-            $studentStatus = (string) ($data['student_status'] ?? 'Regular');
+            $studentStatus = \App\Models\Student::normalizeStatus($data['student_status'] ?? null);
             $yearLevel = !empty($data['year_level']) ? (int) $data['year_level'] : 1;
             $setId = !empty($data['set_id']) ? (int) $data['set_id'] : null;
 
-            if ($studentStatus === 'Regular') {
+            if (\App\Models\Student::requiresSet($studentStatus)) {
                 if (empty($setId)) {
                     $this->errors['set_id'] = 'Assigned set is required for student accounts.';
                 }

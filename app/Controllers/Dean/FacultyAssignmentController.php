@@ -90,6 +90,7 @@ class FacultyAssignmentController
         }
 
         $this->facultyRepository->assignSubject($facultyId, $subjectId, $termId);
+        $this->logAssignment('Instructor Assigned', true, $facultyId, $subjectId);
         $session->flash('success', 'Instructor assigned successfully to course offering.');
         redirect("/dean/faculty-assignments{$semQuery}");
     }
@@ -128,7 +129,25 @@ class FacultyAssignmentController
         }
 
         $this->facultyRepository->removeAssignment($facultyId, $subjectId, $termId);
+        $this->logAssignment('Assignment Removed', false, $facultyId, $subjectId);
         $session->flash('success', 'Instructor assignment removed successfully.');
         redirect("/dean/faculty-assignments{$semQuery}");
+    }
+
+    private function logAssignment(string $action, bool $assigned, int $facultyId, int $subjectId): void
+    {
+        $faculty = \App\Models\FacultyDetail::where('user_id', $facultyId)->first();
+        $subject = \App\Models\Subject::find($subjectId);
+        $name = $faculty ? trim($faculty->first_name . ' ' . $faculty->last_name) : "faculty #{$facultyId}";
+        $code = $subject ? $subject->subject_code : "subject #{$subjectId}";
+
+        \App\Services\ActivityLogService::record([
+            'category' => \App\Services\ActivityLogService::CATEGORY_ASSIGNMENTS,
+            'action' => $action,
+            'target_type' => 'subject',
+            'target_id' => $subjectId,
+            'target_label' => $code,
+            'summary' => $assigned ? "Assigned {$name} to {$code}." : "Removed {$name} from {$code}.",
+        ]);
     }
 }

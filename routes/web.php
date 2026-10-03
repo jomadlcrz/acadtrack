@@ -13,6 +13,10 @@ use App\Controllers\Admin\TermClosureController;
 use App\Controllers\Admin\ProgramCurriculumController;
 use App\Controllers\Admin\SetController as AdminSetController;
 use App\Controllers\Admin\ArchiveController;
+use App\Controllers\Admin\RegistrationController;
+use App\Controllers\Admin\StudentController as AdminStudentController;
+use App\Controllers\Admin\StaffController;
+use App\Controllers\Admin\ActivityLogController;
 use App\Controllers\Dean\FacultyAssignmentController;
 use App\Controllers\Dean\SubjectController as DeanSubjectController;
 use App\Controllers\Dean\SetController;
@@ -103,6 +107,17 @@ $router->post('/admin/sets/bulk-archive', [AdminSetController::class, 'bulkArchi
 $router->post('/admin/sets/{id}', [AdminSetController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/sets/{id}/archive', [AdminSetController::class, 'archive'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/sets/{id}/restore', [AdminSetController::class, 'restore'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+
+// Student and staff directories (Admin only)
+$router->get('/admin/students', [AdminStudentController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+$router->get('/admin/staff', [StaffController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+
+// Activity log (Admin only)
+$router->get('/admin/activity-log', [ActivityLogController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+
+// Student term registration (Admin only)
+$router->get('/admin/registrations', [RegistrationController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+$router->post('/admin/registrations/rollover', [RegistrationController::class, 'rollover'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 
 $router->get('/admin/settings', [SettingsController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/settings', [SettingsController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);

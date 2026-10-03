@@ -17,7 +17,7 @@ ob_start();
         <span class="stat-subtext">Manage all accounts <i class="bi bi-arrow-right"></i></span>
     </a>
 
-    <a href="<?= url('/admin/users?role=Student') ?>" class="stat-card stat-card-link">
+    <a href="<?= url('/admin/students') ?>" class="stat-card stat-card-link">
         <div>
             <div class="stat-card-top">
                 <span class="stat-label">Registered students</span>
@@ -28,7 +28,7 @@ ob_start();
         <span class="stat-subtext">View student roster <i class="bi bi-arrow-right"></i></span>
     </a>
 
-    <a href="<?= url('/admin/users?role=Faculty') ?>" class="stat-card stat-card-link">
+    <a href="<?= url('/admin/staff?role=Faculty') ?>" class="stat-card stat-card-link">
         <div>
             <div class="stat-card-top">
                 <span class="stat-label">Teaching faculty</span>

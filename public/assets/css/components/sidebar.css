@@ -4,6 +4,8 @@
 
 .sidebar {
     width: 250px;
+    min-width: 250px;
+    max-width: 250px;
     height: calc(100vh - 58px);
     position: sticky;
     top: 58px;
@@ -12,6 +14,7 @@
     padding: 18px 12px;
     flex-shrink: 0;
     overflow-y: auto;
+    scrollbar-gutter: stable;
     z-index: 1020;
 }
 

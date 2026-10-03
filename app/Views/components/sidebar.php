@@ -7,28 +7,16 @@
 
         <?php if ($userRole === 'Admin'): ?>
             <div class="sidebar-group">
-                <span class="sidebar-heading">Administration</span>
+                <span class="sidebar-heading">Overview</span>
                 <a href="<?= url('/admin/dashboard') ?>" class="sidebar-link <?= $currentPath === '/admin/dashboard' ? 'active' : '' ?>">
                     <i class="bi bi-grid-1x2-fill"></i>
                     <span>Dashboard</span>
-                </a>
-                <a href="<?= url('/admin/users') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/users') ? 'active' : '' ?>">
-                    <i class="bi bi-people-fill"></i>
-                    <span>User Management</span>
-                </a>
-                <a href="<?= url('/admin/settings') ?>" class="sidebar-link <?= $currentPath === '/admin/settings' ? 'active' : '' ?>">
-                    <i class="bi bi-gear-fill"></i>
-                    <span>Institutional Settings</span>
-                </a>
-                <a href="<?= url('/admin/archives') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/archives') ? 'active' : '' ?>">
-                    <i class="bi bi-archive-fill"></i>
-                    <span>Archives</span>
                 </a>
             </div>
 
             <div class="sidebar-group">
                 <span class="sidebar-heading">Academics</span>
-                <a href="<?= url('/admin/academic-terms') ?>" class="sidebar-link <?= ($currentPath === '/admin/academic-terms' || $currentPath === '/admin/academic-terms/') ? 'active' : '' ?>">
+                <a href="<?= url('/admin/academic-terms') ?>" class="sidebar-link <?= (str_starts_with($currentPath, '/admin/academic-terms') && !str_starts_with($currentPath, '/admin/academic-terms/closure')) ? 'active' : '' ?>">
                     <i class="bi bi-calendar3"></i>
                     <span>Academic Terms</span>
                 </a>
@@ -54,13 +42,45 @@
                 </a>
             </div>
 
+            <div class="sidebar-group">
+                <span class="sidebar-heading">User Management</span>
+                <a href="<?= url('/admin/students') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/students') ? 'active' : '' ?>">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    <span>Students</span>
+                </a>
+                <a href="<?= url('/admin/staff') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/staff') ? 'active' : '' ?>">
+                    <i class="bi bi-person-badge-fill"></i>
+                    <span>Faculty and Staff</span>
+                </a>
+            </div>
+
+            <div class="sidebar-group">
+                <span class="sidebar-heading">Administration</span>
+                <a href="<?= url('/admin/settings') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/settings') ? 'active' : '' ?>">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Institutional Settings</span>
+                </a>
+                <a href="<?= url('/admin/activity-log') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/activity-log') ? 'active' : '' ?>">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Activity Log</span>
+                </a>
+                <a href="<?= url('/admin/archives') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/archives') ? 'active' : '' ?>">
+                    <i class="bi bi-archive-fill"></i>
+                    <span>Archives</span>
+                </a>
+            </div>
+
         <?php elseif ($userRole === 'Dean'): ?>
             <div class="sidebar-group">
-                <span class="sidebar-heading">Academic Oversight</span>
+                <span class="sidebar-heading">Overview</span>
                 <a href="<?= url('/dean/dashboard') ?>" class="sidebar-link <?= $currentPath === '/dean/dashboard' ? 'active' : '' ?>">
                     <i class="bi bi-grid-1x2-fill"></i>
                     <span>Dashboard</span>
                 </a>
+            </div>
+
+            <div class="sidebar-group">
+                <span class="sidebar-heading">Academics</span>
                 <a href="<?= url('/dean/subjects') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/subjects') ? 'active' : '' ?>">
                     <i class="bi bi-journal-text"></i>
                     <span>Curriculum Subjects</span>
@@ -73,6 +93,10 @@
                     <i class="bi bi-person-badge-fill"></i>
                     <span>Faculty Assignments</span>
                 </a>
+            </div>
+
+            <div class="sidebar-group">
+                <span class="sidebar-heading">Academic Oversight</span>
                 <a href="<?= url('/dean/grade-review') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/dean/grade-review') ? 'active' : '' ?>">
                     <i class="bi bi-file-earmark-check-fill"></i>
                     <span>Grade Review &amp; Approval</span>
@@ -81,11 +105,15 @@
 
         <?php elseif ($userRole === 'Faculty'): ?>
             <div class="sidebar-group">
-                <span class="sidebar-heading">Teaching &amp; Grading</span>
+                <span class="sidebar-heading">Overview</span>
                 <a href="<?= url('/faculty/dashboard') ?>" class="sidebar-link <?= $currentPath === '/faculty/dashboard' ? 'active' : '' ?>">
                     <i class="bi bi-grid-1x2-fill"></i>
                     <span>Dashboard</span>
                 </a>
+            </div>
+
+            <div class="sidebar-group">
+                <span class="sidebar-heading">Instruction</span>
                 <a href="<?= url('/faculty/subjects') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/faculty/subjects') ? 'active' : '' ?>">
                     <i class="bi bi-journal-text"></i>
                     <span>My Assigned Subjects</span>
@@ -94,6 +122,10 @@
                     <i class="bi bi-people-fill"></i>
                     <span>Student Rosters</span>
                 </a>
+            </div>
+
+            <div class="sidebar-group">
+                <span class="sidebar-heading">Grading &amp; Attendance</span>
                 <a href="<?= url('/faculty/grading') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/faculty/grading') ? 'active' : '' ?>">
                     <i class="bi bi-table"></i>
                     <span>Grade Encoding</span>
@@ -106,11 +138,15 @@
 
         <?php elseif ($userRole === 'Student'): ?>
             <div class="sidebar-group">
-                <span class="sidebar-heading">Academic Records</span>
+                <span class="sidebar-heading">Overview</span>
                 <a href="<?= url('/student/dashboard') ?>" class="sidebar-link <?= $currentPath === '/student/dashboard' ? 'active' : '' ?>">
                     <i class="bi bi-grid-1x2-fill"></i>
                     <span>Dashboard</span>
                 </a>
+            </div>
+
+            <div class="sidebar-group">
+                <span class="sidebar-heading">Academic Records</span>
                 <a href="<?= url('/student/grades') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/student/grades') ? 'active' : '' ?>">
                     <i class="bi bi-award-fill"></i>
                     <span>My Academic Grades</span>
@@ -123,3 +159,32 @@
         <?php endif; ?>
     </nav>
 </aside>
+<script>
+(function() {
+    try {
+        var sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+
+        var savedScroll = sessionStorage.getItem('acadtrack_sidebar_scroll');
+        if (savedScroll !== null) {
+            sidebar.scrollTop = parseInt(savedScroll, 10);
+        } else {
+            var activeLink = sidebar.querySelector('.sidebar-link.active');
+            if (activeLink) {
+                activeLink.scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        sidebar.querySelectorAll('.sidebar-link').forEach(function(link) {
+            link.addEventListener('click', function() {
+                sessionStorage.setItem('acadtrack_sidebar_scroll', sidebar.scrollTop);
+            });
+        });
+
+        window.addEventListener('beforeunload', function() {
+            sessionStorage.setItem('acadtrack_sidebar_scroll', sidebar.scrollTop);
+        });
+    } catch (e) {}
+})();
+</script>
+

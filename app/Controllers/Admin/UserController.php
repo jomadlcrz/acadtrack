@@ -19,42 +19,25 @@ class UserController
         $this->userRepository = new UserRepository();
     }
 
+    /** The combined list was split: students and staff each have their own page. */
     public function index(Request $request, Response $response, Session $session): void
     {
-        $page = (int) $request->get('page', 1);
-        $tab = (string) $request->get('tab', 'all');
+        $tab = (string) $request->get('tab', '');
         $role = (string) $request->get('role', '');
-        $status = (string) $request->get('status', '');
-        $enrollmentStatus = (string) $request->get('enrollment_status', '');
-        $search = trim((string) $request->get('search', ''));
+        $isStaff = in_array($tab, ['faculty', 'admin'], true) || in_array($role, ['Admin', 'Dean', 'Faculty'], true);
 
-        if ($tab === 'regular') {
-            $role = 'Student';
-            $enrollmentStatus = 'Regular';
-        } elseif ($tab === 'irregular') {
-            $role = 'Student';
-            $enrollmentStatus = 'Irregular';
-        } elseif ($tab === 'students') {
-            $role = 'Student';
-        } elseif ($tab === 'faculty') {
-            $role = 'Faculty';
-        } elseif ($tab === 'admin') {
-            $role = 'Admin';
+        $query = array_filter([
+            'role' => $isStaff ? $role : '',
+            'search' => (string) $request->get('search', ''),
+            'status' => (string) $request->get('status', ''),
+        ]);
+        if ($tab === 'irregular') {
+            $query['status'] = 'Irregular';
+        } elseif ($tab === 'regular') {
+            $query['status'] = 'Regular';
         }
 
-        $users = $this->userRepository->paginate($page, 20, $role, $status, $search, $enrollmentStatus);
-
-        $html = (new View())->render('admin.users.index', [
-            'users' => $users,
-            'pagination' => $users,
-            'activeTab' => $tab,
-            'currentRole' => $role,
-            'currentStatus' => $status,
-            'currentEnrollmentStatus' => $enrollmentStatus,
-            'currentSearch' => $search,
-            'currentUserId' => (int) ($session->get('user')['id'] ?? 0),
-        ]);
-        $response->html($html);
+        redirect(($isStaff ? '/admin/staff' : '/admin/students') . ($query ? '?' . http_build_query($query) : ''));
     }
 
     public function create(Request $request, Response $response, Session $session): void
@@ -122,10 +105,8 @@ class UserController
             if ($role === 'Student') {
                 $setId = !empty($data['set_id']) ? (int) $data['set_id'] : null;
                 $yearLevel = !empty($data['year_level']) ? (int) $data['year_level'] : 1;
-                $studentStatus = !empty($data['student_status']) ? (string) $data['student_status'] : 'Regular';
-                if ($studentStatus === 'Irregular') {
-                    $setId = null;
-                }
+                $studentStatus = \App\Models\Student::normalizeStatus($data['student_status'] ?? null);
+                $setId = \App\Models\Student::resolveSetId($studentStatus, $setId);
 
                 \App\Models\Student::updateOrCreate([
                     'user_id' => (int) $user->id,
@@ -145,6 +126,8 @@ class UserController
                     'year_level' => $yearLevel,
                     'status' => $studentStatus,
                 ]);
+
+                $this->registerForActiveTerm((int) $user->id, $studentStatus, $yearLevel, $setId, $session);
             } elseif (in_array($role, ['Faculty', 'Dean'], true)) {
                 $deptId = !empty($data['department_id']) ? (int) $data['department_id'] : null;
                 \App\Models\Faculty::updateOrCreate(
@@ -156,8 +139,19 @@ class UserController
             (new \App\Services\NotificationService())->sendStudentCredentials($user->toArray(), $plainPassword);
         }
 
+        if ($user && $user->id) {
+            \App\Services\ActivityLogService::record([
+                'category' => \App\Services\ActivityLogService::CATEGORY_ACCOUNTS,
+                'action' => 'Account Created',
+                'target_type' => 'account',
+                'target_id' => (int) $user->id,
+                'target_label' => trim($user->first_name . ' ' . $user->last_name),
+                'summary' => "Created a {$role} account for " . trim($user->first_name . ' ' . $user->last_name) . " ({$user->email}).",
+            ]);
+        }
+
         $session->flash('success', 'User created successfully.');
-        redirect('/admin/users');
+        redirect($this->listUrl($role));
     }
 
     public function edit(Request $request, Response $response, Session $session, string $id): void
@@ -170,7 +164,7 @@ class UserController
 
         if ($user->role === 'Admin') {
             $session->flash('error', 'Administrator accounts cannot be modified.');
-            redirect('/admin/users');
+            redirect($this->listUrl());
             return;
         }
 
@@ -195,7 +189,7 @@ class UserController
 
         if ($user->role === 'Admin') {
             $session->flash('error', 'Administrator accounts cannot be modified.');
-            redirect('/admin/users');
+            redirect($this->listUrl());
             return;
         }
 
@@ -223,10 +217,8 @@ class UserController
             $updateData['student_number'] = $studentNumber;
 
             $setId = !empty($data['set_id']) ? (int) $data['set_id'] : null;
-            $studentStatus = !empty($data['student_status']) ? (string) $data['student_status'] : 'Regular';
-            if ($studentStatus === 'Irregular') {
-                $setId = null;
-            }
+            $studentStatus = \App\Models\Student::normalizeStatus($data['student_status'] ?? null);
+            $setId = \App\Models\Student::resolveSetId($studentStatus, $setId);
 
             if ($setId) {
                 $targetSet = \App\Models\Set::find($setId);
@@ -260,6 +252,8 @@ class UserController
                     'status' => $studentStatus,
                 ]
             );
+
+            $this->registerForActiveTerm((int) $user->id, $studentStatus, $yearLevel, $setId, $session);
         } elseif (in_array($user->role, ['Faculty', 'Dean'], true)) {
             $deptId = !empty($data['department_id']) ? (int) $data['department_id'] : null;
             \App\Models\Faculty::updateOrCreate(
@@ -270,8 +264,17 @@ class UserController
 
         (new \App\Repositories\UserRepository())->update((int) $user->id, $data);
 
+        \App\Services\ActivityLogService::record([
+            'category' => \App\Services\ActivityLogService::CATEGORY_ACCOUNTS,
+            'action' => 'Account Updated',
+            'target_type' => 'account',
+            'target_id' => (int) $user->id,
+            'target_label' => trim($data['first_name'] . ' ' . $data['last_name']),
+            'summary' => "Updated the {$user->role} account for {$user->email}.",
+        ]);
+
         $session->flash('success', 'User updated successfully.');
-        redirect('/admin/users');
+        redirect($this->listUrl((string) $user->role));
     }
 
     public function toggleStatus(Request $request, Response $response, Session $session, string $id): void
@@ -279,20 +282,20 @@ class UserController
         $user = \App\Models\User::find((int) $id);
         if (!$user) {
             $session->flash('error', 'User account not found.');
-            redirect('/admin/users');
+            redirect($this->listUrl());
             return;
         }
 
         $currentUserId = (int) ($session->get('user')['id'] ?? 0);
         if ((int) $user->id === $currentUserId) {
             $session->flash('error', 'You cannot deactivate your own active account.');
-            redirect('/admin/users');
+            redirect($this->listUrl());
             return;
         }
 
         if ($user->role === 'Admin' && $user->status === 'active') {
             $session->flash('error', 'Administrator accounts cannot be deactivated to prevent system lockout.');
-            redirect('/admin/users');
+            redirect($this->listUrl());
             return;
         }
 
@@ -303,8 +306,9 @@ class UserController
 
         $actionText = ($newStatus === 'inactive') ? 'deactivated' : 'activated';
         $fullName = trim($user->first_name . ' ' . $user->last_name);
+        $this->logAccountStatus($user, $actionText);
         $session->flash('success', "User account for '{$fullName}' has been {$actionText} successfully.");
-        redirect('/admin/users');
+        redirect($this->listUrl());
     }
 
     public function deactivate(Request $request, Response $response, Session $session, string $id): void
@@ -312,20 +316,20 @@ class UserController
         $user = \App\Models\User::find((int) $id);
         if (!$user) {
             $session->flash('error', 'User account not found.');
-            redirect('/admin/users');
+            redirect($this->listUrl());
             return;
         }
 
         $currentUserId = (int) ($session->get('user')['id'] ?? 0);
         if ((int) $user->id === $currentUserId) {
             $session->flash('error', 'You cannot deactivate your own active account.');
-            redirect('/admin/users');
+            redirect($this->listUrl());
             return;
         }
 
         if ($user->role === 'Admin') {
             $session->flash('error', 'Administrator accounts cannot be deactivated to prevent system lockout.');
-            redirect('/admin/users');
+            redirect($this->listUrl());
             return;
         }
 
@@ -334,8 +338,9 @@ class UserController
         $user->save();
 
         $fullName = trim($user->first_name . ' ' . $user->last_name);
+        $this->logAccountStatus($user, 'deactivated');
         $session->flash('success', "User account for '{$fullName}' has been deactivated successfully.");
-        redirect('/admin/users');
+        redirect($this->listUrl());
     }
 
     public function activate(Request $request, Response $response, Session $session, string $id): void
@@ -343,7 +348,7 @@ class UserController
         $user = \App\Models\User::find((int) $id);
         if (!$user) {
             $session->flash('error', 'User account not found.');
-            redirect('/admin/users');
+            redirect($this->listUrl());
             return;
         }
 
@@ -352,8 +357,9 @@ class UserController
         $user->save();
 
         $fullName = trim($user->first_name . ' ' . $user->last_name);
+        $this->logAccountStatus($user, 'activated');
         $session->flash('success', "User account for '{$fullName}' has been activated successfully.");
-        redirect('/admin/users');
+        redirect($this->listUrl());
     }
 
     public function downloadTemplate(Request $request, Response $response): void
@@ -434,7 +440,7 @@ class UserController
                 ]);
             } else {
                 $session->flash('error', 'No valid student records found in uploaded file.');
-                redirect('/admin/users');
+                redirect($this->listUrl());
             }
             return;
         }
@@ -460,10 +466,7 @@ class UserController
             $lastName = trim((string) ($row['last_name'] ?? ''));
             $email = trim((string) ($row['email'] ?? ''));
             $studentNumber = trim((string) ($row['student_number'] ?? '')) ?: null;
-            $status = ucfirst(strtolower(trim((string) ($row['student_status'] ?? 'Regular'))));
-            if (!in_array($status, ['Regular', 'Irregular'], true)) {
-                $status = 'Regular';
-            }
+            $status = \App\Models\Student::normalizeStatus($row['student_status'] ?? null);
             $yearLevel = (int) ($row['year_level'] ?? 1);
             if ($yearLevel < 1 || $yearLevel > 4) {
                 $yearLevel = 1;
@@ -506,7 +509,7 @@ class UserController
             }
 
             $setId = null;
-            if ($status === 'Regular') {
+            if (\App\Models\Student::requiresSet($status)) {
                 $section = strtoupper(trim((string) ($row['section'] ?? $row['set_name'] ?? $row['set_id'] ?? '')));
                 if (!empty($section)) {
                     if (is_numeric($section) && \App\Models\Set::find((int) $section)) {
@@ -575,6 +578,8 @@ class UserController
                         ]
                     );
 
+                    $this->registerForActiveTerm((int) $user->id, $status, $yearLevel, $setId, $session);
+
                     (new \App\Services\NotificationService())->sendStudentCredentials($user->toArray(), $plainPassword);
                     $createdCount++;
                 }
@@ -585,6 +590,15 @@ class UserController
                     'message' => "Registration failed: " . $e->getMessage(),
                 ];
             }
+        }
+
+        if ($createdCount > 0) {
+            \App\Services\ActivityLogService::record([
+                'category' => \App\Services\ActivityLogService::CATEGORY_ACCOUNTS,
+                'action' => 'Students Imported',
+                'target_type' => 'import',
+                'summary' => "Imported {$createdCount} of " . count($rows) . ' student accounts from a spreadsheet.' . (!empty($errors) ? ' ' . count($errors) . ' rows were skipped.' : ''),
+            ]);
         }
 
         if ($isJson) {
@@ -608,8 +622,60 @@ class UserController
         } else {
             $session->flash('error', "Import failed: " . implode('; ', array_column($errors, 'message')));
         }
-        redirect('/admin/users');
+        redirect($this->listUrl());
+    }
+
+    /** Registers the student for the active term; a broken school rule is flashed, not fatal. */
+    private function registerForActiveTerm(int $userId, string $status, int $yearLevel, ?int $setId, Session $session): void
+    {
+        $term = \App\Models\AcademicTerm::getActive();
+        $student = \App\Models\Student::where('user_id', $userId)->first();
+        if (!$term || !$student) {
+            return;
+        }
+
+        try {
+            (new \App\Services\StudentRegistrationService())->register(
+                (int) $student->id,
+                (int) $term['id'],
+                $status,
+                $yearLevel,
+                $setId,
+                (int) ($session->get('user')['id'] ?? 0) ?: null
+            );
+        } catch (\DomainException $e) {
+            $session->flash('error', 'Student saved, but term registration failed: ' . $e->getMessage());
+        }
+    }
+
+    /** Where to send the admin after an account action: staff or students, keeping the list they came from. */
+    private function listUrl(string $role = ''): string
+    {
+        if ($role !== '') {
+            return $role === 'Student' ? '/admin/students' : '/admin/staff';
+        }
+
+        $referer = parse_url((string) ($_SERVER['HTTP_REFERER'] ?? ''));
+        $path = (string) ($referer['path'] ?? '');
+        $base = base_path_url();
+        if ($base !== '' && str_starts_with($path, $base)) {
+            $path = substr($path, strlen($base));
+        }
+        if ($path === '/admin/staff' || $path === '/admin/students') {
+            return $path . (!empty($referer['query']) ? '?' . $referer['query'] : '');
+        }
+        return '/admin/students';
+    }
+
+    private function logAccountStatus(\App\Models\User $user, string $verb): void
+    {
+        \App\Services\ActivityLogService::record([
+            'category' => \App\Services\ActivityLogService::CATEGORY_ACCOUNTS,
+            'action' => 'Account ' . ucfirst($verb),
+            'target_type' => 'account',
+            'target_id' => (int) $user->id,
+            'target_label' => trim($user->first_name . ' ' . $user->last_name),
+            'summary' => ucfirst($verb) . " the {$user->role} account for {$user->email}.",
+        ]);
     }
 }
-
-

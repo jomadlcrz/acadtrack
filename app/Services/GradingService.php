@@ -95,6 +95,7 @@ class GradingService
         }
 
         $this->gradingSheetRepository->submit($gradingSheetId);
+        $this->logSheet($gradingSheetId, 'Sheet Submitted', 'Submitted');
     }
 
     public function approveGradingSheet(int $gradingSheetId, ?int $approvedBy = null): void
@@ -114,6 +115,7 @@ class GradingService
             'approved_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
+        $this->logSheet($gradingSheetId, 'Sheet Approved', 'Approved');
     }
 
     public function confirmGradingSheet(int $gradingSheetId, int $confirmedBy, ?string $remarks = null): void
@@ -130,6 +132,7 @@ class GradingService
             'confirmed_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
+        $this->logSheet($gradingSheetId, 'Sheet Finalized', 'Finalized', $remarks);
     }
 
     public function returnGradingSheet(int $gradingSheetId): void
@@ -140,6 +143,7 @@ class GradingService
         }
 
         $this->gradingSheetRepository->returnToFaculty($gradingSheetId);
+        $this->logSheet($gradingSheetId, 'Sheet Returned', 'Returned to the instructor');
     }
 
     public function getGradesByStudent(int $studentId, int $academicTermId): array
@@ -168,5 +172,28 @@ class GradingService
         }
 
         return $totalWeight > 0 ? round($weightedSum / $totalWeight, 2) : 0.0;
+    }
+
+    private function logSheet(int $gradingSheetId, string $action, string $verb, ?string $remarks = null): void
+    {
+        $sheet = GradingSheet::findWithDetails($gradingSheetId);
+        if (!$sheet) {
+            return;
+        }
+
+        $faculty = trim(($sheet['faculty_first_name'] ?? '') . ' ' . ($sheet['faculty_last_name'] ?? '')) ?: ($sheet['faculty_email'] ?? 'the instructor');
+        $summary = "{$verb} the {$sheet['period_name']} grading sheet for {$sheet['subject_code']} by {$faculty}.";
+        if ($remarks !== null && $remarks !== '') {
+            $summary .= " Remarks: {$remarks}";
+        }
+
+        ActivityLogService::record([
+            'category' => ActivityLogService::CATEGORY_GRADES,
+            'action' => $action,
+            'target_type' => 'grading_sheet',
+            'target_id' => $gradingSheetId,
+            'target_label' => $sheet['subject_code'] . ' - ' . $sheet['period_name'],
+            'summary' => $summary,
+        ]);
     }
 }

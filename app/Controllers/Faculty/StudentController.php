@@ -72,7 +72,7 @@ class StudentController
 
         $yearLevel = (int) $request->post('year_level', 1);
         $setId = !empty($request->post('set_id')) ? (int) $request->post('set_id') : null;
-        $status = in_array($request->post('status'), ['Regular', 'Irregular'], true) ? $request->post('status') : 'Regular';
+        $status = \App\Models\Student::normalizeStatus((string) $request->post('status', ''));
         $inputPassword = trim((string) $request->post('password', ''));
         $password = empty($inputPassword) 
             ? \App\Models\User::generateRandomPassword() 
@@ -87,7 +87,8 @@ class StudentController
             return;
         }
 
-        if (empty($setId)) {
+        $setId = \App\Models\Student::resolveSetId($status, $setId);
+        if (\App\Models\Student::requiresSet($status) && empty($setId)) {
             $session->flash('error', 'Assigned set is required when adding a student.');
             redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
             return;
@@ -128,8 +129,11 @@ class StudentController
             ]);
             $studentId = (int) $createdStudent->id;
 
+            (new \App\Services\StudentRegistrationService())->register($studentId, $termId, $status, $yearLevel, $setId);
+
             // 3. Enroll into subject
             \App\Models\Student::enroll($studentId, $subjectId, $termId);
+            $this->logRoster('Student Added to Roster', $studentId, $subjectId, "Created the account for {$firstName} {$lastName} and added them to");
 
             // 4. Send email notification with generated temporary password
             (new \App\Services\NotificationService())->sendStudentCredentials($user->toArray(), $password);
@@ -174,7 +178,7 @@ class StudentController
                 return;
             }
 
-            if ($setId === null && empty($student->set_id)) {
+            if (\App\Models\Student::requiresSet($student->status) && $setId === null && empty($student->set_id)) {
                 $session->flash('error', 'Assigned set is required when enrolling a student.');
                 redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
                 return;
@@ -182,6 +186,7 @@ class StudentController
 
             // Student profile (set, year level, status) is owned by the Admin; faculty only roster the student.
             \App\Models\Student::enroll($studentId, $subjectId, $termId);
+            $this->logRoster('Student Added to Roster', $studentId, $subjectId, 'Added');
             $session->flash('success', 'Student enrolled successfully into this class set.');
         } else {
             $session->flash('error', 'Please select a valid student to enroll.');
@@ -220,6 +225,7 @@ class StudentController
             ->where('academic_term_id', $termId)
             ->delete();
 
+        $this->logRoster('Student Removed from Roster', $studentId, $subjectId, 'Removed');
         $session->flash('success', 'Student removed from this course roster.');
         redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
     }
@@ -237,5 +243,28 @@ class StudentController
 
         $pass = (new \App\Services\EvaluationService())->getDigitalPass($studentId, $subjectId, $termId);
         $response->json($pass ?: ['error' => 'Student not found']);
+    }
+
+    private function logRoster(string $action, int $studentId, int $subjectId, string $lead): void
+    {
+        $student = \App\Models\Student::find($studentId);
+        $detail = $student ? \App\Models\StudentDetail::where('user_id', $student->user_id)->first() : null;
+        $name = $detail ? trim($detail->first_name . ' ' . $detail->last_name) : "student #{$studentId}";
+        $subject = \App\Models\Subject::find($subjectId);
+        $code = $subject ? $subject->subject_code : "subject #{$subjectId}";
+
+        // "Added X to CODE" / "Removed X from CODE" / "Created the account for X and added them to CODE"
+        $summary = str_contains($lead, 'Created')
+            ? "{$lead} {$code}."
+            : ($lead === 'Removed' ? "Removed {$name} from the {$code} roster." : "Added {$name} to the {$code} roster.");
+
+        \App\Services\ActivityLogService::record([
+            'category' => \App\Services\ActivityLogService::CATEGORY_REGISTRATION,
+            'action' => $action,
+            'target_type' => 'student',
+            'target_id' => $studentId,
+            'target_label' => $name,
+            'summary' => $summary,
+        ]);
     }
 }

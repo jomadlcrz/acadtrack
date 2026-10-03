@@ -8,6 +8,10 @@ use App\Core\Model;
 
 class Student extends Model
 {
+    public const STATUS_REGULAR = 'Regular';
+    public const STATUS_IRREGULAR = 'Irregular';
+    public const STATUSES = [self::STATUS_REGULAR, self::STATUS_IRREGULAR];
+
     protected $table = 'students';
 
     protected $fillable = [
@@ -16,6 +20,25 @@ class Student extends Model
         'year_level',
         'status',
     ];
+
+    /** Falls back to Regular for unknown or empty input. */
+    public static function normalizeStatus(?string $status): string
+    {
+        $status = ucfirst(strtolower(trim((string) $status)));
+        return in_array($status, self::STATUSES, true) ? $status : self::STATUS_REGULAR;
+    }
+
+    /** Regular students belong to a set; Irregular students are enrolled per subject and have none. */
+    public static function requiresSet(?string $status): bool
+    {
+        return self::normalizeStatus($status) === self::STATUS_REGULAR;
+    }
+
+    /** Set to store for a status: Irregular students never keep one. */
+    public static function resolveSetId(?string $status, ?int $setId): ?int
+    {
+        return self::requiresSet($status) ? $setId : null;
+    }
 
     public function user()
     {

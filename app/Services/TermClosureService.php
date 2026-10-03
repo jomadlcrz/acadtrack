@@ -685,6 +685,16 @@ class TermClosureService
             'ip_address' => $ip,
             'details' => $details,
         ]);
+
+        $readable = ucwords(strtolower(str_replace('_', ' ', $action)));
+        \App\Services\ActivityLogService::record([
+            'category' => \App\Services\ActivityLogService::CATEGORY_TERMS,
+            'action' => $readable,
+            'target_type' => 'term',
+            'target_id' => (string) ($syId ?? ''),
+            'target_label' => trim(($schoolYear ?? '') . ($semesterNumber ? " - Semester {$semesterNumber}" : '')),
+            'summary' => ($details !== null && $details !== '') ? $details : $readable . '.',
+        ], $userId ? ['id' => $userId, 'name' => $performerName, 'email' => '', 'role' => $role] : null);
     }
 
     /**

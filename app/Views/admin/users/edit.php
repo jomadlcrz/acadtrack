@@ -2,7 +2,7 @@
 $pageTitle = $user['role'] === 'Student' ? 'Edit Student Profile' : 'Edit ' . htmlspecialchars($user['role']) . ' Profile';
 $subtitle = 'Update profile information and academic classification for ' . htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) . '.';
 $headerActions = '<div class="d-flex align-items-center gap-2">
-    <a href="' . url('/admin/users') . '" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5"><i class="bi bi-arrow-left"></i> Back to Users</a>
+    <a href="' . url('/admin/users') . '" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5"><i class="bi bi-arrow-left"></i> Back to list</a>
 </div>';
 ob_start();
 ?>
