@@ -418,6 +418,27 @@ CREATE TABLE IF NOT EXISTS password_resets (
     INDEX idx_password_resets_token (token)
 ) ENGINE=InnoDB;
 
+-- Activity Logs (Append-Only Staff Ledger)
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    actor_id INT NULL,
+    actor_name VARCHAR(120) NOT NULL,
+    actor_email VARCHAR(255) NOT NULL DEFAULT '',
+    actor_role VARCHAR(30) NOT NULL DEFAULT '',
+    category VARCHAR(30) NOT NULL,
+    action VARCHAR(80) NOT NULL,
+    target_type VARCHAR(40) NOT NULL DEFAULT '',
+    target_id VARCHAR(64) NOT NULL DEFAULT '',
+    target_label VARCHAR(120) NOT NULL DEFAULT '',
+    summary VARCHAR(500) NOT NULL,
+    ip_address VARCHAR(45) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_audit_created (created_at),
+    INDEX idx_audit_category (category, created_at),
+    INDEX idx_audit_actor (actor_id, created_at),
+    INDEX idx_audit_target (target_type, target_id)
+) ENGINE=InnoDB;
+
 -- Term Audit Logs (Append-Only Lifecycle Ledger)
 CREATE TABLE IF NOT EXISTS term_audit_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -605,7 +626,6 @@ INSERT INTO students (id, user_id, set_id, year_level, status) VALUES (1, 4, NUL
 --     END IF;
 -- END //
 -- DELIMITER ;
-
 
 
 
