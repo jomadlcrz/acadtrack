@@ -91,11 +91,6 @@ $isPending = in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW']);
             <h3 class="h6 mb-0 fw-semibold text-dark">Enrolled Student Grades Roster</h3>
             <span class="text-muted small"><?= count($students) ?> students evaluated for <?= htmlspecialchars($sheet['period_name']) ?></span>
         </div>
-        <?php if (!$isFinalized): ?>
-            <button type="submit" form="editGradesForm" class="btn btn-sm btn-primary py-1 px-3 d-inline-flex align-items-center gap-1">
-                <i class="bi bi-save"></i> Save grade adjustments
-            </button>
-        <?php endif; ?>
     </div>
 
     <?php if (empty($students)): ?>

@@ -45,23 +45,42 @@ class GradeReviewController
         }
 
         $termId = (int) ($academicTerm['id'] ?? 1);
-        $statusFilter = $request->get('status', 'all');
+        $statusFilter = (string) $request->get('status', 'all');
 
-        $statusParam = match ($statusFilter) {
-            'pending' => 'SUBMITTED',
-            'approved' => 'APPROVED',
-            'finalized' => 'FINALIZED',
-            'returned' => 'RETURNED',
-            default => null,
+        $statuses = match ($statusFilter) {
+            'pending' => ['SUBMITTED', 'UNDER_REVIEW'],
+            'approved' => ['APPROVED'],
+            'finalized' => ['FINALIZED'],
+            'returned' => ['RETURNED'],
+            default => [],
         };
 
-        $allTermSheets = GradingSheet::getAllWithDetails($termId);
-        $totalSubmissions = count($allTermSheets);
+        // Period filter: default to the term's current grading period, "all" shows every period
+        $periods = \App\Models\GradingPeriod::getByAcademicTerm($termId);
+        $periodParam = (string) $request->get('period', '');
+        $validPeriodIds = array_map(static fn (array $p): string => (string) $p['id'], $periods);
+        if ($periodParam !== 'all' && !in_array($periodParam, $validPeriodIds, true)) {
+            $periodParam = 'all';
+            foreach ($periods as $p) {
+                if ((int) ($p['is_current'] ?? 0) === 1) {
+                    $periodParam = (string) $p['id'];
+                    break;
+                }
+            }
+        }
+        $periodId = $periodParam === 'all' ? null : (int) $periodParam;
+
+        // Summary figures follow the selected period so they match the list below
+        $totalSubmissions = 0;
         $pendingCount = 0;
         $approvedCount = 0;
         $finalizedCount = 0;
         $returnedCount = 0;
-        foreach ($allTermSheets as $sh) {
+        foreach (GradingSheet::getAllWithDetails($termId) as $sh) {
+            if ($periodId !== null && (int) ($sh['grading_period_id'] ?? 0) !== $periodId) {
+                continue;
+            }
+            $totalSubmissions++;
             $st = $sh['status'] ?? '';
             if (in_array($st, ['SUBMITTED', 'UNDER_REVIEW'], true)) {
                 $pendingCount++;
@@ -76,15 +95,17 @@ class GradeReviewController
 
         $page = max(1, (int) $request->get('page', 1));
         $search = trim((string) $request->get('search', ''));
-        $paginated = GradingSheet::paginateWithDetails($termId, $statusParam, $page, 15, $search);
+        $paginated = GradingSheet::paginateGroupedWithDetails($termId, $statuses, $periodId, $page, 15, $search);
 
         $html = (new View())->render('dean.grade-review.index', [
-            'gradingSheets' => $paginated['data'],
+            'groups' => $paginated['data'],
             'pagination' => $paginated,
             'academicTerm' => $academicTerm,
             'selectedSemester' => (string) ($academicTerm['semester'] ?? '1'),
             'statusFilter' => $statusFilter,
             'currentSearch' => $search,
+            'periods' => $periods,
+            'periodParam' => $periodParam,
             'metrics' => [
                 'total' => $totalSubmissions,
                 'pending' => $pendingCount,

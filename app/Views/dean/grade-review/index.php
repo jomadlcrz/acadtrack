@@ -12,16 +12,31 @@ $headerActions = '
 </div>';
 
 ob_start();
+$groups = $groups ?? [];
+$periods = $periods ?? [];
 $statusFilter = $statusFilter ?? 'all';
 $selectedSemester = (string) ($selectedSemester ?? '1');
-$metrics = $metrics ?? [
-    'total' => count($gradingSheets),
-    'pending' => 0,
-    'approved' => 0,
-    'finalized' => 0,
-    'returned' => 0,
-];
-$totalRecords = (int) ($pagination['total'] ?? count($gradingSheets));
+$periodParam = (string) ($periodParam ?? 'all');
+$currentSearch = (string) ($currentSearch ?? '');
+$metrics = $metrics ?? ['total' => 0, 'pending' => 0, 'approved' => 0, 'finalized' => 0, 'returned' => 0];
+$totalGroups = (int) ($pagination['total'] ?? count($groups));
+$periodCount = max(1, count($periods));
+
+$periodName = 'All periods';
+foreach ($periods as $p) {
+    if ((string) $p['id'] === $periodParam) {
+        $periodName = (string) $p['name'];
+    }
+}
+
+// Keep every filter when switching tabs
+$filterUrl = static function (array $override = []) use ($selectedSemester, $statusFilter, $periodParam, $currentSearch): string {
+    $query = array_filter(
+        array_merge(['semester' => $selectedSemester, 'status' => $statusFilter, 'period' => $periodParam, 'search' => $currentSearch], $override),
+        static fn ($v): bool => $v !== null && $v !== ''
+    );
+    return url('/dean/grade-review') . '?' . http_build_query($query);
+};
 
 $tabs = [
     'all' => ['label' => 'All', 'count' => $metrics['total']],
@@ -38,8 +53,18 @@ $statusView = static fn (string $status): array => match ($status) {
     'APPROVED' => ['Approved', 'badge-approved', 'bi-check-circle-fill'],
     'FINALIZED' => ['Finalized', 'badge-finalized', 'bi-lock-fill'],
     'RETURNED' => ['Returned', 'badge-returned', 'bi-arrow-return-left'],
-    default => ['Awaiting review', 'badge-submitted', 'bi-hourglass-split'],
+    'DRAFT' => ['Draft', 'badge-draft', 'bi-pencil'],
+    default => ['Awaiting', 'badge-submitted', 'bi-hourglass-split'],
 };
+
+$approvedSheets = [];
+foreach ($groups as $g) {
+    foreach ($g['sheets'] as $sh) {
+        if (($sh['status'] ?? '') === 'APPROVED') {
+            $approvedSheets[] = $sh;
+        }
+    }
+}
 ?>
 
 <!-- Summary -->
@@ -47,7 +72,7 @@ $statusView = static fn (string $status): array => match ($status) {
     <div class="summary-cell">
         <div class="summary-label">Total submissions</div>
         <div class="summary-value" id="statTotalSubmissions"><?= (int) $metrics['total'] ?></div>
-        <div class="summary-note">Course grade sheets</div>
+        <div class="summary-note">Grading sheets &bull; <?= htmlspecialchars($periodName) ?></div>
     </div>
     <div class="summary-cell">
         <div class="summary-label">Awaiting review</div>
@@ -74,14 +99,14 @@ $statusView = static fn (string $status): array => match ($status) {
             <small class="text-muted"><?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></small>
         </div>
         <div class="queue-count" id="visibleCounter">
-            <?= $totalRecords ?> <?= $totalRecords === 1 ? 'record' : 'records' ?>
+            <?= $totalGroups ?> <?= $totalGroups === 1 ? 'course' : 'courses' ?>
         </div>
     </div>
 
     <div class="queue-toolbar">
         <nav class="queue-tabs" aria-label="Filter by status">
             <?php foreach ($tabs as $key => $tab): ?>
-                <a href="<?= url('/dean/grade-review?status=' . $key . '&semester=' . $selectedSemester) ?>"
+                <a href="<?= $filterUrl(['status' => $key]) ?>"
                    class="queue-tab <?= $statusFilter === $key ? 'is-active' : '' ?>"
                    <?= $statusFilter === $key ? 'aria-current="page"' : '' ?>>
                     <?= htmlspecialchars($tab['label']) ?>
@@ -90,26 +115,36 @@ $statusView = static fn (string $status): array => match ($status) {
             <?php endforeach; ?>
         </nav>
 
-        <form method="GET" action="<?= url('/dean/grade-review') ?>" class="queue-search">
+        <form method="GET" action="<?= url('/dean/grade-review') ?>" class="queue-filters">
             <input type="hidden" name="semester" value="<?= htmlspecialchars($selectedSemester) ?>">
-            <input type="hidden" name="status" value="<?= htmlspecialchars((string) $statusFilter) ?>">
-            <i class="bi bi-search"></i>
-            <input type="text"
-                   id="gradeReviewSearch"
-                   name="search"
-                   class="form-control form-control-sm"
-                   placeholder="Search course, title, or instructor"
-                   value="<?= htmlspecialchars($currentSearch ?? '') ?>"
-                   autocomplete="off">
+            <input type="hidden" name="status" value="<?= htmlspecialchars($statusFilter) ?>">
+            <select name="period" class="form-select form-select-sm queue-period" aria-label="Grading period" onchange="this.form.submit()">
+                <option value="all" <?= $periodParam === 'all' ? 'selected' : '' ?>>All periods</option>
+                <?php foreach ($periods as $p): ?>
+                    <option value="<?= (int) $p['id'] ?>" <?= (string) $p['id'] === $periodParam ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($p['name']) ?><?= (int) ($p['is_current'] ?? 0) === 1 ? ' (current)' : '' ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <div class="queue-search">
+                <i class="bi bi-search"></i>
+                <input type="text"
+                       id="gradeReviewSearch"
+                       name="search"
+                       class="form-control form-control-sm"
+                       placeholder="Search course, title, or instructor"
+                       value="<?= htmlspecialchars($currentSearch) ?>"
+                       autocomplete="off">
+            </div>
         </form>
     </div>
 
-    <?php if (empty($gradingSheets)): ?>
+    <?php if (empty($groups)): ?>
         <?php
         $icon = 'bi-check2-all';
         $iconColor = 'blue';
         $title = 'No grading sheets found';
-        $message = 'There are no grading sheets matching the current status filter for ' . ($academicTerm['name'] ?? 'this semester') . '.';
+        $message = 'There are no grading sheets matching the current filters for ' . ($academicTerm['name'] ?? 'this semester') . '.';
         include __DIR__ . '/../../components/empty-state.php';
         ?>
     <?php else: ?>
@@ -119,55 +154,70 @@ $statusView = static fn (string $status): array => match ($status) {
                     <tr>
                         <th>Course</th>
                         <th>Instructor</th>
-                        <th>Period</th>
-                        <th>Submitted</th>
-                        <th>Status</th>
+                        <?php foreach ($periods as $p): ?>
+                            <th class="<?= (string) $p['id'] === $periodParam ? 'queue-period-active' : '' ?>"><?= htmlspecialchars($p['name']) ?></th>
+                        <?php endforeach; ?>
                         <th class="text-end">Action</th>
                     </tr>
                 </thead>
                 <tbody id="gradeReviewTableBody">
-                    <?php foreach ($gradingSheets as $sheet): ?>
+                    <?php foreach ($groups as $g): ?>
                     <?php
-                        $code = $sheet['subject_code'] ?? $sheet['code'] ?? '';
-                        $instructorName = trim(($sheet['first_name'] ?? '') . ' ' . ($sheet['last_name'] ?? ''));
-                        $status = (string) ($sheet['status'] ?? '');
-                        [$statusLabel, $statusClass, $statusIcon] = $statusView($status);
-                        $searchHaystack = strtolower($code . ' ' . ($sheet['subject_name'] ?? '') . ' ' . $instructorName . ' ' . ($sheet['period_name'] ?? '') . ' ' . $statusLabel);
-                        $isPending = in_array($status, ['SUBMITTED', 'UNDER_REVIEW'], true);
+                        $instructorName = trim(($g['first_name'] ?? '') . ' ' . ($g['last_name'] ?? ''));
+                        $searchHaystack = strtolower(($g['subject_code'] ?? '') . ' ' . ($g['subject_name'] ?? '') . ' ' . $instructorName);
+
+                        // Next thing the Dean should do for this course
+                        $pendingSheet = $approvedSheet = $lastSheet = null;
+                        foreach ($periods as $p) {
+                            $sh = $g['sheets'][(int) $p['id']] ?? null;
+                            if ($sh === null) {
+                                continue;
+                            }
+                            $lastSheet = $sh;
+                            if ($pendingSheet === null && in_array($sh['status'], ['SUBMITTED', 'UNDER_REVIEW'], true)) {
+                                $pendingSheet = $sh;
+                            }
+                            if ($approvedSheet === null && $sh['status'] === 'APPROVED') {
+                                $approvedSheet = $sh;
+                            }
+                        }
                     ?>
                     <tr class="grade-review-row" data-search="<?= htmlspecialchars($searchHaystack) ?>">
                         <td>
-                            <div class="queue-code"><?= htmlspecialchars($code) ?></div>
-                            <div class="queue-title"><?= htmlspecialchars($sheet['subject_name'] ?? '') ?></div>
+                            <div class="queue-code"><?= htmlspecialchars($g['subject_code'] ?? '') ?></div>
+                            <div class="queue-title"><?= htmlspecialchars($g['subject_name'] ?? '') ?></div>
                         </td>
                         <td>
                             <div class="text-dark text-truncate"><?= htmlspecialchars($instructorName) ?></div>
-                            <?php if (!empty($sheet['email'])): ?>
-                                <div class="queue-meta text-truncate"><?= htmlspecialchars($sheet['email']) ?></div>
+                            <?php if (!empty($g['email'])): ?>
+                                <div class="queue-meta text-truncate"><?= htmlspecialchars($g['email']) ?></div>
                             <?php endif; ?>
                         </td>
-                        <td class="text-dark"><?= htmlspecialchars($sheet['period_name'] ?? '') ?></td>
-                        <td>
-                            <?php if (!empty($sheet['submitted_at'])): ?>
-                                <div class="text-dark tabular-nums"><?= htmlspecialchars(date('M d, Y', strtotime($sheet['submitted_at']))) ?></div>
-                                <div class="queue-meta tabular-nums"><?= htmlspecialchars(date('h:i A', strtotime($sheet['submitted_at']))) ?></div>
-                            <?php else: ?>
-                                <span class="text-muted">&mdash;</span>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <span class="badge <?= $statusClass ?> d-inline-flex align-items-center gap-1">
-                                <i class="bi <?= $statusIcon ?>"></i> <?= htmlspecialchars($statusLabel) ?>
-                            </span>
-                        </td>
+
+                        <?php foreach ($periods as $p): ?>
+                            <?php $sh = $g['sheets'][(int) $p['id']] ?? null; ?>
+                            <td class="<?= (string) $p['id'] === $periodParam ? 'queue-period-active' : '' ?>">
+                                <?php if ($sh !== null): ?>
+                                    <?php [$label, $class, $icon] = $statusView((string) $sh['status']); ?>
+                                    <a href="<?= url('/dean/grade-review/' . $sh['id']) ?>"
+                                       class="badge <?= $class ?> text-decoration-none"
+                                       title="<?= htmlspecialchars($p['name'] . (!empty($sh['submitted_at']) ? ' — submitted ' . date('M d, Y h:i A', strtotime($sh['submitted_at'])) : '')) ?>">
+                                        <i class="bi <?= $icon ?>"></i> <?= htmlspecialchars($label) ?>
+                                    </a>
+                                <?php else: ?>
+                                    <span class="queue-meta">Not submitted</span>
+                                <?php endif; ?>
+                            </td>
+                        <?php endforeach; ?>
+
                         <td>
                             <div class="queue-actions">
-                                <?php if ($isPending): ?>
-                                    <a class="btn btn-sm btn-primary" href="<?= url('/dean/grade-review/' . $sheet['id']) ?>">Review</a>
-                                <?php elseif ($status === 'APPROVED'): ?>
-                                    <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#confirmModal<?= $sheet['id'] ?>">Confirm</button>
-                                <?php else: ?>
-                                    <a class="btn btn-sm btn-outline-secondary" href="<?= url('/dean/grade-review/' . $sheet['id']) ?>">View</a>
+                                <?php if ($pendingSheet !== null): ?>
+                                    <a class="btn btn-sm btn-primary" href="<?= url('/dean/grade-review/' . $pendingSheet['id']) ?>">Review <?= htmlspecialchars($pendingSheet['period_name']) ?></a>
+                                <?php elseif ($approvedSheet !== null): ?>
+                                    <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#confirmModal<?= $approvedSheet['id'] ?>">Confirm <?= htmlspecialchars($approvedSheet['period_name']) ?></button>
+                                <?php elseif ($lastSheet !== null): ?>
+                                    <a class="btn btn-sm btn-outline-secondary" href="<?= url('/dean/grade-review/' . $lastSheet['id']) ?>">View</a>
                                 <?php endif; ?>
 
                                 <div class="dropdown d-inline-block">
@@ -175,30 +225,29 @@ $statusView = static fn (string $status): array => match ($status) {
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
-                                        <?php if ($isPending || $status === 'APPROVED'): ?>
+                                        <?php foreach ($periods as $p): ?>
+                                            <?php $sh = $g['sheets'][(int) $p['id']] ?? null; ?>
+                                            <?php if ($sh === null) { continue; } ?>
                                             <li>
-                                                <a class="dropdown-item" href="<?= url('/dean/grade-review/' . $sheet['id']) ?>">
-                                                    <i class="bi bi-eye text-primary"></i> View details
+                                                <a class="dropdown-item" href="<?= url('/dean/grade-review/' . $sh['id'] . '/print') ?>" target="_blank">
+                                                    <i class="bi bi-printer text-muted"></i> Print <?= htmlspecialchars($p['name']) ?>
                                                 </a>
                                             </li>
-                                        <?php endif; ?>
-                                        <li>
-                                            <a class="dropdown-item" href="<?= url('/dean/grade-review/' . $sheet['id'] . '/print') ?>" target="_blank">
-                                                <i class="bi bi-printer text-muted"></i> Print sheet
-                                            </a>
-                                        </li>
-                                        <?php if ($isPending): ?>
+                                        <?php endforeach; ?>
+                                        <?php foreach ($periods as $p): ?>
+                                            <?php $sh = $g['sheets'][(int) $p['id']] ?? null; ?>
+                                            <?php if ($sh === null || !in_array($sh['status'], ['SUBMITTED', 'UNDER_REVIEW'], true)) { continue; } ?>
                                             <li><hr class="dropdown-divider"></li>
                                             <li>
-                                                <form method="POST" action="<?= url('/dean/grade-review/approve') ?>" class="m-0" onsubmit="return confirm('Approve this grading sheet for <?= htmlspecialchars($code) ?>?');">
+                                                <form method="POST" action="<?= url('/dean/grade-review/approve') ?>" class="m-0" onsubmit="return confirm('Approve the <?= htmlspecialchars($p['name']) ?> grading sheet for <?= htmlspecialchars($g['subject_code'] ?? '') ?>?');">
                                                     <?= csrf_field() ?>
-                                                    <input type="hidden" name="grading_sheet_id" value="<?= $sheet['id'] ?>">
+                                                    <input type="hidden" name="grading_sheet_id" value="<?= $sh['id'] ?>">
                                                     <button type="submit" class="dropdown-item text-success">
-                                                        <i class="bi bi-check-circle"></i> Approve sheet
+                                                        <i class="bi bi-check-circle"></i> Approve <?= htmlspecialchars($p['name']) ?>
                                                     </button>
                                                 </form>
                                             </li>
-                                        <?php endif; ?>
+                                        <?php endforeach; ?>
                                     </ul>
                                 </div>
                             </div>
@@ -208,7 +257,7 @@ $statusView = static fn (string $status): array => match ($status) {
 
                     <!-- Empty Search Result Fallback Row -->
                     <tr id="noResultsRow" style="display: none;">
-                        <td colspan="6" class="p-0">
+                        <td colspan="<?= 3 + $periodCount ?>" class="p-0">
                             <?php
                             $icon = 'bi-search';
                             $title = 'No matching submissions found';
@@ -220,12 +269,9 @@ $statusView = static fn (string $status): array => match ($status) {
                 </tbody>
             </table>
         </div>
-        <?php if (!empty($gradingSheets)): ?>
-            <?php include __DIR__ . '/../../components/pagination.php'; ?>
-        <?php endif; ?>
+        <?php include __DIR__ . '/../../components/pagination.php'; ?>
 
-        <?php foreach ($gradingSheets as $sheet): ?>
-        <?php if ($sheet['status'] === 'APPROVED'): ?>
+        <?php foreach ($approvedSheets as $sheet): ?>
         <div class="modal fade" id="confirmModal<?= $sheet['id'] ?>" tabindex="-1" aria-labelledby="confirmModalLabel<?= $sheet['id'] ?>" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -235,7 +281,7 @@ $statusView = static fn (string $status): array => match ($status) {
                         <div class="modal-header">
                             <h5 class="modal-title" id="confirmModalLabel<?= $sheet['id'] ?>">
                                 <i class="bi bi-shield-check text-primary"></i>
-                                Confirm Grading Sheet: <?= htmlspecialchars($sheet['subject_code'] ?? $sheet['code'] ?? '') ?>
+                                Confirm Grading Sheet: <?= htmlspecialchars($sheet['subject_code'] ?? $sheet['code'] ?? '') ?> &middot; <?= htmlspecialchars($sheet['period_name'] ?? '') ?>
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
@@ -259,7 +305,6 @@ $statusView = static fn (string $status): array => match ($status) {
                 </div>
             </div>
         </div>
-        <?php endif; ?>
         <?php endforeach; ?>
 
     <?php endif; ?>
@@ -274,6 +319,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (!searchInput) return;
 
+    // Filter the rows already on the page as you type; Enter searches all pages on the server
     searchInput.addEventListener('input', function () {
         const query = this.value.trim().toLowerCase();
         let visibleCount = 0;
@@ -289,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         if (visibleCounter) {
-            visibleCounter.textContent = visibleCount + (visibleCount === 1 ? ' record' : ' records');
+            visibleCounter.textContent = visibleCount + (visibleCount === 1 ? ' course' : ' courses');
         }
 
         if (noResultsRow) {

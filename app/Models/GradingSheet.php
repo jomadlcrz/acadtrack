@@ -149,6 +149,132 @@ class GradingSheet extends Model
         return $stmt->fetchAll();
     }
 
+    /**
+     * Paginate grading sheets grouped by course + instructor (one group per subject/faculty pair).
+     *
+     * Filters (status, period, search) decide WHICH groups appear; each returned group then carries
+     * every sheet of that pair in the term (keyed by grading period id), so a row can show all periods.
+     *
+     * @param string[] $statuses Grading sheet statuses to match (empty = any)
+     * @return array{data: array<int, array<string, mixed>>, total: int, page: int, perPage: int, per_page: int, lastPage: int, last_page: int}
+     */
+    public static function paginateGroupedWithDetails(
+        int $academicTermId,
+        array $statuses = [],
+        ?int $periodId = null,
+        int $page = 1,
+        int $perPage = 15,
+        string $search = ''
+    ): array {
+        $page = max(1, $page);
+        $offset = ($page - 1) * $perPage;
+
+        $where = ['gs.academic_term_id = :term'];
+        $params = ['term' => $academicTermId];
+
+        if ($statuses !== []) {
+            $placeholders = [];
+            foreach (array_values($statuses) as $i => $status) {
+                $placeholders[] = ':st' . $i;
+                $params['st' . $i] = $status;
+            }
+            $where[] = 'gs.status IN (' . implode(',', $placeholders) . ')';
+        }
+
+        if ($periodId !== null && $periodId > 0) {
+            $where[] = 'gs.grading_period_id = :period';
+            $params['period'] = $periodId;
+        }
+
+        if ($search !== '') {
+            $where[] = "CONCAT(s.subject_code, ' ', s.descriptive_title, ' ', COALESCE(fd.first_name, ''), ' ', COALESCE(fd.last_name, ''), ' ', gp.name) LIKE :search";
+            $params['search'] = '%' . $search . '%';
+        }
+
+        $whereSql = implode(' AND ', $where);
+        $joins = "
+            FROM grading_sheets gs
+            JOIN subjects s ON gs.subject_id = s.id
+            JOIN grading_periods gp ON gs.grading_period_id = gp.id
+            JOIN users u ON gs.faculty_id = u.id
+            LEFT JOIN faculty_details fd ON gs.faculty_id = fd.user_id
+        ";
+
+        $stmt = self::db()->prepare("SELECT COUNT(*) FROM (SELECT gs.subject_id, gs.faculty_id {$joins} WHERE {$whereSql} GROUP BY gs.subject_id, gs.faculty_id) g");
+        $stmt->execute($params);
+        $total = (int) $stmt->fetchColumn();
+
+        $stmt = self::db()->prepare("
+            SELECT gs.subject_id, gs.faculty_id, MAX(gs.updated_at) AS last_update
+            {$joins}
+            WHERE {$whereSql}
+            GROUP BY gs.subject_id, gs.faculty_id
+            ORDER BY last_update DESC, gs.subject_id ASC, gs.faculty_id ASC
+            LIMIT :limit OFFSET :offset
+        ");
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue('limit', $perPage, \PDO::PARAM_INT);
+        $stmt->bindValue('offset', $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+        $keys = $stmt->fetchAll();
+
+        $groups = [];
+        if ($keys !== []) {
+            $pairSql = [];
+            $pairParams = ['term' => $academicTermId];
+            foreach ($keys as $i => $k) {
+                $pairSql[] = "(gs.subject_id = :s{$i} AND gs.faculty_id = :f{$i})";
+                $pairParams['s' . $i] = (int) $k['subject_id'];
+                $pairParams['f' . $i] = (int) $k['faculty_id'];
+            }
+
+            $stmt = self::db()->prepare("
+                SELECT gs.*, s.subject_code, s.subject_code AS code, s.descriptive_title AS subject_name,
+                       gp.name AS period_name, gp.order_num AS period_order,
+                       fd.first_name, fd.last_name, u.email
+                {$joins}
+                WHERE gs.academic_term_id = :term AND (" . implode(' OR ', $pairSql) . ")
+                ORDER BY gp.order_num ASC
+            ");
+            $stmt->execute($pairParams);
+
+            foreach ($keys as $k) {
+                $id = $k['subject_id'] . ':' . $k['faculty_id'];
+                $groups[$id] = ['subject_id' => (int) $k['subject_id'], 'faculty_id' => (int) $k['faculty_id'], 'sheets' => []];
+            }
+            foreach ($stmt->fetchAll() as $row) {
+                $id = $row['subject_id'] . ':' . $row['faculty_id'];
+                if (!isset($groups[$id])) {
+                    continue;
+                }
+                if (!isset($groups[$id]['subject_code'])) {
+                    $groups[$id] += [
+                        'subject_code' => $row['subject_code'],
+                        'subject_name' => $row['subject_name'],
+                        'first_name' => $row['first_name'],
+                        'last_name' => $row['last_name'],
+                        'email' => $row['email'],
+                    ];
+                }
+                $groups[$id]['sheets'][(int) $row['grading_period_id']] = $row;
+            }
+        }
+
+        $lastPage = max(1, (int) ceil($total / $perPage));
+
+        return [
+            'data' => array_values($groups),
+            'total' => $total,
+            'page' => $page,
+            'perPage' => $perPage,
+            'per_page' => $perPage,
+            'lastPage' => $lastPage,
+            'last_page' => $lastPage,
+        ];
+    }
+
     public static function paginateWithDetails(int $academicTermId, ?string $status = null, int $page = 1, int $perPage = 15, string $search = ''): array
     {
         $page = max(1, $page);
