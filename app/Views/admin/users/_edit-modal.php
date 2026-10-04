@@ -30,7 +30,7 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
         <div class="modal-content">
             <div class="modal-header bg-white py-3 px-4">
                 <div class="d-flex align-items-center gap-2">
-                    <div class="d-flex align-items-center justify-content-center rounded-2 text-primary" style="width: 32px; height: 32px; background-color: #eff6ff;">
+                    <div class="d-flex align-items-center justify-content-center text-primary" style="width: 32px; height: 32px;">
                         <i class="bi bi-person-gear fs-6"></i>
                     </div>
                     <div>

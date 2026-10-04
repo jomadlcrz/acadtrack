@@ -57,7 +57,7 @@ ob_start();
 <div class="row g-3 mb-4">
     <div class="col-md-4">
         <a href="<?= url('/dean/grade-review') ?>" class="quick-action-card">
-            <div class="quick-action-icon bg-warning-subtle text-warning-emphasis">
+            <div class="quick-action-icon text-warning-emphasis">
                 <i class="bi bi-clipboard-check-fill"></i>
             </div>
             <div>
@@ -68,7 +68,7 @@ ob_start();
     </div>
     <div class="col-md-4">
         <a href="<?= url('/dean/faculty-assignments') ?>" class="quick-action-card">
-            <div class="quick-action-icon bg-primary-subtle text-primary">
+            <div class="quick-action-icon text-primary">
                 <i class="bi bi-person-workspace"></i>
             </div>
             <div>
@@ -79,7 +79,7 @@ ob_start();
     </div>
     <div class="col-md-4">
         <a href="<?= url('/dean/subjects') ?>" class="quick-action-card">
-            <div class="quick-action-icon bg-info-subtle text-info">
+            <div class="quick-action-icon text-info">
                 <i class="bi bi-book-half"></i>
             </div>
             <div>

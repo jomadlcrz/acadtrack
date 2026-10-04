@@ -91,6 +91,7 @@ graph TD
 | **Buttons & Actions** | Clear visual hierarchy: Primary, Secondary Outline, Destructive with confirmation. | Uniform blue pills everywhere with vague labels like "Submit" or "Do It". |
 | **Table Headers** | Sticky headers with dark background/contrast border so labels never disappear. | Disappearing headers when scrolling past 10 students. |
 | **Empty States** | Contextual explanations with direct action buttons (e.g., "Add First Subject"). | Cartoon illustrations of sleeping robots or empty shopping carts. |
+| **Icons** | Bare, flat icons that carry their semantic color (`text-primary`, `text-success`, ...) with no container. Size them up (20–24px) instead of boxing them. | Icons inside tinted or colored tiles/circles (`bg-*-subtle`, pastel `#eff6ff`/`#f0fdf4` squares, `rounded-circle` backplates) on stat cards, quick actions, modal headers, section headings and empty states. |
 | **Notifications** | Direct, dismissible alert banners explaining exact cause and remediation steps. | Vague floating toasts saying *"Something went wrong"* with no context. |
 
 ---
@@ -191,4 +192,5 @@ Before shipping any new view, layout, or table in the GWC Acadtrack, verify:
 - [ ] **Contrast Compliance:** Does all body copy and secondary metadata have a contrast ratio of at least $4.5:1$ against its background?
 - [ ] **Sticky Headers:** When scrolling through a 50-student set, do the column headers remain anchored at the top?
 - [ ] **Modal Safeguards:** Are destructive or irreversible actions (Dean return with remarks, Sheet submission) protected by explicit confirmation modals?
+- [ ] **Flat Icons:** Are all icons rendered without a colored background tile or circle (no `bg-*-subtle`, pastel hex backgrounds, or `rounded-circle` icon backplates)? Selected-state toggles and text badges are the only exceptions.
 - [ ] **Offline Independence:** Are all styles and icons served locally via `public/assets/vendor/` without external CDN dependencies?

@@ -44,7 +44,7 @@ ob_start();
 <div class="row g-3 mb-4">
     <div class="col-md-4">
         <a href="<?= url('/faculty/grading') ?>" class="quick-action-card">
-            <div class="quick-action-icon bg-primary-subtle text-primary">
+            <div class="quick-action-icon text-primary">
                 <i class="bi bi-pencil-square"></i>
             </div>
             <div>
@@ -55,7 +55,7 @@ ob_start();
     </div>
     <div class="col-md-4">
         <a href="<?= url('/faculty/students') ?>" class="quick-action-card">
-            <div class="quick-action-icon bg-success-subtle text-success">
+            <div class="quick-action-icon text-success">
                 <i class="bi bi-people-fill"></i>
             </div>
             <div>
@@ -66,7 +66,7 @@ ob_start();
     </div>
     <div class="col-md-4">
         <a href="<?= url('/faculty/subjects') ?>" class="quick-action-card">
-            <div class="quick-action-icon bg-info-subtle text-info">
+            <div class="quick-action-icon text-info">
                 <i class="bi bi-gear-fill"></i>
             </div>
             <div>

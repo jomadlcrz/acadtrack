@@ -29,18 +29,17 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background-color: #f1f5f9;
     color: #64748b;
     font-size: 22px;
     margin-bottom: 12px;
     flex-shrink: 0;
 }
 
-.empty-state-icon-blue   { background-color: #eff6ff; color: #1d4ed8; }
-.empty-state-icon-green  { background-color: #f0fdf4; color: #16a34a; }
-.empty-state-icon-amber  { background-color: #fffbeb; color: #d97706; }
-.empty-state-icon-red    { background-color: #fef2f2; color: #dc2626; }
-.empty-state-icon-purple { background-color: #faf5ff; color: #7c3aed; }
+.empty-state-icon-blue   { color: #1d4ed8; }
+.empty-state-icon-green  { color: #16a34a; }
+.empty-state-icon-amber  { color: #d97706; }
+.empty-state-icon-red    { color: #dc2626; }
+.empty-state-icon-purple { color: #7c3aed; }
 
 /* 4. Empty State Typography */
 .empty-state-title {

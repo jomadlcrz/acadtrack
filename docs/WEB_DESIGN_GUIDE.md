@@ -221,3 +221,4 @@ This design specification enforces the rules defined in [docs/ANTI_GENERIC_DESIG
 2. **No Unstyled Templates:** Every card, button, and badge is styled with institutional pride and purpose.
 3. **Guaranteed Contrast:** All text passes WCAG AA contrast tests with a minimum ratio of $4.5:1$.
 4. **Accessible Semantics:** Badges combine icons, colors, and unambiguous text.
+5. **Flat Icons Only:** Icons never sit on a colored background tile or circle. Use the bare icon with a semantic text color (`.stat-icon-*`, `.quick-action-icon`, `.empty-state-icon-*` are transparent by design). Text badges and selected-state toggles are exempt.

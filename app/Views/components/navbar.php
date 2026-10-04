@@ -40,7 +40,7 @@ $fullName = trim($firstName . ' ' . $lastName) ?: 'User';
         <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
             <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex justify-content-between align-items-start">
                 <div class="d-flex align-items-center gap-2.5">
-                    <div class="d-flex align-items-center justify-content-center rounded-circle text-danger" style="width: 42px; height: 42px; background-color: #fef2f2; flex-shrink: 0;">
+                    <div class="d-flex align-items-center justify-content-center text-danger" style="width: 42px; height: 42px; flex-shrink: 0;">
                         <i class="bi bi-box-arrow-right fs-5"></i>
                     </div>
                     <div>

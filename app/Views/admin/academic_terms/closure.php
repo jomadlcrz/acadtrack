@@ -243,7 +243,7 @@ ob_start();
                 <?= csrf_field() ?>
                 <div class="modal-header border-bottom py-3 px-4">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="p-2 bg-danger-subtle text-danger rounded-circle">
+                        <div class="p-1 text-danger">
                             <i class="bi bi-lock fs-5"></i>
                         </div>
                         <div>
@@ -371,7 +371,7 @@ ob_start();
                 <?= csrf_field() ?>
                 <div class="modal-header border-bottom py-3 px-4">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="p-2 bg-secondary-subtle text-dark rounded-circle">
+                        <div class="p-1 text-secondary">
                             <i class="bi bi-unlock fs-5"></i>
                         </div>
                         <div>

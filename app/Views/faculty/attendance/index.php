@@ -96,7 +96,7 @@ $hasStudents = !empty($students);
                     <span class="text-muted small d-block fw-medium">Enrolled Students</span>
                     <span class="fs-4 fw-bold mb-0 text-dark tabular-nums"><?= count($students) ?></span>
                 </div>
-                <div class="attendance-stat-icon bg-light text-secondary">
+                <div class="attendance-stat-icon text-secondary">
                     <i class="bi bi-people"></i>
                 </div>
             </div>
@@ -107,7 +107,7 @@ $hasStudents = !empty($students);
                     <span class="text-muted small d-block fw-medium">Present Today</span>
                     <span class="fs-4 fw-bold mb-0 text-success tabular-nums" id="counterPresent"><?= $presentCount ?></span>
                 </div>
-                <div class="attendance-stat-icon bg-success-subtle text-success">
+                <div class="attendance-stat-icon text-success">
                     <i class="bi bi-person-check-fill"></i>
                 </div>
             </div>
@@ -118,7 +118,7 @@ $hasStudents = !empty($students);
                     <span class="text-muted small d-block fw-medium">Absent</span>
                     <span class="fs-4 fw-bold mb-0 text-danger tabular-nums" id="counterAbsent"><?= $absentCount ?></span>
                 </div>
-                <div class="attendance-stat-icon bg-danger-subtle text-danger">
+                <div class="attendance-stat-icon text-danger">
                     <i class="bi bi-person-x-fill"></i>
                 </div>
             </div>
@@ -129,7 +129,7 @@ $hasStudents = !empty($students);
                     <span class="text-muted small d-block fw-medium">Late / Excused</span>
                     <span class="fs-4 fw-bold mb-0 text-warning tabular-nums" id="counterExcused"><?= ($excusedCount + $lateCount) ?></span>
                 </div>
-                <div class="attendance-stat-icon bg-warning-subtle text-warning">
+                <div class="attendance-stat-icon text-warning">
                     <i class="bi bi-clock-history"></i>
                 </div>
             </div>

@@ -27,7 +27,7 @@ ob_start();
             <!-- Personal Information -->
             <div class="mb-4 pb-2">
                 <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
-                    <div class="d-flex align-items-center justify-content-center rounded-2 text-primary" style="width: 28px; height: 28px; background-color: #eff6ff;">
+                    <div class="d-flex align-items-center justify-content-center text-primary" style="width: 28px; height: 28px;">
                         <i class="bi bi-person text-primary" style="font-size: 15px;"></i>
                     </div>
                     <div>
@@ -99,7 +99,7 @@ ob_start();
                 <!-- Academic Classification -->
                 <div class="mt-4 mb-3 pt-3 border-top">
                     <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
-                        <div class="d-flex align-items-center justify-content-center rounded-2 text-primary" style="width: 28px; height: 28px; background-color: #eff6ff;">
+                        <div class="d-flex align-items-center justify-content-center text-primary" style="width: 28px; height: 28px;">
                             <i class="bi bi-mortarboard text-primary" style="font-size: 15px;"></i>
                         </div>
                         <div>
@@ -233,7 +233,7 @@ ob_start();
                 <!-- Department Affiliation -->
                 <div class="mt-4 mb-3 pt-3 border-top">
                     <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
-                        <div class="d-flex align-items-center justify-content-center rounded-2 text-primary" style="width: 28px; height: 28px; background-color: #eff6ff;">
+                        <div class="d-flex align-items-center justify-content-center text-primary" style="width: 28px; height: 28px;">
                             <i class="bi bi-building text-primary" style="font-size: 15px;"></i>
                         </div>
                         <div>
