@@ -2,6 +2,14 @@
    Acadtrack UI Component: Modals & Confirmation Dialogs
    ========================================================================== */
 
+/* ==========================================================================
+   SINGLE SOURCE OF TRUTH for every Bootstrap modal in the app.
+   Views use plain `modal-content / modal-header / modal-body / modal-footer`
+   (plus modal-lg / modal-dialog-centered for size & position) and NEVER add
+   per-modal padding, border, background, radius or shadow utilities or inline
+   styles. Change the look here, once.
+   ========================================================================== */
+
 /* 1. Modal Content Box */
 .modal-content {
     background-color: #ffffff;
@@ -15,7 +23,7 @@
 .modal-header {
     background-color: #ffffff;
     border-bottom: 1px solid #cbd5e1;
-    padding: 16px 20px;
+    padding: 16px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -67,7 +75,7 @@
 .modal-footer {
     background-color: #f8fafc;
     border-top: 1px solid #e2e8f0;
-    padding: 12px 20px;
+    padding: 12px 24px;
     display: flex;
     align-items: center;
     justify-content: flex-end;

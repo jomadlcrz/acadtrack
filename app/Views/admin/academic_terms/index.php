@@ -548,14 +548,14 @@ ob_start();
 <!-- 1. Create School Year Modal (Matching reference auto-format) -->
 <div class="modal fade" id="createTermModal" tabindex="-1" aria-labelledby="createTermModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content">
             <form method="POST" action="<?= url('/admin/academic-terms') ?>">
                 <?= csrf_field() ?>
-                <div class="modal-header border-bottom py-3 px-4">
-                    <h5 class="modal-title h6 fw-bold mb-0" id="createTermModalLabel">Create Academic Term / School Year</h5>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createTermModalLabel">Create Academic Term / School Year</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4 space-y-3">
+                <div class="modal-body space-y-3">
                     <div class="mb-3">
                         <label for="school_year" class="form-label small fw-semibold text-dark">School Year <span class="text-danger">*</span></label>
                         <input type="text" 
@@ -582,7 +582,7 @@ ob_start();
                         <label class="form-check-label small fw-medium" for="set_active">Set as current active institutional term</label>
                     </div>
                 </div>
-                <div class="modal-footer border-top py-2.5 px-4 bg-light d-flex justify-content-end gap-2">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
                         <i class="bi bi-check2"></i> Save Term
@@ -596,14 +596,14 @@ ob_start();
 <!-- 2. Edit School Year Modal -->
 <div class="modal fade" id="editSchoolYearModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content">
             <form method="POST" id="editSchoolYearForm" action="">
                 <?= csrf_field() ?>
-                <div class="modal-header border-bottom py-3 px-4">
-                    <h5 class="modal-title h6 fw-bold mb-0">Edit School Year</h5>
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit School Year</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4">
+                <div class="modal-body">
                     <div class="mb-3">
                         <label for="edit_school_year" class="form-label small fw-semibold text-dark">School Year <span class="text-danger">*</span></label>
                         <input type="text" 
@@ -615,7 +615,7 @@ ob_start();
                         <div class="form-text small text-muted">Format: YYYY-YYYY (consecutive years)</div>
                     </div>
                 </div>
-                <div class="modal-footer border-top py-2.5 px-4 bg-light d-flex justify-content-end gap-2">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
                         <i class="bi bi-check2"></i> Save changes
@@ -629,12 +629,12 @@ ob_start();
 <!-- 3. Help Modal (Matching reference Help dialog) -->
 <div class="modal fade" id="helpModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom py-3 px-4">
-                <h5 class="modal-title h6 fw-bold mb-0">About Academic Terms & Lifecycle</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">About Academic Terms & Lifecycle</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4 space-y-3 font-body text-secondary" style="font-size: 14px; line-height: 1.6;">
+            <div class="modal-body space-y-3 font-body text-secondary">
                 <p>
                     <strong>School Years:</strong> Each row represents an academic year (e.g. 2026-2027). Calendar status — <em>Ongoing</em>, <em>Ended</em>, or <em>Upcoming</em> — is computed automatically from today's date.
                 </p>
@@ -645,7 +645,7 @@ ob_start();
                     <strong>Lifecycle & Immutability:</strong> School years and terms are <strong>never archived or deleted</strong>, because they represent students' permanent transcripts of records. When a semester completes and all grades are verified, the Registrar <strong>Closes / Posts</strong> the term to freeze data.
                 </p>
             </div>
-            <div class="modal-footer border-top py-2.5 px-4 bg-light">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it</button>
             </div>
         </div>
@@ -655,14 +655,14 @@ ob_start();
 <!-- 4. Term Closure Pre-Closure Impact Modal -->
 <div class="modal fade" id="closurePreviewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content">
             <form method="POST" id="closureForm" action="">
                 <?= csrf_field() ?>
-                <div class="modal-header border-bottom py-3 px-4">
-                    <h5 class="modal-title h6 fw-bold mb-0" id="previewTermTitle">Post Academic Term</h5>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewTermTitle">Post Academic Term</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4">
+                <div class="modal-body">
                     <div id="previewLoading" class="text-center py-4">
                         <div class="spinner-border spinner-border-sm text-primary me-2"></div>
                         <span class="text-muted">Loading pre-closure audit checks…</span>
@@ -704,7 +704,7 @@ ob_start();
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-top py-2.5 px-4 bg-light d-flex justify-content-end gap-2">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-warning text-dark fw-semibold d-inline-flex align-items-center gap-1.5" id="btnConfirmClose">
                         <i class="bi bi-lock-fill"></i> Confirm & Post Term
@@ -718,14 +718,14 @@ ob_start();
 <!-- 5. Term Closure Reopen Modal -->
 <div class="modal fade" id="reopenModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content">
             <form method="POST" id="reopenForm" action="">
                 <?= csrf_field() ?>
-                <div class="modal-header border-bottom py-3 px-4">
-                    <h5 class="modal-title h6 fw-bold mb-0" id="reopenModalTitle">Reopen Academic Term</h5>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reopenModalTitle">Reopen Academic Term</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4">
+                <div class="modal-body">
                     <p class="text-secondary small mb-3">
                         Reopening unlocks the term for faculty grade sheet adjustments. An audit reason is mandatory.
                     </p>
@@ -736,7 +736,7 @@ ob_start();
                         <textarea class="form-control" id="reopen_reason" name="reopen_reason" rows="3" required placeholder="e.g. Registrar resolution regarding grade appeal for CS301"></textarea>
                     </div>
                 </div>
-                <div class="modal-footer border-top py-2.5 px-4 bg-light d-flex justify-content-end gap-2">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
                         <i class="bi bi-unlock"></i> Reopen Term
@@ -750,15 +750,15 @@ ob_start();
 <!-- 6. Term Closure Details Audit Modal (Adopted from class-scheduling TermClosureDetailsDrawer) -->
 <div class="modal fade" id="closureDetailsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom py-3 px-4">
+        <div class="modal-content">
+            <div class="modal-header">
                 <div>
-                    <h5 class="modal-title h6 fw-bold mb-0 text-dark" id="detailsTermTitle">Term Lifecycle & Closure Details</h5>
+                    <h5 class="modal-title" id="detailsTermTitle">Term Lifecycle & Closure Details</h5>
                     <small class="text-muted" id="detailsTermSubtitle">Academic term audit trail</small>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body">
                 <div id="detailsLoading" class="text-center py-4">
                     <div class="spinner-border spinner-border-sm text-primary me-2"></div>
                     <span class="text-muted">Loading term audit details…</span>
@@ -851,7 +851,7 @@ ob_start();
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-top py-2.5 px-4 bg-light d-flex justify-content-end">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>

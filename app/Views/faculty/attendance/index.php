@@ -298,17 +298,17 @@ $hasStudents = !empty($students);
     <div class="modal fade" id="saveAttendanceConfirmModal" tabindex="-1" aria-labelledby="saveAttendanceConfirmLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header border-bottom py-3 px-4">
+                <div class="modal-header">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-calendar-check text-primary fs-4"></i>
                         <div>
-                            <h5 class="modal-title fw-semibold text-dark fs-6 mb-0" id="saveAttendanceConfirmLabel">Save Attendance</h5>
+                            <h5 class="modal-title" id="saveAttendanceConfirmLabel">Save Attendance</h5>
                             <div class="text-muted" style="font-size: 12px;"><?= date('l, F j, Y', strtotime($date)) ?> &bull; <?= htmlspecialchars($currentSubject['code'] ?? '') ?></div>
                         </div>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4 text-secondary">
+                <div class="modal-body text-secondary">
                     <p class="mb-3">Record attendance for <strong class="text-dark tabular-nums" id="confirmTotal">0</strong> students? Changes are recorded in official student course logs.</p>
                     <div class="row g-2 text-center">
                         <div class="col-3"><div class="fs-5 fw-semibold text-success tabular-nums" id="confirmPresent">0</div><div class="small text-muted">Present</div></div>
@@ -317,7 +317,7 @@ $hasStudents = !empty($students);
                         <div class="col-3"><div class="fs-5 fw-semibold text-danger tabular-nums" id="confirmAbsent">0</div><div class="small text-muted">Absent</div></div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-sm btn-primary px-3 d-inline-flex align-items-center gap-1" id="btnConfirmSaveAttendance">
                         <i class="bi bi-check2"></i> Confirm and save
@@ -398,15 +398,15 @@ $hasStudents = !empty($students);
 <!-- Student Absence History Audit Modal -->
 <div class="modal fade" id="studentAbsenceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom py-3 px-4">
+        <div class="modal-content">
+            <div class="modal-header">
                 <div>
-                    <h5 class="modal-title h6 fw-bold mb-0 text-dark" id="historyModalStudentName">Student Absence Audit</h5>
+                    <h5 class="modal-title" id="historyModalStudentName">Student Absence Audit</h5>
                     <div class="small text-muted" id="historyModalSubtitle">Official attendance record</div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4" id="historyModalBody">
+            <div class="modal-body" id="historyModalBody">
                 <div class="text-center py-4 text-muted">
                     <span class="spinner-border spinner-border-sm me-2"></span> Loading audit logs...
                 </div>

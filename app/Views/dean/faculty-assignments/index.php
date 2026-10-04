@@ -338,26 +338,26 @@ ob_start();
 <!-- Modal: Assign Instructor to Course -->
 <div class="modal fade" id="assignInstructorModal" tabindex="-1" aria-labelledby="assignInstructorModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content">
             <form method="POST" action="<?= url('/dean/faculty-assignments/assign') ?>" novalidate>
                 <?= csrf_field() ?>
                 <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
                 <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
 
-                <div class="modal-header border-bottom py-3 px-4">
+                <div class="modal-header">
                     <div class="d-flex align-items-center gap-2">
                         <div class="bg-primary-subtle text-primary p-2 rounded">
                             <i class="bi bi-person-plus-fill fs-6"></i>
                         </div>
                         <div>
-                            <h5 class="modal-title h6 fw-bold mb-0" id="assignInstructorModalLabel">Assign Instructor to Course</h5>
+                            <h5 class="modal-title" id="assignInstructorModalLabel">Assign Instructor to Course</h5>
                             <small class="text-muted" style="font-size: 12px;"><?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?> &bull; <?= htmlspecialchars(semester_label($selectedSemester ?? 1)) ?></small>
                         </div>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <div class="modal-body p-4">
+                <div class="modal-body">
                     <div class="mb-3">
                         <label for="modal_subject_id" class="form-label small fw-semibold">Subject Offering <span class="text-danger">*</span></label>
                         <select class="form-select" id="modal_subject_id" name="subject_id" required>
@@ -395,7 +395,7 @@ ob_start();
                     </div>
                 </div>
 
-                <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5 shadow-sm">
                         <i class="bi bi-check-circle"></i> Confirm Assignment
@@ -409,21 +409,21 @@ ob_start();
 <!-- Modal: Faculty Workload Overview -->
 <div class="modal fade" id="facultyWorkloadModal" tabindex="-1" aria-labelledby="facultyWorkloadModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom py-3 px-4">
+        <div class="modal-content">
+            <div class="modal-header">
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-info-subtle text-info p-2 rounded">
                         <i class="bi bi-person-lines-fill fs-6"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title h6 fw-bold mb-0" id="facultyWorkloadModalLabel">Faculty Teaching Workload Summary</h5>
+                        <h5 class="modal-title" id="facultyWorkloadModalLabel">Faculty Teaching Workload Summary</h5>
                         <small class="text-muted" style="font-size: 12px;"><?= htmlspecialchars($termDisplay) ?></small>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body p-4">
+            <div class="modal-body">
                 <?php if (empty($faculty)): ?>
                     <div class="text-center py-4 text-muted small">
                         No faculty members found in the institutional roster.
@@ -494,7 +494,7 @@ ob_start();
                 <?php endif; ?>
             </div>
 
-            <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>

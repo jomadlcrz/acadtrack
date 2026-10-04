@@ -332,3 +332,31 @@ Before deploying any view containing forms or UI elements:
 - [ ] Are all button labels, form labels, and table headers in **Sentence case** per `CASING_GUIDELINES.md`?
 - [ ] Are all form action attributes and links using `<?= url('/path') ?>`?
 - [ ] Is `font-weight` capped at `600` (zero `700`, `800`, or `bold`)?
+
+---
+
+## Modals: One Centralized Style
+
+All Bootstrap modals are styled in one place: `public/assets/css/components/modal.css`. It owns padding, borders, header/footer backgrounds, radius, shadow, title typography, footer alignment and the viewport-scroll behavior.
+
+**Markup contract (views):**
+
+```html
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">          <!-- + modal-lg for wide forms -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-..."></i> Title Case Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">...</div>
+            <div class="modal-footer">                         <!-- add justify-content-between only if needed -->
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+**Never** add to `modal-content`, `modal-header`, `modal-body`, `modal-footer` or `modal-title`: padding (`p-*`, `py-*`, `px-*`), `bg-*`, `border-*`, `shadow*`, `rounded*`, `fw-*`/`fs-*`/`h6`, or inline `style=""`. If a modal needs a different look, change `modal.css` so every modal changes together.

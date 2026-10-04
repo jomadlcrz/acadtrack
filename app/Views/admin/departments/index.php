@@ -109,7 +109,7 @@ ob_start();
                                 <form method="POST" action="<?= url('/admin/departments/' . $dept['id']) ?>">
                                     <?= csrf_field() ?>
                                     <div class="modal-header">
-                                        <h5 class="modal-title h6 fw-semibold" id="editDepartmentModalLabel<?= $dept['id'] ?>">Edit Department</h5>
+                                        <h5 class="modal-title" id="editDepartmentModalLabel<?= $dept['id'] ?>">Edit Department</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
@@ -134,7 +134,7 @@ ob_start();
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                                    <div class="modal-footer">
                                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                                         <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
                                             <i class="bi bi-check2"></i> Save Changes
@@ -168,7 +168,7 @@ ob_start();
             <form method="POST" action="<?= url('/admin/departments') ?>">
                 <?= csrf_field() ?>
                 <div class="modal-header">
-                    <h5 class="modal-title h6 fw-semibold" id="addDepartmentModalLabel">Add New Department</h5>
+                    <h5 class="modal-title" id="addDepartmentModalLabel">Add New Department</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -193,7 +193,7 @@ ob_start();
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
                         <i class="bi bi-check2"></i> Save Department

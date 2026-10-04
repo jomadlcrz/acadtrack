@@ -297,10 +297,10 @@ ob_start();
 <!-- ================= MODAL: BATCH EXCEL / CSV IMPORT ================= -->
 <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow" style="border: 1px solid #cbd5e1 !important; border-radius: 10px;">
-            <div class="modal-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+        <div class="modal-content">
+            <div class="modal-header">
                 <div>
-                    <h5 class="modal-title h6 fw-bold text-dark mb-0" id="importExcelModalLabel">
+                    <h5 class="modal-title" id="importExcelModalLabel">
                         Batch Student Registration
                     </h5>
                     <small class="text-muted" style="font-size: 12px;">Upload a student roster spreadsheet (.xlsx, .xls, or .csv) to register multiple accounts.</small>
@@ -308,7 +308,7 @@ ob_start();
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body p-4">
+            <div class="modal-body">
                 <!-- Step 1: Template and File Picker -->
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3 pb-3 border-bottom">
                     <div>
@@ -362,7 +362,7 @@ ob_start();
                 </div>
             </div>
 
-            <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-between">
+            <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" id="btnSubmitImport" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1.5" disabled style="background-color: #1e3a8a; border-color: #1e3a8a;">
                     <i class="bi bi-cloud-arrow-up"></i> Register Verified Records

@@ -255,16 +255,16 @@ ob_start();
 <div class="modal fade" id="importSubjectsModal" tabindex="-1" aria-labelledby="importSubjectsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header border-bottom py-3 px-4">
+            <div class="modal-header">
                 <div>
-                    <h5 class="modal-title fw-bold text-dark mb-0" id="importSubjectsModalLabel">
+                    <h5 class="modal-title" id="importSubjectsModalLabel">
                         <i class="bi bi-file-earmark-excel text-success me-1"></i> Import Curriculum Subjects (Excel / CSV)
                     </h5>
                     <div class="text-muted text-xs mt-0.5">Upload an Excel workbook (.xlsx, .xls) or CSV file to bulk-populate subjects.</div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body">
                 <!-- Tabs: Upload File vs Paste Data -->
                 <ul class="nav nav-tabs mb-3" id="importTab" role="tablist">
                     <li class="nav-item" role="presentation">
@@ -380,7 +380,7 @@ ob_start();
                     <div id="importValidationErrors" class="alert alert-warning py-2 px-3 small mt-2" style="display: none;"></div>
                 </div>
             </div>
-            <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" id="applyImportBtn" class="btn btn-primary d-inline-flex align-items-center gap-1.5" disabled onclick="applyImportedSubjects()">
                     <i class="bi bi-check2"></i> Apply Subjects to Curriculum

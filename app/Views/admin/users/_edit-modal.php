@@ -28,13 +28,13 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
 <div class="modal fade" id="editUserModal<?= $uid ?>" tabindex="-1" aria-labelledby="editUserModalLabel<?= $uid ?>" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-white py-3 px-4">
+            <div class="modal-header">
                 <div class="d-flex align-items-center gap-2">
                     <div class="d-flex align-items-center justify-content-center text-primary" style="width: 32px; height: 32px;">
                         <i class="bi bi-person-gear fs-6"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-semibold text-dark fs-6 mb-0" id="editUserModalLabel<?= $uid ?>">
+                        <h5 class="modal-title" id="editUserModalLabel<?= $uid ?>">
                             Edit <?= htmlspecialchars($userRole) ?> Account
                         </h5>
                         <div class="text-muted text-xs d-flex align-items-center gap-1 mt-1" style="font-size: 11.5px;">
@@ -50,7 +50,7 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
             <form method="POST" action="<?= url('/admin/users/' . $uid) ?>" autocomplete="off" class="user-edit-modal-form" data-modal-id="<?= $uid ?>">
                 <?= csrf_field() ?>
 
-                <div class="modal-body px-4 py-3">
+                <div class="modal-body">
                     <!-- Personal details section -->
                     <div class="mb-3">
                         <div class="d-flex align-items-center gap-2 mb-2 pb-1 border-bottom">
@@ -237,7 +237,7 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
                     <?php endif; ?>
                 </div>
 
-                <div class="modal-footer py-2 px-4 d-flex justify-content-between align-items-center">
+                <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
                         Cancel
                     </button>

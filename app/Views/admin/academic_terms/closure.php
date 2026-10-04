@@ -238,23 +238,23 @@ ob_start();
 <!-- Modal 1: Pre-Closure Audit Preview & Confirmation (Adopted from class-scheduling) -->
 <div class="modal fade" id="closurePreviewModal" tabindex="-1" aria-labelledby="closurePreviewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content">
             <form id="closureConfirmForm" method="POST" action="">
                 <?= csrf_field() ?>
-                <div class="modal-header border-bottom py-3 px-4">
+                <div class="modal-header">
                     <div class="d-flex align-items-center gap-2">
                         <div class="p-1 text-danger">
                             <i class="bi bi-lock fs-5"></i>
                         </div>
                         <div>
-                            <h5 class="modal-title fw-bold text-dark mb-0" id="closurePreviewModalLabel">Post & Close Academic Term</h5>
+                            <h5 class="modal-title" id="closurePreviewModalLabel">Post & Close Academic Term</h5>
                             <span class="text-muted small" id="previewTermHeader">1st Semester, 2026-2027</span>
                         </div>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <div class="modal-body p-4">
+                <div class="modal-body">
                     <!-- Loading Spinner -->
                     <div id="previewLoading" class="text-center py-5">
                         <div class="spinner-border text-primary" role="status">
@@ -352,7 +352,7 @@ ob_start();
                     </div>
                 </div>
 
-                <div class="modal-footer bg-light py-3 px-4 border-top">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger d-inline-flex align-items-center gap-1.5" id="btnConfirmClose">
                         <i class="bi bi-lock-fill"></i> Confirm & Close Term
@@ -366,23 +366,23 @@ ob_start();
 <!-- Modal 2: Audited Reopen Modal -->
 <div class="modal fade" id="reopenModal" tabindex="-1" aria-labelledby="reopenModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content">
             <form id="reopenForm" method="POST" action="">
                 <?= csrf_field() ?>
-                <div class="modal-header border-bottom py-3 px-4">
+                <div class="modal-header">
                     <div class="d-flex align-items-center gap-2">
                         <div class="p-1 text-secondary">
                             <i class="bi bi-unlock fs-5"></i>
                         </div>
                         <div>
-                            <h5 class="modal-title fw-bold text-dark mb-0" id="reopenModalLabel">Reopen Academic Term</h5>
+                            <h5 class="modal-title" id="reopenModalLabel">Reopen Academic Term</h5>
                             <span class="text-muted small" id="reopenTermHeader">Term</span>
                         </div>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <div class="modal-body p-4">
+                <div class="modal-body">
                     <div class="alert alert-info border-0 small mb-3">
                         <i class="bi bi-info-circle-fill me-1"></i>
                         Reopening unlocks the term for official grade corrections or administrative adjustments. This action is permanently logged to the audit trail.
@@ -399,7 +399,7 @@ ob_start();
                     </div>
                 </div>
 
-                <div class="modal-footer bg-light py-3 px-4 border-top">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-dark d-inline-flex align-items-center gap-1.5">
                         <i class="bi bi-unlock-fill"></i> Reopen Term

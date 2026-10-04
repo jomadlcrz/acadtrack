@@ -134,7 +134,7 @@ $displaySets = $sets ?? [];
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
                                     <div class="modal-header">
-                                        <h5 class="modal-title h6 fw-semibold" id="editSetModalLabel<?= $sec['id'] ?>">Edit Set</h5>
+                                        <h5 class="modal-title" id="editSetModalLabel<?= $sec['id'] ?>">Edit Set</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
@@ -173,7 +173,7 @@ $displaySets = $sets ?? [];
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                                    <div class="modal-footer">
                                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                                         <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
                                             <i class="bi bi-check2"></i> Save Changes
@@ -199,7 +199,7 @@ $displaySets = $sets ?? [];
                 <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
                 <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
                 <div class="modal-header">
-                    <h5 class="modal-title h6 fw-semibold" id="addSetModalLabel">Add New Set</h5>
+                    <h5 class="modal-title" id="addSetModalLabel">Add New Set</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -238,7 +238,7 @@ $displaySets = $sets ?? [];
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
                         <i class="bi bi-plus-lg"></i> Save Set

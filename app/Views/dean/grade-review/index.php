@@ -286,18 +286,18 @@ $metrics = $metrics ?? [
         <?php if ($sheet['status'] === 'APPROVED'): ?>
         <div class="modal fade" id="confirmModal<?= $sheet['id'] ?>" tabindex="-1" aria-labelledby="confirmModalLabel<?= $sheet['id'] ?>" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow" style="border-radius: 8px;">
+                <div class="modal-content">
                     <form method="POST" action="<?= url('/dean/grade-review/confirm') ?>">
                         <?= csrf_field() ?>
                         <input type="hidden" name="grading_sheet_id" value="<?= $sheet['id'] ?>">
-                        <div class="modal-header border-bottom py-3">
-                            <h5 class="modal-title h6 fw-semibold mb-0 d-flex align-items-center gap-2" id="confirmModalLabel<?= $sheet['id'] ?>">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmModalLabel<?= $sheet['id'] ?>">
                                 <i class="bi bi-shield-check text-primary"></i>
                                 Confirm Grading Sheet: <?= htmlspecialchars($sheet['subject_code'] ?? $sheet['code'] ?? '') ?>
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body p-4">
+                        <div class="modal-body">
                             <div class="alert alert-warning d-flex align-items-start gap-2 mb-3 py-2 px-3 small border-0 bg-warning-subtle text-warning-emphasis">
                                 <i class="bi bi-exclamation-triangle-fill fs-6 mt-0.5 flex-shrink-0"></i>
                                 <div>Confirming will formally finalize and permanently lock this grading sheet. No further grade revisions can be recorded once confirmed.</div>
@@ -307,7 +307,7 @@ $metrics = $metrics ?? [
                                 <textarea class="form-control" id="remarks_<?= $sheet['id'] ?>" name="remarks" rows="3" placeholder="Enter confirmation remarks (e.g. Official semester rating confirmed by the Dean's Office.)"></textarea>
                             </div>
                         </div>
-                        <div class="modal-footer border-top py-2.5 px-4 d-flex justify-content-end gap-2 bg-light">
+                        <div class="modal-footer">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-dark d-inline-flex align-items-center gap-1.5 shadow-sm">
                                 <i class="bi bi-shield-check"></i> Confirm &amp; Finalize

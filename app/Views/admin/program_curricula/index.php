@@ -258,17 +258,17 @@ ob_start();
                                     <!-- Edit Subject Modal -->
                                     <div class="modal fade" id="editSubjectModal<?= $sub->id ?>" tabindex="-1" aria-labelledby="editSubjectModalLabel<?= $sub->id ?>" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content" style="border: 1px solid #cbd5e1 !important; box-shadow: none !important; border-radius: 6px;">
+                                            <div class="modal-content">
                                                 <form method="POST" action="<?= url('/admin/program-curricula/subjects/' . $sub->id) ?>">
                                                     <?= csrf_field() ?>
                                                     <input type="hidden" name="program" value="<?= htmlspecialchars($selectedAbbrev) ?>">
-                                                    <div class="modal-header border-bottom py-3 px-4" style="border-bottom: 1px solid #cbd5e1 !important;">
-                                                        <h5 class="modal-title h6 fw-semibold mb-0" id="editSubjectModalLabel<?= $sub->id ?>">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="editSubjectModalLabel<?= $sub->id ?>">
                                                             Edit Subject: <span class="font-monospace text-primary"><?= htmlspecialchars($sub->subject_code) ?></span>
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
-                                                    <div class="modal-body p-4 text-start">
+                                                    <div class="modal-body text-start">
                                                         <div class="row g-3">
                                                             <div class="col-12 col-md-5">
                                                                 <label for="subCode_<?= $sub->id ?>" class="form-label small fw-semibold text-dark">Subject Code <span class="text-danger">*</span></label>
@@ -332,7 +332,7 @@ ob_start();
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="modal-footer bg-light py-2.5 px-4 border-top">
+                                                    <div class="modal-footer">
                                                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                                                         <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
                                                             <i class="bi bi-check2"></i> Save Changes
@@ -369,18 +369,18 @@ ob_start();
 <?php if ($selectedProgram): ?>
 <div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border: 1px solid #cbd5e1 !important; box-shadow: none !important; border-radius: 6px;">
+        <div class="modal-content">
             <form method="POST" action="<?= url('/admin/program-curricula/subjects') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="program_id" value="<?= $selectedProgram->id ?>">
                 <input type="hidden" name="program" value="<?= htmlspecialchars($selectedAbbrev) ?>">
-                <div class="modal-header border-bottom py-3 px-4" style="border-bottom: 1px solid #cbd5e1 !important;">
-                    <h5 class="modal-title h6 fw-semibold mb-0" id="addSubjectModalLabel">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSubjectModalLabel">
                         Add Subject to <span class="text-primary"><?= htmlspecialchars($selectedProgram->program_abbrev) ?></span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4 text-start">
+                <div class="modal-body text-start">
                     <div class="row g-3">
                         <div class="col-12 col-md-5">
                             <label for="newSubCode" class="form-label small fw-semibold text-dark">Subject Code <span class="text-danger">*</span></label>
@@ -425,7 +425,7 @@ ob_start();
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-2.5 px-4 border-top">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
                         <i class="bi bi-plus-lg"></i> Add Subject

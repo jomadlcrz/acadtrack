@@ -196,13 +196,13 @@ $isPending = in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW']);
 <?php if ($isApproved): ?>
 <div class="modal fade" id="confirmSheetModal" tabindex="-1" aria-labelledby="confirmSheetModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content">
             <form method="POST" action="<?= url('/dean/grade-review/confirm') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="grading_sheet_id" value="<?= $sheet['id'] ?>">
                 <input type="hidden" name="redirect_to" value="<?= url('/dean/grade-review/' . $sheet['id']) ?>">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title h6 fw-semibold mb-0" id="confirmSheetModalLabel">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmSheetModalLabel">
                         Confirm &amp; Finalize: <?= htmlspecialchars($sheet['subject_code']) ?>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -220,7 +220,7 @@ $isPending = in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW']);
                         <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="e.g. Official rating approved and confirmed for registrar filing."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer border-top py-3 d-flex justify-content-end gap-2">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-dark d-inline-flex align-items-center gap-2">
                         <i class="bi bi-check2"></i> Confirm &amp; finalize sheet

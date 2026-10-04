@@ -277,11 +277,11 @@ $activeGradingMethod = $currentSubject['grading_method'] ?? 'zero_based';
 <!-- IntelliGrade Component Score Calculator Modal -->
 <div class="modal fade" id="intelliGradeModal" tabindex="-1" aria-labelledby="intelliGradeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom py-3 px-4">
+        <div class="modal-content">
+            <div class="modal-header">
                 <div>
                     <div class="d-flex align-items-center gap-2">
-                        <h5 class="modal-title h6 fw-bold mb-0 text-dark" id="intelliGradeModalLabel">
+                        <h5 class="modal-title" id="intelliGradeModalLabel">
                             <i class="bi bi-calculator me-1 text-primary"></i> Period Score Calculator
                         </h5>
                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 11px;">
@@ -293,7 +293,7 @@ $activeGradingMethod = $currentSubject['grading_method'] ?? 'zero_based';
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body p-4">
+            <div class="modal-body">
                 <div class="row g-3 mb-3">
                     <!-- Target Student Selector -->
                     <div class="col-md-6">
@@ -378,7 +378,7 @@ $activeGradingMethod = $currentSubject['grading_method'] ?? 'zero_based';
                 </div>
             </div>
 
-            <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-between align-items-center">
+            <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" onclick="resetCalculatorInputs()">
                     <i class="bi bi-arrow-counterclockwise me-1"></i> Clear inputs
                 </button>

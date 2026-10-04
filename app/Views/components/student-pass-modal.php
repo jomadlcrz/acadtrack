@@ -1,9 +1,9 @@
 <!-- Digital Student Pass Modal (Official Institutional Credential) -->
 <div class="modal fade" id="digitalStudentPassModal" tabindex="-1" aria-labelledby="digitalStudentPassModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden; background: #ffffff;">
-            <div class="modal-header border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
-                <h5 class="modal-title h6 fw-semibold text-dark mb-0">Digital Student Pass</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Digital Student Pass</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-0">
@@ -155,7 +155,7 @@
             </div>
 
             <!-- Modal Action Footer -->
-            <div class="modal-footer py-3 px-4 bg-light border-top d-flex justify-content-between align-items-center">
+            <div class="modal-footer justify-content-between">
                 <a href="#" target="_blank" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5" id="passVerifyDirectLink">
                     <i class="bi bi-box-arrow-up-right"></i> Open Verification Page
                 </a>

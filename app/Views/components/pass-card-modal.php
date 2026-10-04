@@ -1,14 +1,10 @@
 <!-- Student Grade Pass Slip Modal (IntelliGrade Model) -->
 <div class="modal fade" id="passCardModal" tabindex="-1" aria-labelledby="passCardModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
-            <div class="modal-header bg-dark text-white py-3 px-4 border-0 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0f172a, #1e293b) !important;">
-                <div class="d-flex align-items-center gap-2">
-                    <h5 class="modal-title h6 fw-bold mb-0 text-white" id="passCardModalLabel">
-                        Official Student Grade Slip
-                    </h5>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="passCardModalLabel">Official Student Grade Slip</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <div class="modal-body p-0" id="printablePassCardArea">
@@ -135,7 +131,7 @@
                 </div>
             </div>
 
-            <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-between align-items-center">
+            <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     Close
                 </button>

@@ -191,9 +191,9 @@ ob_start();
 <!-- Modal: Add New Student -->
 <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom py-3 px-4">
-                <h5 class="modal-title h6 fw-semibold text-dark" id="addStudentModalLabel">Add New Student to Roster</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addStudentModalLabel">Add New Student to Roster</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="<?= url('/faculty/students/add') ?>">
@@ -201,7 +201,7 @@ ob_start();
                 <input type="hidden" name="subject_id" value="<?= $subjectId ?>">
                 <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
                 <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                <div class="modal-body p-4">
+                <div class="modal-body">
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label for="first_name" class="form-label">First name <span class="text-danger">*</span></label>
@@ -252,7 +252,7 @@ ob_start();
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
                         <i class="bi bi-check2"></i> Add student
@@ -266,9 +266,9 @@ ob_start();
 <!-- Modal: Select Existing Student -->
 <div class="modal fade" id="enrollExistingModal" tabindex="-1" aria-labelledby="enrollExistingModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom py-3 px-4">
-                <h5 class="modal-title h6 fw-semibold text-dark" id="enrollExistingModalLabel">Select Existing Student</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="enrollExistingModalLabel">Select Existing Student</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="<?= url('/faculty/students/enroll') ?>">
@@ -276,7 +276,7 @@ ob_start();
                 <input type="hidden" name="subject_id" value="<?= $subjectId ?>">
                 <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
                 <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                <div class="modal-body p-4">
+                <div class="modal-body">
                     <div class="mb-3">
                         <label for="student_id" class="form-label">Select student <span class="text-danger">*</span></label>
                         <select class="form-select" id="student_id" name="student_id" required>
@@ -318,7 +318,7 @@ ob_start();
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
                         <i class="bi bi-check2"></i> Enroll student

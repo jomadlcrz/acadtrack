@@ -181,14 +181,14 @@ ob_start();
                             <!-- Edit Set Modal -->
                             <div class="modal fade" id="editSetModal<?= $set->id ?>" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content border-0 shadow">
+                                    <div class="modal-content">
                                         <form method="POST" action="<?= url('/admin/sets/' . $set->id) ?>">
                                             <?= csrf_field() ?>
-                                            <div class="modal-header border-bottom py-3 px-4">
-                                                <h5 class="modal-title h6 fw-bold mb-0">Edit Section — <?= htmlspecialchars($set->name) ?></h5>
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Edit Section — <?= htmlspecialchars($set->name) ?></h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <div class="modal-body p-4 space-y-3">
+                                            <div class="modal-body space-y-3">
                                                 <div class="mb-3">
                                                     <label class="form-label small fw-semibold text-dark">Program</label>
                                                     <input type="text" class="form-control bg-light" value="<?= htmlspecialchars($progAbbrev . ' — ' . $progName) ?>" disabled>
@@ -211,7 +211,7 @@ ob_start();
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                                            <div class="modal-footer">
                                                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                                                 <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5">
                                                     <i class="bi bi-check2"></i> Save Changes
@@ -249,14 +249,14 @@ ob_start();
     <!-- Create Sets Modal -->
     <div class="modal fade" id="createSetsModal" tabindex="-1" aria-labelledby="createSetsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 shadow">
+            <div class="modal-content">
                 <form method="POST" action="<?= url('/admin/sets') ?>" id="createSetsForm">
                     <?= csrf_field() ?>
-                    <div class="modal-header border-bottom py-3 px-4">
-                        <h5 class="modal-title h6 fw-bold mb-0" id="createSetsModalLabel">Create Sections</h5>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createSetsModalLabel">Create Sections</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body p-4">
+                    <div class="modal-body">
                         <div class="row g-3 mb-3">
                             <div class="col-12 col-md-8">
                                 <label class="form-label small fw-semibold text-dark">Program <span class="text-danger">*</span></label>
@@ -333,7 +333,7 @@ ob_start();
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5" id="createSetsSubmitBtn">
                             <i class="bi bi-magic"></i> Generate &amp; Save Sections

@@ -37,23 +37,23 @@ $fullName = trim($firstName . ' ' . $lastName) ?: 'User';
 <!-- Sign Out Confirmation Modal -->
 <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
-            <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex justify-content-between align-items-start">
+        <div class="modal-content">
+            <div class="modal-header">
                 <div class="d-flex align-items-center gap-2.5">
                     <div class="d-flex align-items-center justify-content-center text-danger" style="width: 42px; height: 42px; flex-shrink: 0;">
                         <i class="bi bi-box-arrow-right fs-5"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold text-dark fs-6 mb-0" id="logoutConfirmModalLabel">Sign Out Confirmation</h5>
+                        <h5 class="modal-title" id="logoutConfirmModalLabel">Sign Out Confirmation</h5>
                         <div class="text-muted" style="font-size: 12px;">Active portal session</div>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body px-4 py-3 text-secondary" style="font-size: 13.5px; line-height: 1.55;">
+            <div class="modal-body text-secondary">
                 Are you sure you want to sign out of <strong>Acadtrack</strong>? Any unsaved changes on the current page will be lost.
             </div>
-            <div class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-end gap-2">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1.5 fw-medium" data-bs-dismiss="modal">
                     Cancel
                 </button>
