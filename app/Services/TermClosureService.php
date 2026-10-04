@@ -692,7 +692,7 @@ class TermClosureService
             'action' => $readable,
             'target_type' => 'term',
             'target_id' => (string) ($syId ?? ''),
-            'target_label' => trim(($schoolYear ?? '') . ($semesterNumber ? " - Semester {$semesterNumber}" : '')),
+            'target_label' => trim(($schoolYear ?? '') . ($semesterNumber ? ' - ' . semester_label($semesterNumber) : '')),
             'summary' => ($details !== null && $details !== '') ? $details : $readable . '.',
         ], $userId ? ['id' => $userId, 'name' => $performerName, 'email' => '', 'role' => $role] : null);
     }

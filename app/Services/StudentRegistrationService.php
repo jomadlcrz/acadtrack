@@ -227,7 +227,7 @@ class StudentRegistrationService
 
     private function termLabel(AcademicTerm $term): string
     {
-        return trim((string) $term->school_year . ' - Semester ' . $term->semester);
+        return trim((string) $term->school_year . ' - ' . semester_label($term->semester));
     }
 
     /** Enroll a Regular student in every active curriculum subject of their set's program, year level and semester. */

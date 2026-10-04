@@ -22,7 +22,8 @@
             "app/Helpers/auth.php",
             "app/Helpers/redirect.php",
             "app/Helpers/response.php",
-            "app/Helpers/csrf.php"
+            "app/Helpers/csrf.php",
+            "app/Helpers/term.php"
         ]
     },
     "autoload-dev": {

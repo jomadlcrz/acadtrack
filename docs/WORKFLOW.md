@@ -2,7 +2,7 @@
 
 > **Institution:** Golden West Colleges, Inc. (GWC)  
 > **System:** Acadtrack — Academic Grading & Curriculum Evaluation Platform  
-> **Reference Specification:** [grading_system_workflow.md](file:///C:/xampp/htdocs/acadtrack/grading_system_workflow.md)  
+> **Reference Specification:** [systemflow.md](file:///C:/xampp/htdocs/acadtrack/systemflow.md)  
 > **Related Documents:**
 > * [Anti-Generic Design Standards](file:///C:/xampp/htdocs/acadtrack/docs/ANTI_GENERIC_DESIGN.md)
 > * [Web Design & UI/UX Architecture](file:///C:/xampp/htdocs/acadtrack/docs/WEB_DESIGN_GUIDE.md)

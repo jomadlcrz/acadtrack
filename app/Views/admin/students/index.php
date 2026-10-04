@@ -6,7 +6,7 @@ $headerActions = '<div class="d-flex align-items-center gap-2">
     <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#importExcelModal"><i class="bi bi-file-earmark-excel"></i> Import spreadsheet</button>
     <a href="' . url('/admin/users/create?role=Student') . '" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1.5" style="background-color: #1e3a8a; border-color: #1e3a8a;"><i class="bi bi-plus-lg"></i> Add student</a>
 </div>';
-$termLabel = static fn(array $t): string => ($t['academic_year_name'] ?? '') . ' - Semester ' . ($t['semester'] ?? '');
+$termLabel = static fn(array $t): string => ($t['academic_year_name'] ?? '') . ' - ' . semester_label($t['semester'] ?? 1);
 $total = (int) ($students['total'] ?? 0);
 ob_start();
 ?>
@@ -72,7 +72,7 @@ ob_start();
             <?= csrf_field() ?>
             <input type="hidden" name="from_term_id" value="<?= (int) $termId ?>">
             <button type="submit" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5">
-                <i class="bi bi-arrow-right-circle"></i> Roll over to Semester <?= (int) $nextTerm['semester'] ?>
+                <i class="bi bi-arrow-right-circle"></i> Roll over to <?= htmlspecialchars(semester_label($nextTerm['semester'])) ?>
             </button>
         </form>
     <?php else: ?>

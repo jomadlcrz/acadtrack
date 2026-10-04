@@ -109,7 +109,7 @@ The application strictly implements the workflow specified in `grading_system_wo
 9. Dean/Admin Review  ──>  10. Grade Finalization  ──>  11. Email Notification  ──>  12. Student Views Evaluation
 ```
 
-- **Features & Workflow:** [grading_system_workflow.md](file:///C:/xampp/htdocs/acadtrack/grading_system_workflow.md) | [docs/WORKFLOW.md](file:///C:/xampp/htdocs/acadtrack/docs/WORKFLOW.md)
+- **Features & Workflow:** [systemflow.md](file:///C:/xampp/htdocs/acadtrack/systemflow.md) | [docs/WORKFLOW.md](file:///C:/xampp/htdocs/acadtrack/docs/WORKFLOW.md)
 - **Bootstrap 5 & Forms Guide:** [docs/BOOTSTRAP_GUIDE.md](file:///C:/xampp/htdocs/acadtrack/docs/BOOTSTRAP_GUIDE.md)
 - **Casing & Typography Standards:** [CASING_GUIDELINES.md](file:///C:/xampp/htdocs/acadtrack/CASING_GUIDELINES.md)
 - **Web Design & UI/UX Architecture:** [docs/WEB_DESIGN_GUIDE.md](file:///C:/xampp/htdocs/acadtrack/docs/WEB_DESIGN_GUIDE.md)
