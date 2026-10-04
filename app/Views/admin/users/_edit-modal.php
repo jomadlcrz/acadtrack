@@ -26,9 +26,9 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
 ?>
 
 <div class="modal fade" id="editUserModal<?= $uid ?>" tabindex="-1" aria-labelledby="editUserModalLabel<?= $uid ?>" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" style="border: 1px solid #cbd5e1; border-radius: 6px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);">
-            <div class="modal-header bg-white py-3 px-4 border-bottom" style="border-top-left-radius: 6px; border-top-right-radius: 6px;">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-white py-3 px-4">
                 <div class="d-flex align-items-center gap-2">
                     <div class="d-flex align-items-center justify-content-center rounded-2 text-primary" style="width: 32px; height: 32px; background-color: #eff6ff;">
                         <i class="bi bi-person-gear fs-6"></i>
@@ -37,8 +37,8 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
                         <h5 class="modal-title fw-semibold text-dark fs-6 mb-0" id="editUserModalLabel<?= $uid ?>">
                             Edit <?= htmlspecialchars($userRole) ?> Account
                         </h5>
-                        <div class="text-muted text-xs d-flex align-items-center gap-1.5 mt-0.5" style="font-size: 11.5px;">
-                            <span class="badge badge-<?= strtolower($userRole) ?> py-0.5 px-2"><?= htmlspecialchars($userRole) ?></span>
+                        <div class="text-muted text-xs d-flex align-items-center gap-1 mt-1" style="font-size: 11.5px;">
+                            <span class="badge badge-<?= strtolower($userRole) ?> py-1 px-2"><?= htmlspecialchars($userRole) ?></span>
                             <span>&bull;</span>
                             <span>User ID: <strong class="text-dark">#<?= $uid ?></strong></span>
                         </div>
@@ -50,10 +50,10 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
             <form method="POST" action="<?= url('/admin/users/' . $uid) ?>" autocomplete="off" class="user-edit-modal-form" data-modal-id="<?= $uid ?>">
                 <?= csrf_field() ?>
 
-                <div class="modal-body p-4">
+                <div class="modal-body px-4 py-3">
                     <!-- Personal details section -->
-                    <div class="mb-4">
-                        <div class="d-flex align-items-center gap-2 mb-3 pb-1 border-bottom">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center gap-2 mb-2 pb-1 border-bottom">
                             <i class="bi bi-person text-secondary" style="font-size: 14px;"></i>
                             <span class="fw-semibold text-dark small text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Identity & Account</span>
                         </div>
@@ -111,8 +111,8 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
 
                     <?php if ($userRole === 'Student'): ?>
                         <!-- Academic classification section for students -->
-                        <div class="mb-2">
-                            <div class="d-flex align-items-center gap-2 mb-3 pb-1 border-bottom">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-2 pb-1 border-bottom">
                                 <i class="bi bi-mortarboard text-secondary" style="font-size: 14px;"></i>
                                 <span class="fw-semibold text-dark small text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Academic Classification</span>
                             </div>
@@ -210,13 +210,13 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
 
                     <?php elseif (in_array($userRole, ['Faculty', 'Dean'], true)): ?>
                         <!-- Academic department affiliation for faculty / dean -->
-                        <div class="mb-2">
-                            <div class="d-flex align-items-center gap-2 mb-3 pb-1 border-bottom">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-2 pb-1 border-bottom">
                                 <i class="bi bi-building text-secondary" style="font-size: 14px;"></i>
                                 <span class="fw-semibold text-dark small text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Academic Department</span>
                             </div>
 
-                            <div class="mb-2">
+                            <div>
                                 <label for="department_id_<?= $uid ?>" class="form-label fw-medium text-dark small mb-1">
                                     Department <span class="text-danger">*</span>
                                 </label>
@@ -237,11 +237,11 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
                     <?php endif; ?>
                 </div>
 
-                <div class="modal-footer py-2.5 px-4 d-flex justify-content-between align-items-center" style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px;">
+                <div class="modal-footer py-2 px-4 d-flex justify-content-between align-items-center">
                     <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
                         Cancel
                     </button>
-                    <button type="submit" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1.5" style="background-color: #1e3a8a; border-color: #1e3a8a;">
+                    <button type="submit" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1" style="background-color: #1e3a8a; border-color: #1e3a8a;">
                         <i class="bi bi-check2"></i> Save changes
                     </button>
                 </div>

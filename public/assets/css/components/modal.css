@@ -6,8 +6,8 @@
 .modal-content {
     background-color: #ffffff;
     border: 1px solid #cbd5e1 !important;
-    border-radius: 6px;
-    box-shadow: none !important;
+    border-radius: 14px;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
     overflow: hidden;
 }
 
@@ -75,8 +75,16 @@
 }
 
 /* 5. Modal Dim Backdrop */
+.modal-backdrop {
+    --bs-backdrop-bg: #152a45;
+    --bs-backdrop-opacity: 0.6;
+    width: 100% !important;
+    height: 100% !important;
+    backdrop-filter: blur(2px);
+}
+
 .modal-backdrop.show {
-    opacity: 0.45;
+    opacity: 0.6;
 }
 
 /* 6. Legacy Non-Bootstrap Modal Fallbacks (app/Views/components/modal.php) */
@@ -105,8 +113,11 @@
 }
 
 /* 7. Modal Viewport Scrollarea & Body Scroll Lock */
-html.modal-open,
-html:has(body.modal-open),
+/* Release the reserved gutter so the overlay spans the full viewport; the overlay itself scrolls (viewport-style) */
+html:has(body.modal-open) {
+    scrollbar-gutter: auto;
+}
+
 body.modal-open {
     overflow: hidden !important;
     padding-right: 0 !important;
@@ -124,3 +135,8 @@ body.modal-open .fixed-bottom {
     padding-left: 0 !important;
     overflow-y: auto !important;
 }
+
+.modal .modal-dialog {
+    margin: 1.5rem auto;
+}
+
