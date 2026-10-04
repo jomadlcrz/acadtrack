@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="<?= asset('css/components/card.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/table.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/modal.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/combobox.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/badge.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/navbar.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/sidebar.css') ?>">
@@ -59,5 +60,6 @@
 
     <script src="<?= asset('vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
     <script src="<?= asset('js/app.js') ?>"></script>
+    <script src="<?= asset('js/components/combobox.js') ?>"></script>
 </body>
 </html>

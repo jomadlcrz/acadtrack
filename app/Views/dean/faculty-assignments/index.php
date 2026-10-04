@@ -1,7 +1,7 @@
 <?php
 $pageTitle = 'Faculty Subject Assignments';
 $termDisplay = $termLabel ?? (($academicTerm['academic_year_name'] ?? '2026-2027') . ' · ' . (($selectedSemester ?? '1') === '2' ? '2nd Semester' : '1st Semester'));
-$subtitle = 'Designate accredited faculty instructors to curricular course offerings for ' . htmlspecialchars($termDisplay) . '.';
+$subtitle = 'Designate accredited faculty instructors to course offerings for ' . htmlspecialchars($termDisplay) . '.';
 
 // Calculate Executive Metrics
 $totalSubjects = count($subjects);
@@ -24,10 +24,10 @@ $totalFacultyPool = count($faculty);
 
 // Organize subjects into Year Level groups (1st Year through 4th Year)
 $yearLabels = [
-    1 => '1st Year Curriculum',
-    2 => '2nd Year Curriculum',
-    3 => '3rd Year Curriculum',
-    4 => '4th Year Curriculum',
+    1 => '1st Year',
+    2 => '2nd Year',
+    3 => '3rd Year',
+    4 => '4th Year',
 ];
 
 $groups = [];
@@ -346,9 +346,7 @@ ob_start();
 
                 <div class="modal-header">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="bg-primary-subtle text-primary p-2 rounded">
-                            <i class="bi bi-person-plus-fill fs-6"></i>
-                        </div>
+                        <i class="bi bi-person-plus-fill text-primary fs-4"></i>
                         <div>
                             <h5 class="modal-title" id="assignInstructorModalLabel">Assign Instructor to Course</h5>
                             <small class="text-muted" style="font-size: 12px;"><?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?> &bull; <?= htmlspecialchars(semester_label($selectedSemester ?? 1)) ?></small>
@@ -360,7 +358,7 @@ ob_start();
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="modal_subject_id" class="form-label small fw-semibold">Subject Offering <span class="text-danger">*</span></label>
-                        <select class="form-select" id="modal_subject_id" name="subject_id" required>
+                        <select class="form-select" id="modal_subject_id" name="subject_id" required data-combobox data-placeholder="Search course offerings..." data-empty-text="No course offerings found">
                             <option value="">Select a course offering...</option>
                             <?php foreach ($subjects as $s): ?>
                                 <?php $assignedCount = count($s['assigned_faculty'] ?? []); ?>
@@ -369,24 +367,28 @@ ob_start();
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="form-text small">Course offerings available in the official curriculum for this term.</div>
+                        <div class="form-text small">Course offerings available for this term.</div>
+                        <div id="modalAssignedWrap" class="mt-2 d-none">
+                            <div class="small text-muted mb-1">Currently assigned instructors</div>
+                            <div id="modalAssignedList" class="d-flex flex-wrap gap-1"></div>
+                        </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="modal_faculty_id" class="form-label small fw-semibold">Faculty Member <span class="text-danger">*</span></label>
-                        <select class="form-select" id="modal_faculty_id" name="faculty_id" required>
-                            <option value="">Select accredited faculty...</option>
+                        <label for="modal_faculty_id" class="form-label small fw-semibold">Instructors <span class="text-danger">*</span></label>
+                        <select class="form-select" id="modal_faculty_id" name="faculty_ids[]" multiple required data-combobox data-placeholder="Search and select instructors..." data-empty-text="No instructors found">
                             <?php foreach ($faculty as $f): ?>
-                                <?php 
-                                    $deptName = $f['faculty']['department']['dept_abbrev'] ?? ($f['faculty']['department']['name'] ?? null); 
+                                <?php
+                                    $deptName = $f['faculty']['department']['dept_abbrev'] ?? ($f['faculty']['department']['name'] ?? null);
                                     $load = (int)($f['assigned_count'] ?? 0);
+                                    $fullName = $f['first_name'] . ' ' . $f['last_name'];
                                 ?>
-                                <option value="<?= $f['id'] ?>">
-                                    <?= htmlspecialchars($f['first_name'] . ' ' . $f['last_name']) ?> (<?= htmlspecialchars($f['email']) ?>) <?= $deptName ? "— [{$deptName}]" : '' ?> &bull; <?= $load ?> <?= $load === 1 ? 'course' : 'courses' ?>
+                                <option value="<?= $f['id'] ?>" data-chip="<?= htmlspecialchars($fullName) ?>" data-label="<?= htmlspecialchars($fullName . ' (' . $f['email'] . ')' . ($deptName ? " — [{$deptName}]" : '') . ' • ' . $load . ($load === 1 ? ' course' : ' courses')) ?>">
+                                    <?= htmlspecialchars($fullName) ?> (<?= htmlspecialchars($f['email']) ?>) <?= $deptName ? "— [" . htmlspecialchars($deptName) . "]" : '' ?> &bull; <?= $load ?> <?= $load === 1 ? 'course' : 'courses' ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="form-text small">Instructor workload count is shown in brackets to prevent overload.</div>
+                        <div class="form-text small">A course offering can have several instructors (for example, one per section). Select all that apply; instructor workload is shown to prevent overload.</div>
                     </div>
 
                     <div class="p-3 bg-light rounded border small text-muted">
@@ -502,6 +504,54 @@ ob_start();
 </div>
 
 <script>
+(function () {
+    var assignedBySubject = <?= json_encode(array_reduce($subjects, function ($carry, $s) {
+        $carry[(string) $s['id']] = array_map(function ($a) {
+            return ['id' => (int) $a['faculty_id'], 'name' => trim(($a['first_name'] ?? '') . ' ' . ($a['last_name'] ?? ''))];
+        }, $s['assigned_faculty'] ?? []);
+        return $carry;
+    }, []), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+
+    var subjectEl = document.getElementById('modal_subject_id');
+    var facultyEl = document.getElementById('modal_faculty_id');
+    var wrap = document.getElementById('modalAssignedWrap');
+    var listEl = document.getElementById('modalAssignedList');
+    if (!subjectEl || !facultyEl) return;
+
+    function syncAssigned() {
+        var assigned = assignedBySubject[subjectEl.value] || [];
+        var ids = assigned.map(function (a) { return String(a.id); });
+
+        Array.prototype.forEach.call(facultyEl.options, function (o) {
+            if (o.value === '') return;
+            var base = o.getAttribute('data-label') || o.textContent;
+            var taken = ids.indexOf(o.value) !== -1;
+            o.disabled = taken;
+            if (taken) o.selected = false;
+            o.textContent = taken ? base + ' \u2014 already assigned' : base;
+        });
+        facultyEl.comboboxRefresh && facultyEl.comboboxRefresh();
+
+        listEl.innerHTML = '';
+        assigned.forEach(function (a) {
+            var b = document.createElement('span');
+            b.className = 'badge bg-light text-dark border fw-normal';
+            b.textContent = a.name;
+            listEl.appendChild(b);
+        });
+        wrap.classList.toggle('d-none', assigned.length === 0);
+    }
+
+    subjectEl.addEventListener('change', function () {
+        syncAssigned();
+        // Continue straight to the instructors field so focus is never lost
+        if (subjectEl.value && facultyEl.comboboxFocus) facultyEl.comboboxFocus();
+    });
+    syncAssigned();
+})();
+</script>
+
+<script>
 function openAssignModal(subjectId) {
     var modalEl = document.getElementById('assignInstructorModal');
     if (!modalEl) return;
@@ -509,6 +559,7 @@ function openAssignModal(subjectId) {
     var selectEl = document.getElementById('modal_subject_id');
     if (selectEl && subjectId) {
         selectEl.value = subjectId;
+        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
     }
     
     var modal = bootstrap.Modal.getOrCreateInstance(modalEl);

@@ -211,7 +211,7 @@ class AcademicModulesWorkflowTest extends TestCase
         $this->assertNotEmpty($html);
         $this->assertStringContainsString('Faculty Subject Assignments', $html);
         $this->assertStringContainsString('Assign Instructor to Course', $html);
-        $this->assertStringContainsString('1st Year Curriculum', $html);
+        $this->assertStringContainsString('1st Year', $html);
         $this->assertStringContainsString('Faculty Teaching Workload Summary', $html);
         $this->assertStringContainsString('assignmentSearch', $html);
         $this->assertStringContainsString('yearLevelFilter', $html);

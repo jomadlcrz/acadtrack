@@ -72,14 +72,18 @@ class FacultyAssignmentController
 
     public function assign(Request $request, Response $response, Session $session): void
     {
-        $facultyId = (int) $request->post('faculty_id');
+        $rawFacultyIds = $request->post('faculty_ids', $request->post('faculty_id', []));
+        $facultyIds = array_values(array_unique(array_filter(
+            array_map('intval', is_array($rawFacultyIds) ? $rawFacultyIds : [$rawFacultyIds]),
+            static fn (int $id): bool => $id > 0
+        )));
         $subjectId = (int) $request->post('subject_id');
         $termId = (int) $request->post('academic_term_id', 0);
         $semester = (string) $request->post('semester', '');
         $semQuery = $semester !== '' ? "?semester={$semester}" : '';
 
-        if ($facultyId <= 0 || $subjectId <= 0) {
-            $session->flash('error', 'Please select both an instructor and a subject offering.');
+        if ($facultyIds === [] || $subjectId <= 0) {
+            $session->flash('error', 'Please select a subject offering and at least one instructor.');
             redirect("/dean/faculty-assignments{$semQuery}");
             return;
         }
@@ -89,9 +93,13 @@ class FacultyAssignmentController
             $termId = (int) ($academicTerm['id'] ?? 1);
         }
 
-        $this->facultyRepository->assignSubject($facultyId, $subjectId, $termId);
-        $this->logAssignment('Instructor Assigned', true, $facultyId, $subjectId);
-        $session->flash('success', 'Instructor assigned successfully to course offering.');
+        foreach ($facultyIds as $facultyId) {
+            $this->facultyRepository->assignSubject($facultyId, $subjectId, $termId);
+            $this->logAssignment('Instructor Assigned', true, $facultyId, $subjectId);
+        }
+        $session->flash('success', count($facultyIds) === 1
+            ? 'Instructor assigned successfully to course offering.'
+            : count($facultyIds) . ' instructors assigned successfully to course offering.');
         redirect("/dean/faculty-assignments{$semQuery}");
     }
 

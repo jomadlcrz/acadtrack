@@ -1,0 +1,136 @@
+/* ==========================================================================
+   Acadtrack UI Component: Combobox (searchable select / multi-select chips)
+   Enhances <select data-combobox>; see public/assets/js/components/combobox.js
+   ========================================================================== */
+
+.cbx {
+    position: relative;
+}
+
+.cbx-native {
+    position: absolute !important;
+    inset: auto 0 0 0;
+    width: 100%;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.cbx-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 38px;
+    height: auto;
+    padding: 4px 32px 4px 10px;
+    cursor: text;
+    position: relative;
+}
+
+.cbx.is-open .cbx-control {
+    border-color: #2f4a86;
+    box-shadow: 0 0 0 3px rgba(47, 74, 134, 0.15);
+}
+
+.cbx-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.cbx-input {
+    flex: 1 1 80px;
+    min-width: 80px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    padding: 2px 0;
+    font: inherit;
+    color: #0f172a;
+}
+
+.cbx-caret {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    pointer-events: none;
+}
+
+.cbx-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 4px 2px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 12.5px;
+    line-height: 1.4;
+}
+
+.cbx-chip-remove {
+    border: 0;
+    background: transparent;
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 4px;
+    cursor: pointer;
+}
+
+.cbx-chip-remove:hover {
+    color: #dc2626;
+}
+
+.cbx-list {
+    position: fixed;
+    z-index: 2000;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.18);
+    padding: 4px;
+}
+
+.cbx-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 4px;
+    font-size: 13.5px;
+    color: #0f172a;
+    cursor: pointer;
+}
+
+.cbx-option.is-active {
+    background: #e2e8f0;
+}
+
+.cbx-option.is-selected {
+    font-weight: 600;
+}
+
+.cbx-option.is-disabled {
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.cbx-tick {
+    color: #1e3a8a;
+}
+
+.cbx-empty {
+    padding: 10px;
+    font-size: 13px;
+    color: #64748b;
+    text-align: center;
+}
