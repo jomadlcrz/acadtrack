@@ -191,8 +191,8 @@ ob_start();
 <!-- Modal: Add New Student -->
 <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow" style="border-radius: 6px;">
-            <div class="modal-header bg-white border-bottom py-3">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom py-3 px-4">
                 <h5 class="modal-title h6 fw-semibold text-dark" id="addStudentModalLabel">Add New Student to Roster</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -252,7 +252,7 @@ ob_start();
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-3 border-top d-flex justify-content-end gap-2">
+                <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
                         <i class="bi bi-check2"></i> Add student
@@ -266,8 +266,8 @@ ob_start();
 <!-- Modal: Select Existing Student -->
 <div class="modal fade" id="enrollExistingModal" tabindex="-1" aria-labelledby="enrollExistingModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow" style="border-radius: 6px;">
-            <div class="modal-header bg-white border-bottom py-3">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom py-3 px-4">
                 <h5 class="modal-title h6 fw-semibold text-dark" id="enrollExistingModalLabel">Select Existing Student</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -318,7 +318,7 @@ ob_start();
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-3 border-top d-flex justify-content-end gap-2">
+                <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
                         <i class="bi bi-check2"></i> Enroll student

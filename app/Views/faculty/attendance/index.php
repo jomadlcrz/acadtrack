@@ -153,11 +153,6 @@ $hasStudents = !empty($students);
                     </h3>
                     <span class="badge bg-light text-muted border font-monospace"><?= htmlspecialchars($currentSubject['code'] ?? '') ?></span>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1.5 shadow-sm" id="btnSaveAttendanceTop">
-                        <i class="bi bi-cloud-arrow-up-fill"></i> Save Attendance
-                    </button>
-                </div>
             </div>
 
             <div class="table-responsive">
@@ -299,6 +294,39 @@ $hasStudents = !empty($students);
         </div>
     </form>
 
+    <!-- Save Attendance Confirmation Modal -->
+    <div class="modal fade" id="saveAttendanceConfirmModal" tabindex="-1" aria-labelledby="saveAttendanceConfirmLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-bottom py-3 px-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-calendar-check text-primary fs-4"></i>
+                        <div>
+                            <h5 class="modal-title fw-semibold text-dark fs-6 mb-0" id="saveAttendanceConfirmLabel">Save Attendance</h5>
+                            <div class="text-muted" style="font-size: 12px;"><?= date('l, F j, Y', strtotime($date)) ?> &bull; <?= htmlspecialchars($currentSubject['code'] ?? '') ?></div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-secondary">
+                    <p class="mb-3">Record attendance for <strong class="text-dark tabular-nums" id="confirmTotal">0</strong> students? Changes are recorded in official student course logs.</p>
+                    <div class="row g-2 text-center">
+                        <div class="col-3"><div class="fs-5 fw-semibold text-success tabular-nums" id="confirmPresent">0</div><div class="small text-muted">Present</div></div>
+                        <div class="col-3"><div class="fs-5 fw-semibold text-warning tabular-nums" id="confirmLate">0</div><div class="small text-muted">Late</div></div>
+                        <div class="col-3"><div class="fs-5 fw-semibold text-info tabular-nums" id="confirmExcused">0</div><div class="small text-muted">Excused</div></div>
+                        <div class="col-3"><div class="fs-5 fw-semibold text-danger tabular-nums" id="confirmAbsent">0</div><div class="small text-muted">Absent</div></div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-sm btn-primary px-3 d-inline-flex align-items-center gap-1" id="btnConfirmSaveAttendance">
+                        <i class="bi bi-check2"></i> Confirm and save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Historical Attendance Session Logs -->
     <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 8px;">
         <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
@@ -370,8 +398,8 @@ $hasStudents = !empty($students);
 <!-- Student Absence History Audit Modal -->
 <div class="modal fade" id="studentAbsenceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
-            <div class="modal-header py-3 px-4 border-bottom bg-light">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom py-3 px-4">
                 <div>
                     <h5 class="modal-title h6 fw-bold mb-0 text-dark" id="historyModalStudentName">Student Absence Audit</h5>
                     <div class="small text-muted" id="historyModalSubtitle">Official attendance record</div>
@@ -502,24 +530,44 @@ function openStudentHistory(studentId, studentName) {
         });
 }
 
-// Button loading state on save
+// Confirm before saving, then show loading state
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('attendanceSaveForm');
-    const topBtn = document.getElementById('btnSaveAttendanceTop');
+    const modalEl = document.getElementById('saveAttendanceConfirmModal');
+    const confirmBtn = document.getElementById('btnConfirmSaveAttendance');
     const btmBtn = document.getElementById('btnSaveAttendanceBottom');
+    if (!form || !modalEl || !confirmBtn) return;
 
-    if (form) {
-        form.addEventListener('submit', () => {
-            if (topBtn) {
-                topBtn.disabled = true;
-                topBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Saving...';
-            }
-            if (btmBtn) {
-                btmBtn.disabled = true;
-                btmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Saving...';
-            }
-        });
-    }
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    let confirmed = false;
+
+    form.addEventListener('submit', (e) => {
+        if (!confirmed) {
+            e.preventDefault();
+            const counts = { Present: 0, Late: 0, Excused: 0, Absent: 0 };
+            form.querySelectorAll('input[type="radio"][name^="attendance["]:checked').forEach((r) => {
+                if (r.value in counts) counts[r.value]++;
+            });
+            document.getElementById('confirmPresent').textContent = counts.Present;
+            document.getElementById('confirmLate').textContent = counts.Late;
+            document.getElementById('confirmExcused').textContent = counts.Excused;
+            document.getElementById('confirmAbsent').textContent = counts.Absent;
+            document.getElementById('confirmTotal').textContent = counts.Present + counts.Late + counts.Excused + counts.Absent;
+            modal.show();
+            return;
+        }
+        if (btmBtn) {
+            btmBtn.disabled = true;
+            btmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Saving...';
+        }
+    });
+
+    confirmBtn.addEventListener('click', () => {
+        confirmed = true;
+        confirmBtn.disabled = true;
+        modal.hide();
+        form.requestSubmit();
+    });
 });
 </script>
 

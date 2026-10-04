@@ -106,13 +106,13 @@ ob_start();
                     <form method="POST" action="<?= url('/faculty/subjects/' . $subject['id'] . '/setup') ?>">
                         <?= csrf_field() ?>
                         <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
-                        <div class="modal-header border-bottom">
+                        <div class="modal-header border-bottom py-3 px-4">
                             <h5 class="modal-title h6 fw-semibold mb-0" id="setupModalLabel<?= $subject['id'] ?>">
                                 Subject Setup: <?= htmlspecialchars($subject['subject_code'] ?? $subject['code']) ?>
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
+                        <div class="modal-body p-4">
                             <p class="text-muted small mb-3">Configure course nature and grading period percentage weights per institutional syllabus guidelines.</p>
 
                             <div class="mb-3">
@@ -155,7 +155,7 @@ ob_start();
                                 <div class="form-text mt-2 small">Total must sum to exactly 100% (e.g. 20% + 20% + 20% + 40%).</div>
                             </div>
                         </div>
-                        <div class="modal-footer border-top py-3 d-flex justify-content-end gap-2">
+                        <div class="modal-footer bg-light py-2.5 px-4 border-top d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
                                 <i class="bi bi-check2"></i> Save configuration

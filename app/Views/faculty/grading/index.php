@@ -277,8 +277,8 @@ $activeGradingMethod = $currentSubject['grading_method'] ?? 'zero_based';
 <!-- IntelliGrade Component Score Calculator Modal -->
 <div class="modal fade" id="intelliGradeModal" tabindex="-1" aria-labelledby="intelliGradeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 8px; overflow: hidden;">
-            <div class="modal-header bg-light py-3 px-4 border-bottom">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom py-3 px-4">
                 <div>
                     <div class="d-flex align-items-center gap-2">
                         <h5 class="modal-title h6 fw-bold mb-0 text-dark" id="intelliGradeModalLabel">
