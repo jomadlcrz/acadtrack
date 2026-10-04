@@ -138,7 +138,7 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
                                     <label class="form-label fw-medium text-dark small mb-1">
                                         Enrollment standing <span class="text-danger">*</span>
                                     </label>
-                                    <div class="btn-group w-100" role="group">
+                                    <div class="btn-group segmented" role="group" aria-label="Enrollment standing">
                                         <input type="radio" 
                                                class="btn-check status-toggle-radio" 
                                                name="student_status" 
@@ -146,7 +146,7 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
                                                value="Regular" 
                                                <?= $studentStatus === 'Regular' ? 'checked' : '' ?> 
                                                data-modal="<?= $uid ?>">
-                                        <label class="btn btn-outline-primary btn-sm" for="status_reg_<?= $uid ?>">
+                                        <label class="btn btn-sm" for="status_reg_<?= $uid ?>">
                                             <i class="bi bi-mortarboard me-1"></i> Regular
                                         </label>
 
@@ -157,7 +157,7 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
                                                value="Irregular" 
                                                <?= $studentStatus === 'Irregular' ? 'checked' : '' ?> 
                                                data-modal="<?= $uid ?>">
-                                        <label class="btn btn-outline-primary btn-sm" for="status_irreg_<?= $uid ?>">
+                                        <label class="btn btn-sm" for="status_irreg_<?= $uid ?>">
                                             <i class="bi bi-shuffle me-1"></i> Irregular
                                         </label>
                                     </div>

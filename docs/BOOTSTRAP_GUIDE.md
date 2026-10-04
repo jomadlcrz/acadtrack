@@ -360,3 +360,21 @@ All Bootstrap modals are styled in one place: `public/assets/css/components/moda
 ```
 
 **Never** add to `modal-content`, `modal-header`, `modal-body`, `modal-footer` or `modal-title`: padding (`p-*`, `py-*`, `px-*`), `bg-*`, `border-*`, `shadow*`, `rounded*`, `fw-*`/`fs-*`/`h6`, or inline `style=""`. If a modal needs a different look, change `modal.css` so every modal changes together.
+
+---
+
+## Segmented Control (Radio Choice with a Visible Selected State)
+
+For a short either/or choice (for example Regular / Irregular), use the shared `.segmented` component from `public/assets/css/components/button.css`. The selected option is filled navy with white text.
+
+```html
+<div class="btn-group segmented" role="group" aria-label="Enrollment standing">
+    <input type="radio" class="btn-check" name="student_status" id="reg" value="Regular" checked>
+    <label class="btn btn-sm" for="reg"><i class="bi bi-mortarboard"></i> Regular</label>
+
+    <input type="radio" class="btn-check" name="student_status" id="irreg" value="Irregular">
+    <label class="btn btn-sm" for="irreg"><i class="bi bi-shuffle"></i> Irregular</label>
+</div>
+```
+
+Do **not** combine `.btn-check` with `.btn-outline-primary`: the global `.btn-outline-primary` rules use `!important` and hide the checked state.

@@ -348,3 +348,49 @@
     margin: 4px 0;
     border-top: 1px solid #f1f5f9;
 }
+
+/* ==========================================================================
+   Segmented control (radio group): <div class="btn-group segmented"> with
+   <input class="btn-check"> + <label class="btn btn-sm">. The selected option is filled.
+   (Do not use .btn-outline-primary here: its !important rules hide the checked state.)
+   ========================================================================== */
+.segmented {
+    display: flex;
+    width: 100%;
+    gap: 2px;
+    padding: 2px;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+}
+
+.segmented > .btn {
+    flex: 1 1 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 0 !important;
+    border-radius: 4px !important;
+    background: transparent !important;
+    color: #475569 !important;
+    font-weight: 500;
+    box-shadow: none !important;
+}
+
+.segmented > .btn:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+.segmented > .btn-check:checked + .btn {
+    background: #1e3a8a !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.25) !important;
+}
+
+.segmented > .btn-check:focus-visible + .btn {
+    outline: 2px solid #2f4a86;
+    outline-offset: 2px;
+}

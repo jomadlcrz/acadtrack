@@ -178,3 +178,36 @@
     border-bottom-right-radius: 5px !important;
     border-top: 1px solid #cbd5e1;
 }
+
+/* ==========================================================================
+   Choice card: large selectable option (e.g. Regular / Irregular student).
+   Selected = filled blue background + navy border (never border only).
+   The icon is a bare icon: navy when selected, slate otherwise.
+   ========================================================================== */
+.formal-status-card {
+    border-radius: 8px;
+    border-color: #cbd5e1 !important;
+    background-color: #ffffff !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+    cursor: pointer;
+}
+
+.formal-status-card:hover {
+    border-color: #94a3b8 !important;
+    background-color: #f1f5f9 !important;
+}
+
+.formal-status-card .status-icon-box {
+    color: #64748b;
+    font-size: 22px;
+}
+
+.formal-status-card.active-formal-card {
+    background-color: #dbeafe !important;
+    border-color: #1e3a8a !important;
+    box-shadow: 0 0 0 1px #1e3a8a;
+}
+
+.formal-status-card.active-formal-card .status-icon-box {
+    color: #1e3a8a;
+}

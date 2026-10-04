@@ -147,9 +147,9 @@ ob_start();
                                         role="tab"
                                         aria-selected="<?= $currentStatus === 'Regular' ? 'true' : 'false' ?>">
                                     <div class="d-flex align-items-start gap-3">
-                                        <div class="status-icon-box rounded-2 d-flex align-items-center justify-content-center flex-shrink-0" 
+                                        <div class="status-icon-box d-flex align-items-center justify-content-center flex-shrink-0" 
                                              id="iconBoxRegular"
-                                             style="width: 36px; height: 36px; <?= $currentStatus === 'Regular' ? 'background-color: #1e3a8a; color: #ffffff;' : 'background-color: #f1f5f9; color: #64748b;' ?>">
+                                             style="width: 30px; height: 30px;">
                                             <i class="bi bi-mortarboard-fill" style="font-size: 17px;"></i>
                                         </div>
                                         <div class="flex-grow-1 min-w-0">
@@ -173,9 +173,9 @@ ob_start();
                                         role="tab"
                                         aria-selected="<?= $currentStatus === 'Irregular' ? 'true' : 'false' ?>">
                                     <div class="d-flex align-items-start gap-3">
-                                        <div class="status-icon-box rounded-2 d-flex align-items-center justify-content-center flex-shrink-0" 
+                                        <div class="status-icon-box d-flex align-items-center justify-content-center flex-shrink-0" 
                                              id="iconBoxIrregular"
-                                             style="width: 36px; height: 36px; <?= $currentStatus === 'Irregular' ? 'background-color: #1e3a8a; color: #ffffff;' : 'background-color: #f1f5f9; color: #64748b;' ?>">
+                                             style="width: 30px; height: 30px;">
                                             <i class="bi bi-shuffle" style="font-size: 17px;"></i>
                                         </div>
                                         <div class="flex-grow-1 min-w-0">
@@ -372,25 +372,6 @@ ob_start();
     </div>
 </div>
 
-<style>
-.formal-status-card {
-    border-radius: 10px;
-    border-color: #cbd5e1 !important;
-    background-color: #ffffff !important;
-    transition: all 0.15s ease-in-out;
-    cursor: pointer;
-}
-.formal-status-card:hover {
-    border-color: #94a3b8 !important;
-    background-color: #f8fafc !important;
-}
-.formal-status-card.active-formal-card {
-    background-color: #eff6ff !important;
-    border-color: #1e3a8a !important;
-    box-shadow: 0 0 0 1.5px #1e3a8a, 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-}
-</style>
-
 <!-- Load SheetJS for local Excel parsing -->
 <script src="<?= url('/assets/js/xlsx.full.min.js') ?>"></script>
 
@@ -418,15 +399,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusRegularBtn.classList.add('active-formal-card');
                 statusRegularBtn.setAttribute('aria-selected', 'true');
                 if (iconBoxRegular) {
-                    iconBoxRegular.style.backgroundColor = '#1e3a8a';
-                    iconBoxRegular.style.color = '#ffffff';
+                    iconBoxRegular.style.color = '#1e3a8a';
                 }
                 if (checkRegular) checkRegular.classList.remove('d-none');
 
                 statusIrregularBtn.classList.remove('active-formal-card');
                 statusIrregularBtn.setAttribute('aria-selected', 'false');
                 if (iconBoxIrregular) {
-                    iconBoxIrregular.style.backgroundColor = '#f1f5f9';
                     iconBoxIrregular.style.color = '#64748b';
                 }
                 if (checkIrregular) checkIrregular.classList.add('d-none');
@@ -440,15 +419,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusIrregularBtn.classList.add('active-formal-card');
                 statusIrregularBtn.setAttribute('aria-selected', 'true');
                 if (iconBoxIrregular) {
-                    iconBoxIrregular.style.backgroundColor = '#1e3a8a';
-                    iconBoxIrregular.style.color = '#ffffff';
+                    iconBoxIrregular.style.color = '#1e3a8a';
                 }
                 if (checkIrregular) checkIrregular.classList.remove('d-none');
 
                 statusRegularBtn.classList.remove('active-formal-card');
                 statusRegularBtn.setAttribute('aria-selected', 'false');
                 if (iconBoxRegular) {
-                    iconBoxRegular.style.backgroundColor = '#f1f5f9';
                     iconBoxRegular.style.color = '#64748b';
                 }
                 if (checkRegular) checkRegular.classList.add('d-none');
