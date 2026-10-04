@@ -13,6 +13,7 @@ $headerActions = '
 
 ob_start();
 $statusFilter = $statusFilter ?? 'all';
+$selectedSemester = (string) ($selectedSemester ?? '1');
 $metrics = $metrics ?? [
     'total' => count($gradingSheets),
     'pending' => 0,
@@ -20,136 +21,87 @@ $metrics = $metrics ?? [
     'finalized' => 0,
     'returned' => 0,
 ];
+$totalRecords = (int) ($pagination['total'] ?? count($gradingSheets));
+
+$tabs = [
+    'all' => ['label' => 'All', 'count' => $metrics['total']],
+    'pending' => ['label' => 'Awaiting Review', 'count' => $metrics['pending']],
+    'approved' => ['label' => 'Approved', 'count' => $metrics['approved']],
+    'finalized' => ['label' => 'Finalized', 'count' => $metrics['finalized']],
+];
+if (($metrics['returned'] ?? 0) > 0 || $statusFilter === 'returned') {
+    $tabs['returned'] = ['label' => 'Returned', 'count' => $metrics['returned'] ?? 0];
+}
+
+// Display label, badge class and icon per grading sheet status
+$statusView = static fn (string $status): array => match ($status) {
+    'APPROVED' => ['Approved', 'badge-approved', 'bi-check-circle-fill'],
+    'FINALIZED' => ['Finalized', 'badge-finalized', 'bi-lock-fill'],
+    'RETURNED' => ['Returned', 'badge-returned', 'bi-arrow-return-left'],
+    default => ['Awaiting review', 'badge-submitted', 'bi-hourglass-split'],
+};
 ?>
 
-<!-- Metric KPI Cards (Matching Dashboard Standard) -->
-<div class="dashboard-stats mb-4">
-    <div class="stat-card">
-        <div>
-            <div class="stat-card-top">
-                <span class="stat-label">Total submissions</span>
-                <div class="stat-icon stat-icon-blue"><i class="bi bi-file-earmark-spreadsheet-fill"></i></div>
-            </div>
-            <div class="stat-value tabular-nums" id="statTotalSubmissions"><?= $metrics['total'] ?></div>
-        </div>
-        <span class="stat-subtext">Course grade sheets</span>
+<!-- Summary -->
+<div class="summary-strip mb-4">
+    <div class="summary-cell">
+        <div class="summary-label">Total submissions</div>
+        <div class="summary-value" id="statTotalSubmissions"><?= (int) $metrics['total'] ?></div>
+        <div class="summary-note">Course grade sheets</div>
     </div>
-
-    <div class="stat-card">
-        <div>
-            <div class="stat-card-top">
-                <span class="stat-label">Pending review</span>
-                <div class="stat-icon stat-icon-amber"><i class="bi bi-hourglass-split"></i></div>
-            </div>
-            <div class="stat-value tabular-nums <?= ($metrics['pending'] ?? 0) > 0 ? 'text-amber' : '' ?>" id="statPendingReview">
-                <?= $metrics['pending'] ?>
-            </div>
-        </div>
-        <span class="stat-subtext">Awaiting Dean action</span>
+    <div class="summary-cell">
+        <div class="summary-label">Awaiting review</div>
+        <div class="summary-value <?= ($metrics['pending'] ?? 0) > 0 ? 'is-attention' : '' ?>" id="statPendingReview"><?= (int) $metrics['pending'] ?></div>
+        <div class="summary-note">Needs Dean action</div>
     </div>
-
-    <div class="stat-card">
-        <div>
-            <div class="stat-card-top">
-                <span class="stat-label">Approved</span>
-                <div class="stat-icon stat-icon-green"><i class="bi bi-check-circle-fill"></i></div>
-            </div>
-            <div class="stat-value tabular-nums text-success" id="statApproved">
-                <?= $metrics['approved'] ?>
-            </div>
-        </div>
-        <span class="stat-subtext">Ready for confirmation</span>
+    <div class="summary-cell">
+        <div class="summary-label">Approved</div>
+        <div class="summary-value" id="statApproved"><?= (int) $metrics['approved'] ?></div>
+        <div class="summary-note">Ready for confirmation</div>
     </div>
-
-    <div class="stat-card">
-        <div>
-            <div class="stat-card-top">
-                <span class="stat-label">Finalized</span>
-                <div class="stat-icon stat-icon-purple"><i class="bi bi-shield-lock-fill"></i></div>
-            </div>
-            <div class="stat-value tabular-nums" id="statFinalized">
-                <?= $metrics['finalized'] ?>
-            </div>
-        </div>
-        <span class="stat-subtext">Locked &amp; permanently posted</span>
+    <div class="summary-cell">
+        <div class="summary-label">Finalized</div>
+        <div class="summary-value" id="statFinalized"><?= (int) $metrics['finalized'] ?></div>
+        <div class="summary-note">Locked and posted</div>
     </div>
 </div>
 
-<!-- Search & Filtering Controls Bar -->
-<div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-    <div class="card-body p-3">
-        <div class="row g-3 align-items-center justify-content-between">
-            <div class="col-12 col-xl-auto">
-                <div class="nav nav-pills small gap-1 flex-wrap">
-                    <a href="<?= url('/dean/grade-review?status=all&semester=' . ($selectedSemester ?? '1')) ?>" 
-                       class="nav-link py-1.5 px-3 d-inline-flex align-items-center gap-1.5 <?= $statusFilter === 'all' ? 'active' : 'bg-light text-dark' ?>">
-                        All Submissions
-                        <span class="badge rounded-pill <?= $statusFilter === 'all' ? 'bg-white text-primary' : 'bg-secondary-subtle text-secondary' ?>">
-                            <?= $metrics['total'] ?>
-                        </span>
-                    </a>
-                    <a href="<?= url('/dean/grade-review?status=pending&semester=' . ($selectedSemester ?? '1')) ?>" 
-                       class="nav-link py-1.5 px-3 d-inline-flex align-items-center gap-1.5 <?= $statusFilter === 'pending' ? 'active' : 'bg-light text-dark' ?>">
-                        Pending Review
-                        <span class="badge rounded-pill <?= $statusFilter === 'pending' ? 'bg-white text-primary' : 'bg-warning-subtle text-warning-emphasis' ?>">
-                            <?= $metrics['pending'] ?>
-                        </span>
-                    </a>
-                    <a href="<?= url('/dean/grade-review?status=approved&semester=' . ($selectedSemester ?? '1')) ?>" 
-                       class="nav-link py-1.5 px-3 d-inline-flex align-items-center gap-1.5 <?= $statusFilter === 'approved' ? 'active' : 'bg-light text-dark' ?>">
-                        Approved
-                        <span class="badge rounded-pill <?= $statusFilter === 'approved' ? 'bg-white text-primary' : 'bg-success-subtle text-success' ?>">
-                            <?= $metrics['approved'] ?>
-                        </span>
-                    </a>
-                    <a href="<?= url('/dean/grade-review?status=finalized&semester=' . ($selectedSemester ?? '1')) ?>" 
-                       class="nav-link py-1.5 px-3 d-inline-flex align-items-center gap-1.5 <?= $statusFilter === 'finalized' ? 'active' : 'bg-light text-dark' ?>">
-                        Finalized
-                        <span class="badge rounded-pill <?= $statusFilter === 'finalized' ? 'bg-white text-primary' : 'bg-dark-subtle text-dark' ?>">
-                            <?= $metrics['finalized'] ?>
-                        </span>
-                    </a>
-                    <?php if (($metrics['returned'] ?? 0) > 0 || $statusFilter === 'returned'): ?>
-                    <a href="<?= url('/dean/grade-review?status=returned&semester=' . ($selectedSemester ?? '1')) ?>" 
-                       class="nav-link py-1.5 px-3 d-inline-flex align-items-center gap-1.5 <?= $statusFilter === 'returned' ? 'active' : 'bg-light text-dark' ?>">
-                        Returned
-                        <span class="badge rounded-pill <?= $statusFilter === 'returned' ? 'bg-white text-primary' : 'bg-danger-subtle text-danger' ?>">
-                            <?= $metrics['returned'] ?>
-                        </span>
-                    </a>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div class="col-12 col-xl d-flex flex-wrap align-items-center justify-content-xl-end gap-3">
-                <form method="GET" action="<?= url('/dean/grade-review') ?>" class="position-relative flex-grow-1" style="max-width: 380px; min-width: 240px;">
-                    <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                    <input type="hidden" name="status" value="<?= htmlspecialchars((string)($statusFilter ?? 'all')) ?>">
-                    <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 12px;"></i>
-                    <input type="text" 
-                           id="gradeReviewSearch" 
-                           name="search"
-                           class="form-control form-control-sm ps-5" 
-                           placeholder="Search course code, title, or instructor..." 
-                           value="<?= htmlspecialchars($currentSearch ?? '') ?>"
-                           autocomplete="off">
-                </form>
-
-                <div class="text-muted small fw-medium text-nowrap" id="visibleCounter">
-                    <?= (int)($pagination['total'] ?? count($gradingSheets)) ?> <?= ((int)($pagination['total'] ?? count($gradingSheets))) === 1 ? 'record' : 'records' ?> found
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Grading Sheets Roster Card -->
+<!-- Grading Sheets Queue -->
 <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+    <div class="card-header bg-white py-3 border-bottom-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div>
-            <h3 class="h6 mb-0 fw-semibold text-dark">Grading Sheets Roster</h3>
-            <small class="text-muted">Submissions for <?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></small>
+            <h3 class="h6 mb-0 fw-semibold text-dark">Grading Sheets</h3>
+            <small class="text-muted"><?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></small>
         </div>
+        <div class="queue-count" id="visibleCounter">
+            <?= $totalRecords ?> <?= $totalRecords === 1 ? 'record' : 'records' ?>
+        </div>
+    </div>
+
+    <div class="queue-toolbar">
+        <nav class="queue-tabs" aria-label="Filter by status">
+            <?php foreach ($tabs as $key => $tab): ?>
+                <a href="<?= url('/dean/grade-review?status=' . $key . '&semester=' . $selectedSemester) ?>"
+                   class="queue-tab <?= $statusFilter === $key ? 'is-active' : '' ?>"
+                   <?= $statusFilter === $key ? 'aria-current="page"' : '' ?>>
+                    <?= htmlspecialchars($tab['label']) ?>
+                    <span class="queue-tab-count"><?= (int) $tab['count'] ?></span>
+                </a>
+            <?php endforeach; ?>
+        </nav>
+
+        <form method="GET" action="<?= url('/dean/grade-review') ?>" class="queue-search">
+            <input type="hidden" name="semester" value="<?= htmlspecialchars($selectedSemester) ?>">
+            <input type="hidden" name="status" value="<?= htmlspecialchars((string) $statusFilter) ?>">
+            <i class="bi bi-search"></i>
+            <input type="text"
+                   id="gradeReviewSearch"
+                   name="search"
+                   class="form-control form-control-sm"
+                   placeholder="Search course, title, or instructor"
+                   value="<?= htmlspecialchars($currentSearch ?? '') ?>"
+                   autocomplete="off">
+        </form>
     </div>
 
     <?php if (empty($gradingSheets)): ?>
@@ -163,102 +115,92 @@ $metrics = $metrics ?? [
     <?php else: ?>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" id="gradeReviewTable">
-                <thead class="bg-white border-bottom">
+                <thead>
                     <tr>
-                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Subject Code &amp; Title</th>
-                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 140px; font-size: 11px;">Grading Period</th>
-                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 220px; font-size: 11px;">Faculty Instructor</th>
-                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold" style="width: 170px; font-size: 11px;">Submitted At</th>
-                        <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 130px; font-size: 11px;">Status</th>
-                        <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold text-end" style="width: 80px; font-size: 11px;">Actions</th>
+                        <th>Course</th>
+                        <th>Instructor</th>
+                        <th>Period</th>
+                        <th>Submitted</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y" id="gradeReviewTableBody">
+                <tbody id="gradeReviewTableBody">
                     <?php foreach ($gradingSheets as $sheet): ?>
                     <?php
                         $code = $sheet['subject_code'] ?? $sheet['code'] ?? '';
                         $instructorName = trim(($sheet['first_name'] ?? '') . ' ' . ($sheet['last_name'] ?? ''));
-                        $searchHaystack = strtolower($code . ' ' . ($sheet['subject_name'] ?? '') . ' ' . $instructorName . ' ' . ($sheet['period_name'] ?? '') . ' ' . ($sheet['status'] ?? ''));
-                        $initials = strtoupper(substr($sheet['first_name'] ?? 'F', 0, 1) . substr($sheet['last_name'] ?? 'I', 0, 1));
+                        $status = (string) ($sheet['status'] ?? '');
+                        [$statusLabel, $statusClass, $statusIcon] = $statusView($status);
+                        $searchHaystack = strtolower($code . ' ' . ($sheet['subject_name'] ?? '') . ' ' . $instructorName . ' ' . ($sheet['period_name'] ?? '') . ' ' . $statusLabel);
+                        $isPending = in_array($status, ['SUBMITTED', 'UNDER_REVIEW'], true);
                     ?>
                     <tr class="grade-review-row" data-search="<?= htmlspecialchars($searchHaystack) ?>">
-                        <td class="py-2.5 px-4">
-                            <div class="fw-bold text-dark font-monospace fs-7 mb-0.5">
-                                <?= htmlspecialchars($code) ?>
-                            </div>
-                            <div class="text-secondary small">
-                                <?= htmlspecialchars($sheet['subject_name']) ?>
-                            </div>
+                        <td>
+                            <div class="queue-code"><?= htmlspecialchars($code) ?></div>
+                            <div class="queue-title"><?= htmlspecialchars($sheet['subject_name'] ?? '') ?></div>
                         </td>
-                        <td class="py-2.5 px-3 text-center">
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 fs-8 fw-semibold">
-                                <?= htmlspecialchars($sheet['period_name']) ?>
-                            </span>
-                        </td>
-                        <td class="py-2.5 px-3">
-                            <div class="fw-medium text-dark fs-7 text-truncate"><?= htmlspecialchars($instructorName) ?></div>
+                        <td>
+                            <div class="text-dark text-truncate"><?= htmlspecialchars($instructorName) ?></div>
                             <?php if (!empty($sheet['email'])): ?>
-                                <div class="text-muted text-truncate" style="font-size: 11px;"><?= htmlspecialchars($sheet['email']) ?></div>
+                                <div class="queue-meta text-truncate"><?= htmlspecialchars($sheet['email']) ?></div>
                             <?php endif; ?>
                         </td>
-                        <td class="py-2.5 px-3">
+                        <td class="text-dark"><?= htmlspecialchars($sheet['period_name'] ?? '') ?></td>
+                        <td>
                             <?php if (!empty($sheet['submitted_at'])): ?>
-                                <div class="text-dark fs-7 font-monospace fw-medium">
-                                    <?= htmlspecialchars(date('M d, Y', strtotime($sheet['submitted_at']))) ?>
-                                </div>
-                                <div class="text-muted font-monospace" style="font-size: 11px;">
-                                    <?= htmlspecialchars(date('h:i A', strtotime($sheet['submitted_at']))) ?>
-                                </div>
+                                <div class="text-dark tabular-nums"><?= htmlspecialchars(date('M d, Y', strtotime($sheet['submitted_at']))) ?></div>
+                                <div class="queue-meta tabular-nums"><?= htmlspecialchars(date('h:i A', strtotime($sheet['submitted_at']))) ?></div>
                             <?php else: ?>
-                                <span class="text-muted">—</span>
+                                <span class="text-muted">&mdash;</span>
                             <?php endif; ?>
                         </td>
-                        <td class="py-2.5 px-3 text-center">
-                            <span class="badge <?= match($sheet['status']) {
-                                'APPROVED' => 'bg-success-subtle text-success border border-success-subtle',
-                                'FINALIZED' => 'bg-dark-subtle text-dark border border-secondary',
-                                'RETURNED' => 'bg-danger-subtle text-danger border border-danger-subtle',
-                                default => 'bg-warning-subtle text-warning-emphasis border border-warning-subtle'
-                            } ?> px-2.5 py-1 fs-8">
-                                <?= htmlspecialchars($sheet['status']) ?>
+                        <td>
+                            <span class="badge <?= $statusClass ?> d-inline-flex align-items-center gap-1">
+                                <i class="bi <?= $statusIcon ?>"></i> <?= htmlspecialchars($statusLabel) ?>
                             </span>
                         </td>
-                        <td class="py-2.5 px-4 text-end text-nowrap">
-                            <div class="dropdown d-inline-block">
-                                <button class="btn btn-sm btn-action-trigger" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="Actions">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
-                                    <li>
-                                        <a class="dropdown-item" href="<?= url('/dean/grade-review/' . $sheet['id']) ?>">
-                                            <i class="bi bi-eye text-primary"></i> View details
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="<?= url('/dean/grade-review/' . $sheet['id'] . '/print') ?>" target="_blank">
-                                            <i class="bi bi-printer text-muted"></i> Print sheet
-                                        </a>
-                                    </li>
-                                    <?php if (in_array($sheet['status'], ['SUBMITTED', 'UNDER_REVIEW'])): ?>
-                                        <li><hr class="dropdown-divider"></li>
+                        <td>
+                            <div class="queue-actions">
+                                <?php if ($isPending): ?>
+                                    <a class="btn btn-sm btn-primary" href="<?= url('/dean/grade-review/' . $sheet['id']) ?>">Review</a>
+                                <?php elseif ($status === 'APPROVED'): ?>
+                                    <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#confirmModal<?= $sheet['id'] ?>">Confirm</button>
+                                <?php else: ?>
+                                    <a class="btn btn-sm btn-outline-secondary" href="<?= url('/dean/grade-review/' . $sheet['id']) ?>">View</a>
+                                <?php endif; ?>
+
+                                <div class="dropdown d-inline-block">
+                                    <button class="btn btn-sm btn-action-trigger" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="More actions">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
+                                        <?php if ($isPending || $status === 'APPROVED'): ?>
+                                            <li>
+                                                <a class="dropdown-item" href="<?= url('/dean/grade-review/' . $sheet['id']) ?>">
+                                                    <i class="bi bi-eye text-primary"></i> View details
+                                                </a>
+                                            </li>
+                                        <?php endif; ?>
                                         <li>
-                                            <form method="POST" action="<?= url('/dean/grade-review/approve') ?>" class="m-0" onsubmit="return confirm('Approve this grading sheet for <?= htmlspecialchars($code) ?>?');">
-                                                <?= csrf_field() ?>
-                                                <input type="hidden" name="grading_sheet_id" value="<?= $sheet['id'] ?>">
-                                                <button type="submit" class="dropdown-item text-success">
-                                                    <i class="bi bi-check-circle"></i> Approve sheet
-                                                </button>
-                                            </form>
+                                            <a class="dropdown-item" href="<?= url('/dean/grade-review/' . $sheet['id'] . '/print') ?>" target="_blank">
+                                                <i class="bi bi-printer text-muted"></i> Print sheet
+                                            </a>
                                         </li>
-                                    <?php elseif ($sheet['status'] === 'APPROVED'): ?>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <button type="button" class="dropdown-item text-dark" data-bs-toggle="modal" data-bs-target="#confirmModal<?= $sheet['id'] ?>">
-                                                <i class="bi bi-shield-check text-muted"></i> Confirm grades
-                                            </button>
-                                        </li>
-                                    <?php endif; ?>
-                                </ul>
+                                        <?php if ($isPending): ?>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form method="POST" action="<?= url('/dean/grade-review/approve') ?>" class="m-0" onsubmit="return confirm('Approve this grading sheet for <?= htmlspecialchars($code) ?>?');">
+                                                    <?= csrf_field() ?>
+                                                    <input type="hidden" name="grading_sheet_id" value="<?= $sheet['id'] ?>">
+                                                    <button type="submit" class="dropdown-item text-success">
+                                                        <i class="bi bi-check-circle"></i> Approve sheet
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        <?php endif; ?>
+                                    </ul>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -347,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         if (visibleCounter) {
-            visibleCounter.textContent = visibleCount + (visibleCount === 1 ? ' record found' : ' records found');
+            visibleCounter.textContent = visibleCount + (visibleCount === 1 ? ' record' : ' records');
         }
 
         if (noResultsRow) {

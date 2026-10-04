@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="<?= asset('css/components/table.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/modal.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/combobox.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/components/review-queue.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/badge.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/navbar.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/sidebar.css') ?>">
