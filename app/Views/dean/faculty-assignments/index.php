@@ -58,7 +58,7 @@ foreach ($subjects as $subject) {
     }
 }
 
-// Header Actions (Semester selection tabs + Assign Instructor trigger)
+// Header Actions (Semester selection tabs)
 $headerActions = '
 <div class="d-flex align-items-center gap-2">
     <div class="btn-group btn-group-sm" role="group" aria-label="Semester selection">
@@ -69,9 +69,6 @@ $headerActions = '
             2nd Semester
         </a>
     </div>
-    <button type="button" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#assignInstructorModal">
-        <i class="bi bi-person-plus-fill"></i> Assign Instructor
-    </button>
 </div>';
 
 ob_start();
