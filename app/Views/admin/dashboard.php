@@ -28,7 +28,7 @@ ob_start();
         <span class="stat-subtext">View student roster <i class="bi bi-arrow-right"></i></span>
     </a>
 
-    <a href="<?= url('/admin/staff?role=Faculty') ?>" class="stat-card stat-card-link">
+    <a href="<?= url('/admin/faculty') ?>" class="stat-card stat-card-link">
         <div>
             <div class="stat-card-top">
                 <span class="stat-label">Teaching faculty</span>

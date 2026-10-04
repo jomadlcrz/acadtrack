@@ -2,11 +2,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     const editUrlPrefix = '<?= url('/admin/users') ?>';
     
-    // Determine the default base URL for this page (students, staff, or dashboard)
+    // Determine the default base URL for this page (students, faculty, administrators, or dashboard)
     function getPageBaseUrl() {
         const path = window.location.pathname;
-        if (path.indexOf('/admin/staff') !== -1) {
-            return '<?= url('/admin/staff') ?>';
+        if (path.indexOf('/admin/faculty') !== -1 || path.indexOf('/admin/staff') !== -1) {
+            return '<?= url('/admin/faculty') ?>';
+        }
+        if (path.indexOf('/admin/administrators') !== -1) {
+            return '<?= url('/admin/administrators') ?>';
         }
         if (path.indexOf('/admin/dashboard') !== -1) {
             return '<?= url('/admin/dashboard') ?>';

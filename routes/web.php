@@ -16,6 +16,8 @@ use App\Controllers\Admin\ArchiveController;
 use App\Controllers\Admin\RegistrationController;
 use App\Controllers\Admin\StudentController as AdminStudentController;
 use App\Controllers\Admin\StaffController;
+use App\Controllers\Admin\FacultyController;
+use App\Controllers\Admin\AdministratorController;
 use App\Controllers\Admin\ActivityLogController;
 use App\Controllers\Dean\FacultyAssignmentController;
 use App\Controllers\Dean\SubjectController as DeanSubjectController;
@@ -108,8 +110,10 @@ $router->post('/admin/sets/{id}', [AdminSetController::class, 'update'], [new Au
 $router->post('/admin/sets/{id}/archive', [AdminSetController::class, 'archive'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/sets/{id}/restore', [AdminSetController::class, 'restore'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 
-// Student and staff directories (Admin only)
+// User directories (Admin only)
 $router->get('/admin/students', [AdminStudentController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+$router->get('/admin/faculty', [FacultyController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+$router->get('/admin/administrators', [AdministratorController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->get('/admin/staff', [StaffController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 
 // Activity log (Admin only)

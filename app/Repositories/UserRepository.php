@@ -355,4 +355,124 @@ class UserRepository
             'last_page' => $lastPage,
         ];
     }
+
+    /** Faculty and Dean accounts. */
+    public function paginateFaculty(int $page = 1, int $perPage = 20, string $role = '', string $status = '', string $search = '', int $departmentId = 0): array
+    {
+        $page = max(1, $page);
+        $clauses = ["r.role_name IN ('Faculty', 'Dean')"];
+        $params = [];
+
+        if ($role !== '' && in_array($role, ['Faculty', 'Dean'], true)) {
+            $clauses[] = 'r.role_name = :role';
+            $params['role'] = $role;
+        }
+        if ($status !== '') {
+            $clauses[] = 'u.status = :status';
+            $params['status'] = $status;
+        }
+        if ($departmentId > 0) {
+            $clauses[] = 'fd.department_id = :department_id';
+            $params['department_id'] = $departmentId;
+        }
+        if ($search !== '') {
+            $clauses[] = "CONCAT(u.email, ' ', COALESCE(fd.first_name, ''), ' ', COALESCE(fd.last_name, '')) LIKE :search";
+            $params['search'] = '%' . $search . '%';
+        }
+        $where = 'WHERE ' . implode(' AND ', $clauses);
+
+        $from = "FROM users u
+                 JOIN user_roles ur ON ur.user_id = u.id
+                 JOIN roles r ON r.id = ur.role_id
+                 LEFT JOIN faculty_details fd ON fd.user_id = u.id
+                 LEFT JOIN departments d ON d.id = fd.department_id
+                 {$where}";
+
+        $stmt = Database::getConnection()->prepare("SELECT COUNT(*) {$from}");
+        $stmt->execute($params);
+        $total = (int) $stmt->fetchColumn();
+
+        $stmt = Database::getConnection()->prepare(
+            "SELECT u.id, u.email, u.status, r.role_name AS role,
+                    COALESCE(fd.first_name, '') AS first_name,
+                    COALESCE(fd.last_name, '') AS last_name,
+                    fd.department_id,
+                    d.dept_name AS department_name, d.dept_abbrev AS department_code
+             {$from}
+             ORDER BY COALESCE(fd.last_name, ''), COALESCE(fd.first_name, '')
+             LIMIT :limit OFFSET :offset"
+        );
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', ($page - 1) * $perPage, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $lastPage = max(1, (int) ceil($total / $perPage));
+        return [
+            'data' => $stmt->fetchAll(PDO::FETCH_ASSOC),
+            'total' => $total,
+            'page' => $page,
+            'perPage' => $perPage,
+            'per_page' => $perPage,
+            'lastPage' => $lastPage,
+            'last_page' => $lastPage,
+        ];
+    }
+
+    /** Administrator accounts. */
+    public function paginateAdministrators(int $page = 1, int $perPage = 20, string $status = '', string $search = ''): array
+    {
+        $page = max(1, $page);
+        $clauses = ["r.role_name = 'Admin'"];
+        $params = [];
+
+        if ($status !== '') {
+            $clauses[] = 'u.status = :status';
+            $params['status'] = $status;
+        }
+        if ($search !== '') {
+            $clauses[] = "CONCAT(u.email, ' ', COALESCE(ad.first_name, ''), ' ', COALESCE(ad.last_name, '')) LIKE :search";
+            $params['search'] = '%' . $search . '%';
+        }
+        $where = 'WHERE ' . implode(' AND ', $clauses);
+
+        $from = "FROM users u
+                 JOIN user_roles ur ON ur.user_id = u.id
+                 JOIN roles r ON r.id = ur.role_id
+                 LEFT JOIN admin_details ad ON ad.user_id = u.id
+                 {$where}";
+
+        $stmt = Database::getConnection()->prepare("SELECT COUNT(*) {$from}");
+        $stmt->execute($params);
+        $total = (int) $stmt->fetchColumn();
+
+        $stmt = Database::getConnection()->prepare(
+            "SELECT u.id, u.email, u.status, r.role_name AS role,
+                    COALESCE(ad.first_name, '') AS first_name,
+                    COALESCE(ad.last_name, '') AS last_name
+             {$from}
+             ORDER BY COALESCE(ad.last_name, ''), COALESCE(ad.first_name, '')
+             LIMIT :limit OFFSET :offset"
+        );
+        foreach ($params as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', ($page - 1) * $perPage, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $lastPage = max(1, (int) ceil($total / $perPage));
+        return [
+            'data' => $stmt->fetchAll(PDO::FETCH_ASSOC),
+            'total' => $total,
+            'page' => $page,
+            'perPage' => $perPage,
+            'per_page' => $perPage,
+            'lastPage' => $lastPage,
+            'last_page' => $lastPage,
+        ];
+    }
 }
+

@@ -19,25 +19,37 @@ class UserController
         $this->userRepository = new UserRepository();
     }
 
-    /** The combined list was split: students and staff each have their own page. */
+    /** The combined list was split: students, faculty, and administrators each have their own page. */
     public function index(Request $request, Response $response, Session $session): void
     {
         $tab = (string) $request->get('tab', '');
         $role = (string) $request->get('role', '');
-        $isStaff = in_array($tab, ['faculty', 'admin'], true) || in_array($role, ['Admin', 'Dean', 'Faculty'], true);
-
         $query = array_filter([
-            'role' => $isStaff ? $role : '',
             'search' => (string) $request->get('search', ''),
             'status' => (string) $request->get('status', ''),
         ]);
+
+        if ($role === 'Admin' || $tab === 'admin') {
+            redirect('/admin/administrators' . ($query ? '?' . http_build_query($query) : ''));
+            return;
+        }
+
+        $isFaculty = in_array($tab, ['faculty', 'dean'], true) || in_array($role, ['Dean', 'Faculty'], true);
+        if ($isFaculty) {
+            if ($role !== '') {
+                $query['role'] = $role;
+            }
+            redirect('/admin/faculty' . ($query ? '?' . http_build_query($query) : ''));
+            return;
+        }
+
         if ($tab === 'irregular') {
             $query['status'] = 'Irregular';
         } elseif ($tab === 'regular') {
             $query['status'] = 'Regular';
         }
 
-        redirect(($isStaff ? '/admin/staff' : '/admin/students') . ($query ? '?' . http_build_query($query) : ''));
+        redirect('/admin/students' . ($query ? '?' . http_build_query($query) : ''));
     }
 
     public function create(Request $request, Response $response, Session $session): void
@@ -175,7 +187,7 @@ class UserController
             return;
         }
 
-        (new StaffController())->index($request, $response, $session, $user->toArray());
+        (new FacultyController())->index($request, $response, $session, $user->toArray());
     }
 
     public function update(Request $request, Response $response, Session $session, string $id): void
@@ -647,11 +659,17 @@ class UserController
         }
     }
 
-    /** Where to send the admin after an account action: staff or students, keeping the list they came from. */
+    /** Where to send the admin after an account action, keeping the list they came from. */
     private function listUrl(string $role = ''): string
     {
         if ($role !== '') {
-            return $role === 'Student' ? '/admin/students' : '/admin/staff';
+            if ($role === 'Student') {
+                return '/admin/students';
+            }
+            if ($role === 'Admin') {
+                return '/admin/administrators';
+            }
+            return '/admin/faculty';
         }
 
         $referer = parse_url((string) ($_SERVER['HTTP_REFERER'] ?? ''));
@@ -660,7 +678,7 @@ class UserController
         if ($base !== '' && str_starts_with($path, $base)) {
             $path = substr($path, strlen($base));
         }
-        if ($path === '/admin/staff' || $path === '/admin/students') {
+        if ($path === '/admin/faculty' || $path === '/admin/administrators' || $path === '/admin/students' || $path === '/admin/staff') {
             return $path . (!empty($referer['query']) ? '?' . $referer['query'] : '');
         }
         return '/admin/students';

@@ -48,9 +48,13 @@
                     <i class="bi bi-mortarboard-fill"></i>
                     <span>Students</span>
                 </a>
-                <a href="<?= url('/admin/staff') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/staff') ? 'active' : '' ?>">
+                <a href="<?= url('/admin/faculty') ?>" class="sidebar-link <?= (str_starts_with($currentPath, '/admin/faculty') || str_starts_with($currentPath, '/admin/staff')) ? 'active' : '' ?>">
                     <i class="bi bi-person-badge-fill"></i>
-                    <span>Faculty and Staff</span>
+                    <span>Faculty</span>
+                </a>
+                <a href="<?= url('/admin/administrators') ?>" class="sidebar-link <?= str_starts_with($currentPath, '/admin/administrators') ? 'active' : '' ?>">
+                    <i class="bi bi-shield-lock-fill"></i>
+                    <span>Administrators</span>
                 </a>
             </div>
 
