@@ -18,6 +18,8 @@ class GradeHistoryLog extends Model
         'old_score',
         'new_score',
         'action_performed',
+        'changed_by',
+        'reason',
         'changed_at',
     ];
 

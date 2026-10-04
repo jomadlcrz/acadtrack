@@ -45,18 +45,9 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
 
             <div class="col-md-2 text-md-end pt-md-3">
                 <?php if ($gradingSheet): ?>
-                    <span class="badge badge-<?= strtolower($gradingSheet['status']) ?> fs-6 py-2 px-3">
-                        <?php if ($gradingSheet['status'] === 'DRAFT'): ?>
-                            <i class="bi bi-pencil-square me-1"></i> Draft
-                        <?php elseif ($gradingSheet['status'] === 'SUBMITTED'): ?>
-                            <i class="bi bi-lock-fill me-1"></i> Submitted
-                        <?php elseif ($gradingSheet['status'] === 'APPROVED'): ?>
-                            <i class="bi bi-check-circle-fill me-1"></i> Approved
-                        <?php elseif ($gradingSheet['status'] === 'RETURNED'): ?>
-                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Returned
-                        <?php else: ?>
-                            <?= htmlspecialchars(ucfirst(strtolower($gradingSheet['status']))) ?>
-                        <?php endif; ?>
+                    <?php $sheetStatus = grading_sheet_status((string) $gradingSheet['status']); ?>
+                    <span class="badge <?= $sheetStatus['class'] ?> fs-6 py-2 px-3">
+                        <i class="bi <?= $sheetStatus['icon'] ?> me-1"></i> <?= htmlspecialchars($sheetStatus['label']) ?>
                     </span>
                 <?php else: ?>
                     <span class="badge bg-secondary-subtle text-secondary border fs-6 py-2 px-3">
@@ -68,25 +59,36 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
     </div>
 </div>
 
-<?php if ($gradingSheet && $gradingSheet['status'] === 'SUBMITTED'): ?>
+<?php if ($gradingSheet && in_array($gradingSheet['status'], ['SUBMITTED', 'UNDER_REVIEW'], true)): ?>
     <div class="alert alert-info d-flex align-items-center gap-2 mb-4" role="alert">
         <i class="bi bi-info-circle-fill fs-5"></i>
         <div>
-            <strong class="fw-semibold">Grading sheet submitted.</strong> This sheet is currently locked under Dean review. Editing is disabled until approved or returned.
+            <strong class="fw-semibold"><?= $gradingSheet['status'] === 'UNDER_REVIEW' ? 'The Dean is reviewing this sheet.' : 'Grading sheet submitted.' ?></strong> Editing is locked until the Dean approves it or returns it to you.
         </div>
     </div>
 <?php elseif ($gradingSheet && $gradingSheet['status'] === 'RETURNED'): ?>
-    <div class="alert alert-warning d-flex align-items-center gap-2 mb-4" role="alert">
-        <i class="bi bi-arrow-counterclockwise fs-5"></i>
+    <div class="alert alert-warning d-flex align-items-start gap-2 mb-4" role="alert">
+        <i class="bi bi-arrow-return-left fs-5"></i>
         <div>
-            <strong class="fw-semibold">Grading sheet returned for revision.</strong> Please inspect the scores below, apply the necessary revisions, and submit for review once finalized.
+            <strong class="fw-semibold">The Dean returned this sheet for correction.</strong>
+            <?php if (!empty($gradingSheet['remarks'])): ?>
+                <div class="mt-1">Reason: &ldquo;<?= htmlspecialchars($gradingSheet['remarks']) ?>&rdquo;</div>
+            <?php endif; ?>
+            <div class="mt-1">Fix the marks below, then submit the sheet again.</div>
         </div>
     </div>
 <?php elseif ($gradingSheet && $gradingSheet['status'] === 'APPROVED'): ?>
     <div class="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
         <i class="bi bi-check-circle-fill fs-5"></i>
         <div>
-            <strong class="fw-semibold">Grading sheet approved.</strong> Scores have been officially verified and locked into permanent student academic records.
+            <strong class="fw-semibold">Approved by the Dean.</strong> Waiting for final confirmation. Students will see the marks once the sheet is finalized.
+        </div>
+    </div>
+<?php elseif ($gradingSheet && $gradingSheet['status'] === 'FINALIZED'): ?>
+    <div class="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="bi bi-lock-fill fs-5"></i>
+        <div>
+            <strong class="fw-semibold">Finalized.</strong> These marks are official, locked, and visible to your students.
         </div>
     </div>
 <?php endif; ?>

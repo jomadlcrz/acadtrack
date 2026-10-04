@@ -22,6 +22,9 @@ class TestDatabaseSeeder
 {
     public static function seedIfNeeded(): void
     {
+        // Grade review audit trail (idempotent): grading_sheet_events + reviewer / changed_by columns
+        (require dirname(__DIR__) . '/database/migrations/2026_10_04_create_grading_sheet_events_table.php')->up();
+
         // Ensure audit_logs and student_term_registrations exist if running against fresh or legacy test DB
         if (!DB::schema()->hasTable('audit_logs')) {
             DB::connection()->getPdo()->exec("

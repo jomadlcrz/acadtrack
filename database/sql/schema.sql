@@ -317,6 +317,8 @@ CREATE TABLE grade_history_log (
     old_score DECIMAL(5,2) NULL,
     new_score DECIMAL(5,2) NULL,
     action_performed VARCHAR(20) DEFAULT 'UPDATE',
+    changed_by INT NULL DEFAULT NULL,
+    reason VARCHAR(255) NULL DEFAULT NULL,
     changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_grade_id (grade_id),
     INDEX idx_student_id (student_id)
@@ -332,6 +334,8 @@ CREATE TABLE grading_sheets (
     status ENUM('DRAFT', 'SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'FINALIZED', 'RETURNED') DEFAULT 'DRAFT',
     approved_by INT NULL,
     submitted_at TIMESTAMP NULL,
+    reviewed_by INT NULL DEFAULT NULL,
+    reviewed_at TIMESTAMP NULL DEFAULT NULL,
     approved_at TIMESTAMP NULL,
     returned_at TIMESTAMP NULL,
     confirmed_at TIMESTAMP NULL,
@@ -346,6 +350,21 @@ CREATE TABLE grading_sheets (
     INDEX idx_sheets_term_status (academic_term_id, status),
     INDEX idx_sheets_faculty_term (faculty_id, academic_term_id)
 ) ENGINE=InnoDB;
+
+-- Grading Sheet Events (append-only review trail: submitted, review started, approved, returned, adjusted, finalized)
+CREATE TABLE IF NOT EXISTS grading_sheet_events (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    grading_sheet_id INT NOT NULL,
+    action VARCHAR(30) NOT NULL,
+    from_status VARCHAR(20) NULL,
+    to_status VARCHAR(20) NULL,
+    actor_id INT NULL,
+    actor_name VARCHAR(120) NOT NULL DEFAULT '',
+    remarks TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_sheet_events_sheet (grading_sheet_id, id),
+    CONSTRAINT fk_sheet_events_sheet FOREIGN KEY (grading_sheet_id) REFERENCES grading_sheets(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Grading Settings
 CREATE TABLE grading_settings (

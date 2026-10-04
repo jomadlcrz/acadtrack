@@ -61,21 +61,28 @@ stateDiagram-v2
     [*] --> DRAFT : Faculty Enters Initial Scores
     DRAFT --> DRAFT : Faculty Saves Working Draft
     DRAFT --> SUBMITTED : Faculty Submits Sheet to Dean/Admin
-    SUBMITTED --> UNDER_REVIEW : Dean or Admin Opens Review Queue
-    UNDER_REVIEW --> RETURNED : Discrepancy Flagged / Returned with Feedback Remarks
-    RETURNED --> DRAFT : Faculty Corrects Scores
-    UNDER_REVIEW --> APPROVED : Dean or Admin Approves & Confirms
-    APPROVED --> FINALIZED : Registrar Locks Term Records
+    SUBMITTED --> UNDER_REVIEW : Dean or Admin Opens the Sheet (review starts automatically)
+    SUBMITTED --> RETURNED : Returned with a Required Reason
+    UNDER_REVIEW --> RETURNED : Returned with a Required Reason
+    APPROVED --> RETURNED : Returned with a Required Reason
+    RETURNED --> SUBMITTED : Faculty Corrects Scores and Resubmits
+    UNDER_REVIEW --> APPROVED : Dean or Admin Approves
+    APPROVED --> FINALIZED : Dean or Admin Confirms and Finalizes (marks published to students)
     FINALIZED --> [*]
 ```
 
 ### State Definitions & Security Guarantees
 * **`DRAFT`:** Editable solely by the assigned faculty member. Scores are autosaved or updated via `POST /faculty/grading/save`.
 * **`SUBMITTED`:** Inputs locked on the faculty portal. Available in Dean/Admin review queue.
-* **`UNDER_REVIEW`:** Dean or Admin has opened the grading sheet and is inspecting historical grade spread, scores, and percentage calculations.
-* **`RETURNED`:** Dean has requested corrections with mandatory feedback comments. Inputs unlock for the faculty member to revise.
-* **`APPROVED`:** Grades are certified by Dean or Admin. Triggers email notification dispatch to enrolled students.
-* **`FINALIZED`:** Term closed. Approved grades become immutable historical records in student academic files.
+* **`UNDER_REVIEW`:** Dean or Admin has opened the grading sheet (this happens automatically on first open and records who is reviewing). They inspect the class summary (average, pass/fail, missing marks) and the marks.
+* **`RETURNED`:** Dean has requested corrections and **must give a reason**. The instructor is notified by email, sees the reason on the sheet, and the inputs unlock so they can fix and resubmit.
+* **`APPROVED`:** Marks are certified by Dean or Admin. **Students cannot see them yet**, so a mark can still be corrected (with a recorded reason) before it is published.
+* **`FINALIZED`:** Dean or Admin confirms. The sheet is locked, the marks become official and visible to students, and the enrolled students are notified by email. A finalized sheet can no longer be returned or edited.
+
+### Guarantees
+* **Guarded and atomic steps:** every status change is one conditional update (`WHERE status IN (...)`), so a double click or two reviewers acting at once cannot apply a step twice, and a step cannot be skipped (for example, only an `APPROVED` sheet can be finalized).
+* **Full history:** every step (submitted, review started, approved, returned with reason, marks adjusted, finalized) is appended to `grading_sheet_events` with who did it and when. Repeated return/resubmit rounds all stay on record.
+* **Attributed adjustments:** a Dean/Admin mark adjustment needs a reason, respects closed terms and periods, and writes who changed which mark (and why) to `grade_history_log`.
 
 ---
 
@@ -157,15 +164,16 @@ sequenceDiagram
 * **Actor:** College Dean and/or System Administrator
 * **Route:** `/dean/grade-review`, `/dean/grading/print`
 * **Process:** Dean and/or Admin reviews the submitted grades. They can:
-  * **View:** Inspect grade distributions, averages, and student performance.
-  * **Edit when necessary:** Adjust or correct individual marks when institutional policy requires correction.
-  * **Approve:** Certify and approve the grading sheet.
-  * **Confirm the grading sheet:** Finalize the sheet status and lock approved records.
+  * **View:** Inspect the class summary (average, pass/fail, missing marks) and every student's mark. Opening a submitted sheet starts the review.
+  * **Adjust marks when necessary:** Correct individual marks; a reason is required and recorded.
+  * **Approve:** Certify the marks. Students cannot see them yet.
+  * **Return to instructor:** Send the sheet back with a required reason.
+  * **Confirm and finalize:** Lock the sheet and publish the marks to students.
   * **Print:** Generate and print official physical grade sheets for registrar filing.
 
 ### Step 10: Grade Finalization
 * **Actor:** Administration / System
-* **Process:** Once the grades are finalized/approved, the student's results become available according to the existing approval workflow. Final marks become official records in the student's academic transcript.
+* **Process:** Once the sheet is finalized, the student's results become visible and the students are notified. Final marks become official records in the student's academic transcript.
 
 ### Step 11: Email Notification
 * **Actor:** System (Automated Mailer Service)

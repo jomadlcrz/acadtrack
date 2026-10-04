@@ -83,16 +83,17 @@ Faculty submits the completed grading sheet for review.
 ↓
 ```
 Dean and/or Admin reviews the submitted grades. They can:
-- View
-- Edit when necessary
+- View the class summary and marks (opening a submitted sheet starts the review)
+- Adjust marks when necessary (a reason is required)
 - Approve
-- Confirm the grading sheet
+- Return to the instructor (a reason is required)
+- Confirm and finalize the grading sheet
 
 ### 10. Grade Finalization
 ```text
 ↓
 ```
-Once the grades are finalized/approved, the student's results become available according to the existing approval workflow.
+Once the grading sheet is finalized, the student's results become visible and the students are notified. Approved but not yet finalized marks stay hidden from students.
 
 ### 11. Email Notification
 ```text

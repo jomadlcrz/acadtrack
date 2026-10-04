@@ -183,3 +183,147 @@
 .table.align-middle tbody td.queue-period-active {
     background-color: #f8fafc;
 }
+
+/* ==========================================================================
+   Review desk (single grading sheet): next-step box, period steps, history
+   ========================================================================== */
+
+/* What the Dean should do now */
+.next-step {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding: 16px 20px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+}
+
+.next-step-text {
+    flex: 1 1 380px;
+    font-size: 13.5px;
+    color: #334155;
+}
+
+.next-step-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.next-step-title .bi {
+    font-size: 18px;
+}
+
+.next-step-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Same course, all grading periods */
+.period-steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.period-step {
+    display: inline-flex;
+    flex-direction: column;
+    min-width: 108px;
+    padding: 6px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #0f172a;
+    text-decoration: none;
+    background: #ffffff;
+}
+
+a.period-step:hover {
+    border-color: #94a3b8;
+}
+
+.period-step.is-current {
+    border-color: #1e3a8a;
+    box-shadow: inset 0 0 0 1px #1e3a8a;
+}
+
+.period-step.is-empty {
+    color: #94a3b8;
+    background: #f8fafc;
+}
+
+.period-step-status {
+    font-size: 11.5px;
+    font-weight: 400;
+    color: #64748b;
+}
+
+/* Sheet history */
+.timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    font-size: 13px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.timeline-item:first-child {
+    border-top: 0;
+}
+
+.timeline-icon {
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 16px;
+}
+
+.timeline-note {
+    margin-top: 4px;
+    padding: 6px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background: #f8fafc;
+    font-size: 12.5px;
+    color: #334155;
+}
+
+/* Marks: read as text, switch to inputs only in "Adjust marks" mode */
+.mark-text {
+    font-weight: 600;
+}
+
+.mark-input {
+    display: none;
+    width: 110px;
+}
+
+#editGradesForm.is-editing .mark-text {
+    display: none;
+}
+
+#editGradesForm.is-editing .mark-input {
+    display: block;
+}
+
+.mark-input.is-changed {
+    border-color: #d97706;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+}

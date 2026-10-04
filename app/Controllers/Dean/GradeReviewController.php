@@ -128,6 +128,14 @@ class GradeReviewController
             return;
         }
 
+        // Opening a submitted sheet is what starts the review: it becomes UNDER_REVIEW and records who is looking.
+        if ($sheet['status'] === GradingSheet::STATUS_SUBMITTED) {
+            $user = $session->get('user');
+            if ($this->gradingService->startReview($sheetId, (int) ($user['id'] ?? 0))) {
+                $sheet = GradingSheet::findWithDetails($sheetId) ?? $sheet;
+            }
+        }
+
         $academicTerm = AcademicTerm::find((int) $sheet['academic_term_id']) ?: AcademicTerm::getActive();
         $students = $this->studentRepository->getBySubject((int) $sheet['subject_id'], (int) $sheet['academic_term_id']);
         $existingGrades = $this->gradeRepository->getBySubjectAndPeriod((int) $sheet['subject_id'], (int) $sheet['grading_period_id'], (int) $sheet['academic_term_id']);
@@ -142,74 +150,104 @@ class GradeReviewController
             ->where('academic_term_id', (int) $sheet['academic_term_id'])
             ->first();
 
+        // The same course and instructor in the other grading periods, for quick context
+        $siblings = [];
+        foreach (GradingPeriod::getByAcademicTerm((int) $sheet['academic_term_id']) as $period) {
+            $other = GradingSheet::findByComposite((int) $sheet['faculty_id'], (int) $sheet['subject_id'], (int) $period['id'], (int) $sheet['academic_term_id']);
+            $siblings[] = [
+                'period_name' => $period['name'],
+                'sheet_id' => $other['id'] ?? null,
+                'status' => $other['status'] ?? null,
+                'is_this' => (int) $period['id'] === (int) $sheet['grading_period_id'],
+            ];
+        }
+
         $html = (new View())->render('dean.grade-review.show', [
             'sheet' => $sheet,
             'students' => $students,
             'grades' => $gradeMap,
             'setting' => $setting,
             'academicTerm' => $academicTerm,
+            'summary' => $this->summarize($students, $gradeMap),
+            'events' => $this->gradingService->getSheetEvents($sheetId),
+            'siblings' => $siblings,
         ]);
         $response->html($html);
+    }
+
+    /**
+     * Class summary the Dean reads before deciding: how many are graded, pass/fail, average, and who is near the line.
+     *
+     * @param array<int, array<string, mixed>> $students
+     * @param array<int|string, mixed> $gradeMap student id => mark
+     * @return array<string, mixed>
+     */
+    private function summarize(array $students, array $gradeMap): array
+    {
+        $marks = [];
+        $noMark = 0;
+        foreach ($students as $student) {
+            $grade = $gradeMap[$student['id']] ?? null;
+            if ($grade === null || $grade === '') {
+                $noMark++;
+                continue;
+            }
+            $marks[] = (float) $grade;
+        }
+
+        $passed = count(array_filter($marks, static fn (float $m): bool => $m >= 75.0));
+        $nearLine = count(array_filter($marks, static fn (float $m): bool => $m >= 73.0 && $m < 75.0));
+
+        return [
+            'total' => count($students),
+            'graded' => count($marks),
+            'no_mark' => $noMark,
+            'passed' => $passed,
+            'failed' => count($marks) - $passed,
+            'near_line' => $nearLine,
+            'average' => $marks !== [] ? round(array_sum($marks) / count($marks), 2) : null,
+            'highest' => $marks !== [] ? max($marks) : null,
+            'lowest' => $marks !== [] ? min($marks) : null,
+        ];
+    }
+
+    /** Only allow redirecting back to a grade review page of this app. */
+    private function safeRedirect(Request $request, string $default): string
+    {
+        $target = (string) $request->post('redirect_to', '');
+        if ($target !== '' && preg_match('#^/[^/\\\\]#', $target) === 1 && str_contains($target, '/dean/grade-review')) {
+            return $target;
+        }
+        return $default;
     }
 
     public function updateGrade(Request $request, Response $response, Session $session, string $id): void
     {
         $sheetId = (int) $id;
-        $sheet = GradingSheet::findWithDetails($sheetId);
+        $user = $session->get('user');
 
-        if (!$sheet) {
+        if (!GradingSheet::find($sheetId)) {
             $session->flash('error', 'Grading sheet not found.');
             redirect('/dean/grade-review');
             return;
         }
 
-        if ($sheet['status'] === GradingSheet::STATUS_FINALIZED) {
-            $session->flash('error', 'Cannot edit a confirmed and finalized grading sheet.');
-            redirect('/dean/grade-review/' . $sheetId);
-            return;
-        }
-
         $studentGrades = $request->post('grades', []);
-        $changes = [];
-        if (is_array($studentGrades)) {
-            foreach ($studentGrades as $studentId => $gradeValue) {
-                if ($gradeValue === '' || $gradeValue === null) {
-                    continue;
-                }
-                $old = \App\Models\Grade::where('student_id', (int) $studentId)
-                    ->where('subject_id', (int) $sheet['subject_id'])
-                    ->where('grading_period_id', (int) $sheet['grading_period_id'])
-                    ->where('academic_term_id', (int) $sheet['academic_term_id'])
-                    ->value('grade');
-                if ($old === null || abs((float) $old - (float) $gradeValue) > 0.0001) {
-                    $student = \App\Models\Student::find((int) $studentId);
-                    $detail = $student ? \App\Models\StudentDetail::where('user_id', $student->user_id)->first() : null;
-                    $name = $detail ? trim($detail->first_name . ' ' . $detail->last_name) : "student #{$studentId}";
-                    $changes[] = $name . ': ' . ($old === null ? 'none' : rtrim(rtrim((string) $old, '0'), '.')) . ' to ' . (float) $gradeValue;
-                }
-                $this->gradeRepository->saveGrade(
-                    (int) $studentId,
-                    (int) $sheet['subject_id'],
-                    (int) $sheet['grading_period_id'],
-                    (int) $sheet['academic_term_id'],
-                    (float) $gradeValue
-                );
-            }
+
+        try {
+            $changes = $this->gradingService->adjustGrades(
+                $sheetId,
+                is_array($studentGrades) ? $studentGrades : [],
+                (string) $request->post('reason', ''),
+                (int) ($user['id'] ?? 0)
+            );
+            $session->flash('success', $changes === []
+                ? 'No marks were changed.'
+                : count($changes) . ' mark' . (count($changes) === 1 ? '' : 's') . ' adjusted. The change and your reason were recorded in the sheet history.');
+        } catch (\RuntimeException | \DomainException $e) {
+            $session->flash('error', $e->getMessage());
         }
 
-        if (!empty($changes)) {
-            $shown = implode('; ', array_slice($changes, 0, 5)) . (count($changes) > 5 ? '; and ' . (count($changes) - 5) . ' more' : '');
-            \App\Services\ActivityLogService::record([
-                'category' => \App\Services\ActivityLogService::CATEGORY_GRADES,
-                'action' => 'Grades Adjusted',
-                'target_type' => 'grading_sheet',
-                'target_id' => $sheetId,
-                'target_label' => $sheet['subject_code'] . ' - ' . $sheet['period_name'],
-                'summary' => 'Adjusted ' . count($changes) . ' grade(s) in the ' . $sheet['period_name'] . ' sheet for ' . $sheet['subject_code'] . ". {$shown}.",
-            ]);
-        }
-
-        $session->flash('success', 'Student grade adjustments recorded successfully.');
         redirect('/dean/grade-review/' . $sheetId);
     }
 
@@ -220,23 +258,12 @@ class GradeReviewController
 
         try {
             $this->gradingService->approveGradingSheet($gradingSheetId, (int) ($user['id'] ?? 0));
-            
-            $sheet = GradingSheet::findWithDetails($gradingSheetId);
-            if ($sheet) {
-                $this->notificationService->sendGradesPublished(
-                    (int) $sheet['subject_id'],
-                    (int) $sheet['academic_term_id'],
-                    $sheet['period_name'] ?? 'Term'
-                );
-            }
-
-            $session->flash('success', 'Grading sheet approved successfully. Enrolled students have been notified.');
-        } catch (\RuntimeException $e) {
+            $session->flash('success', 'Grading sheet approved. Students will see the marks once you confirm and finalize it.');
+        } catch (\RuntimeException | \DomainException $e) {
             $session->flash('error', $e->getMessage());
         }
 
-        $redirectUrl = $request->post('redirect_to', '/dean/grade-review');
-        redirect($redirectUrl);
+        redirect($this->safeRedirect($request, '/dean/grade-review'));
     }
 
     public function confirm(Request $request, Response $response, Session $session): void
@@ -247,27 +274,47 @@ class GradeReviewController
 
         try {
             $this->gradingService->confirmGradingSheet($gradingSheetId, (int) ($user['id'] ?? 0), $remarks ?: 'Formally confirmed by academic administration.');
-            $session->flash('success', 'Grading sheet officially confirmed and finalized.');
-        } catch (\RuntimeException $e) {
+
+            // Marks become visible to students at this point, so this is when they are told.
+            $sheet = GradingSheet::findWithDetails($gradingSheetId);
+            if ($sheet) {
+                $this->notificationService->sendGradesPublished(
+                    (int) $sheet['subject_id'],
+                    (int) $sheet['academic_term_id'],
+                    $sheet['period_name'] ?? 'Term'
+                );
+            }
+
+            $session->flash('success', 'Grading sheet finalized. The marks are now official and enrolled students have been notified.');
+        } catch (\RuntimeException | \DomainException $e) {
             $session->flash('error', $e->getMessage());
         }
 
-        $redirectUrl = $request->post('redirect_to', '/dean/grade-review');
-        redirect($redirectUrl);
+        redirect($this->safeRedirect($request, '/dean/grade-review'));
     }
 
     public function returnToFaculty(Request $request, Response $response, Session $session): void
     {
         $gradingSheetId = (int) $request->post('grading_sheet_id');
+        $reason = trim((string) $request->post('reason', ''));
+        $user = $session->get('user');
 
         try {
-            $this->gradingService->returnGradingSheet($gradingSheetId);
-            $session->flash('success', 'Grading sheet returned to faculty for revision.');
-        } catch (\RuntimeException $e) {
+            $this->gradingService->returnGradingSheet($gradingSheetId, (int) ($user['id'] ?? 0), $reason);
+
+            $sheet = GradingSheet::findWithDetails($gradingSheetId);
+            if ($sheet) {
+                $this->notificationService->sendGradeReturned($sheet, $reason);
+            }
+
+            $session->flash('success', 'Grading sheet returned to the instructor with your reason.');
+        } catch (\RuntimeException | \DomainException $e) {
             $session->flash('error', $e->getMessage());
+            redirect($this->safeRedirect($request, '/dean/grade-review/' . $gradingSheetId));
+            return;
         }
 
-        redirect('/dean/grade-review');
+        redirect($this->safeRedirect($request, '/dean/grade-review'));
     }
 
     public function printSheet(Request $request, Response $response, Session $session, string $id): void

@@ -48,15 +48,6 @@ if (($metrics['returned'] ?? 0) > 0 || $statusFilter === 'returned') {
     $tabs['returned'] = ['label' => 'Returned', 'count' => $metrics['returned'] ?? 0];
 }
 
-// Display label, badge class and icon per grading sheet status
-$statusView = static fn (string $status): array => match ($status) {
-    'APPROVED' => ['Approved', 'badge-approved', 'bi-check-circle-fill'],
-    'FINALIZED' => ['Finalized', 'badge-finalized', 'bi-lock-fill'],
-    'RETURNED' => ['Returned', 'badge-returned', 'bi-arrow-return-left'],
-    'DRAFT' => ['Draft', 'badge-draft', 'bi-pencil'],
-    default => ['Awaiting', 'badge-submitted', 'bi-hourglass-split'],
-};
-
 $approvedSheets = [];
 foreach ($groups as $g) {
     foreach ($g['sheets'] as $sh) {
@@ -198,11 +189,11 @@ foreach ($groups as $g) {
                             <?php $sh = $g['sheets'][(int) $p['id']] ?? null; ?>
                             <td class="<?= (string) $p['id'] === $periodParam ? 'queue-period-active' : '' ?>">
                                 <?php if ($sh !== null): ?>
-                                    <?php [$label, $class, $icon] = $statusView((string) $sh['status']); ?>
+                                    <?php $st = grading_sheet_status((string) $sh['status']); ?>
                                     <a href="<?= url('/dean/grade-review/' . $sh['id']) ?>"
-                                       class="badge <?= $class ?> text-decoration-none"
+                                       class="badge <?= $st['class'] ?> text-decoration-none"
                                        title="<?= htmlspecialchars($p['name'] . (!empty($sh['submitted_at']) ? ' — submitted ' . date('M d, Y h:i A', strtotime($sh['submitted_at'])) : '')) ?>">
-                                        <i class="bi <?= $icon ?>"></i> <?= htmlspecialchars($label) ?>
+                                        <i class="bi <?= $st['icon'] ?>"></i> <?= htmlspecialchars($st['short']) ?>
                                     </a>
                                 <?php else: ?>
                                     <span class="queue-meta">Not submitted</span>

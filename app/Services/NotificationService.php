@@ -87,9 +87,53 @@ class NotificationService
         // Notification logged for faculty
     }
 
+    /**
+     * Tell the instructor their grading sheet was returned and exactly what to fix.
+     *
+     * @param array<string, mixed> $gradingSheet a row from GradingSheet::findWithDetails()
+     */
     public function sendGradeReturned(array $gradingSheet, string $reason): void
     {
-        // Notification logged for faculty revisions
+        $userId = (int) ($gradingSheet['faculty_id'] ?? 0);
+        $email = (string) ($gradingSheet['faculty_email'] ?? '');
+        if ($userId <= 0 || $email === '') {
+            return;
+        }
+
+        $name = trim(($gradingSheet['faculty_first_name'] ?? '') . ' ' . ($gradingSheet['faculty_last_name'] ?? '')) ?: 'Instructor';
+        $code = (string) ($gradingSheet['subject_code'] ?? '');
+        $period = (string) ($gradingSheet['period_name'] ?? '');
+
+        $title = "Grading Sheet Returned: {$code} - {$period}";
+        $message = "Dear {$name},
+
+Your {$period} grading sheet for {$code} was returned for revision.
+
+Reason: {$reason}
+
+Please correct the marks and submit the sheet again.
+
+Golden West Colleges, Inc.";
+
+        Notification::create([
+            'user_id' => $userId,
+            'recipient_email' => $email,
+            'title' => $title,
+            'message' => $message,
+            'type' => 'general',
+            'status' => 'sent',
+            'sent_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        $safe = static fn (string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
+        $body = '<div style="font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 16px;">Dear ' . $safe($name) . ',</div>'
+            . '<p style="margin: 0 0 16px 0;">Your <strong>' . $safe($period) . '</strong> grading sheet for <strong>' . $safe($code) . '</strong> was returned for revision.</p>'
+            . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; margin: 16px 0 20px 0;"><tr><td style="padding: 14px 20px; font-size: 14px; color: #0f172a;">'
+            . '<div style="font-size: 12px; text-transform: uppercase; color: #92400e; font-weight: 600; margin-bottom: 6px;">What to correct</div>' . nl2br($safe($reason))
+            . '</td></tr></table>'
+            . '<p style="margin: 0;">Please correct the marks and submit the sheet again.</p>';
+
+        $this->emailService->send($email, $title, EmailTemplateBuilder::wrap('Grading Sheet Returned', $code . ' - ' . $period, $body, $title));
     }
 }
 

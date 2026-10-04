@@ -23,7 +23,8 @@
             "app/Helpers/redirect.php",
             "app/Helpers/response.php",
             "app/Helpers/csrf.php",
-            "app/Helpers/term.php"
+            "app/Helpers/term.php",
+            "app/Helpers/grading.php"
         ]
     },
     "autoload-dev": {
