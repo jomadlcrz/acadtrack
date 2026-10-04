@@ -202,6 +202,11 @@ ob_start();
                 <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
                 <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
                 <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="student_number" class="form-label">Student ID number <span class="text-muted">(Optional)</span></label>
+                        <input type="text" class="form-control" id="student_number" name="student_number" placeholder="e.g. 2026-0045">
+                        <div class="form-text">Optional because a student's ID may be issued late. Leave blank until it is released; once entered it must be unique.</div>
+                    </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label for="first_name" class="form-label">First name <span class="text-danger">*</span></label>
@@ -211,11 +216,6 @@ ob_start();
                             <label for="last_name" class="form-label">Last name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="last_name" name="last_name" required placeholder="e.g. Dela Cruz">
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="student_number" class="form-label">Student ID number <span class="text-muted">(Optional / Late ID)</span></label>
-                        <input type="text" class="form-control" id="student_number" name="student_number" placeholder="e.g. 2026-0045 (leave blank if pending/late ID)">
-                        <div class="form-text">Optional. If the student does not have an ID yet, leave blank. If provided, it must be unique.</div>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email address <span class="text-danger">*</span></label>

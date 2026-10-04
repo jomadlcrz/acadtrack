@@ -50,7 +50,7 @@ ob_start();
                                value="<?= htmlspecialchars($user['student_number'] ?? '') ?>"
                                maxlength="50">
                         <div class="form-text text-muted" style="font-size: 12px;">
-                            Leave blank if the student number has not yet been issued by Admissions.
+                            Optional because a student's ID may be issued late. Leave blank until it is released; once entered it must be unique.
                         </div>
                     </div>
                 <?php endif; ?>

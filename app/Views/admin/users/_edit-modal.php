@@ -59,6 +59,22 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
                         </div>
 
                         <div class="row g-3">
+                            <?php if ($userRole === 'Student'): ?>
+                                <div class="col-12">
+                                    <label for="student_number_<?= $uid ?>" class="form-label fw-medium text-dark small mb-1">
+                                        Student ID <span class="text-muted fw-normal">(Optional)</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control form-control-sm font-monospace" 
+                                           id="student_number_<?= $uid ?>" 
+                                           name="student_number" 
+                                           placeholder="e.g. 2026-0001" 
+                                           value="<?= htmlspecialchars($studentNumber) ?>" 
+                                           maxlength="50">
+                                    <div class="form-text text-muted" style="font-size: 11px;">Optional because a student's ID may be issued late. Leave blank until it is released; once entered it must be unique.</div>
+                                </div>
+                            <?php endif; ?>
+
                             <div class="col-md-6">
                                 <label for="first_name_<?= $uid ?>" class="form-label fw-medium text-dark small mb-1">
                                     First name <span class="text-danger">*</span>
@@ -118,20 +134,7 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
                             </div>
 
                             <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="student_number_<?= $uid ?>" class="form-label fw-medium text-dark small mb-1">
-                                        Student ID <span class="text-muted fw-normal">(Optional)</span>
-                                    </label>
-                                    <input type="text" 
-                                           class="form-control form-control-sm font-monospace" 
-                                           id="student_number_<?= $uid ?>" 
-                                           name="student_number" 
-                                           placeholder="e.g. 2026-0001" 
-                                           value="<?= htmlspecialchars($studentNumber) ?>" 
-                                           maxlength="50">
-                                </div>
-
-                                <div class="col-md-6">
+                                <div class="col-12">
                                     <label class="form-label fw-medium text-dark small mb-1">
                                         Enrollment standing <span class="text-danger">*</span>
                                     </label>
