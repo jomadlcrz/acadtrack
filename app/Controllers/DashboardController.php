@@ -202,7 +202,7 @@ class DashboardController
             $rankings = $rankingService->getSubjectRankings($selectedSubjectId, $termId, $selectedSetId, 10);
         }
 
-        $sets = Set::getActiveByTerm($termId);
+        $sets = Set::getAssignedForFaculty($facultyId, $termId, $selectedSubjectId);
 
         return [
             'academicTerm' => $academicTerm,

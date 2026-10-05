@@ -298,23 +298,33 @@ ob_start();
                                                         $lastInitial = strtoupper(substr($inst['last_name'] ?? 'M', 0, 1));
                                                         $initials = $firstInitial . $lastInitial;
                                                         $dept = $inst['dept_abbrev'] ?? null;
+                                                        $setName = $inst['set_name'] ?? null;
                                                     ?>
                                                     <div class="d-inline-flex align-items-center gap-2 py-1 px-2.5 rounded border bg-white shadow-sm" style="border-color: #e2e8f0 !important;">
                                                         <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; font-size: 10.5px; flex-shrink: 0;">
                                                             <?= $initials ?>
                                                         </div>
                                                         <div class="d-flex flex-column" style="line-height: 1.2;">
-                                                            <span class="fw-semibold text-dark small" style="font-size: 12.5px;">
-                                                                <?= htmlspecialchars(($inst['first_name'] ?? '') . ' ' . ($inst['last_name'] ?? '')) ?>
-                                                            </span>
+                                                            <div class="d-flex align-items-center gap-1.5">
+                                                                <span class="fw-semibold text-dark small" style="font-size: 12.5px;">
+                                                                    <?= htmlspecialchars(($inst['first_name'] ?? '') . ' ' . ($inst['last_name'] ?? '')) ?>
+                                                                </span>
+                                                                <?php if ($setName): ?>
+                                                                    <span class="badge bg-light text-secondary border font-monospace px-1.5 py-0.5" style="font-size: 10.5px;">
+                                                                        <?= htmlspecialchars($setName) ?>
+                                                                    </span>
+                                                                <?php endif; ?>
+                                                            </div>
                                                             <span class="text-muted" style="font-size: 11px;">
                                                                 <?= htmlspecialchars($inst['email'] ?? '') ?><?= $dept ? ' &bull; ' . htmlspecialchars($dept) : '' ?>
                                                             </span>
                                                         </div>
-                                                        <form method="POST" action="<?= url('/dean/faculty-assignments/remove') ?>" class="ms-1 d-inline" onsubmit="return confirm('Remove <?= htmlspecialchars(addslashes(($inst['first_name'] ?? '') . ' ' . ($inst['last_name'] ?? ''))) ?> from <?= htmlspecialchars(addslashes($subject['subject_code'] ?? $subject['code'])) ?>?');">
+                                                        <form method="POST" action="<?= url('/dean/faculty-assignments/remove') ?>" class="ms-1 d-inline" onsubmit="return confirm('Remove <?= htmlspecialchars(addslashes(($inst['first_name'] ?? '') . ' ' . ($inst['last_name'] ?? ''))) ?> from <?= htmlspecialchars(addslashes($subject['subject_code'] ?? $subject['code'])) ?><?= $setName ? ' (' . htmlspecialchars(addslashes($setName)) . ')' : '' ?>?');">
                                                             <?= csrf_field() ?>
+                                                            <input type="hidden" name="assignment_id" value="<?= (int)($inst['assignment_id'] ?? 0) ?>">
                                                             <input type="hidden" name="faculty_id" value="<?= (int)$inst['faculty_id'] ?>">
                                                             <input type="hidden" name="subject_id" value="<?= (int)$subject['id'] ?>">
+                                                            <input type="hidden" name="set_id" value="<?= (int)($inst['set_id'] ?? 0) ?>">
                                                             <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
                                                             <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
                                                             <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Remove instructor assignment" style="line-height: 1;">
@@ -405,6 +415,44 @@ ob_start();
                             <div class="small text-muted mb-1">Currently assigned instructors</div>
                             <div id="modalAssignedList" class="d-flex flex-wrap gap-1"></div>
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold d-flex justify-content-between align-items-center">
+                            <span>Assigned Sections / Sets <span class="text-muted fw-normal">(Optional)</span></span>
+                            <span class="small text-muted" id="modalSetCountBadge"></span>
+                        </label>
+                        <div id="modalSetContainer" class="border rounded p-2.5 bg-light-subtle" style="max-height: 150px; overflow-y: auto;">
+                            <div class="form-check mb-1.5 pb-1.5 border-bottom">
+                                <input class="form-check-input" type="checkbox" id="modal_set_all" checked>
+                                <label class="form-check-label small fw-semibold" for="modal_set_all">
+                                    All sections / general course assignment
+                                </label>
+                            </div>
+                            <div id="modalSetCheckboxes" class="d-flex flex-wrap gap-2 pt-1">
+                                <?php if (empty($sets)): ?>
+                                    <span class="text-muted small">No sections created for this term.</span>
+                                <?php else: ?>
+                                    <?php foreach ($sets as $set): ?>
+                                        <div class="form-check set-checkbox-item" 
+                                             data-year="<?= (int)$set['year_level'] ?>" 
+                                             data-program="<?= (int)($set['program_id'] ?? 0) ?>"
+                                             style="min-width: 105px;">
+                                            <input class="form-check-input set-checkbox" 
+                                                   type="checkbox" 
+                                                   name="set_ids[]" 
+                                                   value="<?= (int)$set['id'] ?>" 
+                                                   id="set_cb_<?= (int)$set['id'] ?>" 
+                                                   disabled>
+                                            <label class="form-check-label small" for="set_cb_<?= (int)$set['id'] ?>">
+                                                <?= htmlspecialchars($set['set_name']) ?>
+                                            </label>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="form-text small">Select the section(s) this instructor handles. Leaving &ldquo;All sections&rdquo; checked assigns them across the entire subject.</div>
                     </div>
 
                     <div class="mb-3">
@@ -545,11 +593,82 @@ ob_start();
         return $carry;
     }, []), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
 
+    var subjectsMeta = <?= json_encode(array_reduce($subjects, function ($carry, $s) {
+        $carry[(string) $s['id']] = [
+            'year_level' => (int) ($s['year_level'] ?? 1),
+            'program_id' => (int) ($s['program_id'] ?? 0),
+        ];
+        return $carry;
+    }, []), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
+
     var subjectEl = document.getElementById('modal_subject_id');
     var facultyEl = document.getElementById('modal_faculty_id');
     var wrap = document.getElementById('modalAssignedWrap');
     var listEl = document.getElementById('modalAssignedList');
+    var setAllCb = document.getElementById('modal_set_all');
+    var setCheckboxes = document.querySelectorAll('.set-checkbox');
+    var setCheckboxItems = document.querySelectorAll('.set-checkbox-item');
+    var setCountBadge = document.getElementById('modalSetCountBadge');
+
     if (!subjectEl || !facultyEl) return;
+
+    function syncSetOptions() {
+        var subId = subjectEl ? subjectEl.value : '';
+        var meta = subId && subjectsMeta[subId] ? subjectsMeta[subId] : null;
+
+        var visibleCount = 0;
+        setCheckboxItems.forEach(function (item) {
+            var itemYear = parseInt(item.getAttribute('data-year'), 10);
+            var itemProg = parseInt(item.getAttribute('data-program'), 10);
+
+            var matches = true;
+            if (meta) {
+                if (meta.year_level && itemYear !== meta.year_level) {
+                    matches = false;
+                }
+                if (meta.program_id && itemProg > 0 && itemProg !== meta.program_id) {
+                    matches = false;
+                }
+            }
+
+            if (matches) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+                var cb = item.querySelector('.set-checkbox');
+                if (cb) cb.checked = false;
+            }
+        });
+
+        if (setCountBadge) {
+            setCountBadge.textContent = meta ? visibleCount + ' matching sections' : '';
+        }
+    }
+
+    if (setAllCb) {
+        setAllCb.addEventListener('change', function () {
+            if (this.checked) {
+                setCheckboxes.forEach(function (cb) {
+                    cb.checked = false;
+                    cb.disabled = true;
+                });
+            } else {
+                setCheckboxes.forEach(function (cb) {
+                    cb.disabled = false;
+                });
+            }
+        });
+    }
+
+    setCheckboxes.forEach(function (cb) {
+        cb.addEventListener('change', function () {
+            if (this.checked && setAllCb && setAllCb.checked) {
+                setAllCb.checked = false;
+                setCheckboxes.forEach(function (c) { c.disabled = false; });
+            }
+        });
+    });
 
     function syncAssigned() {
         var assigned = assignedBySubject[subjectEl.value] || [];
@@ -559,8 +678,6 @@ ob_start();
             if (o.value === '') return;
             var base = o.getAttribute('data-label') || o.textContent;
             var taken = ids.indexOf(o.value) !== -1;
-            o.disabled = taken;
-            if (taken) o.selected = false;
             o.textContent = taken ? base + ' \u2014 already assigned' : base;
         });
         facultyEl.comboboxRefresh && facultyEl.comboboxRefresh();
@@ -577,10 +694,12 @@ ob_start();
 
     subjectEl.addEventListener('change', function () {
         syncAssigned();
+        syncSetOptions();
         // Continue straight to the instructors field so focus is never lost
         if (subjectEl.value && facultyEl.comboboxFocus) facultyEl.comboboxFocus();
     });
     syncAssigned();
+    syncSetOptions();
 })();
 </script>
 

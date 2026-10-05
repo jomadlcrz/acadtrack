@@ -165,4 +165,143 @@ class Set extends Model
             ->get()
             ->toArray();
     }
+
+    /**
+     * Retrieve sets assigned to this faculty member for a given term and optional subject.
+     * Prioritizes explicit section assignments from `faculty_subjects.set_id`.
+     */
+    public static function getAssignedForFaculty(int $facultyId, int $academicTermId, ?int $subjectId = null): array
+    {
+        // 1. Direct query on faculty_subjects with assigned set_id
+        $query = \Illuminate\Database\Capsule\Manager::table('faculty_subjects')
+            ->join('sets', 'faculty_subjects.set_id', '=', 'sets.id')
+            ->where('faculty_subjects.faculty_id', $facultyId)
+            ->where('faculty_subjects.academic_term_id', $academicTermId)
+            ->whereNotNull('faculty_subjects.set_id')
+            ->where('sets.status', 'active');
+
+        if ($subjectId !== null && $subjectId > 0) {
+            $query->where('faculty_subjects.subject_id', $subjectId);
+        }
+
+        $assignedRows = $query->select('sets.*')
+            ->distinct()
+            ->orderBy('sets.year_level', 'asc')
+            ->orderBy('sets.set_name', 'asc')
+            ->get()
+            ->map(fn($item) => (array) $item)
+            ->toArray();
+
+        if (!empty($assignedRows)) {
+            $enrolledCounts = self::getEnrolledCountsBySet($subjectId, $academicTermId);
+            foreach ($assignedRows as &$s) {
+                $s['enrolled_count'] = (int) ($enrolledCounts[$s['id']] ?? 0);
+            }
+            unset($s);
+
+            return $assignedRows;
+        }
+
+        // 2. If no explicit section was assigned (legacy/unassigned set), check enrolled sets
+        $enrolled = self::getEnrolledBySubject($subjectId, $academicTermId, $facultyId);
+        if (!empty($enrolled)) {
+            return $enrolled;
+        }
+
+        // 3. Fallback: If no enrollments yet, and subject is specified, return program + year_level sets of that subject
+        if ($subjectId !== null && $subjectId > 0) {
+            $subject = Subject::find($subjectId);
+            if ($subject) {
+                $subQuery = self::where('academic_term_id', $academicTermId)->where('status', 'active');
+                if (!empty($subject->program_id) && !empty($subject->year_level)) {
+                    $subQuery->where('program_id', $subject->program_id)
+                             ->where('year_level', $subject->year_level);
+                } elseif (!empty($subject->year_level)) {
+                    $subQuery->where('year_level', $subject->year_level);
+                } else {
+                    return [];
+                }
+                return $subQuery->orderBy('year_level', 'asc')->orderBy('set_name', 'asc')->get()->toArray();
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Retrieve enrolled student counts grouped by set_id for a subject/term.
+     */
+    public static function getEnrolledCountsBySet(?int $subjectId, int $academicTermId): array
+    {
+        $query = \Illuminate\Database\Capsule\Manager::table('enrollments')
+            ->join('students', 'enrollments.student_id', '=', 'students.id')
+            ->leftJoin('student_details', 'student_details.user_id', '=', 'students.user_id')
+            ->where('enrollments.academic_term_id', $academicTermId)
+            ->where(function ($q) {
+                $q->whereNotNull('students.set_id')
+                  ->orWhereNotNull('student_details.set_id');
+            });
+
+        if ($subjectId !== null && $subjectId > 0) {
+            $query->where('enrollments.subject_id', $subjectId);
+        }
+
+        return $query->selectRaw('COALESCE(students.set_id, student_details.set_id) as set_id, COUNT(DISTINCT students.id) as enrolled_count')
+            ->groupBy('set_id')
+            ->pluck('enrolled_count', 'set_id')
+            ->toArray();
+    }
+
+    /**
+     * Retrieve only sets that have active students enrolled in this specific subject offering.
+     */
+    public static function getEnrolledBySubject(?int $subjectId, int $academicTermId, ?int $facultyId = null): array
+    {
+        if ($subjectId === null || $subjectId <= 0) {
+            if ($facultyId !== null && $facultyId > 0) {
+                $assigned = Faculty::getAssignedSubjects($facultyId, $academicTermId);
+                $subjectIds = array_column($assigned, 'id');
+                if (empty($subjectIds)) {
+                    return [];
+                }
+            } else {
+                return [];
+            }
+        } else {
+            $subjectIds = [$subjectId];
+        }
+
+        $enrolledCounts = \Illuminate\Database\Capsule\Manager::table('enrollments')
+            ->join('students', 'enrollments.student_id', '=', 'students.id')
+            ->leftJoin('student_details', 'student_details.user_id', '=', 'students.user_id')
+            ->whereIn('enrollments.subject_id', $subjectIds)
+            ->where('enrollments.academic_term_id', $academicTermId)
+            ->where(function ($q) {
+                $q->whereNotNull('students.set_id')
+                  ->orWhereNotNull('student_details.set_id');
+            })
+            ->selectRaw('COALESCE(students.set_id, student_details.set_id) as set_id, COUNT(DISTINCT students.id) as enrolled_count')
+            ->groupBy('set_id')
+            ->pluck('enrolled_count', 'set_id')
+            ->toArray();
+
+        if (empty($enrolledCounts)) {
+            return [];
+        }
+
+        $sets = self::whereIn('id', array_keys($enrolledCounts))
+            ->where('academic_term_id', $academicTermId)
+            ->where('status', 'active')
+            ->orderBy('year_level', 'asc')
+            ->orderBy('set_name', 'asc')
+            ->get()
+            ->toArray();
+
+        foreach ($sets as &$s) {
+            $s['enrolled_count'] = (int) ($enrolledCounts[$s['id']] ?? 0);
+        }
+        unset($s);
+
+        return $sets;
+    }
 }

@@ -251,11 +251,15 @@ CREATE TABLE faculty_subjects (
     academic_term_id INT NOT NULL,
     faculty_id INT NOT NULL,
     subject_id INT NOT NULL,
+    set_id INT NULL DEFAULT NULL,
     assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (faculty_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE RESTRICT,
+    FOREIGN KEY (set_id) REFERENCES sets(id) ON DELETE CASCADE,
     FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT,
-    UNIQUE KEY unique_assignment (faculty_id, subject_id, academic_term_id)
+    INDEX idx_fs_faculty_term (faculty_id, academic_term_id),
+    INDEX idx_fs_subject_term (subject_id, academic_term_id),
+    INDEX idx_fs_set (set_id)
 ) ENGINE=InnoDB;
 
 -- Enrollments
