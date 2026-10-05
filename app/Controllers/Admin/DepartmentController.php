@@ -25,6 +25,24 @@ class DepartmentController
         $response->html($html);
     }
 
+    public function show(Request $request, Response $response, Session $session, string $id): void
+    {
+        $department = Department::with(['programs', 'faculty.user.facultyDetail'])
+            ->withCount('faculty')
+            ->find((int) $id);
+
+        if (!$department) {
+            $session->flash('error', 'Department not found.');
+            redirect('/admin/departments');
+            return;
+        }
+
+        $html = (new View())->render('admin.departments.show', [
+            'department' => $department->toArray(),
+        ]);
+        $response->html($html);
+    }
+
     public function store(Request $request, Response $response, Session $session): void
     {
         $code = strtoupper(trim((string) ($request->post('dept_abbrev') ?: $request->post('code', ''))));
@@ -89,7 +107,11 @@ class DepartmentController
         ]);
 
         $session->flash('success', "Department '{$name}' updated successfully.");
-        redirect('/admin/departments');
+        $redirectUrl = (string) $request->post('_redirect', '');
+        if (empty($redirectUrl) && isset($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], '/admin/departments/' . $id)) {
+            $redirectUrl = '/admin/departments/' . $id;
+        }
+        redirect(!empty($redirectUrl) ? $redirectUrl : '/admin/departments');
     }
 
     public function archive(Request $request, Response $response, Session $session, string $id): void
@@ -103,7 +125,10 @@ class DepartmentController
 
         $department->update(['status' => 'inactive']);
         $session->flash('success', "Department '{$department->name}' archived successfully.");
-        redirect('/admin/departments');
+        $redirectUrl = isset($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], '/admin/departments/' . $id)
+            ? '/admin/departments/' . $id
+            : '/admin/departments';
+        redirect($redirectUrl);
     }
 
     public function restore(Request $request, Response $response, Session $session, string $id): void
@@ -117,6 +142,9 @@ class DepartmentController
 
         $department->update(['status' => 'active']);
         $session->flash('success', "Department '{$department->name}' restored to active status.");
-        redirect('/admin/departments');
+        $redirectUrl = isset($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], '/admin/departments/' . $id)
+            ? '/admin/departments/' . $id
+            : '/admin/departments';
+        redirect($redirectUrl);
     }
 }

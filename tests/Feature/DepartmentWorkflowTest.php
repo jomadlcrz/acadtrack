@@ -140,5 +140,31 @@ class DepartmentWorkflowTest extends TestCase
         $this->assertStringContainsString('College of Information Technology Education', $html);
         $this->assertStringContainsString('Department abbrev', $html);
         $this->assertStringContainsString('e.g., CITE', $html);
+        $this->assertStringContainsString('/admin/departments/' . ($departments[0]['id'] ?? 1), $html);
+        $this->assertStringContainsString('data-href=', $html);
+    }
+
+    public function testDepartmentShowViewRendering(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['user'] = ['role' => 'Admin', 'first_name' => 'Admin', 'last_name' => 'User'];
+
+        $dept = Department::with(['programs', 'faculty.user.facultyDetail'])
+            ->withCount('faculty')
+            ->first();
+        $this->assertNotNull($dept);
+
+        $html = (new \App\Core\View())->render('admin.departments.show', [
+            'department' => $dept->toArray(),
+        ]);
+
+        $this->assertNotEmpty($html);
+        $this->assertStringContainsString($dept->name, $html);
+        $this->assertStringContainsString($dept->code, $html);
+        $this->assertStringContainsString('Academic Programs', $html);
+        $this->assertStringContainsString('Assigned Faculty', $html);
+        $this->assertStringContainsString('Back to departments', $html);
     }
 }

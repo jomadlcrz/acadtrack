@@ -70,6 +70,7 @@ $router->post('/admin/users/{id}/toggle-status', [UserController::class, 'toggle
 $router->post('/admin/users/{id}/deactivate', [UserController::class, 'deactivate'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/users/{id}/activate', [UserController::class, 'activate'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->get('/admin/departments', [DepartmentController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
+$router->get('/admin/departments/{id}', [DepartmentController::class, 'show'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/departments', [DepartmentController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/departments/{id}', [DepartmentController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/departments/{id}/archive', [DepartmentController::class, 'archive'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);

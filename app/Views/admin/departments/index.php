@@ -46,9 +46,17 @@ ob_start();
                     </tr>
                 <?php else: ?>
                     <?php foreach ($departments as $dept): ?>
-                    <tr class="dept-row" data-search="<?= strtolower(htmlspecialchars($dept['code'] . ' ' . $dept['name'])) ?>">
-                        <td class="py-3 px-4 fw-bold text-dark font-monospace"><?= htmlspecialchars($dept['code']) ?></td>
-                        <td class="px-4 fw-semibold text-dark"><?= htmlspecialchars($dept['name']) ?></td>
+                    <tr class="dept-row" data-href="<?= url('/admin/departments/' . $dept['id']) ?>" data-search="<?= strtolower(htmlspecialchars($dept['code'] . ' ' . $dept['name'])) ?>" style="cursor: pointer;">
+                        <td class="py-3 px-4 font-monospace">
+                            <a href="<?= url('/admin/departments/' . $dept['id']) ?>" class="dept-link fw-bold text-dark text-decoration-none">
+                                <?= htmlspecialchars($dept['code']) ?>
+                            </a>
+                        </td>
+                        <td class="px-4">
+                            <a href="<?= url('/admin/departments/' . $dept['id']) ?>" class="dept-link fw-semibold text-dark text-decoration-none">
+                                <?= htmlspecialchars($dept['name']) ?>
+                            </a>
+                        </td>
                         <td class="px-3 text-center">
                             <?php $facCount = (int) ($dept['faculty_count'] ?? 0); ?>
                             <?php if ($facCount > 0): ?>
@@ -72,6 +80,11 @@ ob_start();
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end action-dropdown-menu shadow-sm">
+                                    <li>
+                                        <a class="dropdown-item" href="<?= url('/admin/departments/' . $dept['id']) ?>">
+                                            <i class="bi bi-eye text-muted"></i> View department
+                                        </a>
+                                    </li>
                                     <li>
                                         <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editDepartmentModal<?= $dept['id'] ?>">
                                             <i class="bi bi-pencil text-muted"></i> Edit department
@@ -235,8 +248,37 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Row-level click navigation to /admin/departments/{id}
+    document.querySelectorAll('.dept-row[data-href]').forEach(function(row) {
+        row.addEventListener('click', function(e) {
+            // Do not navigate if user clicked an interactive button, link, or dropdown
+            if (e.target.closest('button, a, input, select, textarea, form, .dropdown, .dropdown-menu, .btn-action-trigger')) {
+                return;
+            }
+            const href = row.getAttribute('data-href');
+            if (href) {
+                window.location.href = href;
+            }
+        });
+    });
 });
 </script>
+
+<style>
+.dept-row {
+    transition: background-color 0.15s ease-in-out;
+}
+.dept-row:hover {
+    background-color: #f8fafc;
+}
+.dept-link {
+    transition: color 0.15s ease-in-out;
+}
+.dept-link:hover {
+    color: var(--bs-primary, #2f4a86) !important;
+}
+</style>
 
 <?php
 $content = ob_get_clean();
