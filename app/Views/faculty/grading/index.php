@@ -9,7 +9,9 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
     <div class="card-body py-3 px-4">
         <form method="GET" action="<?= url('/faculty/grading') ?>" class="row g-3 align-items-center">
-            <div class="col-md-3">
+            <input type="hidden" name="period_id" value="<?= htmlspecialchars((string)$periodId) ?>">
+
+            <div class="col-md-4 col-lg-3">
                 <label for="semester" class="form-label mb-1 fw-semibold small text-muted">Semester:</label>
                 <select id="semester" name="semester" class="form-select" onchange="this.form.submit()">
                     <option value="1" <?= ($selectedSemester ?? '1') === '1' ? 'selected' : '' ?>>1st Semester</option>
@@ -17,7 +19,7 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
                 </select>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-5 col-lg-6">
                 <label for="subject_id" class="form-label mb-1 fw-semibold small text-muted">Subject:</label>
                 <select id="subject_id" name="subject_id" class="form-select" onchange="this.form.submit()">
                     <?php if (empty($assignedSubjects)): ?>
@@ -32,18 +34,7 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
                 </select>
             </div>
 
-            <div class="col-md-3">
-                <label for="period_id" class="form-label mb-1 fw-semibold small text-muted">Grading period:</label>
-                <select id="period_id" name="period_id" class="form-select" onchange="this.form.submit()">
-                    <?php foreach ($periods as $period): ?>
-                        <option value="<?= $period['id'] ?>" <?= $period['id'] == $periodId ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($period['name']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="col-md-2 text-md-end pt-md-3">
+            <div class="col-md-3 text-md-end pt-md-3">
                 <?php if ($gradingSheet): ?>
                     <?php $sheetStatus = grading_sheet_status((string) $gradingSheet['status']); ?>
                     <span class="badge <?= $sheetStatus['class'] ?> fs-6 py-2 px-3">
@@ -57,6 +48,31 @@ $isLocked = in_array($gradingSheet['status'] ?? '', ['SUBMITTED', 'APPROVED']);
             </div>
         </form>
     </div>
+</div>
+
+<!-- Period Tabs (Excel Workbook Style matching IntelliGrade) -->
+<div class="tab-bar period-tab-bar mb-4" role="tablist" aria-label="Grading periods">
+    <?php foreach ($periods as $period): ?>
+        <?php
+        $isActive = ((int) $period['id'] === (int) $periodId);
+        $periodUrl = url('/faculty/grading?semester=' . ($selectedSemester ?? '1') . '&subject_id=' . $subjectId . '&period_id=' . $period['id']);
+        $periodIcon = match(strtolower(trim($period['name']))) {
+            'prelim', 'prelims' => 'bi-flag',
+            'midterm', 'midterms' => 'bi-flag-fill',
+            'semi-final', 'semifinal', 'semi-finals', 'semifinals' => 'bi-award',
+            'final', 'finals' => 'bi-trophy',
+            default => 'bi-calendar-check'
+        };
+        ?>
+        <a href="<?= $periodUrl ?>" 
+           class="tab-btn period-tab-btn <?= $isActive ? 'active' : '' ?>"
+           role="tab"
+           aria-selected="<?= $isActive ? 'true' : 'false' ?>"
+           title="Switch to <?= htmlspecialchars($period['name']) ?> grading sheet">
+            <i class="bi <?= $periodIcon ?>" aria-hidden="true"></i>
+            <span><?= htmlspecialchars($period['name']) ?></span>
+        </a>
+    <?php endforeach; ?>
 </div>
 
 <?php if ($gradingSheet && in_array($gradingSheet['status'], ['SUBMITTED', 'UNDER_REVIEW'], true)): ?>

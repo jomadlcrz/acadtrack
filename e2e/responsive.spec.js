@@ -199,6 +199,41 @@ test.describe('Portal Pages Responsiveness', () => {
         await assertNoHorizontalOverflow(page);
     });
 
+    test('Faculty Grading Sheet: Excel-style Period Tabs navigation', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 800 });
+        await loginAs(page, 'faculty@gwc.edu', 'faculty123');
+
+        await page.goto('/acadtrack/faculty/grading');
+        await expect(page).toHaveURL(/.*faculty\/grading/);
+
+        // Verify period dropdown is removed and replaced by period tabs bar
+        await expect(page.locator('#period_id')).toHaveCount(0);
+        const tabBar = page.locator('.period-tab-bar');
+        await expect(tabBar).toBeVisible();
+
+        // Verify active period tab
+        const activeTab = tabBar.locator('.period-tab-btn.active');
+        await expect(activeTab).toBeVisible();
+
+        // Verify all period tabs exist (Prelim, Midterm, Semi-Final, Final)
+        const tabBtns = tabBar.locator('.period-tab-btn');
+        const count = await tabBtns.count();
+        expect(count).toBeGreaterThanOrEqual(2);
+
+        // Capture screenshot of Excel-style period tabs
+        await page.screenshot({ path: 'test-results/faculty-grading-period-tabs.png' });
+
+        // Click Midterm tab if present
+        const midtermTab = tabBar.locator('.period-tab-btn', { hasText: 'Midterm' });
+        if (await midtermTab.count() > 0) {
+            await midtermTab.click();
+            await expect(page).toHaveURL(/.*period_id=/);
+            await expect(tabBar.locator('.period-tab-btn.active')).toContainText('Midterm');
+        }
+
+        await assertNoHorizontalOverflow(page);
+    });
+
     test('Mobile viewport (375x667): Student Dashboard', async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 667 });
         await loginAs(page, 'student@gwc.edu', 'student123');

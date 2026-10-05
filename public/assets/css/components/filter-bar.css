@@ -77,3 +77,85 @@
     }
 }
 
+/* 7. Excel-Style Period Tabs Bar (IntelliGrade Model) */
+.tab-bar,
+.period-tab-bar {
+    display: flex;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tab-bar .tab-btn,
+.period-tab-bar .period-tab-btn {
+    padding: 8px 18px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #64748b;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 0 0 auto;
+    text-align: center;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+    background: transparent;
+}
+
+.tab-bar .tab-btn:hover,
+.period-tab-bar .period-tab-btn:hover {
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.tab-bar .tab-btn.active,
+.period-tab-bar .period-tab-btn.active {
+    background: #ffffff;
+    color: #1e3a8a;
+    border-color: #cbd5e1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    font-weight: 700;
+}
+
+.tab-bar .tab-btn i,
+.period-tab-bar .period-tab-btn i {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    transition: color 0.2s ease;
+}
+
+.tab-bar .tab-btn:hover i,
+.period-tab-bar .period-tab-btn:hover i {
+    color: #64748b;
+}
+
+.tab-bar .tab-btn.active i,
+.period-tab-bar .period-tab-btn.active i {
+    color: #1e3a8a;
+}
+
+@media (max-width: 768px) {
+    .tab-bar,
+    .period-tab-bar {
+        padding: 3px;
+        gap: 3px;
+    }
+    .tab-bar .tab-btn,
+    .period-tab-bar .period-tab-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+}
+
+

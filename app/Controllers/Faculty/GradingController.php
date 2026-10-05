@@ -53,7 +53,8 @@ class GradingController
         }
 
         $periodId = (int) $request->get('period_id', 0);
-        if ($periodId === 0 && !empty($periods)) {
+        $validPeriodIds = array_map(fn($p) => (int) $p['id'], $periods);
+        if ($periodId === 0 || !in_array($periodId, $validPeriodIds, true)) {
             $periodId = (int) ($periods[0]['id'] ?? 0);
         }
 
