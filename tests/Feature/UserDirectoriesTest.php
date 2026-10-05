@@ -111,7 +111,44 @@ class UserDirectoriesTest extends TestCase
         $body = $response->getBody() ?: $output;
         $this->assertStringContainsString('Students', $body);
         $this->assertStringContainsString('/admin/students', $body);
+        $this->assertStringContainsString('Add student', $body);
+        $this->assertStringNotContainsString('import-template', $body);
+        $this->assertStringNotContainsString('importExcelModal', $body);
         $this->assertStringContainsString('All year levels', $body);
         $this->assertStringContainsString('All standings', $body);
+    }
+
+    public function testUserCreateStudentShowsDownloadAndImport(): void
+    {
+        $controller = new \App\Controllers\Admin\UserController();
+        $_GET['role'] = 'Student';
+        $request = new Request();
+        $response = new Response();
+
+        ob_start();
+        $controller->create($request, $response, $this->session);
+        $output = ob_get_clean();
+
+        $body = $response->getBody() ?: $output;
+        $this->assertStringContainsString('import-template', $body);
+        $this->assertStringContainsString('importExcelModal', $body);
+        $this->assertStringContainsString('/admin/students', $body);
+    }
+
+    public function testUserCreateFacultyDoesNotShowDownloadAndImport(): void
+    {
+        $controller = new \App\Controllers\Admin\UserController();
+        $_GET['role'] = 'Faculty';
+        $request = new Request();
+        $response = new Response();
+
+        ob_start();
+        $controller->create($request, $response, $this->session);
+        $output = ob_get_clean();
+
+        $body = $response->getBody() ?: $output;
+        $this->assertStringNotContainsString('import-template', $body);
+        $this->assertStringNotContainsString('importExcelModal', $body);
+        $this->assertStringContainsString('/admin/faculty', $body);
     }
 }

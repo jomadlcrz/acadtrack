@@ -1,11 +1,9 @@
 <?php
 $pageTitle = 'Students';
 $subtitle = 'Manage student accounts, year levels, and sections.';
-$headerActions = '<div class="d-flex align-items-center gap-2">
-    <a href="' . url('/admin/users/import-template') . '" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5"><i class="bi bi-download"></i> Download template</a>
-    <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#importExcelModal"><i class="bi bi-file-earmark-excel"></i> Import spreadsheet</button>
-    <a href="' . url('/admin/users/create?role=Student') . '" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1.5" style="background-color: #1e3a8a; border-color: #1e3a8a;"><i class="bi bi-plus-lg"></i> Add student</a>
-</div>';
+$headerActions = '<a href="' . url('/admin/users/create?role=Student') . '" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1.5" style="background-color: #1e3a8a; border-color: #1e3a8a;">
+    <i class="bi bi-plus-lg"></i> Add student
+</a>';
 $total = (int) ($students['total'] ?? 0);
 $yearLabels = [1 => '1st Year', 2 => '2nd Year', 3 => '3rd Year', 4 => '4th Year'];
 $hasActiveFilters = !empty($filters['search']) || !empty($filters['year_level']) || !empty($filters['set_id']) || !empty($filters['status']) || !empty($filters['account_status']);
@@ -124,8 +122,6 @@ if (!empty($students['data'])) {
     include __DIR__ . '/../../components/pagination.php';
 }
 ?>
-
-<?php include __DIR__ . '/../users/_import-modal.php'; ?>
 
 <?php
 $renderedModalIds = [];

@@ -1,6 +1,6 @@
 <!-- Modal: Batch Excel / CSV Import -->
 <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <div>
@@ -44,18 +44,18 @@
                         <span class="badge bg-secondary-subtle text-secondary" id="indexPreviewBadge">Ready to import</span>
                     </div>
 
-                    <div class="table-responsive border rounded-2" style="max-height: 280px; overflow-y: auto;">
-                        <table class="table table-sm table-hover align-middle mb-0" style="font-size: 12px;">
-                            <thead class="bg-light sticky-top">
+                    <div class="table-responsive border rounded-2" style="max-height: 320px; overflow-y: auto;">
+                        <table class="table table-sm table-hover align-middle mb-0" style="font-size: 11.5px;">
+                            <thead class="bg-light sticky-top border-bottom text-secondary text-uppercase fw-semibold" style="font-size: 10.5px; letter-spacing: 0.3px;">
                                 <tr>
-                                    <th class="py-2 px-2.5">#</th>
-                                    <th class="py-2 px-2.5">Student ID</th>
-                                    <th class="py-2 px-2.5">Full Name</th>
-                                    <th class="py-2 px-2.5">Email Address</th>
-                                    <th class="py-2 px-2.5">Classification</th>
-                                    <th class="py-2 px-2.5">Year</th>
-                                    <th class="py-2 px-2.5">Section</th>
-                                    <th class="py-2 px-2.5 text-center">Status</th>
+                                    <th class="py-1.5 px-2 text-center" style="width: 40px;">#</th>
+                                    <th class="py-1.5 px-2" style="width: 110px;">Student ID</th>
+                                    <th class="py-1.5 px-2">Full Name</th>
+                                    <th class="py-1.5 px-2">Email Address</th>
+                                    <th class="py-1.5 px-2 text-center" style="width: 105px;">Standing</th>
+                                    <th class="py-1.5 px-2 text-center" style="width: 75px;">Year</th>
+                                    <th class="py-1.5 px-2" style="width: 100px;">Section</th>
+                                    <th class="py-1.5 px-2 text-center" style="width: 90px;">Status</th>
                                 </tr>
                             </thead>
                             <tbody id="indexPreviewTableBody">
@@ -218,18 +218,19 @@ document.addEventListener('DOMContentLoaded', function() {
         students.forEach(function(s, idx) {
             var tr = document.createElement('tr');
             tr.className = s._valid ? '' : 'table-danger';
+            var yearLabel = s.year_level ? (s.year_level == 1 ? '1st Yr' : (s.year_level == 2 ? '2nd Yr' : (s.year_level == 3 ? '3rd Yr' : '4th Yr'))) : '1st Yr';
             tr.innerHTML = 
-                '<td class="py-1.5 px-2.5 text-muted">' + (idx + 1) + '</td>' +
-                '<td class="py-1.5 px-2.5 font-monospace">' + (s.student_number || '<span class="text-muted">—</span>') + '</td>' +
-                '<td class="py-1.5 px-2.5 fw-medium">' + s.last_name + ', ' + s.first_name + '</td>' +
-                '<td class="py-1.5 px-2.5">' + s.email + '</td>' +
-                '<td class="py-1.5 px-2.5"><span class="badge ' + (s.student_status === 'Regular' ? 'bg-primary-subtle text-primary' : 'bg-warning-subtle text-warning-emphasis') + '">' + s.student_status + '</span></td>' +
-                '<td class="py-1.5 px-2.5">Yr ' + s.year_level + '</td>' +
-                '<td class="py-1.5 px-2.5">' + (s.student_status === 'Regular' ? (s.section || 'Auto') : '<span class="text-muted">None (Irreg)</span>') + '</td>' +
-                '<td class="py-1.5 px-2.5 text-center">' + 
+                '<td class="py-1 px-2 text-muted text-center text-nowrap">' + (idx + 1) + '</td>' +
+                '<td class="py-1 px-2 font-monospace text-nowrap">' + (s.student_number || '<span class="text-muted">—</span>') + '</td>' +
+                '<td class="py-1 px-2 fw-semibold text-dark text-nowrap">' + s.last_name + ', ' + s.first_name + '</td>' +
+                '<td class="py-1 px-2 text-nowrap text-secondary">' + s.email + '</td>' +
+                '<td class="py-1 px-2 text-center text-nowrap"><span class="badge ' + (s.student_status === 'Regular' ? 'bg-primary-subtle text-primary border border-primary-subtle' : 'bg-warning-subtle text-warning-emphasis border border-warning-subtle') + '">' + s.student_status + '</span></td>' +
+                '<td class="py-1 px-2 text-center text-nowrap"><span class="badge bg-light text-secondary border">' + yearLabel + '</span></td>' +
+                '<td class="py-1 px-2 text-nowrap">' + (s.student_status === 'Regular' ? (s.section ? '<span class="badge bg-light text-dark border">' + s.section + '</span>' : '<span class="text-muted small">Auto</span>') : '<span class="text-muted small">None (Irreg)</span>') + '</td>' +
+                '<td class="py-1 px-2 text-center text-nowrap">' + 
                     (s._valid 
-                        ? '<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check"></i> Ready</span>' 
-                        : '<span class="badge bg-danger-subtle text-danger border border-danger-subtle" title="' + s._errors.join(', ') + '"><i class="bi bi-x"></i> Invalid</span>') + 
+                        ? '<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check me-0.5"></i>Ready</span>' 
+                        : '<span class="badge bg-danger-subtle text-danger border border-danger-subtle" title="' + s._errors.join(', ') + '"><i class="bi bi-x me-0.5"></i>Invalid</span>') + 
                 '</td>';
             previewTableBody.appendChild(tr);
         });
@@ -285,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     statusAlert.className = 'alert alert-success py-2 px-3 small mb-3';
                     statusAlert.innerHTML = '<i class="bi bi-check2-circle me-1"></i> ' + result.data.message;
                     setTimeout(function() {
-                        window.location.reload();
+                        window.location.href = '<?= url("/admin/students") ?>';
                     }, 1200);
                 } else {
                     var errorMsg = result.data.message || 'Import failed.';
