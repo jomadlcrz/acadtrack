@@ -5,17 +5,11 @@
 /* 1. Base Filter Bar Layout */
 .filter-bar {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
     margin-bottom: 20px;
-}
-
-@media (min-width: 768px) {
-    .filter-bar {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-    }
 }
 
 /* 2. Elevated Card Filter Bar Variant */
