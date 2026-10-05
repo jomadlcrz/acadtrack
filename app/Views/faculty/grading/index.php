@@ -174,10 +174,6 @@ $activeGradingMethod = $currentSubject['grading_method'] ?? 'zero_based';
                         </li>
                     </ul>
                 </div>
-
-                <small class="text-muted d-none d-lg-inline ms-1">
-                    <kbd class="bg-secondary-subtle text-dark px-1 rounded">Tab</kbd> to move
-                </small>
             </div>
         </div>
 
