@@ -52,12 +52,6 @@ ob_start();
                 </option>
             <?php endforeach; ?>
         </select>
-
-        <?php if (!empty($currentSubject)): ?>
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 fs-7">
-                <?= htmlspecialchars($currentSubject['nature'] ?? 'Lecture') ?>
-            </span>
-        <?php endif; ?>
     </form>
 
     <div class="text-muted small fw-medium text-nowrap" id="studentCounter">
