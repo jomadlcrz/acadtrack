@@ -33,23 +33,23 @@
 .table thead.table-light,
 .table thead.bg-light,
 .table thead.bg-white {
-    background-color: #ffffff !important;
-    border-bottom: 1px solid #cbd5e1 !important;
+    background-color: #f8fafc !important;
+    border-bottom: 2px solid #e2e8f0 !important;
 }
 
 .table.align-middle thead th,
 .table thead.table-light th,
 .table thead.bg-light th,
 .table thead.bg-white th {
-    font-size: 11px !important;
+    font-size: 11.5px !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.04em !important;
-    color: #64748b !important;
+    color: #475569 !important;
     padding: 10px 16px !important;
-    border-bottom: 1px solid #cbd5e1 !important;
+    border-bottom: 2px solid #e2e8f0 !important;
     border-top: none !important;
-    background-color: #ffffff !important;
+    background-color: #f8fafc !important;
     white-space: nowrap;
 }
 

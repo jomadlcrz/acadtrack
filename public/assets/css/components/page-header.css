@@ -22,10 +22,10 @@
 
 .page-header-title,
 .dashboard-header h1 {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 600;
     color: #0f172a;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     margin: 0 0 4px 0;
     line-height: 1.25;
 }
@@ -33,9 +33,9 @@
 .page-header-subtitle,
 .dashboard-header p {
     font-size: 13.5px;
-    color: #64748b;
+    color: #475569;
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.45;
 }
 
 /* 3. Header Action Buttons & Controls */

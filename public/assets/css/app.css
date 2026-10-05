@@ -20,14 +20,17 @@
 
 /* 2. Institutional Design Tokens */
 :root {
-    --primary: #2f4a86;
-    --primary-dark: #243a6b;
+    --primary: #1e3a8a;
+    --primary-dark: #172554;
+    --primary-light: #eff6ff;
     --secondary: #64748b;
+    --accent-gold: #f59e0b;
+    --accent-gold-dark: #d97706;
     --success: #16a34a;
     --warning: #d97706;
     --danger: #dc2626;
     --info: #0891b2;
-    --dark: #1e293b;
+    --dark: #0f172a;
     --light: #f8fafc;
     --gray-100: #f1f5f9;
     --gray-200: #e2e8f0;
@@ -38,17 +41,18 @@
     --gray-700: #334155;
     --gray-800: #1e293b;
     --white: #ffffff;
-    --radius: 6px;
-    --shadow: none;
-    --shadow-md: none;
+    --radius: 8px;
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04);
+    --shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 10px 24px -4px rgba(15, 23, 42, 0.08);
 
     /* Bootstrap Overrides for Absolute Border & Radius Consistency */
-    --bs-border-color: #cbd5e1;
-    --bs-border-color-translucent: #cbd5e1;
-    --bs-card-border-color: #cbd5e1;
-    --bs-card-border-radius: 6px;
-    --bs-card-inner-border-radius: 5px;
-    --bs-card-box-shadow: none;
+    --bs-border-color: #e2e8f0;
+    --bs-border-color-translucent: #e2e8f0;
+    --bs-card-border-color: #e2e8f0;
+    --bs-card-border-radius: 8px;
+    --bs-card-inner-border-radius: 7px;
+    --bs-card-box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
     --bs-card-bg: #ffffff;
 }
 
