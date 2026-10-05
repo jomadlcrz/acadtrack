@@ -13,3 +13,7 @@ composer.lock
 .DS_Store
 Thumbs.db
 .phpunit.result.cache
+node_modules/
+playwright-report/
+test-results/
+.playwright/

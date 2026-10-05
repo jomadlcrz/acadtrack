@@ -7,6 +7,11 @@ $fullName = trim($firstName . ' ' . $lastName) ?: 'User';
 ?>
 <header class="app-navbar">
     <div class="navbar-left">
+        <?php if ($currentUser): ?>
+            <button type="button" class="btn-sidebar-toggle d-lg-none" id="sidebarToggle" aria-label="Toggle navigation menu">
+                <i class="bi bi-list"></i>
+            </button>
+        <?php endif; ?>
         <a href="<?= url('/dashboard') ?>" class="navbar-brand-link" title="Acadtrack Dashboard">
             <img src="<?= asset('images/cite.png') ?>" alt="CITE Logo" class="navbar-brand-logo">
             <div class="navbar-brand-text">
@@ -25,9 +30,9 @@ $fullName = trim($firstName . ' ' . $lastName) ?: 'User';
                 </div>
             </div>
 
-            <button type="button" class="btn-navbar-logout" data-bs-toggle="modal" data-bs-target="#logoutConfirmModal" title="Sign out of your session">
+            <button type="button" class="btn-navbar-logout" data-bs-toggle="modal" data-bs-target="#logoutConfirmModal" title="Sign out of your session" aria-label="Sign out">
                 <i class="bi bi-box-arrow-right"></i>
-                <span>Sign out</span>
+                <span class="d-none d-sm-inline">Sign out</span>
             </button>
         <?php endif; ?>
     </div>

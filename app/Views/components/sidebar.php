@@ -1,4 +1,10 @@
-<aside class="sidebar">
+<aside class="sidebar" id="appSidebar">
+    <div class="sidebar-mobile-header d-lg-none">
+        <span class="sidebar-mobile-title">Navigation</span>
+        <button type="button" class="btn-sidebar-close" id="sidebarCloseBtn" aria-label="Close navigation menu">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
     <nav class="sidebar-nav">
         <?php
         $userRole = $_SESSION['user']['role'] ?? '';

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle ?? 'Dashboard') ?> &mdash; Acadtrack</title>
     <link rel="icon" type="image/x-icon" href="<?= url('favicon.ico') ?>">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= asset('images/favicon-32x32.png') ?>">
@@ -33,6 +34,7 @@
     <?php include __DIR__ . '/../components/navbar.php'; ?>
 
     <div class="app-container">
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
         <?php include __DIR__ . '/../components/sidebar.php'; ?>
 
         <main class="main-content">

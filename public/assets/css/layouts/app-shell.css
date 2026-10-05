@@ -52,3 +52,31 @@
 .content-wrapper {
     position: relative;
 }
+
+/* 5. Mobile & Tablet Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .main-content {
+        padding: 16px 12px;
+    }
+
+    .dashboard-header,
+    .page-header {
+        margin-bottom: 16px;
+        gap: 12px;
+    }
+
+    .dashboard-header h1,
+    .page-header h1 {
+        font-size: 19px;
+    }
+
+    .dashboard-header p,
+    .page-header p {
+        font-size: 12.5px;
+    }
+
+    .dashboard-actions,
+    .page-header-actions {
+        width: 100%;
+    }
+}
