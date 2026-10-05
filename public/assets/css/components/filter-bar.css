@@ -235,15 +235,47 @@
 }
 
 .filter-popover-reset {
-    font-size: 0.75rem;
-    color: #ef4444;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #dc2626;
     text-decoration: none;
-    font-weight: 500;
+    cursor: pointer;
+    line-height: 1.3;
+    transition: all 0.15s ease-in-out;
+    user-select: none;
+}
+
+.filter-popover-reset i {
+    font-size: 0.75rem;
+    transition: transform 0.25s ease;
 }
 
 .filter-popover-reset:hover {
-    color: #dc2626;
-    text-decoration: underline;
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+    text-decoration: none;
+}
+
+.filter-popover-reset:hover i {
+    transform: rotate(-45deg);
+}
+
+.filter-popover-reset:active {
+    background: #fee2e2;
+    transform: scale(0.97);
+}
+
+.filter-popover-reset:focus-visible {
+    outline: 2px solid rgba(220, 38, 38, 0.4);
+    outline-offset: 1px;
 }
 
 .filter-popover-body {

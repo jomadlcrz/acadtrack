@@ -74,7 +74,7 @@ if (!empty($selectedSet)) {
                     <h6 class="filter-popover-title">
                         <i class="bi bi-filter text-primary"></i> Filter Roster
                     </h6>
-                    <button type="button" class="filter-popover-reset <?= $activeFilterCount > 0 ? '' : 'd-none' ?>" id="facultyStudentsResetBtn" onclick="resetFacultyStudentFilters()">Reset</button>
+                    <button type="button" class="filter-popover-reset <?= $activeFilterCount > 0 ? '' : 'd-none' ?>" id="facultyStudentsResetBtn" onclick="resetFacultyStudentFilters()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
                 </div>
                 <div class="filter-popover-body">
                     <div class="filter-field-group">

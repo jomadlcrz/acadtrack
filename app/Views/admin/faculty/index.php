@@ -59,7 +59,7 @@ if (!empty($currentDepartment)) {
                             <i class="bi bi-filter text-primary"></i> Filter Faculty
                         </h6>
                         <?php if ($activeFilterCount > 0): ?>
-                            <a href="<?= url('/admin/faculty' . (!empty($currentSearch) ? '?search=' . urlencode($currentSearch) : '')) ?>" class="filter-popover-reset">Reset</a>
+                            <a href="<?= url('/admin/faculty' . (!empty($currentSearch) ? '?search=' . urlencode($currentSearch) : '')) ?>" class="filter-popover-reset"><i class="bi bi-arrow-counterclockwise"></i> Reset</a>
                         <?php endif; ?>
                     </div>
                     <div class="filter-popover-body">

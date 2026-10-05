@@ -157,7 +157,7 @@ ob_start();
                     <h6 class="filter-popover-title">
                         <i class="bi bi-filter text-primary"></i> Filter Courses
                     </h6>
-                    <button type="button" class="filter-popover-reset d-none" id="assignmentsFilterResetBtn" onclick="resetDropdownFilters()">Reset</button>
+                    <button type="button" class="filter-popover-reset d-none" id="assignmentsFilterResetBtn" onclick="resetDropdownFilters()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
                 </div>
                 <div class="filter-popover-body">
                     <div class="filter-field-group">
