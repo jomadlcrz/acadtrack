@@ -285,53 +285,134 @@ $activeFinalWeight = (float) ($gradingSetting['final_weight'] ?? ($currentSubjec
 <?php endif; ?>
 
 <style>
-.method-card {
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 12px 14px;
-    background: #ffffff;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    display: block;
-    position: relative;
-    user-select: none;
-    text-decoration: none;
-}
-.method-card:hover {
-    border-color: #93c5fd;
-    background-color: #fbfdff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
-}
-.method-card.is-active,
-.method-card:has(input[type="radio"]:checked) {
-    border-color: #2563eb !important;
-    background-color: #f4f8ff !important;
-    box-shadow: 0 0 0 1px #2563eb, 0 4px 12px rgba(37, 99, 235, 0.1) !important;
-}
-.method-card .method-radio {
-    accent-color: #2563eb;
-    width: 17px;
-    height: 17px;
-    cursor: pointer;
-}
-.method-card .method-tag {
-    font-size: 11px;
-    padding: 2px 8px;
+.manage-section {
+    background: #f8fafc;
     border-radius: 6px;
-    font-weight: 600;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #e2e8f0;
 }
-.method-card.is-active .method-tag,
-.method-card:has(input[type="radio"]:checked) .method-tag {
-    background-color: #dbeafe !important;
-    color: #1e40af !important;
-    border-color: #bfdbfe !important;
+.manage-section.section-accent {
+    border-color: #c9a84c;
+}
+.manage-section .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+.manage-section .section-header h4 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #0a2e4a;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+}
+.setting-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 3px 0;
+}
+.setting-row label {
+    font-weight: 600;
+    font-size: 0.75rem;
+    min-width: 100px;
+    color: #475569;
+    margin-bottom: 0;
+}
+.setting-row input, .setting-row select {
+    padding: 3px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    background: #ffffff;
+    color: #0f172a;
+    outline: none;
+}
+.setting-row input:focus, .setting-row select:focus {
+    border-color: #0a2e4a;
+    box-shadow: 0 0 0 2px rgba(10, 46, 74, 0.1);
+}
+.setting-hint {
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-top: 2px;
+    padding-left: 108px;
+}
+.weight-table-wrap {
+    overflow-x: auto;
+}
+.weight-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
+    min-width: 280px;
+}
+.weight-table th {
+    background: #0a2e4a;
+    color: #ffffff;
+    padding: 5px 8px;
+    text-align: center;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-weight: 600;
+    border: 1px solid #0a2e4a;
+}
+.weight-table td {
+    padding: 4px 6px;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+    background: #ffffff;
+    vertical-align: middle;
+}
+.weight-table td .period-label {
+    font-weight: 600;
+    font-size: 0.7rem;
+    color: #334155;
+    white-space: nowrap;
+}
+.weight-table td input[type="number"],
+.weight-table td input.comp-score-input {
+    width: 60px;
+    padding: 2px 4px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: #ffffff;
+    color: #0f172a;
+    font-family: monospace;
+}
+.weight-table td input[type="number"]:focus,
+.weight-table td input.comp-score-input:focus {
+    border-color: #0a2e4a;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(10, 46, 74, 0.1);
+}
+.weight-table .sum-row td {
+    font-weight: 700;
+    font-size: 0.7rem;
+    background: #f8fafc;
+}
+.weight-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 </style>
 
 <!-- IntelliGrade Settings Modal -->
 <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 720px;">
         <div class="modal-content">
             <div class="modal-header">
                 <div>
@@ -351,7 +432,7 @@ $activeFinalWeight = (float) ($gradingSetting['final_weight'] ?? ($currentSubjec
             </div>
 
             <div class="modal-body p-3">
-                <form method="POST" action="<?= url('/faculty/grading/settings') ?>" id="subjectSettingsForm" class="mb-3">
+                <form method="POST" action="<?= url('/faculty/grading/settings') ?>" id="subjectSettingsForm" class="mb-0">
                     <?= csrf_field() ?>
                     <input type="hidden" name="subject_id" value="<?= htmlspecialchars((string)$subjectId) ?>">
                     <input type="hidden" name="period_id" value="<?= htmlspecialchars((string)$periodId) ?>">
@@ -359,141 +440,133 @@ $activeFinalWeight = (float) ($gradingSetting['final_weight'] ?? ($currentSubjec
                     <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
 
                     <!-- Section 1: General (Grading Method) -->
-                    <div class="border rounded-3 p-3 mb-3 bg-light">
-                        <div class="d-flex justify-content-between align-items-center mb-2.5">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-sliders text-primary fs-6"></i>
-                                <div>
-                                    <span class="small fw-bold text-dark d-block lh-sm">General</span>
-                                    <span class="text-muted" style="font-size: 11px;">Subject grading computation rule</span>
-                                </div>
-                            </div>
-                            <span class="badge bg-white text-secondary border px-2.5 py-1 rounded-pill d-inline-flex align-items-center gap-1" style="font-size: 11px;">
-                                <i class="bi bi-mortarboard text-primary"></i> Applies to Subject
-                            </span>
+                    <div class="manage-section">
+                        <div class="section-header">
+                            <h4><i class="bi bi-sliders text-primary"></i> General</h4>
                         </div>
-                        <div class="row g-2">
-                            <div class="col-md-6">
-                                <label class="method-card h-100 <?= ($activeGradingMethod === 'zero_based') ? 'is-active' : '' ?>" for="methodZeroBased">
-                                    <div class="d-flex align-items-start justify-content-between mb-1.5">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <input class="form-check-input method-radio mt-0" 
-                                                   type="radio" 
-                                                   name="grading_method" 
-                                                   id="methodZeroBased" 
-                                                   value="zero_based" 
-                                                   <?= ($activeGradingMethod === 'zero_based') ? 'checked' : '' ?> 
-                                                   onchange="onGradingMethodChanged()">
-                                            <span class="fw-bold text-dark small">Zero-Based (Raw %)</span>
-                                        </div>
-                                        <span class="method-tag badge bg-light text-secondary border font-monospace">Raw = Grade</span>
-                                    </div>
-                                    <p class="text-muted small mb-2 ps-4" style="font-size: 11.5px; line-height: 1.45;">
-                                        Absolute percentage scale (0.00 – 100.00). Exam scores are unadjusted; raw performance reflects final mark directly.
-                                    </p>
-                                    <div class="ps-4 pt-1.5 border-top d-flex align-items-center justify-content-between text-muted" style="font-size: 11px;">
-                                        <span><i class="bi bi-shield-check text-success me-1"></i>Direct Scale</span>
-                                        <span class="font-monospace text-dark">50 raw &rarr; 50.00%</span>
-                                    </div>
-                                </label>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="method-card h-100 <?= ($activeGradingMethod === 'fifty_based') ? 'is-active' : '' ?>" for="methodFiftyBased">
-                                    <div class="d-flex align-items-start justify-content-between mb-1.5">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <input class="form-check-input method-radio mt-0" 
-                                                   type="radio" 
-                                                   name="grading_method" 
-                                                   id="methodFiftyBased" 
-                                                   value="fifty_based" 
-                                                   <?= ($activeGradingMethod === 'fifty_based') ? 'checked' : '' ?> 
-                                                   onchange="onGradingMethodChanged()">
-                                            <span class="fw-bold text-dark small">50-Based Transmutation</span>
-                                        </div>
-                                        <span class="method-tag badge bg-light text-secondary border font-monospace">(Raw ÷ 2) + 50</span>
-                                    </div>
-                                    <p class="text-muted small mb-2 ps-4" style="font-size: 11.5px; line-height: 1.45;">
-                                        Transmutes examination mark so that a 50% raw score reaches the 75.00% passing threshold. Philippine collegiate standard.
-                                    </p>
-                                    <div class="ps-4 pt-1.5 border-top d-flex align-items-center justify-content-between text-muted" style="font-size: 11px;">
-                                        <span><i class="bi bi-award text-primary me-1"></i>College Standard</span>
-                                        <span class="font-monospace fw-semibold text-primary">50 raw &rarr; 75.00%</span>
-                                    </div>
-                                </label>
-                            </div>
+                        <div class="setting-row">
+                            <label>Passing Grade:</label>
+                            <input type="number" id="passingGradeInput" value="75" min="0" max="100" step="0.5" style="width: 60px;" readonly disabled>
+                            <span class="badge bg-secondary-subtle text-secondary border" style="font-size: 10px;">College Standard</span>
+                        </div>
+                        <div class="setting-row">
+                            <label>Decimals:</label>
+                            <select id="decimalPlacesInput" style="width: 60px;" disabled>
+                                <option value="2" selected>2</option>
+                            </select>
+                            <span class="badge bg-secondary-subtle text-secondary border" style="font-size: 10px;">Fixed</span>
+                        </div>
+                        <div class="setting-row">
+                            <label>Grading Method:</label>
+                            <select id="gradingMethodSelect" name="grading_method" style="width: 170px;" onchange="onGradingMethodChanged()">
+                                <option value="zero_based" <?= ($activeGradingMethod === 'zero_based') ? 'selected' : '' ?>>Zero Based (0-100)</option>
+                                <option value="fifty_based" <?= ($activeGradingMethod === 'fifty_based') ? 'selected' : '' ?>>50 Based (score/2+50)</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary py-0 px-2" style="font-size: 0.72rem; height: 26px;">Save</button>
+                        </div>
+                        <div class="setting-hint">
+                            <i class="bi bi-info-circle me-1"></i> Only applies to EXAM scores, not computed totals
                         </div>
                     </div>
 
                     <!-- Section 2: Period Weights -->
-                    <div class="border rounded p-3 mb-3 bg-light">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label small fw-bold text-dark mb-0">
-                                <i class="bi bi-layers me-1 text-primary"></i> Period Weights
-                            </label>
-                            <span id="periodWeightSumBadge" class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 11px;">
-                                Sum: 100.00%
-                            </span>
+                    <div class="manage-section section-accent">
+                        <div class="section-header">
+                            <h4><i class="bi bi-layers text-primary"></i> Period Weights</h4>
                         </div>
-                        <div class="row g-2 mb-2">
-                            <div class="col-6 col-md-3">
-                                <label for="prelimWeightInput" class="form-label small text-muted mb-1">Prelim (%)</label>
-                                <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm text-center font-monospace" id="prelimWeightInput" name="prelim_weight" value="<?= number_format($activePrelimWeight, 2, '.', '') ?>" oninput="validatePeriodWeightSum()">
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label for="midtermWeightInput" class="form-label small text-muted mb-1">Midterm (%)</label>
-                                <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm text-center font-monospace" id="midtermWeightInput" name="midterm_weight" value="<?= number_format($activeMidtermWeight, 2, '.', '') ?>" oninput="validatePeriodWeightSum()">
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label for="semiFinalWeightInput" class="form-label small text-muted mb-1">Semi-Final (%)</label>
-                                <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm text-center font-monospace" id="semiFinalWeightInput" name="semi_final_weight" value="<?= number_format($activeSemiFinalWeight, 2, '.', '') ?>" oninput="validatePeriodWeightSum()">
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label for="finalWeightInput" class="form-label small text-muted mb-1">Final (%)</label>
-                                <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm text-center font-monospace" id="finalWeightInput" name="final_weight" value="<?= number_format($activeFinalWeight, 2, '.', '') ?>" oninput="validatePeriodWeightSum()">
-                            </div>
+                        <p style="font-size: 0.68rem; color: #64748b; margin-bottom: 6px;">
+                            Per period & subject type. Must sum to 100%.
+                        </p>
+                        <div class="weight-table-wrap">
+                            <table class="weight-table" id="weightTable">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width: 70px;">Scope</th>
+                                        <th>Prelim (%)</th>
+                                        <th>Midterm (%)</th>
+                                        <th>Semi-Final (%)</th>
+                                        <th>Final (%)</th>
+                                        <th style="min-width: 60px;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span class="period-label fw-bold"><?= htmlspecialchars($currentSubject['subject_code'] ?? 'Subject') ?></span>
+                                        </td>
+                                        <td>
+                                            <input type="number" step="0.01" min="0" max="100" id="prelimWeightInput" name="prelim_weight" value="<?= number_format($activePrelimWeight, 2, '.', '') ?>" oninput="validatePeriodWeightSum()">
+                                        </td>
+                                        <td>
+                                            <input type="number" step="0.01" min="0" max="100" id="midtermWeightInput" name="midterm_weight" value="<?= number_format($activeMidtermWeight, 2, '.', '') ?>" oninput="validatePeriodWeightSum()">
+                                        </td>
+                                        <td>
+                                            <input type="number" step="0.01" min="0" max="100" id="semiFinalWeightInput" name="semi_final_weight" value="<?= number_format($activeSemiFinalWeight, 2, '.', '') ?>" oninput="validatePeriodWeightSum()">
+                                        </td>
+                                        <td>
+                                            <input type="number" step="0.01" min="0" max="100" id="finalWeightInput" name="final_weight" value="<?= number_format($activeFinalWeight, 2, '.', '') ?>" oninput="validatePeriodWeightSum()">
+                                        </td>
+                                        <td id="periodTotalCell" class="fw-bold font-monospace" style="font-size: 0.75rem; color: #16a34a;">
+                                            100.00%
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="sum-row">
+                                        <td><span style="font-weight: 600; color: #64748b;">Validation</span></td>
+                                        <td colspan="5" style="text-align: center;">
+                                            <span id="weightValidationMsg" style="font-size: 0.68rem; color: #16a34a;">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Period weights sum to exactly 100.00%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
-                        <div id="periodWeightError" class="text-danger small mb-2 d-none">
-                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Period weights must sum to exactly 100.00%.
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetPeriodWeightsDefault()" style="font-size: 11.5px;">
-                                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset weights to 20/20/20/40
+                        <div class="weight-actions">
+                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="resetPeriodWeightsDefault()" style="font-size: 0.72rem; height: 26px;">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
                             </button>
-                            <button type="submit" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1.5" id="btnSaveSubjectSettings">
-                                <i class="bi bi-check2-circle"></i> Save & Apply to Subject
+                            <button type="submit" class="btn btn-sm btn-success py-0 px-2" id="btnSaveSubjectSettings" style="font-size: 0.72rem; height: 26px;">
+                                <i class="bi bi-save me-1"></i> Save Period Weights
                             </button>
                         </div>
                     </div>
                 </form>
 
-                <!-- Section 3: Syllabus Component Breakdown & Test Preview -->
-                <div class="border rounded p-3 bg-white">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label small fw-bold text-dark mb-0">
-                            <i class="bi bi-pie-chart me-1 text-primary"></i> Syllabus Component Weights
-                        </label>
-                        <select id="calcSubjectType" class="form-select form-select-sm" style="width: auto; min-width: 170px;" onchange="switchSubjectTemplate()">
-                            <option value="major_with_lab" <?= in_array($activeSubjectNature, ['Laboratory', 'Combined']) ? 'selected' : '' ?>>
-                                Major with Lab
-                            </option>
-                            <option value="major_without_lab" <?= ($activeSubjectNature === 'Lecture') ? 'selected' : '' ?>>
-                                Major without Lab
-                            </option>
-                            <option value="research">
-                                Research / Thesis
-                            </option>
-                        </select>
+                <!-- Section 3: Syllabus Components -->
+                <div class="manage-section mb-0">
+                    <div class="section-header">
+                        <h4><i class="bi bi-book text-primary"></i> Syllabus Components</h4>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="fw-semibold text-secondary mb-0" style="font-size: 0.72rem;">Subject Type:</label>
+                            <select id="calcSubjectType" class="form-select form-select-sm py-1" style="width: auto; min-width: 170px; font-size: 0.72rem;" onchange="switchSubjectTemplate()">
+                                <option value="major_with_lab" <?= in_array($activeSubjectNature, ['Laboratory', 'Combined']) ? 'selected' : '' ?>>
+                                    Major with Lab
+                                </option>
+                                <option value="major_without_lab" <?= ($activeSubjectNature === 'Lecture') ? 'selected' : '' ?>>
+                                    Major without Lab
+                                </option>
+                                <option value="research">
+                                    Research / Thesis
+                                </option>
+                            </select>
+                        </div>
+                        <span class="badge bg-light text-secondary border font-monospace" style="font-size: 10px;">
+                            Components sum to 100%
+                        </span>
                     </div>
 
-                    <!-- Dynamic Components Table -->
-                    <div class="table-responsive border rounded mb-3">
-                        <table class="table table-sm table-hover align-middle mb-0">
-                            <thead class="bg-light">
+                    <div class="weight-table-wrap mb-2">
+                        <table class="weight-table">
+                            <thead>
                                 <tr>
-                                    <th class="py-2 px-3 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Component</th>
-                                    <th class="py-2 px-3 text-secondary text-uppercase fw-semibold text-center" style="width: 110px; font-size: 11px;">Syllabus Weight</th>
-                                    <th class="py-2 px-3 text-secondary text-uppercase fw-semibold text-end" style="width: 150px; font-size: 11px;">Score (0–100)</th>
-                                    <th class="py-2 px-3 text-secondary text-uppercase fw-semibold text-end" style="width: 130px; font-size: 11px;">Weighted Mark</th>
+                                    <th style="text-align: left; padding-left: 10px;">Component</th>
+                                    <th style="width: 90px;">Weight (%)</th>
+                                    <th style="width: 110px;">Score (0–100)</th>
+                                    <th style="width: 90px;">Weighted</th>
                                 </tr>
                             </thead>
                             <tbody id="calcComponentBody">
@@ -503,23 +576,18 @@ $activeFinalWeight = (float) ($gradingSetting['final_weight'] ?? ($currentSubjec
                     </div>
 
                     <!-- Live Summary Banner -->
-                    <div class="p-3 rounded border d-flex justify-content-between align-items-center mb-0" id="calcResultBanner" style="background-color: #f8fafc;">
-                        <div>
-                            <span class="text-muted small d-block">Computed Period Rating</span>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="h4 mb-0 fw-bold font-monospace text-primary" id="calcComputedGrade">0.00</span>
-                                <span class="text-muted small">/ 100.00</span>
-                            </div>
+                    <div class="d-flex justify-content-between align-items-center p-2 rounded border bg-white">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-secondary fw-semibold" style="font-size: 0.72rem;">Computed Period Rating:</span>
+                            <span class="fw-bold font-monospace text-primary" id="calcComputedGrade" style="font-size: 0.9rem;">0.00</span>
+                            <span class="text-muted" style="font-size: 0.72rem;">/ 100.00</span>
                         </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="text-end">
-                                <span class="text-muted small d-block mb-1">Status Preview</span>
-                                <span id="calcStatusBadge" class="badge bg-secondary-subtle text-secondary border px-2.5 py-1.5" style="font-size: 12px;">
-                                    Awaiting scores
-                                </span>
-                            </div>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetCalculatorInputs()" title="Clear calculator inputs">
-                                <i class="bi bi-arrow-counterclockwise me-1"></i> Clear inputs
+                        <div class="d-flex align-items-center gap-2">
+                            <span id="calcStatusBadge" class="badge bg-secondary-subtle text-secondary border px-2 py-1" style="font-size: 10px;">
+                                Awaiting scores
+                            </span>
+                            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="resetCalculatorInputs()" style="font-size: 10px; height: 22px;" title="Clear calculator inputs">
+                                <i class="bi bi-arrow-counterclockwise"></i> Clear
                             </button>
                         </div>
                     </div>
@@ -576,21 +644,24 @@ function validatePeriodWeightSum() {
     const f = parseFloat(document.getElementById('finalWeightInput')?.value) || 0;
     const total = Math.round((p + m + s + f) * 100) / 100;
 
-    const badge = document.getElementById('periodWeightSumBadge');
-    const err = document.getElementById('periodWeightError');
+    const totalCell = document.getElementById('periodTotalCell');
+    const msg = document.getElementById('weightValidationMsg');
     const btn = document.getElementById('btnSaveSubjectSettings');
 
-    if (badge) {
-        badge.textContent = `Sum: ${total.toFixed(2)}%`;
+    if (totalCell) {
+        totalCell.textContent = `${total.toFixed(2)}%`;
         if (Math.abs(total - 100) < 0.01) {
-            badge.className = 'badge bg-success-subtle text-success border border-success-subtle';
-            if (err) err.classList.add('d-none');
+            totalCell.style.color = '#16a34a';
+            if (msg) {
+                msg.style.color = '#16a34a';
+                msg.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Period weights sum to exactly 100.00%';
+            }
             if (btn) btn.disabled = false;
         } else {
-            badge.className = 'badge bg-danger-subtle text-danger border border-danger-subtle';
-            if (err) {
-                err.classList.remove('d-none');
-                err.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> Period weights must equal 100.00% (currently ${total.toFixed(2)}%).`;
+            totalCell.style.color = '#dc2626';
+            if (msg) {
+                msg.style.color = '#dc2626';
+                msg.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> Period weights must equal 100.00% (currently ${total.toFixed(2)}%).`;
             }
             if (btn) btn.disabled = true;
         }
@@ -610,14 +681,6 @@ function resetPeriodWeightsDefault() {
 }
 
 function onGradingMethodChanged() {
-    document.querySelectorAll('.method-card').forEach(card => {
-        const radio = card.querySelector('input[type="radio"]');
-        if (radio && radio.checked) {
-            card.classList.add('is-active');
-        } else {
-            card.classList.remove('is-active');
-        }
-    });
     recalculateComponents();
 }
 
@@ -632,24 +695,25 @@ function switchSubjectTemplate() {
     tmpl.components.forEach(comp => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td class="px-3">
-                <div class="fw-semibold text-dark small">${comp.label}</div>
-                ${comp.isExam ? '<span class="badge bg-light text-muted border" style="font-size: 10px;">Subject to Transmutation</span>' : ''}
+            <td style="text-align: left; padding-left: 10px;">
+                <span class="fw-semibold text-dark" style="font-size: 0.72rem;">${comp.label}</span>
+                ${comp.isExam ? '<span class="badge bg-light text-muted border ms-1" style="font-size: 9px;">Transmuted</span>' : ''}
             </td>
-            <td class="px-3 text-center font-monospace small fw-semibold">
+            <td class="font-monospace fw-semibold" style="font-size: 0.72rem;">
                 ${(comp.weight * 100).toFixed(0)}%
             </td>
-            <td class="px-3 text-end">
+            <td>
                 <input type="number" 
                        min="0" max="100" step="0.5" 
                        data-key="${comp.key}" 
                        data-weight="${comp.weight}" 
                        data-is-exam="${comp.isExam ? '1' : '0'}"
-                       class="form-control form-control-sm text-end font-monospace comp-score-input" 
+                       class="comp-score-input" 
                        placeholder="0.00" 
-                       oninput="recalculateComponents()">
+                       oninput="recalculateComponents()"
+                       style="width: 60px;">
             </td>
-            <td class="px-3 text-end font-monospace small fw-semibold text-primary" id="contrib_${comp.key}">
+            <td class="font-monospace fw-semibold text-primary" id="contrib_${comp.key}" style="font-size: 0.72rem;">
                 0.00%
             </td>
         `;
@@ -660,8 +724,8 @@ function switchSubjectTemplate() {
 }
 
 function recalculateComponents() {
-    const fiftyEl = document.getElementById('methodFiftyBased');
-    const isFiftyBased = fiftyEl ? fiftyEl.checked : false;
+    const methodSelect = document.getElementById('gradingMethodSelect');
+    const isFiftyBased = methodSelect ? (methodSelect.value === 'fifty_based') : false;
 
     const inputs = document.querySelectorAll('.comp-score-input');
     let totalScore = 0;
@@ -689,29 +753,25 @@ function recalculateComponents() {
 
     const gradeEl = document.getElementById('calcComputedGrade');
     const badgeEl = document.getElementById('calcStatusBadge');
-    const bannerEl = document.getElementById('calcResultBanner');
 
     const rounded = Math.round(totalScore * 100) / 100;
     if (gradeEl) gradeEl.textContent = rounded.toFixed(2);
 
     if (!hasAnyData) {
         if (badgeEl) {
-            badgeEl.className = 'badge bg-secondary-subtle text-secondary border px-2.5 py-1.5';
+            badgeEl.className = 'badge bg-secondary-subtle text-secondary border px-2 py-1';
             badgeEl.textContent = 'Awaiting scores';
         }
-        if (bannerEl) bannerEl.style.backgroundColor = '#f8fafc';
     } else if (rounded >= 75.0) {
         if (badgeEl) {
-            badgeEl.className = 'badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5';
+            badgeEl.className = 'badge bg-success-subtle text-success border border-success-subtle px-2 py-1';
             badgeEl.textContent = 'PASSED (≥ 75.00%)';
         }
-        if (bannerEl) bannerEl.style.backgroundColor = '#f0fdf4';
     } else {
         if (badgeEl) {
-            badgeEl.className = 'badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1.5';
+            badgeEl.className = 'badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1';
             badgeEl.textContent = 'FAILED (< 75.00%)';
         }
-        if (bannerEl) bannerEl.style.backgroundColor = '#fef2f2';
     }
 }
 
