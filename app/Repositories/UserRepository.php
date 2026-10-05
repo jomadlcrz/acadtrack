@@ -221,26 +221,40 @@ class UserRepository
     }
 
     /**
-     * Students registered in a term, with their per-term year level, set and Regular/Irregular status.
+     * Student accounts directory with optional filtering.
      *
-     * @param array{status?:string,year_level?:int,set_id?:int,account_status?:string,search?:string} $filters
+     * @param array{status?:string,year_level?:int,set_id?:int,account_status?:string,search?:string,term_id?:int}|int $filters
+     * @param int|array $pageOrFilters
+     * @param int $page
+     * @param int $perPage
+     * @return array{data:array,total:int,page:int,perPage:int,per_page:int,lastPage:int,last_page:int}
      */
-    public function paginateStudents(int $termId, array $filters = [], int $page = 1, int $perPage = 20): array
+    public function paginateStudents(array|int $filters = [], int|array $pageOrFilters = 1, int $page = 1, int $perPage = 20): array
     {
+        if (is_int($filters)) {
+            $termId = $filters;
+            $filters = is_array($pageOrFilters) ? $pageOrFilters : [];
+            if ($termId > 0 && !isset($filters['term_id'])) {
+                $filters['term_id'] = $termId;
+            }
+        } elseif (is_int($pageOrFilters)) {
+            $page = $pageOrFilters;
+        }
+
         $page = max(1, $page);
-        $clauses = ['r.academic_term_id = :term_id'];
-        $params = ['term_id' => $termId];
+        $clauses = ["r.role_name = 'Student'"];
+        $params = [];
 
         if (!empty($filters['status'])) {
-            $clauses[] = 'r.status = :status';
+            $clauses[] = 'COALESCE(sd.status, s.status) = :status';
             $params['status'] = $filters['status'];
         }
         if (!empty($filters['year_level'])) {
-            $clauses[] = 'r.year_level = :year_level';
+            $clauses[] = 'COALESCE(sd.year_level, s.year_level) = :year_level';
             $params['year_level'] = (int) $filters['year_level'];
         }
         if (!empty($filters['set_id'])) {
-            $clauses[] = 'r.set_id = :set_id';
+            $clauses[] = 'COALESCE(sd.set_id, s.set_id) = :set_id';
             $params['set_id'] = (int) $filters['set_id'];
         }
         if (!empty($filters['account_status'])) {
@@ -248,27 +262,44 @@ class UserRepository
             $params['account_status'] = $filters['account_status'];
         }
         if (!empty($filters['search'])) {
-            $clauses[] = "CONCAT(u.email, ' ', COALESCE(sd.first_name, ''), ' ', COALESCE(sd.last_name, ''), ' ', COALESCE(sd.student_number, '')) LIKE :search";
+            $clauses[] = "CONCAT(
+                u.email, ' ', 
+                COALESCE(sd.first_name, ''), ' ', 
+                COALESCE(sd.last_name, ''), ' ', 
+                COALESCE(sd.student_number, '')
+            ) LIKE :search";
             $params['search'] = '%' . $filters['search'] . '%';
+        }
+        if (!empty($filters['term_id'])) {
+            $clauses[] = 'EXISTS (SELECT 1 FROM student_term_registrations str WHERE str.student_id = s.id AND str.academic_term_id = :term_id)';
+            $params['term_id'] = (int) $filters['term_id'];
         }
         $where = 'WHERE ' . implode(' AND ', $clauses);
 
-        $from = "FROM student_term_registrations r
-                 JOIN students s ON s.id = r.student_id
-                 JOIN users u ON u.id = s.user_id
+        $from = "FROM users u
+                 JOIN user_roles ur ON ur.user_id = u.id
+                 JOIN roles r ON r.id = ur.role_id
+                 LEFT JOIN students s ON s.user_id = u.id
                  LEFT JOIN student_details sd ON sd.user_id = u.id
-                 LEFT JOIN sets st ON st.id = r.set_id
+                 LEFT JOIN sets st ON st.id = COALESCE(sd.set_id, s.set_id)
                  {$where}";
 
-        $stmt = Database::getConnection()->prepare("SELECT COUNT(*) {$from}");
+        $stmt = Database::getConnection()->prepare("SELECT COUNT(DISTINCT u.id) {$from}");
         $stmt->execute($params);
         $total = (int) $stmt->fetchColumn();
 
         $stmt = Database::getConnection()->prepare(
-            "SELECT u.id, u.email, u.status, 'Student' AS role, COALESCE(sd.first_name, '') AS first_name, COALESCE(sd.last_name, '') AS last_name,
-                    sd.student_number, r.year_level, r.status AS student_status, r.registration_status, r.set_id, st.set_name
+            "SELECT u.id, u.email, u.status, 'Student' AS role,
+                    COALESCE(sd.first_name, '') AS first_name,
+                    COALESCE(sd.last_name, '') AS last_name,
+                    COALESCE(sd.student_number, '') AS student_number,
+                    COALESCE(sd.year_level, s.year_level, 1) AS year_level,
+                    COALESCE(sd.status, s.status, 'Regular') AS student_status,
+                    'enrolled' AS registration_status,
+                    COALESCE(sd.set_id, s.set_id) AS set_id,
+                    st.set_name
              {$from}
-             ORDER BY r.year_level, sd.last_name, sd.first_name
+             ORDER BY COALESCE(sd.year_level, s.year_level, 1), sd.last_name, sd.first_name
              LIMIT :limit OFFSET :offset"
         );
         foreach ($params as $key => $val) {

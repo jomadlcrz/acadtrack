@@ -80,4 +80,38 @@ class UserDirectoriesTest extends TestCase
         $this->assertStringContainsString('Administrators', $body);
         $this->assertStringContainsString('/admin/administrators', $body);
     }
+
+    public function testPaginateStudentsReturnsStudentAccounts(): void
+    {
+        $repo = new UserRepository();
+        $result = $repo->paginateStudents();
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('data', $result);
+        $this->assertNotEmpty($result['data']);
+        foreach ($result['data'] as $row) {
+            $this->assertSame('Student', $row['role']);
+            $this->assertArrayHasKey('first_name', $row);
+            $this->assertArrayHasKey('last_name', $row);
+            $this->assertArrayHasKey('year_level', $row);
+            $this->assertArrayHasKey('student_status', $row);
+        }
+    }
+
+    public function testStudentControllerRendersStudentsDirectory(): void
+    {
+        $controller = new \App\Controllers\Admin\StudentController();
+        $request = new Request();
+        $response = new Response();
+
+        ob_start();
+        $controller->index($request, $response, $this->session);
+        $output = ob_get_clean();
+
+        $body = $response->getBody() ?: $output;
+        $this->assertStringContainsString('Students', $body);
+        $this->assertStringContainsString('/admin/students', $body);
+        $this->assertStringContainsString('All year levels', $body);
+        $this->assertStringContainsString('All standings', $body);
+    }
 }
