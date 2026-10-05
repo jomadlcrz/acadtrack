@@ -411,9 +411,7 @@ ob_start();
         <div class="modal-content">
             <div class="modal-header">
                 <div class="d-flex align-items-center gap-2">
-                    <div class="bg-info-subtle text-info p-2 rounded">
-                        <i class="bi bi-person-lines-fill fs-6"></i>
-                    </div>
+                    <i class="bi bi-person-lines-fill fs-5 text-info"></i>
                     <div>
                         <h5 class="modal-title" id="facultyWorkloadModalLabel">Faculty Teaching Workload Summary</h5>
                         <small class="text-muted" style="font-size: 12px;"><?= htmlspecialchars($termDisplay) ?></small>

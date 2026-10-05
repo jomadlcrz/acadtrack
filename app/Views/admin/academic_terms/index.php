@@ -767,9 +767,7 @@ ob_start();
                     <!-- Top Status Card -->
                     <div class="p-3 rounded-3 mb-4 border d-flex align-items-center justify-content-between" id="detailsHeaderCard" style="background: #f8fafc;">
                         <div class="d-flex align-items-center gap-3">
-                            <span class="rounded-3 p-2.5 bg-white border shadow-sm text-primary" style="font-size: 20px;">
-                                <i class="bi bi-shield-lock" id="detailsStatusIcon"></i>
-                            </span>
+                            <i class="bi bi-shield-lock text-primary fs-4" id="detailsStatusIcon"></i>
                             <div>
                                 <div class="small text-uppercase fw-bold text-muted" style="font-size: 11px;">Lifecycle Status</div>
                                 <div class="fw-bold fs-6 text-dark" id="detailsStatusText">Closed</div>
