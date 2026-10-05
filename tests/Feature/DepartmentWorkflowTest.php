@@ -7,7 +7,12 @@ namespace Tests\Feature;
 use PHPUnit\Framework\TestCase;
 use App\Models\Department;
 use App\Models\Faculty;
+use App\Models\Program;
 use App\Models\User;
+use App\Controllers\Admin\DepartmentController;
+use App\Core\Request;
+use App\Core\Response;
+use App\Core\Session;
 
 class DepartmentWorkflowTest extends TestCase
 {
@@ -166,5 +171,76 @@ class DepartmentWorkflowTest extends TestCase
         $this->assertStringContainsString('Academic Programs', $html);
         $this->assertStringContainsString('Assigned Faculty', $html);
         $this->assertStringContainsString('Back to departments', $html);
+    }
+
+    public function testDepartmentArchiveConstraints(): void
+    {
+        $uniqueCode = 'DARC' . rand(100, 999);
+        $dept = Department::create([
+            'code' => $uniqueCode,
+            'name' => 'Department Archive Constraint Test ' . $uniqueCode,
+            'description' => 'Test archive constraints',
+            'status' => 'active',
+        ]);
+        self::$cleanupDeptIds[] = $dept->id;
+
+        $controller = new DepartmentController();
+        $request = new Request();
+        $response = new Response();
+        $session = new Session();
+
+        // 1. With an active program, archiving department must be blocked
+        $program = Program::create([
+            'program_name' => 'Dept Constraint Program ' . $uniqueCode,
+            'program_abbrev' => 'DCP' . rand(100, 999),
+            'department_id' => $dept->id,
+            'program_type' => "Bachelor's Degree",
+            'program_length' => '4 Years',
+            'status' => 'active',
+        ]);
+
+        $controller->archive($request, $response, $session, (string) $dept->id);
+        $dept->refresh();
+        $this->assertSame('active', $dept->status);
+        $this->assertStringContainsString('It still has 1 active program(s)', (string) $session->getFlash('error'));
+
+        // Remove the program
+        $program->delete();
+
+        // 2. With an assigned faculty member, archiving department must be blocked
+        $user = User::create([
+            'first_name' => 'DeptFac',
+            'last_name' => 'Constraint_' . $uniqueCode,
+            'email' => "dept_fac_{$uniqueCode}@gwc.edu",
+            'password' => password_hash('secret123', PASSWORD_BCRYPT),
+            'role' => 'Faculty',
+            'status' => 'active',
+        ]);
+        self::$cleanupUserIds[] = $user->id;
+
+        $faculty = Faculty::create([
+            'user_id' => $user->id,
+            'department_id' => $dept->id,
+        ]);
+
+        $controller->archive($request, $response, $session, (string) $dept->id);
+        $dept->refresh();
+        $this->assertSame('active', $dept->status);
+        $this->assertStringContainsString('It still has 1 assigned faculty member(s)', (string) $session->getFlash('error'));
+
+        // Remove faculty
+        $faculty->delete();
+
+        // 3. With no dependents, archiving must succeed
+        $controller->archive($request, $response, $session, (string) $dept->id);
+        $dept->refresh();
+        $this->assertSame('inactive', $dept->status);
+        $this->assertStringContainsString('archived successfully', (string) $session->getFlash('success'));
+
+        // 4. Restore must succeed
+        $controller->restore($request, $response, $session, (string) $dept->id);
+        $dept->refresh();
+        $this->assertSame('active', $dept->status);
+        $this->assertStringContainsString('restored to active status', (string) $session->getFlash('success'));
     }
 }

@@ -9,6 +9,13 @@ use App\Models\Program;
 use App\Models\Subject;
 use App\Models\Department;
 use App\Models\AcademicTerm;
+use App\Models\Grade;
+use App\Models\GradingSheet;
+use App\Models\Enrollment;
+use App\Models\GradeHistoryLog;
+use App\Models\Student;
+use App\Models\User;
+use App\Models\GradingPeriod;
 use App\Controllers\Admin\ProgramCurriculumController;
 use App\Core\Request;
 use App\Core\Response;
@@ -17,6 +24,7 @@ use App\Core\Session;
 class ProgramCurriculumWorkflowTest extends TestCase
 {
     private static array $cleanupSubjectIds = [];
+    private static array $cleanupUserIds = [];
     private static ?Program $testProgram = null;
 
     public static function setUpBeforeClass(): void
@@ -46,7 +54,17 @@ class ProgramCurriculumWorkflowTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         if (!empty(self::$cleanupSubjectIds)) {
+            \App\Core\Database::getConnection()->exec("DELETE FROM prerequisites WHERE subject_id IN (" . implode(',', self::$cleanupSubjectIds) . ") OR prerequisite_subject_id IN (" . implode(',', self::$cleanupSubjectIds) . ")");
+            GradeHistoryLog::whereIn('grade_id', function ($query) {
+                $query->select('id')->from('grades')->whereIn('subject_id', self::$cleanupSubjectIds);
+            })->delete();
+            Grade::whereIn('subject_id', self::$cleanupSubjectIds)->delete();
+            Enrollment::whereIn('subject_id', self::$cleanupSubjectIds)->delete();
             Subject::whereIn('id', self::$cleanupSubjectIds)->delete();
+        }
+        if (!empty(self::$cleanupUserIds)) {
+            Student::whereIn('user_id', self::$cleanupUserIds)->delete();
+            User::whereIn('id', self::$cleanupUserIds)->delete();
         }
         if (self::$testProgram) {
             self::$testProgram->delete();
@@ -179,5 +197,119 @@ class ProgramCurriculumWorkflowTest extends TestCase
         $this->assertSame("Bachelor's Degree", $btech->program_type);
         $this->assertSame('4 Years', $btech->program_length);
         $btech->delete();
+    }
+
+    public function testSubjectArchiveConstraintsPreventArchivingWithGradesPrerequisitesEnrollments(): void
+    {
+        $term = AcademicTerm::getActive();
+        $termId = (int) ($term['id'] ?? 1);
+
+        $controller = new ProgramCurriculumController();
+        $request = new Request();
+        $response = new Response();
+        $session = new Session();
+
+        // 1. Subject with recorded grades
+        $subGrade = Subject::create([
+            'program_id' => self::$testProgram->id,
+            'subject_code' => 'TGRD' . rand(100, 999),
+            'descriptive_title' => 'Subject With Grades',
+            'units' => 3.0,
+            'year_level' => 1,
+            'semester' => 1,
+            'academic_term_id' => $termId,
+        ]);
+        self::$cleanupSubjectIds[] = $subGrade->id;
+
+        $user = User::create([
+            'first_name' => 'GradeSub',
+            'last_name' => 'Student',
+            'email' => 'gradesub_' . time() . '_' . rand(100, 999) . '@gwc.edu',
+            'password' => password_hash('secret123', PASSWORD_BCRYPT),
+            'role' => 'Student',
+            'status' => 'active',
+        ]);
+        self::$cleanupUserIds[] = $user->id;
+
+        $student = Student::create([
+            'user_id' => $user->id,
+            'year_level' => 1,
+            'status' => 'Regular',
+        ]);
+
+        $period = GradingPeriod::where('academic_term_id', $termId)->first();
+        $periodId = (int) ($period->id ?? 1);
+
+        Grade::saveGrade(
+            (int) $student->id,
+            (int) $subGrade->id,
+            $periodId,
+            $termId,
+            88.50
+        );
+
+        $_POST = ['program' => self::$testProgram->program_abbrev];
+        $controller->archiveSubject($request, $response, $session, (string) $subGrade->id);
+        $subGrade->refresh();
+        $this->assertSame(0, (int) $subGrade->is_archived);
+        $this->assertStringContainsString('recorded student grade(s)', (string) $session->getFlash('error'));
+
+        // 2. Subject with active enrollment
+        $subEnroll = Subject::create([
+            'program_id' => self::$testProgram->id,
+            'subject_code' => 'TENR' . rand(100, 999),
+            'descriptive_title' => 'Subject With Enrollments',
+            'units' => 3.0,
+            'year_level' => 1,
+            'semester' => 1,
+            'academic_term_id' => $termId,
+        ]);
+        self::$cleanupSubjectIds[] = $subEnroll->id;
+
+        Enrollment::create([
+            'student_id' => $student->id,
+            'subject_id' => $subEnroll->id,
+            'academic_term_id' => $termId,
+        ]);
+
+        $controller->archiveSubject($request, $response, $session, (string) $subEnroll->id);
+        $subEnroll->refresh();
+        $this->assertSame(0, (int) $subEnroll->is_archived);
+        $this->assertStringContainsString('active student enrollment(s)', (string) $session->getFlash('error'));
+
+        // 3. Subject as active prerequisite for another active curriculum subject
+        $prereqSub = Subject::create([
+            'program_id' => self::$testProgram->id,
+            'subject_code' => 'TPREQ' . rand(100, 999),
+            'descriptive_title' => 'Prerequisite Subject',
+            'units' => 3.0,
+            'year_level' => 1,
+            'semester' => 1,
+            'academic_term_id' => $termId,
+        ]);
+        self::$cleanupSubjectIds[] = $prereqSub->id;
+
+        $dependentSub = Subject::create([
+            'program_id' => self::$testProgram->id,
+            'subject_code' => 'TDEP' . rand(100, 999),
+            'descriptive_title' => 'Dependent Subject',
+            'units' => 3.0,
+            'year_level' => 2,
+            'semester' => 1,
+            'academic_term_id' => $termId,
+        ]);
+        self::$cleanupSubjectIds[] = $dependentSub->id;
+
+        \App\Core\Database::getConnection()->exec("
+            INSERT INTO prerequisites (subject_id, prerequisite_subject_id)
+            VALUES ({$dependentSub->id}, {$prereqSub->id})
+        ");
+
+        $controller->archiveSubject($request, $response, $session, (string) $prereqSub->id);
+        $prereqSub->refresh();
+        $this->assertSame(0, (int) $prereqSub->is_archived);
+        $errorMsg = (string) $session->getFlash('error');
+        $this->assertStringContainsString('required prerequisite for active curriculum subject(s)', $errorMsg);
+        $this->assertStringContainsString($dependentSub->subject_code, $errorMsg);
     }
 }

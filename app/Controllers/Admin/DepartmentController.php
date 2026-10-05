@@ -9,6 +9,9 @@ use App\Core\Response;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\Department;
+use App\Models\Faculty;
+use App\Models\Program;
+use App\Models\Set;
 
 class DepartmentController
 {
@@ -123,11 +126,40 @@ class DepartmentController
             return;
         }
 
-        $department->update(['status' => 'inactive']);
-        $session->flash('success', "Department '{$department->name}' archived successfully.");
         $redirectUrl = isset($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], '/admin/departments/' . $id)
             ? '/admin/departments/' . $id
             : '/admin/departments';
+
+        // Constraint 1: Check active programs
+        $activeProgramsCount = Program::where('department_id', $department->id)
+            ->where('status', 'active')
+            ->count();
+        if ($activeProgramsCount > 0) {
+            $session->flash('error', "Cannot archive department '{$department->name}'. It still has {$activeProgramsCount} active program(s). Please archive or reassign programs first.");
+            redirect($redirectUrl);
+            return;
+        }
+
+        // Constraint 2: Check assigned faculty
+        $facultyCount = Faculty::where('department_id', $department->id)->count();
+        if ($facultyCount > 0) {
+            $session->flash('error', "Cannot archive department '{$department->name}'. It still has {$facultyCount} assigned faculty member(s). Please reassign faculty members first.");
+            redirect($redirectUrl);
+            return;
+        }
+
+        // Constraint 3: Check active sections (sets)
+        $activeSetsCount = Set::where('department_id', $department->id)
+            ->where('status', 'active')
+            ->count();
+        if ($activeSetsCount > 0) {
+            $session->flash('error', "Cannot archive department '{$department->name}'. It still has {$activeSetsCount} active section(s). Please archive or reassign sections first.");
+            redirect($redirectUrl);
+            return;
+        }
+
+        $department->update(['status' => 'inactive']);
+        $session->flash('success', "Department '{$department->name}' archived successfully.");
         redirect($redirectUrl);
     }
 

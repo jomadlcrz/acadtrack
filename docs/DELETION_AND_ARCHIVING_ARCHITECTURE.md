@@ -151,3 +151,10 @@ DELIMITER ;
    - Faculty assignment removal verifies if submitted, approved, or finalized grading sheets exist. If they do, assignment removal is prohibited.
 4. **Admin User Management (`Admin\UserController`):**
    - User deactivation/activation handles personnel status transitions without row deletion.
+   - Self-deactivation and Administrator account deactivation are strictly prohibited to prevent lockout.
+5. **Department Archiving (`Admin\DepartmentController`):**
+   - Archiving is blocked if active programs, assigned faculty members, or active sections reference the department.
+6. **Section / Set Archiving (`Admin\SetController` & `Dean\SetController`):**
+   - Archiving is blocked if the academic term is closed, or if students are actively assigned or registered in the section. Bulk archive skips sections with active students or closed terms.
+7. **Curriculum Subject Archiving (`Admin\ProgramCurriculumController`):**
+   - Archiving is blocked if recorded grades exist, active/submitted grading sheets exist, student enrollments exist, or if the subject is an active prerequisite for other active curriculum subjects.

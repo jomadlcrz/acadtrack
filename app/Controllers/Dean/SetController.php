@@ -11,6 +11,9 @@ use App\Core\View;
 use App\Models\AcademicTerm;
 use App\Models\Department;
 use App\Models\Set;
+use App\Models\Student;
+use App\Models\StudentTermRegistration;
+use App\Services\TermClosureService;
 
 class SetController
 {
@@ -109,6 +112,22 @@ class SetController
 
         if (!$set) {
             $session->flash('error', 'Set not found.');
+            redirect("/dean/sets{$semQuery}");
+            return;
+        }
+
+        $termClosureService = new TermClosureService();
+        if ($termClosureService->isTermClosed((int) $set->academic_term_id)) {
+            $session->flash('error', 'Cannot modify sections. This academic term is officially closed and sealed.');
+            redirect("/dean/sets{$semQuery}");
+            return;
+        }
+
+        $studentCount = Student::where('set_id', $set->id)->count();
+        $termRegCount = StudentTermRegistration::where('set_id', $set->id)->count();
+        if ($studentCount > 0 || $termRegCount > 0) {
+            $totalStudents = max($studentCount, $termRegCount);
+            $session->flash('error', "Cannot archive section '{$set->name}'. It still has {$totalStudents} assigned student(s). Please reassign students before archiving.");
             redirect("/dean/sets{$semQuery}");
             return;
         }

@@ -14,6 +14,9 @@ use App\Models\Subject;
 use App\Models\Prerequisite;
 use App\Models\Department;
 use App\Models\AcademicTerm;
+use App\Models\Grade;
+use App\Models\GradingSheet;
+use App\Models\Enrollment;
 use PDO;
 
 class ProgramCurriculumController
@@ -597,14 +600,59 @@ class ProgramCurriculumController
             $redirectProgram = $prog?->program_abbrev ?? '';
         }
 
-        $code = $subject->subject_code;
+        $redirectUrl = '/admin/program-curricula' . ($redirectProgram ? '?program=' . urlencode($redirectProgram) : '');
+        $code = $subject->subject_code ?: $subject->code;
+
+        // Constraint 1: Check recorded grades
+        $gradeCount = Grade::where('subject_id', $subject->id)->count();
+        if ($gradeCount > 0) {
+            $session->flash('error', "Cannot archive subject '{$code}'. It has {$gradeCount} recorded student grade(s) in academic history.");
+            redirect($redirectUrl);
+            return;
+        }
+
+        // Constraint 2: Check submitted / active grading sheets
+        $sheetCount = GradingSheet::where('subject_id', $subject->id)
+            ->whereIn('status', ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED', 'FINALIZED'])
+            ->count();
+        if ($sheetCount > 0) {
+            $session->flash('error', "Cannot archive subject '{$code}'. It has active or submitted grading sheets.");
+            redirect($redirectUrl);
+            return;
+        }
+
+        // Constraint 3: Check student enrollments
+        $enrollmentCount = Enrollment::where('subject_id', $subject->id)->count();
+        if ($enrollmentCount > 0) {
+            $session->flash('error', "Cannot archive subject '{$code}'. It has {$enrollmentCount} active student enrollment(s).");
+            redirect($redirectUrl);
+            return;
+        }
+
+        // Constraint 4: Check if this subject is a prerequisite for any active subject
+        $pdo = Database::getConnection();
+        $stmtPrereq = $pdo->prepare("
+            SELECT DISTINCT s.subject_code 
+            FROM prerequisites p 
+            JOIN subjects s ON s.id = p.subject_id 
+            WHERE p.prerequisite_subject_id = :id AND (s.is_archived = 0 OR s.is_archived IS NULL)
+        ");
+        $stmtPrereq->execute(['id' => $subject->id]);
+        $dependentCodes = $stmtPrereq->fetchAll(PDO::FETCH_COLUMN);
+        if (!empty($dependentCodes)) {
+            $deps = implode(', ', array_unique($dependentCodes));
+            $session->flash('error', "Cannot archive subject '{$code}'. It is a required prerequisite for active curriculum subject(s): {$deps}.");
+            redirect($redirectUrl);
+            return;
+        }
+
         $subject->update([
             'is_archived' => 1,
             'archived_at' => date('Y-m-d H:i:s'),
         ]);
 
         $session->flash('success', "Subject '{$code}' archived successfully.");
-        redirect('/admin/program-curricula' . ($redirectProgram ? '?program=' . urlencode($redirectProgram) : ''));
+        redirect($redirectUrl);
     }
 
     private function respondError(bool $isJson, Response $response, Session $session, string $error): void

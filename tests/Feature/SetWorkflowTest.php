@@ -265,4 +265,126 @@ class SetWorkflowTest extends TestCase
         $set->refresh();
         $this->assertSame('active', $set->status);
     }
+
+    public function testSetArchiveConstraintBlocksWhenStudentsAssigned(): void
+    {
+        $term = AcademicTerm::getActive();
+        $termId = (int) $term['id'];
+
+        $set = Set::create([
+            'name' => 'SET-STU-BLOCK-' . rand(100, 999),
+            'academic_term_id' => $termId,
+            'year_level' => 2,
+            'status' => 'active',
+        ]);
+        self::$cleanupSetIds[] = $set->id;
+
+        $unique = 'setblock_' . time() . '_' . rand(100, 999);
+        $user = User::create([
+            'first_name' => 'SetStu',
+            'last_name' => 'Constraint',
+            'email' => "{$unique}@gwc.edu",
+            'password' => password_hash('secret123', PASSWORD_BCRYPT),
+            'role' => 'Student',
+            'status' => 'active',
+        ]);
+        self::$cleanupUserIds[] = $user->id;
+
+        $student = Student::create([
+            'user_id' => $user->id,
+            'set_id' => $set->id,
+            'year_level' => 2,
+            'status' => 'Regular',
+        ]);
+
+        $adminController = new \App\Controllers\Admin\SetController();
+        $request = new \App\Core\Request();
+        $response = new \App\Core\Response();
+        $session = new \App\Core\Session();
+        $session->set('user', ['role' => 'Admin']);
+
+        // Archiving section with assigned students must fail
+        $adminController->archive($request, $response, $session, (string) $set->id);
+        $set->refresh();
+        $this->assertSame('active', $set->status);
+        $this->assertStringContainsString('It still has 1 assigned student(s)', (string) $session->getFlash('error'));
+
+        // Same for Dean SetController
+        $deanController = new \App\Controllers\Dean\SetController();
+        $deanController->archive($request, $response, $session, (string) $set->id);
+        $set->refresh();
+        $this->assertSame('active', $set->status);
+        $this->assertStringContainsString('It still has 1 assigned student(s)', (string) $session->getFlash('error'));
+
+        // Now reassign student away from set
+        $student->update(['set_id' => null]);
+
+        // Archiving empty section succeeds
+        $adminController->archive($request, $response, $session, (string) $set->id);
+        $set->refresh();
+        $this->assertSame('inactive', $set->status);
+        $this->assertStringContainsString('archived successfully', (string) $session->getFlash('success'));
+    }
+
+    public function testAdminSetBulkArchiveSkipsAssignedStudents(): void
+    {
+        $term = AcademicTerm::getActive();
+        $termId = (int) $term['id'];
+
+        // Set A: Has student
+        $setA = Set::create([
+            'name' => 'BULK-A-' . rand(100, 999),
+            'academic_term_id' => $termId,
+            'year_level' => 1,
+            'status' => 'active',
+        ]);
+        self::$cleanupSetIds[] = $setA->id;
+
+        $unique = 'bulk_' . time() . '_' . rand(100, 999);
+        $user = User::create([
+            'first_name' => 'BulkStu',
+            'last_name' => 'Test',
+            'email' => "{$unique}@gwc.edu",
+            'password' => password_hash('secret123', PASSWORD_BCRYPT),
+            'role' => 'Student',
+            'status' => 'active',
+        ]);
+        self::$cleanupUserIds[] = $user->id;
+
+        $student = Student::create([
+            'user_id' => $user->id,
+            'set_id' => $setA->id,
+            'year_level' => 1,
+            'status' => 'Regular',
+        ]);
+
+        // Set B: Empty
+        $setB = Set::create([
+            'name' => 'BULK-B-' . rand(100, 999),
+            'academic_term_id' => $termId,
+            'year_level' => 1,
+            'status' => 'active',
+        ]);
+        self::$cleanupSetIds[] = $setB->id;
+
+        $adminController = new \App\Controllers\Admin\SetController();
+        $request = new \App\Core\Request();
+        $response = new \App\Core\Response();
+        $session = new \App\Core\Session();
+        $session->set('user', ['role' => 'Admin']);
+
+        $_POST = ['ids' => [$setA->id, $setB->id]];
+        $adminController->bulkArchive($request, $response, $session);
+
+        $setA->refresh();
+        $setB->refresh();
+
+        // Set A with student was skipped and remains active
+        $this->assertSame('active', $setA->status);
+        // Set B was archived to inactive
+        $this->assertSame('inactive', $setB->status);
+        $flashMsg = (string) $session->getFlash('success');
+        $this->assertStringContainsString('1 set archived successfully', $flashMsg);
+        $this->assertStringContainsString('1 set(s) skipped', $flashMsg);
+    }
 }

@@ -13,6 +13,7 @@ use App\Models\Department;
 use App\Models\Program;
 use App\Models\Set;
 use App\Models\Student;
+use App\Models\StudentTermRegistration;
 
 class SetController
 {
@@ -251,6 +252,16 @@ class SetController
             return;
         }
 
+        // Constraint: Check assigned students and term registrations
+        $studentCount = Student::where('set_id', $set->id)->count();
+        $termRegCount = StudentTermRegistration::where('set_id', $set->id)->count();
+        if ($studentCount > 0 || $termRegCount > 0) {
+            $totalStudents = max($studentCount, $termRegCount);
+            $session->flash('error', "Cannot archive section '{$set->name}'. It still has {$totalStudents} assigned student(s). Please reassign students before archiving.");
+            redirect('/admin/sets');
+            return;
+        }
+
         $set->update(['status' => 'inactive']);
         $session->flash('success', "Section '{$set->name}' archived successfully.");
         redirect('/admin/sets');
@@ -305,12 +316,21 @@ class SetController
         }
 
         $archived = 0;
+        $skipped = 0;
         $termClosureService = new \App\Services\TermClosureService();
 
         foreach ($ids as $setId) {
             $set = Set::find($setId);
             if (!$set) continue;
             if ($termClosureService->isTermClosed((int) $set->academic_term_id)) {
+                $skipped++;
+                continue;
+            }
+
+            $hasStudents = Student::where('set_id', $set->id)->exists()
+                || StudentTermRegistration::where('set_id', $set->id)->exists();
+            if ($hasStudents) {
+                $skipped++;
                 continue;
             }
 
@@ -319,10 +339,23 @@ class SetController
             $archived++;
         }
 
+        if ($archived === 0 && $skipped > 0) {
+            $this->respondError($isJson, $response, $session, 'No sections were archived. Selected section(s) have assigned students or belong to a closed term.');
+            return;
+        }
+
         $msg = "{$archived} " . ($archived === 1 ? 'set' : 'sets') . ' archived successfully.';
+        if ($skipped > 0) {
+            $msg .= " ({$skipped} set(s) skipped due to assigned students or closed term).";
+        }
 
         if ($isJson) {
-            $response->json(['success' => true, 'message' => $msg]);
+            $response->json([
+                'success' => true,
+                'message' => $msg,
+                'archived_count' => $archived,
+                'skipped_count' => $skipped,
+            ]);
             return;
         }
 
