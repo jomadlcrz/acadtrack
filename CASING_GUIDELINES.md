@@ -37,7 +37,7 @@ Capitalize the first letter of each major word. Used exclusively to answer: *"Wh
 - **Page Titles (`$pageTitle`) & Breadcrumbs:**
   - `Faculty Dashboard`, `Dean Dashboard`, `Admin Dashboard`, `Student Dashboard`
   - `User Management`, `Add New User`, `Edit User`, `Institutional Settings`
-  - `Faculty Subject Assignments`, `Curricular Subjects`, `Grade Review & Approval`
+  - `Faculty Subject Assignments`, `Curriculum Subjects`, `Grade Review & Approval`
   - `Grade Encoding Sheet`, `My Assigned Subjects`, `Enrolled Students`
   - `My Academic Grades`, `Academic Evaluation`
 - **Modal / Dialog / Drawer Titles:**

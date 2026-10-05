@@ -197,7 +197,7 @@ include __DIR__ . '/../../layouts/dashboard.php';
 2. **No Inner Page Headers in Views:** Do not place `<div class="d-flex justify-content-between ..."><h2>...</h2></div>` inside the view body.
 3. **No Bottom Title Overwriting:** Never set `$pageTitle = '...'` at the bottom of the file before `include layouts/dashboard.php`.
 4. **Casing Rules:**
-   - `$pageTitle`: **Title Case** (e.g. `User Management`, `Curricular Subjects`, `Grade Encoding Sheet`).
+   - `$pageTitle`: **Title Case** (e.g. `User Management`, `Curriculum Subjects`, `Grade Encoding Sheet`).
    - `$subtitle`: **Sentence case**, concise 1-sentence description (e.g. `Manage institutional accounts, role assignments, and system access.`).
    - `$headerActions`: Action buttons must use **Sentence case** labels with Bootstrap Icons (e.g. `<i class="bi bi-person-plus"></i> Add user`, `<i class="bi bi-arrow-left"></i> Back to users`).
 

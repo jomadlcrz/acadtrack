@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Curricular Subjects';
+$pageTitle = 'Curriculum Subjects';
 $subtitle = 'Academic course offerings organized by year level and semester placement.';
 $headerActions = '<span class="badge bg-light text-secondary border px-2.5 py-1.5 fs-7 d-inline-flex align-items-center gap-1.5"><i class="bi bi-shield-lock"></i> Read-Only View</span>';
 

@@ -33,25 +33,25 @@ class SubjectController
 
     public function store(Request $request, Response $response, Session $session): void
     {
-        $session->flash('error', 'Curricular subjects are view-only. Academic curriculum authoring is managed by Administrators.');
+        $session->flash('error', 'Curriculum subjects are view-only. Academic curriculum authoring is managed by Administrators.');
         redirect('/dean/subjects');
     }
 
     public function update(Request $request, Response $response, Session $session, string $id): void
     {
-        $session->flash('error', 'Curricular subjects are view-only. Academic curriculum authoring is managed by Administrators.');
+        $session->flash('error', 'Curriculum subjects are view-only. Academic curriculum authoring is managed by Administrators.');
         redirect('/dean/subjects');
     }
 
     public function archive(Request $request, Response $response, Session $session, string $id): void
     {
-        $session->flash('error', 'Curricular subjects are view-only. Academic curriculum authoring is managed by Administrators.');
+        $session->flash('error', 'Curriculum subjects are view-only. Academic curriculum authoring is managed by Administrators.');
         redirect('/dean/subjects');
     }
 
     public function restore(Request $request, Response $response, Session $session, string $id): void
     {
-        $session->flash('error', 'Curricular subjects are view-only. Academic curriculum authoring is managed by Administrators.');
+        $session->flash('error', 'Curriculum subjects are view-only. Academic curriculum authoring is managed by Administrators.');
         redirect('/dean/subjects');
     }
 }
