@@ -290,7 +290,7 @@ $activeGradingMethod = $currentSubject['grading_method'] ?? 'zero_based';
                             <?= htmlspecialchars($activePeriodName) ?>
                         </span>
                     </div>
-                    <small class="text-muted">Compute student period mark from syllabus component breakdown (IntelliGrade model).</small>
+                    <small class="text-muted">Compute student period mark from syllabus component breakdown.</small>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -310,18 +310,18 @@ $activeGradingMethod = $currentSubject['grading_method'] ?? 'zero_based';
                         </select>
                     </div>
 
-                    <!-- Syllabus Template Selector -->
+                    <!-- Subject Type Selector -->
                     <div class="col-md-6">
-                        <label for="calcSubjectType" class="form-label small fw-semibold text-dark mb-1">Curricular Syllabus Model:</label>
+                        <label for="calcSubjectType" class="form-label small fw-semibold text-dark mb-1">Subject Type:</label>
                         <select id="calcSubjectType" class="form-select form-select-sm" onchange="switchSubjectTemplate()">
                             <option value="major_with_lab" <?= in_array($activeSubjectNature, ['Laboratory', 'Combined']) ? 'selected' : '' ?>>
-                                Major with Laboratory (Exam, Quiz, Lab Out/Perf, Part)
+                                Major with Lab
                             </option>
                             <option value="major_without_lab" <?= ($activeSubjectNature === 'Lecture') ? 'selected' : '' ?>>
-                                Major without Lab / Lecture (Exam, Quiz, Projects, Part, Assign)
+                                Major without Lab
                             </option>
                             <option value="research">
-                                Research / Thesis (Proposal, Implementation, Paper, Defense, Adviser)
+                                Research / Thesis
                             </option>
                         </select>
                     </div>
@@ -413,7 +413,7 @@ const INTELLI_TEMPLATES = {
         ]
     },
     'major_without_lab': {
-        label: 'Major without Lab (Lecture)',
+        label: 'Major without Lab',
         components: [
             { key: 'exam', label: 'Periodical Examination', weight: 0.40, isExam: true },
             { key: 'majorProjects', label: 'Major Term Projects / Outputs', weight: 0.20, isExam: false },
