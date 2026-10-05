@@ -13,6 +13,7 @@ use App\Repositories\GradeRepository;
 use App\Repositories\GradingSheetRepository;
 use App\Models\AcademicTerm;
 use App\Models\GradingPeriod;
+use App\Models\GradingSetting;
 use App\Services\GradingService;
 use App\Validators\GradeValidator;
 
@@ -81,11 +82,14 @@ class GradingController
             }
         }
 
+        $gradingSetting = GradingSetting::getForSubject($subjectId, $termId, (int) $user['id']);
+
         $html = (new View())->render('faculty.grading.index', [
             'students' => $students,
             'grades' => $gradeMap,
             'subjectId' => $subjectId,
             'currentSubject' => $currentSubject,
+            'gradingSetting' => $gradingSetting,
             'periodId' => $periodId,
             'periods' => $periods,
             'academicTerm' => $academicTerm,
@@ -158,5 +162,66 @@ class GradingController
         }
 
         redirect($redirectUrl);
+    }
+
+    public function saveSettings(Request $request, Response $response, Session $session): void
+    {
+        $subjectId = (int) $request->post('subject_id');
+        $periodId = (int) $request->post('period_id');
+        $termId = (int) $request->post('academic_term_id', 0);
+        $semester = (string) $request->post('semester', '');
+        $semQuery = $semester !== '' ? "&semester={$semester}" : '';
+
+        if ($termId === 0) {
+            $academicTerm = AcademicTerm::getActive();
+            $termId = (int) ($academicTerm['id'] ?? 1);
+        }
+
+        $user = $session->get('user');
+        $facultyId = (int) ($user['id'] ?? 0);
+
+        $gradingMethod = (string) $request->post('grading_method', 'zero_based');
+        if (!in_array($gradingMethod, ['zero_based', 'fifty_based'], true)) {
+            $gradingMethod = 'zero_based';
+        }
+
+        $prelimWeight = (float) $request->post('prelim_weight', 20.00);
+        $midtermWeight = (float) $request->post('midterm_weight', 20.00);
+        $semiFinalWeight = (float) $request->post('semi_final_weight', 20.00);
+        $finalWeight = (float) $request->post('final_weight', 40.00);
+
+        // Period weights must sum to 100%
+        $totalWeight = $prelimWeight + $midtermWeight + $semiFinalWeight + $finalWeight;
+        if (abs($totalWeight - 100.0) > 0.01) {
+            $session->flash('error', 'Period weights must sum to exactly 100%. Current total: ' . number_format($totalWeight, 2) . '%');
+            redirect("/faculty/grading?subject_id={$subjectId}&period_id={$periodId}{$semQuery}");
+            return;
+        }
+
+        try {
+            $setting = GradingSetting::where('subject_id', $subjectId)
+                ->where('academic_term_id', $termId)
+                ->first();
+
+            if (!$setting) {
+                $setting = new GradingSetting();
+                $setting->subject_id = $subjectId;
+                $setting->academic_term_id = $termId;
+            }
+
+            $setting->faculty_id = $facultyId;
+            $setting->grading_method = $gradingMethod;
+            $setting->prelim_weight = $prelimWeight;
+            $setting->midterm_weight = $midtermWeight;
+            $setting->semi_final_weight = $semiFinalWeight;
+            $setting->final_weight = $finalWeight;
+            $setting->save();
+
+            $session->flash('success', 'Grading settings and period weights applied to subject successfully.');
+        } catch (\Throwable $e) {
+            $session->flash('error', 'Failed to save subject grading settings: ' . $e->getMessage());
+        }
+
+        redirect("/faculty/grading?subject_id={$subjectId}&period_id={$periodId}{$semQuery}");
     }
 }

@@ -166,6 +166,7 @@ $router->get('/faculty/students/pass-data', [StudentController::class, 'getPassD
 $router->get('/faculty/grading', [GradingController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
 $router->post('/faculty/grading/save', [GradingController::class, 'save'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->post('/faculty/grading/submit', [GradingController::class, 'submit'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
+$router->post('/faculty/grading/settings', [GradingController::class, 'saveSettings'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->get('/faculty/attendance', [AttendanceController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
 $router->post('/faculty/attendance/save', [AttendanceController::class, 'save'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->get('/faculty/attendance/student-history', [AttendanceController::class, 'getStudentHistory'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
