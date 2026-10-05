@@ -186,7 +186,7 @@ $activeGradingMethod = $currentSubject['grading_method'] ?? 'zero_based';
 
             <div class="table-responsive" style="max-height: 65vh;">
                 <table class="table table-hover align-middle mb-0" id="rosterTable">
-                    <thead class="bg-white border-bottom sticky-top">
+                    <thead class="bg-white sticky-top">
                         <tr>
                             <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 160px; font-size: 11px;">Student ID</th>
                             <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Student name</th>
