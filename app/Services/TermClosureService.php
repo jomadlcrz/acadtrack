@@ -523,6 +523,7 @@ class TermClosureService
                 WHERE academic_term_id = :term_id
             ");
             $stmtPeriods->execute(['term_id' => $termId]);
+            \App\Models\GradingPeriod::syncCurrentPeriod($termId);
 
             // Record audit log entry
             $this->recordAuditLog(
@@ -580,6 +581,10 @@ class TermClosureService
             action: $isClosed ? 'period_locked' : 'period_unlocked',
             details: $isClosed ? "{$gpName} grading period locked: " . ($reason ?? 'Cutoff reached') : "{$gpName} grading period reopened for corrections"
         );
+
+        if (!empty($gpRow['academic_term_id'])) {
+            \App\Models\GradingPeriod::syncCurrentPeriod((int) $gpRow['academic_term_id']);
+        }
 
         return [
             'success' => true,

@@ -55,7 +55,8 @@ class GradeReviewController
             default => [],
         };
 
-        // Period filter: default to the term's current grading period, "all" shows every period
+        // Period filter: automatically resolve and sync the current grading period
+        \App\Models\GradingPeriod::syncCurrentPeriod($termId);
         $periods = \App\Models\GradingPeriod::getByAcademicTerm($termId);
         $periodParam = (string) $request->get('period', '');
         $validPeriodIds = array_map(static fn (array $p): string => (string) $p['id'], $periods);

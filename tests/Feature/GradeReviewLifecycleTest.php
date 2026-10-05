@@ -270,4 +270,36 @@ class GradeReviewLifecycleTest extends TestCase
         $this->assertSame($this->deanId, (int) $events[3]['actor_id']);
         $this->assertNotSame('', $events[3]['actor_name']);
     }
+
+    public function testAutomaticGradingPeriodResolutionAndSync(): void
+    {
+        $current = GradingPeriod::syncCurrentPeriod($this->termId);
+        $this->assertNotNull($current);
+        $this->assertSame(1, (int) $current['is_current']);
+
+        // Verify in DB that only this period has is_current = 1 for this term
+        $allTermPeriods = GradingPeriod::getByAcademicTerm($this->termId);
+        $currentCount = 0;
+        foreach ($allTermPeriods as $p) {
+            if ((int) $p['is_current'] === 1) {
+                $currentCount++;
+                $this->assertSame((int) $current['id'], (int) $p['id']);
+            }
+        }
+        $this->assertSame(1, $currentCount);
+
+        // Verify determineCurrent behaves predictably if periods are closed
+        $closureService = new \App\Services\TermClosureService();
+        $closureService->togglePeriodState((int) $current['id'], 'closed', 'Test closure');
+
+        $nextPeriod = GradingPeriod::determineCurrent($this->termId);
+        $this->assertNotNull($nextPeriod);
+        $this->assertNotSame((int) $current['id'], (int) $nextPeriod['id']);
+        $this->assertGreaterThan((int) $current['order_num'], (int) $nextPeriod['order_num']);
+
+        // Reopen and verify it returns
+        $closureService->togglePeriodState((int) $current['id'], 'open');
+        $reopened = GradingPeriod::determineCurrent($this->termId);
+        $this->assertSame((int) $current['id'], (int) $reopened['id']);
+    }
 }
