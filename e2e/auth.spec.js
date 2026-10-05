@@ -8,6 +8,7 @@ test.describe('Authentication Flows', () => {
     // Verify title and page headers
     await expect(page).toHaveTitle(/Sign In|Acadtrack/);
     await expect(page.locator('.auth-brand-emblem')).toBeVisible();
+    await expect(page.locator('.auth-brand-sys')).toContainText('Golden West Colleges, Inc.');
     await expect(page.locator('#email')).toBeVisible();
     await expect(page.locator('#password')).toBeVisible();
     await expect(page.locator('#submitBtn')).toBeVisible();

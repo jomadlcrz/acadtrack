@@ -33,7 +33,7 @@ $displaySuccess = $success ?? null;
                     </a>
                     <div class="auth-brand-text">
                         <span class="auth-brand-inst">College of Information Technology</span>
-                        <span class="auth-brand-sys">Acadtrack</span>
+                        <span class="auth-brand-sys">Acadtrack &bull; Golden West Colleges, Inc.</span>
                     </div>
                 </div>
 
@@ -63,7 +63,7 @@ $displaySuccess = $success ?? null;
                         </a>
                         <div>
                             <span class="auth-mobile-inst">College of Information Technology</span>
-                            <span class="auth-mobile-sys">Acadtrack</span>
+                            <span class="auth-mobile-sys">Acadtrack &bull; Golden West Colleges, Inc.</span>
                         </div>
                     </div>
 

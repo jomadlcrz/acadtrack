@@ -202,7 +202,7 @@
                 <img src="<?= asset('images/cite.png') ?>" alt="College of Information Technology Logo" class="landing-logo">
                 <div class="landing-brand-text">
                     <span class="landing-college-name">College of Information Technology</span>
-                    <span class="landing-system-tag">Acadtrack &bull; GWC</span>
+                    <span class="landing-system-tag">Acadtrack &bull; Golden West Colleges, Inc.</span>
                 </div>
             </a>
         </div>

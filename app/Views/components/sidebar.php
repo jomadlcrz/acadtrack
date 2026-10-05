@@ -1,6 +1,12 @@
 <aside class="sidebar" id="appSidebar">
     <div class="sidebar-mobile-header d-lg-none">
-        <span class="sidebar-mobile-title">Navigation</span>
+        <div class="sidebar-drawer-brand">
+            <img src="<?= asset('images/cite.png') ?>" alt="CITE Logo" class="sidebar-drawer-logo">
+            <div class="sidebar-drawer-text">
+                <span class="sidebar-mobile-title">Acadtrack</span>
+                <span class="sidebar-drawer-subtitle">Golden West Colleges, Inc.</span>
+            </div>
+        </div>
         <button type="button" class="btn-sidebar-close" id="sidebarCloseBtn" aria-label="Close navigation menu">
             <i class="bi bi-x-lg"></i>
         </button>
@@ -168,6 +174,43 @@
             </div>
         <?php endif; ?>
     </nav>
+
+    <?php
+    $sidebarUser = $_SESSION['user'] ?? null;
+    if ($sidebarUser):
+        $userRole = $sidebarUser['role'] ?? 'Student';
+        $firstName = $sidebarUser['first_name'] ?? '';
+        $lastName = $sidebarUser['last_name'] ?? '';
+        $fullName = trim($firstName . ' ' . $lastName) ?: 'User';
+        $userEmail = $sidebarUser['email'] ?? '';
+    ?>
+    <div class="sidebar-footer d-lg-none">
+        <div class="dropup w-100">
+            <button type="button" class="sidebar-user-trigger w-100" id="sidebarUserDropdownBtn" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" title="User account options">
+                <div class="sidebar-user-info">
+                    <span class="sidebar-user-name"><?= htmlspecialchars($fullName) ?></span>
+                    <span class="badge badge-role badge-<?= strtolower($userRole) ?>"><?= htmlspecialchars($userRole) ?></span>
+                </div>
+                <i class="bi bi-chevron-expand sidebar-user-chevron" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end sidebar-user-dropdown-menu shadow" aria-labelledby="sidebarUserDropdownBtn">
+                <li class="dropdown-header">
+                    <div class="fw-semibold text-dark text-truncate" style="max-width: 220px;"><?= htmlspecialchars($fullName) ?></div>
+                    <?php if ($userEmail): ?>
+                        <div class="small text-muted text-truncate" style="max-width: 220px;"><?= htmlspecialchars($userEmail) ?></div>
+                    <?php endif; ?>
+                </li>
+                <li><hr class="dropdown-divider my-1"></li>
+                <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center gap-2 text-danger py-2 sidebar-logout-btn" data-bs-toggle="modal" data-bs-target="#logoutConfirmModal">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Sign out</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <?php endif; ?>
 </aside>
 <script>
 (function() {

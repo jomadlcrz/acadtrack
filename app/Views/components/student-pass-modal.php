@@ -16,7 +16,7 @@
                             <div>
                                 <div class="pass-institution-title">College of Information Technology</div>
                                 <div class="pass-doc-title">Official Digital Student Pass</div>
-                                <div class="small opacity-75 text-white" style="font-size: 11.5px;">Golden West Colleges &bull; Office of Academic Affairs</div>
+                                <div class="small opacity-75 text-white" style="font-size: 11.5px;">Golden West Colleges, Inc. &bull; Office of Academic Affairs</div>
                             </div>
                         </div>
                     </div>

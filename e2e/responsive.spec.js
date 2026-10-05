@@ -5,6 +5,7 @@ const { test, expect } = require('@playwright/test');
  * Helper to log in a user with specific credentials.
  */
 async function loginAs(page, email, password) {
+    await page.context().clearCookies();
     await page.goto('login');
     await page.locator('#email').fill(email);
     await page.locator('#password').fill(password);
@@ -39,6 +40,21 @@ test.describe('Portal Pages Responsiveness', () => {
         // Verify zero horizontal scrollbar on root
         await assertNoHorizontalOverflow(page);
 
+        // Verify mobile navbar has no ellipsis truncation and displays system branding
+        const brandTitle = page.locator('.navbar-brand-title');
+        await expect(brandTitle).toBeVisible();
+        await expect(brandTitle).toContainText('College of Information Technology');
+        const brandTextOverflow = await brandTitle.evaluate(el => window.getComputedStyle(el).textOverflow);
+        expect(brandTextOverflow).not.toBe('ellipsis');
+
+        const brandSystem = page.locator('.navbar-brand-system');
+        await expect(brandSystem).toBeVisible();
+        await expect(brandSystem).toContainText('Acadtrack');
+        await expect(brandSystem).toContainText('Golden West Colleges, Inc.');
+
+        // Capture screenshot of mobile navbar without ellipsis
+        await page.screenshot({ path: 'test-results/mobile-navbar.png' });
+
         // Sidebar toggle button must be visible on mobile
         const toggleBtn = page.locator('#sidebarToggle');
         await expect(toggleBtn).toBeVisible();
@@ -62,9 +78,47 @@ test.describe('Portal Pages Responsiveness', () => {
             return Math.abs(rect.left) < 2;
         });
 
+        // Verify mobile drawer header shows complete school name
+        await expect(page.locator('.sidebar-drawer-subtitle')).toContainText('Golden West Colleges, Inc.');
+
         // Close sidebar via the close button
         const closeBtn = page.locator('#sidebarCloseBtn');
         await expect(closeBtn).toBeVisible();
+
+        // Verify mobile sidebar footer contains user profile with chevron, no avatar, and hidden sign out
+        const sidebarFooter = page.locator('.sidebar-footer');
+        await expect(sidebarFooter).toBeVisible();
+        await expect(sidebarFooter.locator('.sidebar-avatar')).toHaveCount(0);
+        await expect(sidebarFooter.locator('.sidebar-user-name')).toBeVisible();
+
+        // Chevron icon is visible on user trigger and uses bi-chevron-expand (<>)
+        const chevron = sidebarFooter.locator('.sidebar-user-chevron');
+        await expect(chevron).toBeVisible();
+        await expect(chevron).toHaveClass(/bi-chevron-expand/);
+
+        // Sign out button is initially hidden
+        const logoutBtn = sidebarFooter.locator('.sidebar-logout-btn');
+        await expect(logoutBtn).toBeHidden();
+
+        // Capture screenshot of mobile drawer with user info and chevron
+        await page.screenshot({ path: 'test-results/mobile-sidebar-footer.png' });
+
+        // Click user info trigger to reveal popover
+        const userTrigger = sidebarFooter.locator('#sidebarUserDropdownBtn');
+        await userTrigger.click();
+
+        // Sign out button is now visible inside popover
+        await expect(logoutBtn).toBeVisible();
+
+        // Capture screenshot of mobile drawer with popover open
+        await page.screenshot({ path: 'test-results/mobile-sidebar-user-popover.png' });
+
+        // Close popover before closing sidebar
+        await userTrigger.click();
+
+        // Verify top navbar-right is hidden on mobile
+        await expect(page.locator('.navbar-right')).toBeHidden();
+
         await closeBtn.click();
         await expect(page.locator('body')).not.toHaveClass(/sidebar-open/);
 
@@ -119,7 +173,7 @@ test.describe('Portal Pages Responsiveness', () => {
 
     test('Mobile viewport (375x667): Dean Grade Review Queue', async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 667 });
-        await loginAs(page, 'dean@gwc.edu', 'Admin123!');
+        await loginAs(page, 'dean@gwc.edu', 'dean123');
 
         await page.goto('dean/grade-review');
         await page.waitForLoadState('networkidle');
@@ -137,7 +191,7 @@ test.describe('Portal Pages Responsiveness', () => {
 
     test('Mobile viewport (375x667): Faculty Dashboard', async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 667 });
-        await loginAs(page, 'faculty@gwc.edu', 'Admin123!');
+        await loginAs(page, 'faculty@gwc.edu', 'faculty123');
 
         await expect(page).toHaveURL(/.*faculty\/dashboard/);
         await expect(page.locator('h1')).toBeVisible();
@@ -147,7 +201,7 @@ test.describe('Portal Pages Responsiveness', () => {
 
     test('Mobile viewport (375x667): Student Dashboard', async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 667 });
-        await loginAs(page, 'student@gwc.edu', 'Admin123!');
+        await loginAs(page, 'student@gwc.edu', 'student123');
 
         await expect(page).toHaveURL(/.*student\/dashboard/);
         await expect(page.locator('h1')).toBeVisible();

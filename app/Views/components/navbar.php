@@ -16,12 +16,12 @@ $fullName = trim($firstName . ' ' . $lastName) ?: 'User';
             <img src="<?= asset('images/cite.png') ?>" alt="CITE Logo" class="navbar-brand-logo">
             <div class="navbar-brand-text">
                 <span class="navbar-brand-title">College of Information Technology</span>
-                <span class="navbar-brand-system">Acadtrack &bull; GWC</span>
+                <span class="navbar-brand-system">Acadtrack &bull; Golden West Colleges, Inc.</span>
             </div>
         </a>
     </div>
 
-    <div class="navbar-right">
+    <div class="navbar-right d-none d-lg-flex">
         <?php if ($currentUser): ?>
             <div class="navbar-user-card">
                 <div class="navbar-user-meta d-flex flex-column text-end">
