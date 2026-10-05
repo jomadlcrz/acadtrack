@@ -158,4 +158,186 @@
     }
 }
 
+/* 8. Modern Minimal Filter Popover (Linear / Stripe Pattern) */
+.filter-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.filter-trigger-btn {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    font-weight: 500;
+    font-size: 0.8125rem;
+    padding: 7px 14px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.filter-trigger-btn:hover,
+.filter-trigger-btn:focus {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+.filter-trigger-btn[aria-expanded="true"] {
+    background: #f1f5f9;
+    border-color: #64748b;
+    color: #0f172a;
+    box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
+}
+
+.filter-trigger-btn.has-filters {
+    border-color: #3b82f6;
+    color: #1e3a8a;
+    background-color: #eff6ff;
+    font-weight: 600;
+}
+
+.filter-popover-panel {
+    min-width: 300px;
+    max-width: 360px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+    background: #ffffff;
+    z-index: 1055;
+    margin-top: 6px !important;
+}
+
+.filter-popover-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.filter-popover-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+}
+
+.filter-popover-reset {
+    font-size: 0.75rem;
+    color: #ef4444;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.filter-popover-reset:hover {
+    color: #dc2626;
+    text-decoration: underline;
+}
+
+.filter-popover-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.filter-field-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0;
+}
+
+.filter-popover-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    margin-top: 14px;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* Filter Chips (Active Filters) */
+.filter-chip-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: #1e40af;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.filter-chip:hover {
+    background: #dbeafe;
+    color: #1e3a8a;
+}
+
+.filter-chip .chip-label {
+    color: #64748b;
+    font-weight: 400;
+}
+
+.filter-chip .chip-remove {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #94a3b8;
+    margin-left: 2px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    line-height: 1;
+}
+
+.filter-chip:hover .chip-remove {
+    color: #ef4444;
+}
+
+.filter-clear-all-chip {
+    background: none;
+    border: none;
+    font-size: 0.75rem;
+    color: #64748b;
+    text-decoration: none;
+    padding: 3px 6px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.filter-clear-all-chip:hover {
+    color: #ef4444;
+    text-decoration: underline;
+}
+
+
 

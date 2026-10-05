@@ -12,8 +12,25 @@ $headerActions = '
 ob_start();
 ?>
 
+<?php
+$activeFilterCount = 0;
+if (!empty($selectedSet)) { $activeFilterCount++; }
+if (($selectedSemester ?? '1') !== '1') { $activeFilterCount++; }
+$hasActiveFilters = $activeFilterCount > 0 || !empty($currentSearch);
+
+$activeSetName = '';
+if (!empty($selectedSet)) {
+    foreach ($sets ?? [] as $s) {
+        if ((int)$s['id'] === (int)$selectedSet) {
+            $activeSetName = $s['name'];
+            break;
+        }
+    }
+}
+?>
+
 <!-- Search, Filter & Statistics Bar -->
-<div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between mb-4">
+<div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between mb-2">
     <form method="GET" action="<?= url('/faculty/students') ?>" class="d-flex flex-wrap align-items-center gap-2 flex-grow-1" id="studentsFilterForm">
         <div class="position-relative flex-grow-1" style="min-width: 220px; max-width: 320px;">
             <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 14px;"></i>
@@ -27,11 +44,6 @@ ob_start();
                    <?= !$hasSubjects ? 'disabled' : '' ?>>
         </div>
 
-        <select id="semester_select" name="semester" class="form-select w-auto" onchange="this.form.submit()">
-            <option value="1" <?= ($selectedSemester ?? '1') === '1' ? 'selected' : '' ?>>1st Semester</option>
-            <option value="2" <?= ($selectedSemester ?? '1') === '2' ? 'selected' : '' ?>>2nd Semester</option>
-        </select>
-
         <select id="subject_id_select" name="subject_id" class="form-select w-auto" style="min-width: 200px; max-width: 280px;" onchange="this.form.submit()" <?= !$hasSubjects ? 'disabled' : '' ?>>
             <?php if (!$hasSubjects): ?>
                 <option value="">No subjects assigned</option>
@@ -44,20 +56,85 @@ ob_start();
             <?php endif; ?>
         </select>
 
-        <select id="set_id_filter" name="set_id" class="form-select w-auto" onchange="window.fetchStudents()" <?= !$hasSubjects ? 'disabled' : '' ?>>
-            <option value="">All Sets</option>
-            <?php foreach (($sets ?? []) as $set): ?>
-                <option value="<?= $set['id'] ?>" <?= ((int)($selectedSet ?? 0) === (int)$set['id']) ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($set['name']) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+        <!-- Consolidated Filter Dropdown Popover -->
+        <div class="dropdown filter-dropdown">
+            <button type="button" 
+                    class="btn filter-trigger-btn <?= $activeFilterCount > 0 ? 'has-filters' : '' ?>" 
+                    id="facultyStudentsFilterBtn" 
+                    data-bs-toggle="dropdown" 
+                    data-bs-auto-close="outside" 
+                    aria-expanded="false"
+                    <?= !$hasSubjects ? 'disabled' : '' ?>>
+                <i class="bi bi-filter"></i>
+                <span>Filters</span>
+                <span class="badge bg-primary text-white rounded-pill px-1.5 py-0.5 <?= $activeFilterCount > 0 ? '' : 'd-none' ?>" id="facultyStudentsFilterBadge" style="font-size: 10px;"><?= $activeFilterCount ?></span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-start filter-popover-panel" aria-labelledby="facultyStudentsFilterBtn">
+                <div class="filter-popover-header">
+                    <h6 class="filter-popover-title">
+                        <i class="bi bi-filter text-primary"></i> Filter Roster
+                    </h6>
+                    <button type="button" class="filter-popover-reset <?= $activeFilterCount > 0 ? '' : 'd-none' ?>" id="facultyStudentsResetBtn" onclick="resetFacultyStudentFilters()">Reset</button>
+                </div>
+                <div class="filter-popover-body">
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Semester</label>
+                        <select id="semester_select" name="semester" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="1" <?= ($selectedSemester ?? '1') === '1' ? 'selected' : '' ?>>1st Semester</option>
+                            <option value="2" <?= ($selectedSemester ?? '1') === '2' ? 'selected' : '' ?>>2nd Semester</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Section / Set</label>
+                        <select id="set_id_filter" name="set_id" class="form-select form-select-sm" onchange="updateFacultyStudentFilters(); window.fetchStudents();" <?= !$hasSubjects ? 'disabled' : '' ?>>
+                            <option value="">All Sets</option>
+                            <?php foreach (($sets ?? []) as $set): ?>
+                                <option value="<?= $set['id'] ?>" <?= ((int)($selectedSet ?? 0) === (int)$set['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($set['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-popover-footer">
+                    <button type="button" class="btn btn-sm btn-light" onclick="bootstrap.Dropdown.getInstance(document.getElementById('facultyStudentsFilterBtn')).hide()">Close</button>
+                    <button type="button" class="btn btn-sm btn-primary px-3" onclick="bootstrap.Dropdown.getInstance(document.getElementById('facultyStudentsFilterBtn')).hide()">Apply filters</button>
+                </div>
+            </div>
+        </div>
+
+        <?php if ($hasActiveFilters): ?>
+            <a href="<?= url('/faculty/students' . ($subjectId ? '?subject_id=' . $subjectId : '')) ?>" class="btn btn-outline-secondary btn-sm" title="Clear all filters">
+                <i class="bi bi-x-circle me-1"></i> Clear
+            </a>
+        <?php endif; ?>
     </form>
 
     <div class="text-muted small fw-medium text-nowrap" id="studentCounter">
         <?php $totalCount = (int)($pagination['total'] ?? count($students)); ?>
         <?= number_format($totalCount) ?> <?= $totalCount === 1 ? 'student enrolled' : 'students enrolled' ?>
     </div>
+</div>
+
+<!-- Active Filter Chips Bar -->
+<div class="filter-chip-bar mb-3 <?= $activeFilterCount > 0 ? '' : 'd-none' ?>" id="facultyStudentsChipBar">
+    <?php if ($activeFilterCount > 0): ?>
+        <span class="small text-muted me-1">Active filters:</span>
+        <?php if (($selectedSemester ?? '1') === '2'): ?>
+            <span class="filter-chip">
+                <span class="chip-label">Semester:</span> 2nd Semester
+                <button type="button" class="chip-remove" onclick="clearFacultyStudentFilter('semester')">&times;</button>
+            </span>
+        <?php endif; ?>
+        <?php if (!empty($activeSetName)): ?>
+            <span class="filter-chip">
+                <span class="chip-label">Section:</span> <?= htmlspecialchars($activeSetName) ?>
+                <button type="button" class="chip-remove" onclick="clearFacultyStudentFilter('set')">&times;</button>
+            </span>
+        <?php endif; ?>
+        <button type="button" class="filter-clear-all-chip" onclick="resetFacultyStudentFilters()">Clear filters</button>
+    <?php endif; ?>
 </div>
 
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
@@ -449,6 +526,87 @@ function viewStudentPass(studentId, subjectId, termId) {
             console.error('Failed to load student pass', err);
             alert('Failed to load student pass details.');
         });
+}
+
+function updateFacultyStudentFilters() {
+    const setSelect = document.getElementById('set_id_filter');
+    const semSelect = document.getElementById('semester_select');
+    const badge = document.getElementById('facultyStudentsFilterBadge');
+    const triggerBtn = document.getElementById('facultyStudentsFilterBtn');
+    const resetBtn = document.getElementById('facultyStudentsResetBtn');
+    const chipBar = document.getElementById('facultyStudentsChipBar');
+
+    const setVal = setSelect ? setSelect.value : '';
+    const semVal = semSelect ? semSelect.value : '1';
+
+    let count = 0;
+    if (setVal) count++;
+    if (semVal !== '1') count++;
+
+    if (badge && triggerBtn) {
+        if (count > 0) {
+            badge.textContent = count;
+            badge.classList.remove('d-none');
+            triggerBtn.classList.add('has-filters');
+            if (resetBtn) resetBtn.classList.remove('d-none');
+        } else {
+            badge.classList.add('d-none');
+            triggerBtn.classList.remove('has-filters');
+            if (resetBtn) resetBtn.classList.add('d-none');
+        }
+    }
+
+    if (chipBar) {
+        if (count > 0) {
+            let chipsHtml = '<span class="small text-muted me-1">Active filters:</span>';
+            if (semVal !== '1') {
+                chipsHtml += '<span class="filter-chip"><span class="chip-label">Semester:</span> 2nd Semester <button type="button" class="chip-remove" onclick="clearFacultyStudentFilter(\'semester\')">&times;</button></span>';
+            }
+            if (setVal) {
+                const setText = setSelect.options[setSelect.selectedIndex]?.text || setVal;
+                chipsHtml += '<span class="filter-chip"><span class="chip-label">Section:</span> ' + setText + ' <button type="button" class="chip-remove" onclick="clearFacultyStudentFilter(\'set\')">&times;</button></span>';
+            }
+            chipsHtml += '<button type="button" class="filter-clear-all-chip" onclick="resetFacultyStudentFilters()">Clear filters</button>';
+            chipBar.innerHTML = chipsHtml;
+            chipBar.classList.remove('d-none');
+        } else {
+            chipBar.innerHTML = '';
+            chipBar.classList.add('d-none');
+        }
+    }
+}
+
+function clearFacultyStudentFilter(type) {
+    if (type === 'semester') {
+        const semSelect = document.getElementById('semester_select');
+        if (semSelect) {
+            semSelect.value = '1';
+            document.getElementById('studentsFilterForm').submit();
+            return;
+        }
+    }
+    if (type === 'set') {
+        const setSelect = document.getElementById('set_id_filter');
+        if (setSelect) {
+            setSelect.value = '';
+            updateFacultyStudentFilters();
+            window.fetchStudents();
+        }
+    }
+}
+
+function resetFacultyStudentFilters() {
+    const semSelect = document.getElementById('semester_select');
+    const setSelect = document.getElementById('set_id_filter');
+    const needSubmit = semSelect && semSelect.value !== '1';
+    if (semSelect) semSelect.value = '1';
+    if (setSelect) setSelect.value = '';
+    if (needSubmit) {
+        document.getElementById('studentsFilterForm').submit();
+    } else {
+        updateFacultyStudentFilters();
+        window.fetchStudents();
+    }
 }
 </script>
 

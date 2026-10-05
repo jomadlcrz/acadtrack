@@ -128,7 +128,7 @@ ob_start();
 </div>
 
 <!-- Search & Filtering Controls Bar -->
-<div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between mb-4">
+<div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between mb-2">
     <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1" style="max-width: 760px;">
         <div class="position-relative flex-grow-1" style="min-width: 250px;">
             <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 14px;"></i>
@@ -140,19 +140,52 @@ ob_start();
                    onkeyup="applyFilters()">
         </div>
 
-        <select class="form-select w-auto" id="yearLevelFilter" onchange="applyFilters()">
-            <option value="ALL">All Year Levels</option>
-            <option value="1">1st Year Only</option>
-            <option value="2">2nd Year Only</option>
-            <option value="3">3rd Year Only</option>
-            <option value="4">4th Year Only</option>
-        </select>
+        <!-- Consolidated Filter Dropdown Popover -->
+        <div class="dropdown filter-dropdown">
+            <button type="button" 
+                    class="btn filter-trigger-btn" 
+                    id="assignmentsFilterBtn" 
+                    data-bs-toggle="dropdown" 
+                    data-bs-auto-close="outside" 
+                    aria-expanded="false">
+                <i class="bi bi-filter"></i>
+                <span>Filters</span>
+                <span class="badge bg-primary text-white rounded-pill px-1.5 py-0.5 d-none" id="assignmentsFilterBadge" style="font-size: 10px;">0</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-start filter-popover-panel" aria-labelledby="assignmentsFilterBtn">
+                <div class="filter-popover-header">
+                    <h6 class="filter-popover-title">
+                        <i class="bi bi-filter text-primary"></i> Filter Courses
+                    </h6>
+                    <button type="button" class="filter-popover-reset d-none" id="assignmentsFilterResetBtn" onclick="resetDropdownFilters()">Reset</button>
+                </div>
+                <div class="filter-popover-body">
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Year level</label>
+                        <select class="form-select form-select-sm" id="yearLevelFilter" onchange="applyFilters()">
+                            <option value="ALL">All Year Levels</option>
+                            <option value="1">1st Year Only</option>
+                            <option value="2">2nd Year Only</option>
+                            <option value="3">3rd Year Only</option>
+                            <option value="4">4th Year Only</option>
+                        </select>
+                    </div>
 
-        <select class="form-select w-auto" id="statusFilter" onchange="applyFilters()">
-            <option value="ALL">All Statuses</option>
-            <option value="ASSIGNED">Assigned Only</option>
-            <option value="UNASSIGNED">Unassigned Only</option>
-        </select>
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Assignment status</label>
+                        <select class="form-select form-select-sm" id="statusFilter" onchange="applyFilters()">
+                            <option value="ALL">All Statuses</option>
+                            <option value="ASSIGNED">Assigned Only</option>
+                            <option value="UNASSIGNED">Unassigned Only</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-popover-footer">
+                    <button type="button" class="btn btn-sm btn-light" onclick="bootstrap.Dropdown.getInstance(document.getElementById('assignmentsFilterBtn')).hide()">Close</button>
+                    <button type="button" class="btn btn-sm btn-primary px-3" onclick="bootstrap.Dropdown.getInstance(document.getElementById('assignmentsFilterBtn')).hide()">Apply filters</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="d-flex flex-wrap align-items-center gap-2">
@@ -164,6 +197,9 @@ ob_start();
         </div>
     </div>
 </div>
+
+<!-- Active Filter Chips Bar -->
+<div class="filter-chip-bar mb-3 d-none" id="assignmentsChipBar"></div>
 
 <!-- Year Level Group Containers -->
 <div class="space-y-4" id="groupsContainer">
@@ -623,12 +659,52 @@ function applyFilters() {
             noResults.classList.add('d-none');
         }
     }
+
+    // Update filter badge and reset buttons
+    var activeFilterCount = 0;
+    if (yearFilter !== 'ALL') activeFilterCount++;
+    if (statusFilter !== 'ALL') activeFilterCount++;
+
+    var badge = document.getElementById('assignmentsFilterBadge');
+    var triggerBtn = document.getElementById('assignmentsFilterBtn');
+    var resetBtn = document.getElementById('assignmentsFilterResetBtn');
+    var chipBar = document.getElementById('assignmentsChipBar');
+
+    if (badge && triggerBtn) {
+        if (activeFilterCount > 0) {
+            badge.textContent = activeFilterCount;
+            badge.classList.remove('d-none');
+            triggerBtn.classList.add('has-filters');
+            if (resetBtn) resetBtn.classList.remove('d-none');
+        } else {
+            badge.classList.add('d-none');
+            triggerBtn.classList.remove('has-filters');
+            if (resetBtn) resetBtn.classList.add('d-none');
+        }
+    }
+
+    if (chipBar) {
+        if (activeFilterCount > 0) {
+            var chipsHtml = '<span class="small text-muted me-1">Active filters:</span>';
+            if (yearFilter !== 'ALL') {
+                var yearLabels = { '1': '1st Year', '2': '2nd Year', '3': '3rd Year', '4': '4th Year' };
+                chipsHtml += '<span class="filter-chip"><span class="chip-label">Year:</span> ' + (yearLabels[yearFilter] || yearFilter) + ' <button type="button" class="chip-remove" onclick="clearAssignmentFilter(\'year\')">&times;</button></span>';
+            }
+            if (statusFilter !== 'ALL') {
+                var statusLabel = statusFilter === 'ASSIGNED' ? 'Assigned' : 'Unassigned';
+                chipsHtml += '<span class="filter-chip"><span class="chip-label">Status:</span> ' + statusLabel + ' <button type="button" class="chip-remove" onclick="clearAssignmentFilter(\'status\')">&times;</button></span>';
+            }
+            chipsHtml += '<button type="button" class="filter-clear-all-chip" onclick="resetDropdownFilters()">Clear filters</button>';
+            chipBar.innerHTML = chipsHtml;
+            chipBar.classList.remove('d-none');
+        } else {
+            chipBar.innerHTML = '';
+            chipBar.classList.add('d-none');
+        }
+    }
 }
 
-function resetFilters() {
-    var searchInput = document.getElementById('assignmentSearch');
-    if (searchInput) searchInput.value = '';
-    
+function resetDropdownFilters() {
     var yearFilter = document.getElementById('yearLevelFilter');
     if (yearFilter) yearFilter.value = 'ALL';
     
@@ -636,6 +712,24 @@ function resetFilters() {
     if (statusFilter) statusFilter.value = 'ALL';
     
     applyFilters();
+}
+
+function clearAssignmentFilter(type) {
+    if (type === 'year') {
+        var yearFilter = document.getElementById('yearLevelFilter');
+        if (yearFilter) yearFilter.value = 'ALL';
+    }
+    if (type === 'status') {
+        var statusFilter = document.getElementById('statusFilter');
+        if (statusFilter) statusFilter.value = 'ALL';
+    }
+    applyFilters();
+}
+
+function resetFilters() {
+    var searchInput = document.getElementById('assignmentSearch');
+    if (searchInput) searchInput.value = '';
+    resetDropdownFilters();
 }
 </script>
 

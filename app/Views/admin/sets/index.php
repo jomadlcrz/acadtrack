@@ -11,7 +11,7 @@ ob_start();
 ?>
 
 <!-- Search, Filter & Statistics Bar -->
-<div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between mb-4">
+<div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between mb-2">
     <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1" style="max-width: 720px;">
         <div class="position-relative flex-grow-1" style="min-width: 220px;">
             <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 14px;"></i>
@@ -19,23 +19,57 @@ ob_start();
                    id="setSearch" 
                    class="form-control ps-5" 
                    placeholder="Search by section, code, or program..." 
-                   autocomplete="off">
+                   autocomplete="off"
+                   oninput="applyFilters()">
         </div>
 
-        <select class="form-select w-auto" id="programFilter" onchange="applyFilters()">
-            <option value="ALL">All Programs</option>
-            <?php foreach ($programs as $prog): ?>
-                <option value="<?= htmlspecialchars($prog->program_abbrev) ?>"><?= htmlspecialchars($prog->program_abbrev) ?></option>
-            <?php endforeach; ?>
-        </select>
+        <!-- Consolidated Filter Dropdown Popover -->
+        <div class="dropdown filter-dropdown">
+            <button type="button" 
+                    class="btn filter-trigger-btn" 
+                    id="setsFilterBtn" 
+                    data-bs-toggle="dropdown" 
+                    data-bs-auto-close="outside" 
+                    aria-expanded="false">
+                <i class="bi bi-filter"></i>
+                <span>Filters</span>
+                <span class="badge bg-primary text-white rounded-pill px-1.5 py-0.5 d-none" id="setsFilterBadge" style="font-size: 10px;">0</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-start filter-popover-panel" aria-labelledby="setsFilterBtn">
+                <div class="filter-popover-header">
+                    <h6 class="filter-popover-title">
+                        <i class="bi bi-filter text-primary"></i> Filter Sections
+                    </h6>
+                    <button type="button" class="filter-popover-reset d-none" id="setsFilterResetBtn" onclick="resetFilters()">Reset</button>
+                </div>
+                <div class="filter-popover-body">
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Program</label>
+                        <select class="form-select form-select-sm" id="programFilter" onchange="applyFilters()">
+                            <option value="ALL">All Programs</option>
+                            <?php foreach ($programs as $prog): ?>
+                                <option value="<?= htmlspecialchars($prog->program_abbrev) ?>"><?= htmlspecialchars($prog->program_abbrev) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-        <select class="form-select w-auto" id="yearFilter" onchange="applyFilters()">
-            <option value="ALL">All Years</option>
-            <option value="1">1st Year</option>
-            <option value="2">2nd Year</option>
-            <option value="3">3rd Year</option>
-            <option value="4">4th Year</option>
-        </select>
+                    <div class="filter-field-group">
+                        <label class="filter-field-label">Year level</label>
+                        <select class="form-select form-select-sm" id="yearFilter" onchange="applyFilters()">
+                            <option value="ALL">All Years</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-popover-footer">
+                    <button type="button" class="btn btn-sm btn-light" onclick="bootstrap.Dropdown.getInstance(document.getElementById('setsFilterBtn')).hide()">Close</button>
+                    <button type="button" class="btn btn-sm btn-primary px-3" onclick="bootstrap.Dropdown.getInstance(document.getElementById('setsFilterBtn')).hide()">Apply filters</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="d-flex align-items-center gap-2">
@@ -49,6 +83,9 @@ ob_start();
         </div>
     </div>
 </div>
+
+<!-- Active Filter Chips Bar -->
+<div class="filter-chip-bar mb-3 d-none" id="setsChipBar"></div>
 
 <!-- Sets Table Card -->
 <div class="card mb-4" style="border: 1px solid #cbd5e1 !important; border-radius: 6px; box-shadow: none !important;">
@@ -441,6 +478,60 @@ function applyFilters() {
     if (emptyRow && rows.length > 0) {
         emptyRow.style.display = visibleCount === 0 ? '' : 'none';
     }
+
+    // Update filter badge and reset buttons
+    let activeFilterCount = 0;
+    if (prog !== 'ALL') activeFilterCount++;
+    if (year !== 'ALL') activeFilterCount++;
+
+    const badge = document.getElementById('setsFilterBadge');
+    const triggerBtn = document.getElementById('setsFilterBtn');
+    const resetBtn = document.getElementById('setsFilterResetBtn');
+    const chipBar = document.getElementById('setsChipBar');
+
+    if (badge && triggerBtn) {
+        if (activeFilterCount > 0) {
+            badge.textContent = activeFilterCount;
+            badge.classList.remove('d-none');
+            triggerBtn.classList.add('has-filters');
+            if (resetBtn) resetBtn.classList.remove('d-none');
+        } else {
+            badge.classList.add('d-none');
+            triggerBtn.classList.remove('has-filters');
+            if (resetBtn) resetBtn.classList.add('d-none');
+        }
+    }
+
+    if (chipBar) {
+        if (activeFilterCount > 0) {
+            let chipsHtml = '<span class="small text-muted me-1">Active filters:</span>';
+            if (prog !== 'ALL') {
+                chipsHtml += `<span class="filter-chip"><span class="chip-label">Program:</span> ${prog} <button type="button" class="chip-remove" onclick="clearFilter('program')">&times;</button></span>`;
+            }
+            if (year !== 'ALL') {
+                const yearLabels = { '1': '1st Year', '2': '2nd Year', '3': '3rd Year', '4': '4th Year' };
+                chipsHtml += `<span class="filter-chip"><span class="chip-label">Year:</span> ${yearLabels[year] || year} <button type="button" class="chip-remove" onclick="clearFilter('year')">&times;</button></span>`;
+            }
+            chipsHtml += `<button type="button" class="filter-clear-all-chip" onclick="resetFilters()">Clear filters</button>`;
+            chipBar.innerHTML = chipsHtml;
+            chipBar.classList.remove('d-none');
+        } else {
+            chipBar.innerHTML = '';
+            chipBar.classList.add('d-none');
+        }
+    }
+}
+
+function resetFilters() {
+    document.getElementById('programFilter').value = 'ALL';
+    document.getElementById('yearFilter').value = 'ALL';
+    applyFilters();
+}
+
+function clearFilter(type) {
+    if (type === 'program') document.getElementById('programFilter').value = 'ALL';
+    if (type === 'year') document.getElementById('yearFilter').value = 'ALL';
+    applyFilters();
 }
 
 function toggleSelectAll(masterCheckbox) {

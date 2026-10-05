@@ -13,37 +13,127 @@ $total = (int) ($staff['total'] ?? 0);
 ob_start();
 ?>
 
-<form method="GET" action="<?= url('/admin/staff') ?>" id="staffFilterForm"
-      class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between mb-4">
-    <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1">
-        <div class="position-relative flex-grow-1" style="min-width: 220px; max-width: 340px;">
-            <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 14px;"></i>
-            <input type="text" name="search" class="form-control ps-5" placeholder="Search by name or email..."
-                   value="<?= htmlspecialchars($currentSearch) ?>" autocomplete="off">
+<?php
+$activeFilterCount = 0;
+if (!empty($currentRole)) { $activeFilterCount++; }
+if (!empty($currentDepartment)) { $activeFilterCount++; }
+if (!empty($currentStatus)) { $activeFilterCount++; }
+$hasActiveFilters = $activeFilterCount > 0 || !empty($currentSearch);
+
+$activeDeptName = '';
+if (!empty($currentDepartment)) {
+    foreach ($departments as $d) {
+        if ((int)$d['id'] === (int)$currentDepartment) {
+            $activeDeptName = $d['dept_name'];
+            break;
+        }
+    }
+}
+?>
+
+<form method="GET" action="<?= url('/admin/staff') ?>" id="staffFilterForm" class="mb-4">
+    <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between">
+        <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1">
+            <div class="position-relative flex-grow-1" style="min-width: 240px; max-width: 360px;">
+                <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 14px;"></i>
+                <input type="text" name="search" class="form-control ps-5" placeholder="Search by name or email..."
+                       value="<?= htmlspecialchars($currentSearch) ?>" autocomplete="off">
+            </div>
+
+            <!-- Single Consolidated Filter Dropdown Popover -->
+            <div class="dropdown filter-dropdown">
+                <button type="button" 
+                        class="btn filter-trigger-btn <?= $activeFilterCount > 0 ? 'has-filters' : '' ?>" 
+                        id="adminStaffFilterBtn" 
+                        data-bs-toggle="dropdown" 
+                        data-bs-auto-close="outside" 
+                        aria-expanded="false">
+                    <i class="bi bi-filter"></i>
+                    <span>Filters</span>
+                    <?php if ($activeFilterCount > 0): ?>
+                        <span class="badge bg-primary text-white rounded-pill px-1.5 py-0.5" style="font-size: 10px;"><?= $activeFilterCount ?></span>
+                    <?php endif; ?>
+                </button>
+                <div class="dropdown-menu dropdown-menu-start filter-popover-panel" aria-labelledby="adminStaffFilterBtn">
+                    <div class="filter-popover-header">
+                        <h6 class="filter-popover-title">
+                            <i class="bi bi-filter text-primary"></i> Filter Faculty & Staff
+                        </h6>
+                        <?php if ($activeFilterCount > 0): ?>
+                            <a href="<?= url('/admin/staff' . (!empty($currentSearch) ? '?search=' . urlencode($currentSearch) : '')) ?>" class="filter-popover-reset">Reset</a>
+                        <?php endif; ?>
+                    </div>
+                    <div class="filter-popover-body">
+                        <div class="filter-field-group">
+                            <label class="filter-field-label">Role</label>
+                            <select name="role" class="form-select form-select-sm">
+                                <option value="">All roles</option>
+                                <?php foreach (['Faculty', 'Dean', 'Admin'] as $r): ?>
+                                    <option value="<?= $r ?>" <?= $currentRole === $r ? 'selected' : '' ?>><?= $r ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="filter-field-group">
+                            <label class="filter-field-label">Department</label>
+                            <select name="department_id" class="form-select form-select-sm">
+                                <option value="">All departments</option>
+                                <?php foreach ($departments as $d): ?>
+                                    <option value="<?= (int) $d['id'] ?>" <?= (int) $currentDepartment === (int) $d['id'] ? 'selected' : '' ?>><?= htmlspecialchars($d['dept_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="filter-field-group">
+                            <label class="filter-field-label">Status</label>
+                            <select name="status" class="form-select form-select-sm">
+                                <option value="">All statuses</option>
+                                <option value="active" <?= $currentStatus === 'active' ? 'selected' : '' ?>>Active</option>
+                                <option value="inactive" <?= $currentStatus === 'inactive' ? 'selected' : '' ?>>Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-popover-footer">
+                        <button type="button" class="btn btn-sm btn-light" onclick="bootstrap.Dropdown.getInstance(document.getElementById('adminStaffFilterBtn')).hide()">Close</button>
+                        <button type="submit" class="btn btn-sm btn-primary px-3">Apply filters</button>
+                    </div>
+                </div>
+            </div>
+
+            <?php if ($hasActiveFilters): ?>
+                <a href="<?= url('/admin/staff') ?>" class="btn btn-outline-secondary btn-sm" title="Clear all filters">
+                    <i class="bi bi-x-circle me-1"></i> Clear
+                </a>
+            <?php endif; ?>
         </div>
 
-        <select name="role" class="form-select w-auto" onchange="this.form.submit()">
-            <option value="">All roles</option>
-            <?php foreach (['Faculty', 'Dean', 'Admin'] as $r): ?>
-                <option value="<?= $r ?>" <?= $currentRole === $r ? 'selected' : '' ?>><?= $r ?></option>
-            <?php endforeach; ?>
-        </select>
-
-        <select name="department_id" class="form-select w-auto" onchange="this.form.submit()">
-            <option value="">All departments</option>
-            <?php foreach ($departments as $d): ?>
-                <option value="<?= (int) $d['id'] ?>" <?= (int) $currentDepartment === (int) $d['id'] ? 'selected' : '' ?>><?= htmlspecialchars($d['dept_name']) ?></option>
-            <?php endforeach; ?>
-        </select>
-
-        <select name="status" class="form-select w-auto" onchange="this.form.submit()">
-            <option value="">All statuses</option>
-            <option value="active" <?= $currentStatus === 'active' ? 'selected' : '' ?>>Active</option>
-            <option value="inactive" <?= $currentStatus === 'inactive' ? 'selected' : '' ?>>Inactive</option>
-        </select>
+        <div class="text-muted small fw-medium text-nowrap"><?= number_format($total) ?> <?= $total === 1 ? 'account' : 'accounts' ?></div>
     </div>
 
-    <div class="text-muted small fw-medium text-nowrap"><?= number_format($total) ?> <?= $total === 1 ? 'account' : 'accounts' ?></div>
+    <!-- Active filter chips -->
+    <?php if ($activeFilterCount > 0): ?>
+        <div class="filter-chip-bar mt-2">
+            <span class="small text-muted me-1">Active filters:</span>
+            <?php if (!empty($currentRole)): ?>
+                <span class="filter-chip">
+                    <span class="chip-label">Role:</span> <?= htmlspecialchars($currentRole) ?>
+                </span>
+            <?php endif; ?>
+            <?php if (!empty($activeDeptName)): ?>
+                <span class="filter-chip">
+                    <span class="chip-label">Department:</span> <?= htmlspecialchars($activeDeptName) ?>
+                </span>
+            <?php endif; ?>
+            <?php if (!empty($currentStatus)): ?>
+                <span class="filter-chip">
+                    <span class="chip-label">Status:</span> <?= ucfirst($currentStatus) ?>
+                </span>
+            <?php endif; ?>
+            <a href="<?= url('/admin/staff' . (!empty($currentSearch) ? '?search=' . urlencode($currentSearch) : '')) ?>" class="filter-clear-all-chip">
+                Clear filters
+            </a>
+        </div>
+    <?php endif; ?>
 </form>
 
 <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
