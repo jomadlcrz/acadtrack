@@ -32,6 +32,7 @@ class GradeReviewLifecycleTest extends TestCase
     private User $studentUser;
     private Student $student;
     private int $sheetId;
+    private ?Subject $testSubject = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -51,11 +52,22 @@ class GradeReviewLifecycleTest extends TestCase
 
         $term = AcademicTerm::where('semester', '1')->first();
         $this->termId = (int) $term->id;
-        $this->subjectId = (int) Subject::where('academic_term_id', $this->termId)->first()->id;
         $this->periodId = (int) GradingPeriod::where('academic_term_id', $this->termId)->where('order_num', 1)->first()->id;
         $this->deanId = (int) User::where('role', 'Dean')->first()->id;
 
         $uniq = time() . '_' . rand(1000, 9999);
+        $this->testSubject = Subject::create([
+            'academic_term_id' => $this->termId,
+            'subject_code' => "TST-{$uniq}",
+            'descriptive_title' => "Review Test Subject {$uniq}",
+            'units' => 3.0,
+            'subject_type' => 'GenEd Core',
+            'nature' => 'Lecture',
+            'year_level' => 1,
+            'semester' => 1,
+        ]);
+        $this->subjectId = (int) $this->testSubject->id;
+
         $this->faculty = User::create([
             'first_name' => 'Review',
             'last_name' => "Instructor_{$uniq}",
@@ -88,6 +100,9 @@ class GradeReviewLifecycleTest extends TestCase
         Grade::where('student_id', (int) $this->student->id)->delete();
         Enrollment::where('student_id', (int) $this->student->id)->delete();
         GradingSheet::where('faculty_id', (int) $this->faculty->id)->delete(); // events cascade
+        if ($this->testSubject) {
+            $this->testSubject->delete();
+        }
         $this->student->delete();
         $this->studentUser->delete();
         $this->faculty->delete();

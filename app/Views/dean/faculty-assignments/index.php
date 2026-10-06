@@ -292,8 +292,14 @@ ob_start();
                                     <td class="py-3 px-3">
                                         <?php if ($isAssigned): ?>
                                             <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                <?php $renderedKeys = []; ?>
                                                 <?php foreach ($assignedList as $inst): ?>
                                                     <?php 
+                                                        $dedupKey = ($inst['faculty_id'] ?? 0) . '_' . ($inst['set_id'] ?? 'all');
+                                                        if (isset($renderedKeys[$dedupKey])) {
+                                                            continue;
+                                                        }
+                                                        $renderedKeys[$dedupKey] = true;
                                                         $firstInitial = strtoupper(substr($inst['first_name'] ?? 'F', 0, 1));
                                                         $lastInitial = strtoupper(substr($inst['last_name'] ?? 'M', 0, 1));
                                                         $initials = $firstInitial . $lastInitial;
@@ -418,33 +424,35 @@ ob_start();
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small fw-semibold d-flex justify-content-between align-items-center">
+                        <label class="form-label small fw-semibold d-flex justify-content-between align-items-center mb-1.5">
                             <span>Assigned Sections / Sets <span class="text-muted fw-normal">(Optional)</span></span>
                             <span class="small text-muted" id="modalSetCountBadge"></span>
                         </label>
-                        <div id="modalSetContainer" class="border rounded p-2.5 bg-light-subtle" style="max-height: 150px; overflow-y: auto;">
-                            <div class="form-check mb-1.5 pb-1.5 border-bottom">
-                                <input class="form-check-input" type="checkbox" id="modal_set_all" checked>
-                                <label class="form-check-label small fw-semibold" for="modal_set_all">
-                                    All sections / general course assignment
-                                </label>
+                        <div id="modalSetContainer" class="border rounded-2 bg-white" style="max-height: 160px; overflow-y: auto;">
+                            <div class="p-2.5 px-3 bg-light border-bottom d-flex align-items-center">
+                                <div class="form-check m-0">
+                                    <input class="form-check-input" type="checkbox" id="modal_set_all" checked>
+                                    <label class="form-check-label small fw-semibold text-dark user-select-none" for="modal_set_all">
+                                        All sections / general course assignment
+                                    </label>
+                                </div>
                             </div>
-                            <div id="modalSetCheckboxes" class="d-flex flex-wrap gap-2 pt-1">
+                            <div id="modalSetCheckboxes" class="p-2.5 px-3 d-flex flex-wrap gap-3">
                                 <?php if (empty($sets)): ?>
                                     <span class="text-muted small">No sections created for this term.</span>
                                 <?php else: ?>
                                     <?php foreach ($sets as $set): ?>
-                                        <div class="form-check set-checkbox-item" 
+                                        <div class="form-check set-checkbox-item m-0" 
                                              data-year="<?= (int)$set['year_level'] ?>" 
                                              data-program="<?= (int)($set['program_id'] ?? 0) ?>"
-                                             style="min-width: 105px;">
+                                             style="min-width: 110px;">
                                             <input class="form-check-input set-checkbox" 
                                                    type="checkbox" 
                                                    name="set_ids[]" 
                                                    value="<?= (int)$set['id'] ?>" 
                                                    id="set_cb_<?= (int)$set['id'] ?>" 
                                                    disabled>
-                                            <label class="form-check-label small" for="set_cb_<?= (int)$set['id'] ?>">
+                                            <label class="form-check-label small user-select-none" for="set_cb_<?= (int)$set['id'] ?>">
                                                 <?= htmlspecialchars($set['set_name']) ?>
                                             </label>
                                         </div>
@@ -452,7 +460,7 @@ ob_start();
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <div class="form-text small">Select the section(s) this instructor handles. Leaving &ldquo;All sections&rdquo; checked assigns them across the entire subject.</div>
+                        <div class="form-text small mt-1.5">Select the section(s) this instructor handles. Leaving &ldquo;All sections&rdquo; checked assigns them across the entire subject.</div>
                     </div>
 
                     <div class="mb-3">
@@ -588,7 +596,12 @@ ob_start();
 (function () {
     var assignedBySubject = <?= json_encode(array_reduce($subjects, function ($carry, $s) {
         $carry[(string) $s['id']] = array_map(function ($a) {
-            return ['id' => (int) $a['faculty_id'], 'name' => trim(($a['first_name'] ?? '') . ' ' . ($a['last_name'] ?? ''))];
+            return [
+                'id' => (int) $a['faculty_id'],
+                'name' => trim(($a['first_name'] ?? '') . ' ' . ($a['last_name'] ?? '')),
+                'set_id' => isset($a['set_id']) && $a['set_id'] !== null ? (int) $a['set_id'] : null,
+                'set_name' => $a['set_name'] ?? null,
+            ];
         }, $s['assigned_faculty'] ?? []);
         return $carry;
     }, []), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
@@ -634,10 +647,17 @@ ob_start();
             if (matches) {
                 item.style.display = '';
                 visibleCount++;
+                var cb = item.querySelector('.set-checkbox');
+                if (cb && setAllCb && !setAllCb.checked) {
+                    cb.disabled = false;
+                }
             } else {
                 item.style.display = 'none';
                 var cb = item.querySelector('.set-checkbox');
-                if (cb) cb.checked = false;
+                if (cb) {
+                    cb.checked = false;
+                    cb.disabled = true;
+                }
             }
         });
 
@@ -655,9 +675,11 @@ ob_start();
                 });
             } else {
                 setCheckboxes.forEach(function (cb) {
-                    cb.disabled = false;
+                    var item = cb.closest('.set-checkbox-item');
+                    cb.disabled = (item && item.style.display === 'none');
                 });
             }
+            syncAssigned();
         });
     }
 
@@ -665,20 +687,90 @@ ob_start();
         cb.addEventListener('change', function () {
             if (this.checked && setAllCb && setAllCb.checked) {
                 setAllCb.checked = false;
-                setCheckboxes.forEach(function (c) { c.disabled = false; });
+                setCheckboxes.forEach(function (c) {
+                    var item = c.closest('.set-checkbox-item');
+                    c.disabled = (item && item.style.display === 'none');
+                });
             }
+            syncAssigned();
         });
     });
 
     function syncAssigned() {
-        var assigned = assignedBySubject[subjectEl.value] || [];
-        var ids = assigned.map(function (a) { return String(a.id); });
+        var subId = subjectEl ? subjectEl.value : '';
+        var assigned = assignedBySubject[subId] || [];
+
+        // Determine currently targeted sections
+        var isAllSections = !setAllCb || setAllCb.checked;
+        var selectedSetIds = [];
+        if (!isAllSections) {
+            setCheckboxes.forEach(function (cb) {
+                if (cb.checked && !cb.disabled) {
+                    selectedSetIds.push(parseInt(cb.value, 10));
+                }
+            });
+        }
+
+        // Map facultyId -> array of assignments for this subject
+        var facultyAssignments = {};
+        assigned.forEach(function (a) {
+            var fId = String(a.id);
+            if (!facultyAssignments[fId]) {
+                facultyAssignments[fId] = [];
+            }
+            facultyAssignments[fId].push(a);
+        });
 
         Array.prototype.forEach.call(facultyEl.options, function (o) {
             if (o.value === '') return;
             var base = o.getAttribute('data-label') || o.textContent;
-            var taken = ids.indexOf(o.value) !== -1;
-            o.textContent = taken ? base + ' \u2014 already assigned' : base;
+            var listForFaculty = facultyAssignments[o.value] || [];
+
+            var taken = false;
+            var reason = '';
+
+            if (listForFaculty.length > 0) {
+                var hasGeneral = listForFaculty.some(function (item) { return item.set_id === null || item.set_id === 0; });
+
+                if (isAllSections) {
+                    taken = true;
+                    if (hasGeneral) {
+                        reason = 'already assigned';
+                    } else {
+                        var sectionNames = listForFaculty.map(function (item) { return item.set_name; }).filter(Boolean);
+                        reason = sectionNames.length ? 'already assigned (' + sectionNames.join(', ') + ')' : 'already assigned';
+                    }
+                } else if (selectedSetIds.length > 0) {
+                    if (hasGeneral) {
+                        taken = true;
+                        reason = 'already assigned (all sections)';
+                    } else {
+                        var assignedSetIds = listForFaculty.map(function (item) { return item.set_id; });
+                        var allSelectedAlreadyAssigned = selectedSetIds.every(function (sId) {
+                            return assignedSetIds.indexOf(sId) !== -1;
+                        });
+                        if (allSelectedAlreadyAssigned) {
+                            taken = true;
+                            var matchedNames = listForFaculty
+                                .filter(function (item) { return selectedSetIds.indexOf(item.set_id) !== -1; })
+                                .map(function (item) { return item.set_name; })
+                                .filter(Boolean);
+                            reason = matchedNames.length ? 'already assigned (' + matchedNames.join(', ') + ')' : 'already assigned';
+                        }
+                    }
+                } else {
+                    if (hasGeneral) {
+                        taken = true;
+                        reason = 'already assigned';
+                    }
+                }
+            }
+
+            o.disabled = taken;
+            if (taken && o.selected) {
+                o.selected = false;
+            }
+            o.textContent = taken ? base + ' \u2014 ' + reason : base;
         });
         facultyEl.comboboxRefresh && facultyEl.comboboxRefresh();
 
@@ -686,20 +778,20 @@ ob_start();
         assigned.forEach(function (a) {
             var b = document.createElement('span');
             b.className = 'badge bg-light text-dark border fw-normal';
-            b.textContent = a.name;
+            b.textContent = a.name + (a.set_name ? ' (' + a.set_name + ')' : '');
             listEl.appendChild(b);
         });
         wrap.classList.toggle('d-none', assigned.length === 0);
     }
 
     subjectEl.addEventListener('change', function () {
-        syncAssigned();
         syncSetOptions();
+        syncAssigned();
         // Continue straight to the instructors field so focus is never lost
         if (subjectEl.value && facultyEl.comboboxFocus) facultyEl.comboboxFocus();
     });
-    syncAssigned();
     syncSetOptions();
+    syncAssigned();
 })();
 </script>
 

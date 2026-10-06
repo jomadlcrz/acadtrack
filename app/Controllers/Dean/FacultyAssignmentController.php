@@ -100,23 +100,42 @@ class FacultyAssignmentController
             $termId = (int) ($academicTerm['id'] ?? 1);
         }
 
+        $assignedCount = 0;
+        $skippedCount = 0;
+
         if (empty($setIds)) {
             foreach ($facultyIds as $facultyId) {
+                if ($this->facultyRepository->hasAssignment($facultyId, $subjectId, $termId, null)) {
+                    $skippedCount++;
+                    continue;
+                }
                 $this->facultyRepository->assignSubject($facultyId, $subjectId, $termId, null);
                 $this->logAssignment('Instructor Assigned', true, $facultyId, $subjectId);
+                $assignedCount++;
             }
         } else {
             foreach ($facultyIds as $facultyId) {
                 foreach ($setIds as $setId) {
+                    if ($this->facultyRepository->hasAssignment($facultyId, $subjectId, $termId, $setId)) {
+                        $skippedCount++;
+                        continue;
+                    }
                     $this->facultyRepository->assignSubject($facultyId, $subjectId, $termId, $setId);
                     $this->logAssignment('Instructor Assigned', true, $facultyId, $subjectId, $setId);
+                    $assignedCount++;
                 }
             }
         }
 
-        $session->flash('success', count($facultyIds) === 1
-            ? 'Instructor assigned successfully to course offering.'
-            : count($facultyIds) . ' instructors assigned successfully to course offering.');
+        if ($assignedCount === 0 && $skippedCount > 0) {
+            $session->flash('warning', 'The selected instructor(s) are already assigned to this course offering.');
+        } elseif ($skippedCount > 0) {
+            $session->flash('success', "Assigned {$assignedCount} instructor(s). {$skippedCount} instructor assignment(s) were already present and skipped.");
+        } else {
+            $session->flash('success', $assignedCount === 1
+                ? 'Instructor assigned successfully to course offering.'
+                : "{$assignedCount} instructors assigned successfully to course offering.");
+        }
         redirect("/dean/faculty-assignments{$semQuery}");
     }
 

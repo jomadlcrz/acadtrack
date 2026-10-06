@@ -31,9 +31,85 @@ class FacultyRepository
         return Faculty::getAssignedSubjects($facultyId, $academicTermId);
     }
 
+    public function hasAssignment(int $facultyId, int $subjectId, int $academicTermId, ?int $setId = null): bool
+    {
+        $db = \App\Core\Database::getConnection();
+        if ($setId !== null && $setId > 0) {
+            $stmt = $db->prepare("
+                SELECT id FROM faculty_subjects
+                WHERE faculty_id = :faculty_id
+                  AND subject_id = :subject_id
+                  AND academic_term_id = :academic_term_id
+                  AND set_id = :set_id
+                LIMIT 1
+            ");
+            $stmt->execute([
+                'faculty_id' => $facultyId,
+                'subject_id' => $subjectId,
+                'academic_term_id' => $academicTermId,
+                'set_id' => $setId,
+            ]);
+        } else {
+            $stmt = $db->prepare("
+                SELECT id FROM faculty_subjects
+                WHERE faculty_id = :faculty_id
+                  AND subject_id = :subject_id
+                  AND academic_term_id = :academic_term_id
+                  AND set_id IS NULL
+                LIMIT 1
+            ");
+            $stmt->execute([
+                'faculty_id' => $facultyId,
+                'subject_id' => $subjectId,
+                'academic_term_id' => $academicTermId,
+            ]);
+        }
+
+        return (bool) $stmt->fetchColumn();
+    }
+
     public function assignSubject(int $facultyId, int $subjectId, int $academicTermId, ?int $setId = null): int
     {
-        $stmt = \App\Core\Database::getConnection()->prepare("
+        $db = \App\Core\Database::getConnection();
+
+        // Prevent duplicate assignment
+        if ($setId !== null && $setId > 0) {
+            $checkStmt = $db->prepare("
+                SELECT id FROM faculty_subjects
+                WHERE faculty_id = :faculty_id
+                  AND subject_id = :subject_id
+                  AND academic_term_id = :academic_term_id
+                  AND set_id = :set_id
+                LIMIT 1
+            ");
+            $checkStmt->execute([
+                'faculty_id' => $facultyId,
+                'subject_id' => $subjectId,
+                'academic_term_id' => $academicTermId,
+                'set_id' => $setId,
+            ]);
+        } else {
+            $checkStmt = $db->prepare("
+                SELECT id FROM faculty_subjects
+                WHERE faculty_id = :faculty_id
+                  AND subject_id = :subject_id
+                  AND academic_term_id = :academic_term_id
+                  AND set_id IS NULL
+                LIMIT 1
+            ");
+            $checkStmt->execute([
+                'faculty_id' => $facultyId,
+                'subject_id' => $subjectId,
+                'academic_term_id' => $academicTermId,
+            ]);
+        }
+
+        $existingId = $checkStmt->fetchColumn();
+        if ($existingId) {
+            return (int) $existingId;
+        }
+
+        $stmt = $db->prepare("
             INSERT INTO faculty_subjects (faculty_id, subject_id, set_id, academic_term_id, assigned_at)
             VALUES (:faculty_id, :subject_id, :set_id, :academic_term_id, NOW())
         ");
@@ -43,7 +119,7 @@ class FacultyRepository
             'set_id' => $setId,
             'academic_term_id' => $academicTermId,
         ]);
-        return (int) \App\Core\Database::getConnection()->lastInsertId();
+        return (int) $db->lastInsertId();
     }
 
     public function getAssignmentsForTerm(int $academicTermId): array

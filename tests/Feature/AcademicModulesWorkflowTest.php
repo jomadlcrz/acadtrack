@@ -284,4 +284,46 @@ class AcademicModulesWorkflowTest extends TestCase
         $pdo->exec("DELETE FROM academic_years WHERE school_year = '2088-2089'");
         $_POST = [];
     }
+
+    public function testFacultyAssignmentPreventsDuplicateAssignments(): void
+    {
+        $term = AcademicTerm::getActive();
+        $termId = (int) $term['id'];
+        $faculty = \App\Models\User::where('role', 'Faculty')->first();
+
+        $this->assertNotNull($faculty);
+
+        $uniq = time() . '_' . rand(1000, 9999);
+        $testSubject = Subject::create([
+            'academic_term_id' => $termId,
+            'subject_code' => "TST-DUP-{$uniq}",
+            'descriptive_title' => "Dup Test Subject {$uniq}",
+            'units' => 3.0,
+            'subject_type' => 'GenEd Core',
+            'nature' => 'Lecture',
+            'year_level' => 1,
+            'semester' => 1,
+        ]);
+        $subjectId = (int) $testSubject->id;
+        $facultyId = (int) $faculty['id'];
+        $facultyRepo = new \App\Repositories\FacultyRepository();
+        $pdo = \App\Core\Database::getConnection();
+
+        try {
+            // First assignment
+            $id1 = $facultyRepo->assignSubject($facultyId, $subjectId, $termId, null);
+            $this->assertGreaterThan(0, $id1);
+            $this->assertTrue($facultyRepo->hasAssignment($facultyId, $subjectId, $termId, null));
+
+            // Re-assigning same subject and null set_id should return the existing ID and NOT duplicate
+            $id2 = $facultyRepo->assignSubject($facultyId, $subjectId, $termId, null);
+            $this->assertSame($id1, $id2);
+
+            $count = (int) $pdo->query("SELECT COUNT(*) FROM faculty_subjects WHERE faculty_id = {$facultyId} AND subject_id = {$subjectId} AND academic_term_id = {$termId} AND set_id IS NULL")->fetchColumn();
+            $this->assertSame(1, $count, 'Should only have 1 row in faculty_subjects, preventing duplicate assignment');
+        } finally {
+            $pdo->prepare("DELETE FROM faculty_subjects WHERE subject_id = ?")->execute([$subjectId]);
+            $testSubject->delete();
+        }
+    }
 }
