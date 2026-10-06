@@ -1,7 +1,8 @@
 <?php
 $pageTitle = 'Academic Evaluation';
 $subtitle = 'Official curricular evaluation, weighted averages, and academic standing.';
-$headerActions = '<a href="' . url('/student/grades') . '" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><i class="bi bi-arrow-left"></i> Back to grades</a>';
+$headerActions = '<a href="' . url('/student/grades') . '" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><i class="bi bi-arrow-left"></i> Back to grades</a>'
+    . '<button type="button" id="printEvaluationBtn" class="btn btn-primary d-inline-flex align-items-center gap-2"><i class="bi bi-printer"></i> Print</button>';
 ob_start();
 ?>
 
@@ -131,6 +132,23 @@ ob_start();
         </div>
     <?php endif; ?>
 </div>
+
+<style>
+@media print {
+    .navbar, .sidebar, .sidebar-backdrop, .dashboard-actions, .dashboard-header .btn, .card-header .btn-group {
+        display: none !important;
+    }
+}
+</style>
+
+<script>
+(function () {
+    const printBtn = document.getElementById('printEvaluationBtn');
+    if (printBtn) {
+        printBtn.addEventListener('click', function () { window.print(); });
+    }
+})();
+</script>
 
 <?php
 $content = ob_get_clean();
