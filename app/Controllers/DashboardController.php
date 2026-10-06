@@ -245,7 +245,7 @@ class DashboardController
             'student' => $student,
             'set' => $set,
             'activeTerm' => $activeTerm,
-            'enrolledCount' => !empty($summary) ? count($summary) : count($grades),
+            'enrolledCount' => count($grades),
             'grades' => $grades,
             'summary' => $summary,
             'overallAttendance' => $overallAttendance,

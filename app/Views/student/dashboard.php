@@ -97,7 +97,6 @@ ob_start();
                 <tr>
                     <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Subject code</th>
                     <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Descriptive title</th>
-                    <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Instructor</th>
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 11px;">Prelim</th>
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 11px;">Midterm</th>
                     <th class="py-2.5 px-3 text-secondary text-uppercase fw-semibold text-center" style="font-size: 11px;">Semi-final</th>
@@ -106,12 +105,9 @@ ob_start();
                 </tr>
             </thead>
             <tbody class="divide-y">
-                <?php
-                $classesList = !empty($summary) ? $summary : [];
-                ?>
-                <?php if (empty($classesList)): ?>
+                <?php if (empty($grades)): ?>
                     <tr>
-                        <td colspan="8" class="p-0">
+                        <td colspan="7" class="p-0">
                             <?php
                             $icon = 'bi-journal-x';
                             $title = 'No enrolled subjects';
@@ -121,41 +117,31 @@ ob_start();
                         </td>
                     </tr>
                 <?php else: ?>
-                    <?php foreach ($classesList as $code => $sub): ?>
-                        <?php
-                        $prelim = $sub['periods']['Prelim'] ?? $sub['periods']['Preliminary'] ?? null;
-                        $midterm = $sub['periods']['Midterm'] ?? null;
-                        $semi = $sub['periods']['Semi-Final'] ?? $sub['periods']['Semi-final'] ?? null;
-                        $final = $sub['periods']['Final'] ?? null;
-                        $status = $sub['status'] ?? 'In progress';
-                        ?>
+                    <?php foreach ($grades as $g): ?>
                         <tr>
-                            <td class="px-4 fw-semibold font-monospace text-dark">
-                                <?= htmlspecialchars((string) ($sub['subject_code'] ?? $code)) ?>
+                            <td class="px-3 fw-semibold font-monospace text-dark">
+                                <?= htmlspecialchars($g['code'] ?? '') ?>
                             </td>
-                            <td class="px-4 fw-semibold text-dark">
-                                <?= htmlspecialchars((string) ($sub['subject_name'] ?? '')) ?>
-                            </td>
-                            <td class="px-4 text-secondary small">
-                                <?= htmlspecialchars((string) ($sub['instructor'] ?? 'TBA')) ?>
+                            <td class="px-3 fw-semibold text-dark">
+                                <?= htmlspecialchars($g['name'] ?? '') ?>
                             </td>
                             <td class="px-3 text-center font-monospace small">
-                                <?= $prelim !== null && $prelim !== '' ? number_format((float)$prelim, 2) : '—' ?>
+                                <?= isset($g['prelim']) && $g['prelim'] !== null ? number_format((float)$g['prelim'], 2) : '—' ?>
                             </td>
                             <td class="px-3 text-center font-monospace small">
-                                <?= $midterm !== null && $midterm !== '' ? number_format((float)$midterm, 2) : '—' ?>
+                                <?= isset($g['midterm']) && $g['midterm'] !== null ? number_format((float)$g['midterm'], 2) : '—' ?>
                             </td>
                             <td class="px-3 text-center font-monospace small">
-                                <?= $semi !== null && $semi !== '' ? number_format((float)$semi, 2) : '—' ?>
+                                <?= isset($g['semi_final']) && $g['semi_final'] !== null ? number_format((float)$g['semi_final'], 2) : '—' ?>
                             </td>
                             <td class="px-3 text-center font-monospace small">
-                                <?= $final !== null && $final !== '' ? number_format((float)$final, 2) : '—' ?>
+                                <?= isset($g['final']) && $g['final'] !== null ? number_format((float)$g['final'], 2) : '—' ?>
                             </td>
                             <td class="px-3 text-center">
-                                <?php if ($status === 'Passed'): ?>
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Passed</span>
-                                <?php elseif ($status === 'Failed'): ?>
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Failed</span>
+                                <?php if (!empty($g['final_grade'])): ?>
+                                    <span class="badge <?= ($g['final_grade'] <= 3.0) ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle' ?>">
+                                        <?= ($g['final_grade'] <= 3.0) ? 'Passed' : 'Failed' ?>
+                                    </span>
                                 <?php else: ?>
                                     <span class="badge bg-light text-muted border">In progress</span>
                                 <?php endif; ?>

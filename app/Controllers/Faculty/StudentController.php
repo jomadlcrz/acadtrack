@@ -314,10 +314,23 @@ class StudentController
             return;
         }
 
+        set_time_limit(0);
+
+        $targetSetId = (int) ($isJson ? $request->json('set_id', 0) : $request->post('set_id', 0));
+        $facultySets = \App\Models\Set::getAssignedForFaculty($facultyId, $termId, $subjectId);
+        if ($targetSetId <= 0 && count($facultySets) === 1) {
+            $targetSetId = (int) ($facultySets[0]['id'] ?? 0);
+        }
+        $currentSubject = \App\Models\Subject::find($subjectId);
+        $defaultYearLevel = $currentSubject ? (int) ($currentSubject->year_level ?? 1) : 1;
+
         $enrolledCount = 0;
+        $autoCreatedCount = 0;
         $alreadyOnRoster = 0;
         $errors = [];
         $processed = [];
+        $seenNumbers = [];
+        $seenEmails = [];
 
         foreach ($rows as $index => $row) {
             $rowNum = $index + 1;
@@ -327,6 +340,7 @@ class StudentController
             $email = trim((string) ($row['email'] ?? ''));
             $firstName = trim((string) ($row['first_name'] ?? ''));
             $lastName = trim((string) ($row['last_name'] ?? ''));
+            $rowSection = trim((string) ($row['section'] ?? ''));
 
             $givenName = trim($lastName . ', ' . $firstName);
             $label = $givenName !== '' ? $givenName : "Row {$rowNum}";
@@ -340,20 +354,160 @@ class StudentController
                 continue;
             }
 
-            $student = $this->studentRepository->findByIdentifier($studentNumber, $email);
-
-            if (!$student) {
-                $errors[] = [
-                    'row' => $rowNum,
-                    'name' => $label,
-                    'message' => 'No registered student matches ' . ($studentNumber !== ''
-                        ? "student ID '{$studentNumber}'"
-                        : "'{$email}'") . '. Students must exist before being rostered.',
-                ];
+            // Deduplicate duplicate rows within the same batch
+            if ($studentNumber !== '' && isset($seenNumbers[$studentNumber])) {
+                $alreadyOnRoster++;
+                continue;
+            }
+            if ($email !== '' && isset($seenEmails[strtolower($email)])) {
+                $alreadyOnRoster++;
                 continue;
             }
 
-            $studentId = (int) $student['id'];
+            $student = $this->studentRepository->findByIdentifier($studentNumber, $email);
+
+            if (!$student) {
+                // If student is not registered in the system yet, automatically provision them
+                // provided we have their names from the class list.
+                if ($firstName !== '' || $lastName !== '') {
+                    try {
+                        if ($firstName === '') $firstName = 'Student';
+                        if ($lastName === '') $lastName = ($studentNumber !== '' ? $studentNumber : 'GWC');
+
+                        // Resolve Section and Year Level
+                        $rowSetId = $targetSetId;
+                        $rowYearLevel = $defaultYearLevel;
+                        $rowStatus = \App\Models\Student::STATUS_IRREGULAR;
+
+                        if ($rowSection !== '') {
+                            $matchedSet = \App\Models\Set::where('academic_term_id', $termId)
+                                ->where(function ($q) use ($rowSection) {
+                                    $q->where('set_name', $rowSection)->orWhere('name', $rowSection);
+                                })->first();
+                            if ($matchedSet) {
+                                $rowSetId = (int) $matchedSet->id;
+                                $rowYearLevel = (int) ($matchedSet->year_level ?? $defaultYearLevel);
+                            }
+                        } elseif ($rowSetId > 0) {
+                            $setObj = \App\Models\Set::find($rowSetId);
+                            if ($setObj) {
+                                $rowYearLevel = (int) ($setObj->year_level ?? $defaultYearLevel);
+                            }
+                        }
+
+                        if ($rowSetId > 0) {
+                            $rowStatus = \App\Models\Student::STATUS_REGULAR;
+                        }
+
+                        // Generate unique email address if not provided
+                        $candidateEmail = $email;
+                        if ($candidateEmail === '' || !filter_var($candidateEmail, FILTER_VALIDATE_EMAIL)) {
+                            $cleanNum = preg_replace('/[^a-zA-Z0-9]/', '', $studentNumber);
+                            $baseEmail = $cleanNum !== ''
+                                ? strtolower($cleanNum)
+                                : strtolower(preg_replace('/[^a-z0-9]/', '', $firstName) . '.' . preg_replace('/[^a-z0-9]/', '', $lastName));
+                            $baseEmail = $baseEmail !== '' ? $baseEmail : 'student_' . mt_rand(1000, 9999);
+                            $candidateEmail = $baseEmail . '@gwc.edu.ph';
+
+                            $c = 1;
+                            while (\App\Models\User::where('email', $candidateEmail)->exists()) {
+                                $candidateEmail = str_replace('@gwc.edu.ph', '', $baseEmail) . $c . '@gwc.edu.ph';
+                                $c++;
+                            }
+                        }
+                        $email = $candidateEmail;
+
+                        // Check if a User already exists with this student_number or email
+                        $existingUser = null;
+                        if ($studentNumber !== '') {
+                            $existingUser = \App\Models\User::where('student_number', $studentNumber)->first();
+                        }
+                        if (!$existingUser && $email !== '') {
+                            $existingUser = \App\Models\User::where('email', $email)->first();
+                        }
+
+                        if ($existingUser) {
+                            $studentModel = \App\Models\Student::where('user_id', $existingUser->id)->first();
+                            if (!$studentModel) {
+                                $studentModel = \App\Models\Student::create([
+                                    'user_id' => (int) $existingUser->id,
+                                    'set_id' => $rowSetId > 0 ? $rowSetId : null,
+                                    'year_level' => $rowYearLevel,
+                                    'status' => $rowStatus,
+                                ]);
+                                try {
+                                    (new \App\Services\StudentRegistrationService())->register(
+                                        (int) $studentModel->id,
+                                        $termId,
+                                        $rowStatus,
+                                        $rowYearLevel,
+                                        $rowSetId > 0 ? $rowSetId : null
+                                    );
+                                } catch (\Throwable $e) {}
+                            }
+                            $studentId = (int) $studentModel->id;
+                        } else {
+                            $tempPassword = \App\Models\User::generateRandomPassword();
+                            $newUser = \App\Models\User::create([
+                                'first_name' => $firstName,
+                                'last_name' => $lastName,
+                                'email' => $email,
+                                'student_number' => $studentNumber !== '' ? $studentNumber : null,
+                                'password' => password_hash($tempPassword, PASSWORD_BCRYPT),
+                                'role' => 'Student',
+                                'status' => 'active',
+                                'force_password_change' => true,
+                            ]);
+                            $userId = (int) $newUser->id;
+
+                            $newStudent = \App\Models\Student::create([
+                                'user_id' => $userId,
+                                'set_id' => $rowSetId > 0 ? $rowSetId : null,
+                                'year_level' => $rowYearLevel,
+                                'status' => $rowStatus,
+                            ]);
+                            $studentId = (int) $newStudent->id;
+
+                            try {
+                                (new \App\Services\StudentRegistrationService())->register(
+                                    $studentId,
+                                    $termId,
+                                    $rowStatus,
+                                    $rowYearLevel,
+                                    $rowSetId > 0 ? $rowSetId : null
+                                );
+                            } catch (\Throwable $e) {}
+
+                            $autoCreatedCount++;
+                        }
+                    } catch (\Throwable $e) {
+                        $errors[] = [
+                            'row' => $rowNum,
+                            'name' => $label,
+                            'message' => 'Unable to auto-register student: ' . $e->getMessage(),
+                        ];
+                        continue;
+                    }
+                } else {
+                    $errors[] = [
+                        'row' => $rowNum,
+                        'name' => $label,
+                        'message' => 'No registered student matches ' . ($studentNumber !== ''
+                            ? "student ID '{$studentNumber}'"
+                            : "'{$email}'") . '. Students must exist before being rostered.',
+                    ];
+                    continue;
+                }
+            } else {
+                $studentId = (int) $student['id'];
+            }
+
+            if ($studentNumber !== '') {
+                $seenNumbers[$studentNumber] = $studentId;
+            }
+            if ($email !== '') {
+                $seenEmails[strtolower($email)] = $studentId;
+            }
 
             if (isset($processed[$studentId])) {
                 $alreadyOnRoster++;
@@ -379,12 +533,16 @@ class StudentController
                 'target_type' => 'import',
                 'target_id' => $subjectId,
                 'summary' => "Imported {$enrolledCount} of " . count($rows) . ' students into a class roster.'
+                    . ($autoCreatedCount > 0 ? " ({$autoCreatedCount} new accounts created)." : '')
                     . ($alreadyOnRoster > 0 ? " {$alreadyOnRoster} were already on the roster." : '')
                     . (!empty($errors) ? ' ' . count($errors) . ' rows were skipped.' : ''),
             ]);
         }
 
         $message = "Roster import complete: {$enrolledCount} of " . count($rows) . ' students enrolled.';
+        if ($autoCreatedCount > 0) {
+            $message .= " ({$autoCreatedCount} new student accounts registered).";
+        }
         if ($alreadyOnRoster > 0) {
             $message .= " {$alreadyOnRoster} already on the roster.";
         }
@@ -397,6 +555,7 @@ class StudentController
                 'success' => $enrolledCount > 0 || ($alreadyOnRoster > 0 && empty($errors)),
                 'total' => count($rows),
                 'enrolled' => $enrolledCount,
+                'created' => $autoCreatedCount,
                 'already_enrolled' => $alreadyOnRoster,
                 'failed' => count($errors),
                 'errors' => $errors,
