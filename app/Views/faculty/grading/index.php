@@ -145,7 +145,7 @@ $activeFinalWeight = (float) ($gradingSetting['final_weight'] ?? ($currentSubjec
     ?>
 <?php else: ?>
     <div class="card shadow-sm border-0 mb-4" style="border: 1px solid #e2e8f0 !important; border-radius: 6px;">
-        <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2" style="position: relative; z-index: 1030;">
+        <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2" style="position: relative; z-index: 2;">
             <div class="d-flex align-items-center gap-2">
                 <h3 class="h6 mb-0 fw-semibold text-dark">Student Grade Roster</h3>
                 <span class="text-muted small">(<?= (int) ($pagination['total'] ?? count($students)) ?> enrolled students)</span>
@@ -197,7 +197,7 @@ $activeFinalWeight = (float) ($gradingSetting['final_weight'] ?? ($currentSubjec
                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-inline-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
                         <i class="bi bi-download"></i> Export
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border" style="font-size: 12px; z-index: 1050;">
+                    <ul class="dropdown-menu dropdown-menu-end shadow border" style="font-size: 12px;">
                         <li>
                             <button class="dropdown-item d-flex align-items-center gap-2 py-2" type="button" onclick="exportRosterToExcel('xlsx')">
                                 <i class="bi bi-file-earmark-excel text-success"></i> Export Excel (.xlsx)
