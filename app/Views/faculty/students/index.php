@@ -8,6 +8,9 @@ $headerActions = '
     </button>
     <button type="button" class="btn btn-outline-primary d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#enrollExistingModal"' . (!$hasSubjects ? ' disabled title="Assign a subject first before enrolling students"' : '') . '>
         <i class="bi bi-person-check"></i> Select existing student
+    </button>
+    <button type="button" class="btn btn-outline-primary d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#rosterImportModal"' . (!$hasSubjects ? ' disabled title="Assign a subject first before importing a roster"' : '') . '>
+        <i class="bi bi-file-earmark-spreadsheet"></i> Import roster
     </button>';
 ob_start();
 ?>
@@ -399,6 +402,8 @@ if (!empty($selectedSet)) {
         </div>
     </div>
 </div>
+
+<?php include __DIR__ . '/_roster-import-modal.php'; ?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

@@ -160,6 +160,8 @@ $router->get('/faculty/subjects', [FacultySubjectController::class, 'index'], [n
 $router->post('/faculty/subjects/{id}/setup', [FacultySubjectController::class, 'setup'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->get('/faculty/students', [StudentController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
 $router->post('/faculty/students/add', [StudentController::class, 'addStudent'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
+$router->get('/faculty/students/roster-template', [StudentController::class, 'rosterTemplate'], [new AuthMiddleware(), new RoleMiddleware(['Faculty'])]);
+$router->post('/faculty/students/import-roster', [StudentController::class, 'importRoster'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->post('/faculty/students/enroll', [StudentController::class, 'enrollExisting'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->post('/faculty/students/remove', [StudentController::class, 'remove'], [new AuthMiddleware(), new RoleMiddleware(['Faculty']), new CsrfMiddleware()]);
 $router->get('/faculty/students/pass-data', [StudentController::class, 'getPassData'], [new AuthMiddleware(), new RoleMiddleware(['Faculty', 'Dean', 'Admin'])]);

@@ -52,6 +52,11 @@ class StudentRepository
         return Student::enroll($studentId, $subjectId, $academicTermId);
     }
 
+    public function findByIdentifier(string $studentNumber, string $email): ?array
+    {
+        return Student::findByIdentifier($studentNumber, $email);
+    }
+
     public function getAllAvailable(): array
     {
         return Student::getAllAvailable();

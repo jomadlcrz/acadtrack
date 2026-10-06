@@ -193,6 +193,221 @@ class StudentController
         redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
     }
 
+    /** CSV template for the bulk roster import. */
+    public function rosterTemplate(Request $request, Response $response): void
+    {
+        $headers = ['Student Number', 'Email', 'Last Name', 'First Name'];
+        $sampleRows = [
+            ['2026-0001', 'juan.delacruz@gwc.edu.ph', 'Dela Cruz', 'Juan'],
+            ['2026-0002', 'maria.santos@gwc.edu.ph', 'Santos', 'Maria'],
+            ['', 'pedro.reyes@gwc.edu.ph', 'Reyes', 'Pedro'],
+        ];
+
+        $output = fopen('php://temp', 'r+');
+        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+        fputcsv($output, $headers);
+        foreach ($sampleRows as $row) {
+            fputcsv($output, $row);
+        }
+        rewind($output);
+        $csv = stream_get_contents($output);
+        fclose($output);
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="GWC_Class_Roster_Template.csv"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+        echo $csv;
+
+        if (php_sapi_name() !== 'cli' && !defined('PHPUNIT_RUNNING')) {
+            exit;
+        }
+    }
+
+    /** Bulk-enrolls a class list into the selected course offering. */
+    public function importRoster(Request $request, Response $response, Session $session): void
+    {
+        $isJson = $request->isJson();
+
+        $subjectId = 0;
+        $termId = 0;
+        $semester = '';
+        $rows = [];
+
+        if ($isJson) {
+            $subjectId = (int) $request->json('subject_id', 0);
+            $termId = (int) $request->json('academic_term_id', 0);
+            $semester = (string) $request->json('semester', '');
+            $jsonRows = $request->json('students', []);
+            $rows = is_array($jsonRows) ? $jsonRows : [];
+        } else {
+            $subjectId = (int) $request->post('subject_id');
+            $termId = (int) $request->post('academic_term_id', 0);
+            $semester = (string) $request->post('semester', '');
+
+            if (!empty($_FILES['roster_file']['tmp_name'])) {
+                $handle = fopen($_FILES['roster_file']['tmp_name'], 'r');
+                if ($handle !== false) {
+                    $bom = fread($handle, 3);
+                    if ($bom !== "\xEF\xBB\xBF") {
+                        rewind($handle);
+                    }
+                    fgetcsv($handle);
+                    while (($data = fgetcsv($handle)) !== false) {
+                        if (empty(array_filter($data))) {
+                            continue;
+                        }
+                        $rows[] = [
+                            'student_number' => trim((string) ($data[0] ?? '')),
+                            'email' => trim((string) ($data[1] ?? '')),
+                            'last_name' => trim((string) ($data[2] ?? '')),
+                            'first_name' => trim((string) ($data[3] ?? '')),
+                        ];
+                    }
+                    fclose($handle);
+                }
+            }
+        }
+
+        $semQuery = $semester !== '' ? "&semester=" . urlencode($semester) : '';
+
+        $reject = function (string $message) use ($isJson, $response, $session, $subjectId, $semQuery): void {
+            if ($isJson) {
+                $response->statusCode(422)->json(['success' => false, 'message' => $message]);
+                return;
+            }
+            $session->flash('error', $message);
+            redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
+        };
+
+        if ($termId === 0) {
+            $academicTerm = \App\Models\AcademicTerm::getActive();
+            $termId = $academicTerm ? (int) $academicTerm['id'] : 0;
+        }
+
+        $facultyId = (int) ($session->get('user')['id'] ?? 0);
+        $assignedSubjectIds = array_map(
+            static fn(array $row): int => (int) $row['id'],
+            \App\Models\Faculty::getAssignedSubjects($facultyId, $termId)
+        );
+
+        if ($subjectId <= 0 || !in_array($subjectId, $assignedSubjectIds, true)) {
+            $reject('You are not assigned to this course offering.');
+            return;
+        }
+
+        if ((new \App\Services\TermClosureService())->isTermClosed($termId)) {
+            $reject('This academic term is officially closed and sealed. Rosters can no longer be changed.');
+            return;
+        }
+
+        if (empty($rows)) {
+            $reject('No student records received for import.');
+            return;
+        }
+
+        $enrolledCount = 0;
+        $alreadyOnRoster = 0;
+        $errors = [];
+        $processed = [];
+
+        foreach ($rows as $index => $row) {
+            $rowNum = $index + 1;
+            $row = is_array($row) ? $row : [];
+
+            $studentNumber = trim((string) ($row['student_number'] ?? ''));
+            $email = trim((string) ($row['email'] ?? ''));
+            $firstName = trim((string) ($row['first_name'] ?? ''));
+            $lastName = trim((string) ($row['last_name'] ?? ''));
+
+            $givenName = trim($lastName . ', ' . $firstName);
+            $label = $givenName !== '' ? $givenName : "Row {$rowNum}";
+
+            if ($studentNumber === '' && $email === '') {
+                $errors[] = [
+                    'row' => $rowNum,
+                    'name' => $label,
+                    'message' => 'Provide a student ID number or an email address.',
+                ];
+                continue;
+            }
+
+            $student = $this->studentRepository->findByIdentifier($studentNumber, $email);
+
+            if (!$student) {
+                $errors[] = [
+                    'row' => $rowNum,
+                    'name' => $label,
+                    'message' => 'No registered student matches ' . ($studentNumber !== ''
+                        ? "student ID '{$studentNumber}'"
+                        : "'{$email}'") . '. Students must exist before being rostered.',
+                ];
+                continue;
+            }
+
+            $studentId = (int) $student['id'];
+
+            if (isset($processed[$studentId])) {
+                $alreadyOnRoster++;
+                continue;
+            }
+
+            if (\App\Models\Enrollment::isEnrolled($studentId, $subjectId, $termId)) {
+                $processed[$studentId] = true;
+                $alreadyOnRoster++;
+                continue;
+            }
+
+            $this->studentRepository->enroll($studentId, $subjectId, $termId);
+            $processed[$studentId] = true;
+            $this->logRoster('Student Added to Roster', $studentId, $subjectId, 'Imported');
+            $enrolledCount++;
+        }
+
+        if ($enrolledCount > 0) {
+            \App\Services\ActivityLogService::record([
+                'category' => \App\Services\ActivityLogService::CATEGORY_REGISTRATION,
+                'action' => 'Roster Imported',
+                'target_type' => 'import',
+                'target_id' => $subjectId,
+                'summary' => "Imported {$enrolledCount} of " . count($rows) . ' students into a class roster.'
+                    . ($alreadyOnRoster > 0 ? " {$alreadyOnRoster} were already on the roster." : '')
+                    . (!empty($errors) ? ' ' . count($errors) . ' rows were skipped.' : ''),
+            ]);
+        }
+
+        $message = "Roster import complete: {$enrolledCount} of " . count($rows) . ' students enrolled.';
+        if ($alreadyOnRoster > 0) {
+            $message .= " {$alreadyOnRoster} already on the roster.";
+        }
+        if (!empty($errors)) {
+            $message .= ' ' . count($errors) . ' could not be matched.';
+        }
+
+        if ($isJson) {
+            $response->json([
+                'success' => $enrolledCount > 0 || ($alreadyOnRoster > 0 && empty($errors)),
+                'total' => count($rows),
+                'enrolled' => $enrolledCount,
+                'already_enrolled' => $alreadyOnRoster,
+                'failed' => count($errors),
+                'errors' => $errors,
+                'message' => $message,
+            ]);
+            return;
+        }
+
+        if ($enrolledCount > 0) {
+            $session->flash('success', $message);
+        } else {
+            $session->flash('error', !empty($errors)
+                ? 'Import failed: ' . implode('; ', array_column($errors, 'message'))
+                : $message);
+        }
+
+        redirect("/faculty/students?subject_id={$subjectId}{$semQuery}");
+    }
+
     public function remove(Request $request, Response $response, Session $session): void
     {
         $subjectId = (int) $request->post('subject_id');

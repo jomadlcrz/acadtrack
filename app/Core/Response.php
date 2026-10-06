@@ -27,11 +27,15 @@ class Response
         return $this->body;
     }
 
-    public function json(mixed $data, int $code = 200): void
+    /** Passing $code = 0 keeps a status set earlier via statusCode(). */
+    public function json(mixed $data, int $code = 0): void
     {
-        $this->statusCode = $code;
+        if ($code > 0) {
+            $this->statusCode = $code;
+        }
+
         $this->body = (string) json_encode($data);
-        http_response_code($code);
+        http_response_code($this->statusCode);
         if (!headers_sent()) {
             header('Content-Type: application/json');
         }

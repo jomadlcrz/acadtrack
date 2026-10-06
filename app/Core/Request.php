@@ -6,6 +6,43 @@ namespace App\Core;
 
 class Request
 {
+    private ?string $rawBody = null;
+    private ?array $jsonCache = null;
+
+    /** Lets tests and CLI callers supply a body that php://input cannot provide. */
+    public function setRawBody(?string $body): void
+    {
+        $this->rawBody = $body;
+        $this->jsonCache = null;
+    }
+
+    public function rawBody(): string
+    {
+        return $this->rawBody ?? (string) file_get_contents('php://input');
+    }
+
+    public function isJson(): bool
+    {
+        // PHP exposes Content-Type unprefixed in $_SERVER, unlike every other header.
+        $contentType = (string) ($_SERVER['CONTENT_TYPE'] ?? $this->header('Content-Type', ''));
+        return str_contains($contentType, 'application/json');
+    }
+
+    /** Decoded JSON body; pass null for the whole array or a key for one field. */
+    public function json(?string $key = null, mixed $default = null): mixed
+    {
+        if ($this->jsonCache === null) {
+            $decoded = json_decode($this->rawBody(), true);
+            $this->jsonCache = is_array($decoded) ? $decoded : [];
+        }
+
+        if ($key === null) {
+            return $this->jsonCache;
+        }
+
+        return $this->jsonCache[$key] ?? $default;
+    }
+
     public function method(): string
     {
         return strtoupper($_SERVER['REQUEST_METHOD']);

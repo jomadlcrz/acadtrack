@@ -196,6 +196,39 @@ class Student extends Model
         ]);
     }
 
+    /** Resolves a roster row to a student by student ID first, then by email address. */
+    public static function findByIdentifier(string $studentNumber, string $email): ?array
+    {
+        $sql = "
+            SELECT s.*, sd.first_name, sd.last_name, u.email, sd.student_number
+            FROM students s
+            JOIN users u ON s.user_id = u.id
+            LEFT JOIN student_details sd ON sd.user_id = u.id
+            WHERE %s
+            LIMIT 1
+        ";
+
+        if ($studentNumber !== '') {
+            $stmt = self::db()->prepare(sprintf($sql, 'sd.student_number = :identifier'));
+            $stmt->execute(['identifier' => $studentNumber]);
+            $result = $stmt->fetch();
+            if ($result) {
+                return $result;
+            }
+        }
+
+        if ($email !== '') {
+            $stmt = self::db()->prepare(sprintf($sql, 'LOWER(u.email) = LOWER(:identifier)'));
+            $stmt->execute(['identifier' => $email]);
+            $result = $stmt->fetch();
+            if ($result) {
+                return $result;
+            }
+        }
+
+        return null;
+    }
+
     public static function getAllAvailable(): array
     {
         $stmt = self::db()->query("
