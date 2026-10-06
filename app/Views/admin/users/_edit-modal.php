@@ -193,7 +193,7 @@ $departmentId = (int) ($user['department_id'] ?? $user['faculty']['department_id
                                             <option value="<?= $st['id'] ?>" 
                                                     data-year-level="<?= (int)($st['year_level'] ?? 1) ?>" 
                                                     <?= ($selectedSetId === (int)$st['id']) ? 'selected' : '' ?>>
-                                                Section <?= htmlspecialchars($st['name']) ?> (Year <?= $st['year_level'] ?? 1 ?>)
+                                                <?= htmlspecialchars($st['name']) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>

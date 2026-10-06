@@ -205,7 +205,7 @@ ob_start();
                                     <option value="<?= $set['id'] ?>" 
                                             data-year-level="<?= (int)($set['year_level'] ?? 1) ?>" 
                                             <?= ((string)$selectedSetId === (string)$set['id']) ? 'selected' : '' ?>>
-                                        Section <?= htmlspecialchars($set['name']) ?> (Year <?= $set['year_level'] ?? 1 ?>)
+                                        <?= htmlspecialchars($set['name']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
