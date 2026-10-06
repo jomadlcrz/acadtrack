@@ -60,6 +60,18 @@ class GradingController
         }
 
         $students = $this->studentRepository->getBySubject($subjectId, $termId);
+
+        // Server-side paging + search: the roster is loaded per page instead of
+        // rendering every enrolled student in one tall scrollable table.
+        $page = max(1, (int) $request->get('page', 1));
+        $search = trim((string) $request->get('search', ''));
+        $perPage = 15;
+        $paginated = $this->studentRepository->paginateBySubject($subjectId, $termId, null, $page, $perPage, $search);
+        if ($page > $paginated['lastPage'] && $paginated['lastPage'] >= 1) {
+            $paginated = $this->studentRepository->paginateBySubject($subjectId, $termId, null, $paginated['lastPage'], $perPage, $search);
+        }
+        $students = $paginated['data'];
+
         $existingGrades = $this->gradeRepository->getBySubjectAndPeriod($subjectId, $periodId, $termId);
 
         $gradeMap = [];
@@ -86,6 +98,8 @@ class GradingController
 
         $html = (new View())->render('faculty.grading.index', [
             'students' => $students,
+            'pagination' => $paginated,
+            'currentSearch' => $search,
             'grades' => $gradeMap,
             'subjectId' => $subjectId,
             'currentSubject' => $currentSubject,
@@ -118,10 +132,13 @@ class GradingController
 
         $semester = (string) $request->post('semester', '');
         $semQuery = $semester !== '' ? "&semester={$semester}" : '';
+        $pageQuery = '&page=' . max(1, (int) $request->post('page', 1));
+        $searchRaw = trim((string) $request->post('search', ''));
+        $searchQuery = $searchRaw !== '' ? '&search=' . rawurlencode($searchRaw) : '';
 
         if (!$validator->validate($data)) {
             $session->flash('error', $validator->firstError());
-            redirect("/faculty/grading?subject_id={$subjectId}&period_id={$gradingPeriodId}{$semQuery}");
+            redirect("/faculty/grading?subject_id={$subjectId}&period_id={$gradingPeriodId}{$semQuery}{$pageQuery}{$searchQuery}");
             return;
         }
 
@@ -138,7 +155,7 @@ class GradingController
             $session->flash('error', $e->getMessage());
         }
 
-        redirect("/faculty/grading?subject_id={$subjectId}&period_id={$gradingPeriodId}{$semQuery}");
+        redirect("/faculty/grading?subject_id={$subjectId}&period_id={$gradingPeriodId}{$semQuery}{$pageQuery}{$searchQuery}");
     }
 
     public function submit(Request $request, Response $response, Session $session): void
@@ -171,6 +188,9 @@ class GradingController
         $termId = (int) $request->post('academic_term_id', 0);
         $semester = (string) $request->post('semester', '');
         $semQuery = $semester !== '' ? "&semester={$semester}" : '';
+        $pageQuery = '&page=' . max(1, (int) $request->post('page', 1));
+        $searchRaw = trim((string) $request->post('search', ''));
+        $searchQuery = $searchRaw !== '' ? '&search=' . rawurlencode($searchRaw) : '';
 
         if ($termId === 0) {
             $academicTerm = AcademicTerm::getActive();
@@ -194,7 +214,7 @@ class GradingController
         $totalWeight = $prelimWeight + $midtermWeight + $semiFinalWeight + $finalWeight;
         if (abs($totalWeight - 100.0) > 0.01) {
             $session->flash('error', 'Period weights must sum to exactly 100%. Current total: ' . number_format($totalWeight, 2) . '%');
-            redirect("/faculty/grading?subject_id={$subjectId}&period_id={$periodId}{$semQuery}");
+            redirect("/faculty/grading?subject_id={$subjectId}&period_id={$periodId}{$semQuery}{$pageQuery}{$searchQuery}");
             return;
         }
 
@@ -222,6 +242,6 @@ class GradingController
             $session->flash('error', 'Failed to save subject grading settings: ' . $e->getMessage());
         }
 
-        redirect("/faculty/grading?subject_id={$subjectId}&period_id={$periodId}{$semQuery}");
+        redirect("/faculty/grading?subject_id={$subjectId}&period_id={$periodId}{$semQuery}{$pageQuery}{$searchQuery}");
     }
 }

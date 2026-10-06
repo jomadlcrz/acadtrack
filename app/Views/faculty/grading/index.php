@@ -127,10 +127,19 @@ $activeFinalWeight = (float) ($gradingSetting['final_weight'] ?? ($currentSubjec
 
 <?php if (empty($students)): ?>
     <?php
-    $icon = 'bi-people';
-    $iconColor = 'blue';
-    $title = 'No enrolled students found';
-    $message = 'There are currently no students registered for this course set.';
+    if (!empty($currentSearch)) {
+        $icon = 'bi-search';
+        $iconColor = 'blue';
+        $title = 'No matching students found';
+        $message = 'No enrolled students match your search query.';
+        $actionHtml = '<a href="' . url('/faculty/grading?subject_id=' . $subjectId . '&period_id=' . $periodId . '&semester=' . ($selectedSemester ?? '1')) . '" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-2"><i class="bi bi-x-lg"></i> Clear search</a>';
+    } else {
+        $icon = 'bi-people';
+        $iconColor = 'blue';
+        $title = 'No enrolled students found';
+        $message = 'There are currently no students registered for this course set.';
+        $actionHtml = '';
+    }
     $card = true;
     include __DIR__ . '/../../components/empty-state.php';
     ?>
@@ -139,9 +148,32 @@ $activeFinalWeight = (float) ($gradingSetting['final_weight'] ?? ($currentSubjec
         <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2" style="position: relative; z-index: 1030;">
             <div class="d-flex align-items-center gap-2">
                 <h3 class="h6 mb-0 fw-semibold text-dark">Student Grade Roster</h3>
-                <span class="text-muted small">(<?= count($students) ?> enrolled students)</span>
+                <span class="text-muted small">(<?= (int) ($pagination['total'] ?? count($students)) ?> enrolled students)</span>
             </div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
+                <form method="GET" action="<?= url('/faculty/grading') ?>" class="d-flex align-items-center gap-1" id="rosterSearchForm">
+                    <input type="hidden" name="subject_id" value="<?= htmlspecialchars((string)$subjectId) ?>">
+                    <input type="hidden" name="period_id" value="<?= htmlspecialchars((string)$periodId) ?>">
+                    <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
+                    <div class="position-relative">
+                        <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 13px;"></i>
+                        <input type="text"
+                               name="search"
+                               value="<?= htmlspecialchars($currentSearch ?? '') ?>"
+                               class="form-control form-control-sm ps-5"
+                               style="width: 190px;"
+                               placeholder="Search name or ID..."
+                               autocomplete="off">
+                    </div>
+                    <?php if (!empty($currentSearch)): ?>
+                        <a href="<?= url('/faculty/grading?subject_id=' . $subjectId . '&period_id=' . $periodId . '&semester=' . ($selectedSemester ?? '1')) ?>"
+                           class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center"
+                           title="Clear search">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    <?php endif; ?>
+                </form>
+
                 <button type="button" 
                         class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5"
                         data-bs-toggle="modal" 
@@ -187,10 +219,12 @@ $activeFinalWeight = (float) ($gradingSetting['final_weight'] ?? ($currentSubjec
             <input type="hidden" name="grading_period_id" value="<?= htmlspecialchars((string)$periodId) ?>">
             <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
             <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
+            <input type="hidden" name="page" value="<?= htmlspecialchars((string)($pagination['page'] ?? 1)) ?>">
+            <input type="hidden" name="search" value="<?= htmlspecialchars($currentSearch ?? '') ?>">
 
-            <div class="table-responsive" style="max-height: 65vh;">
+            <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" id="rosterTable">
-                    <thead class="bg-white sticky-top">
+                    <thead class="bg-white border-bottom">
                         <tr>
                             <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="width: 160px; font-size: 11px;">Student ID</th>
                             <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Student name</th>
@@ -259,6 +293,10 @@ $activeFinalWeight = (float) ($gradingSetting['final_weight'] ?? ($currentSubjec
                 </button>
             </div>
         </form>
+
+        <?php if (!empty($students)): ?>
+            <?php include __DIR__ . '/../../components/pagination.php'; ?>
+        <?php endif; ?>
     </div>
 
     <?php if ($gradingSheet && in_array($gradingSheet['status'], ['DRAFT', 'RETURNED'])): ?>
