@@ -436,6 +436,8 @@ class UserController
      */
     public function importPersonnel(Request $request, Response $response, Session $session): void
     {
+        set_time_limit(0);
+
         $role = $this->normalizeAccountRole((string) $request->json('role', ''));
 
         if (!in_array($role, PersonnelImportService::IMPORTABLE_ROLES, true)) {
@@ -473,6 +475,8 @@ class UserController
             'created' => $result['created'],
             'failed' => $result['failed'],
             'errors' => $result['errors'],
+            'credentials' => $result['credentials'] ?? [],
+            'notice' => 'Temporary passwords were not emailed during bulk import. They are included in the credentials field of this response for secure distribution.',
             'message' => "Successfully created {$result['created']} of {$result['total']} {$role} accounts."
                 . ($result['failed'] > 0 ? " {$result['failed']} rows need attention." : ''),
         ]);
@@ -483,9 +487,15 @@ class UserController
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
         $isJson = str_contains($contentType, 'application/json');
 
+        // A multi-hundred-row batch does real work per student (bcrypt, Eloquent
+        // writes, term registration). With per-row SMTP gone, the loop still
+        // outlives Apache's 120s default; lifting the limit is deliberate so a
+        // long import finishes with a JSON report instead of a fatal-HTML timeout.
+        set_time_limit(0);
+
         $rows = [];
         if ($isJson) {
-            $input = json_decode((string) file_get_contents('php://input'), true);
+            $input = json_decode($request->rawBody(), true);
             $rows = $input['students'] ?? [];
         } elseif (!empty($_FILES['excel_file']['tmp_name'])) {
             $filePath = $_FILES['excel_file']['tmp_name'];
@@ -538,6 +548,22 @@ class UserController
 
         $createdCount = 0;
         $errors = [];
+        $credentials = [];
+
+        // Snapshot existing accounts once instead of querying the database per
+        // row. Rows created by this loop are added to the sets as they go, so
+        // duplicate rows inside the same batch are still caught.
+        $existingEmails = [];
+        foreach (\App\Models\User::pluck('email') as $existingEmail) {
+            if ($existingEmail !== null && $existingEmail !== '') {
+                $existingEmails[strtolower(trim((string) $existingEmail))] = true;
+            }
+        }
+
+        $existingNumbers = [];
+        foreach (\App\Models\StudentDetail::whereNotNull('student_number')->pluck('student_number') as $existingNumber) {
+            $existingNumbers[strtoupper(trim((string) $existingNumber))] = true;
+        }
 
         foreach ($rows as $index => $row) {
             $rowNum = $index + 1;
@@ -569,7 +595,8 @@ class UserController
                 continue;
             }
 
-            if (\App\Models\User::where('email', $email)->exists()) {
+            $emailKey = strtolower(trim($email));
+            if (isset($existingEmails[$emailKey])) {
                 $errors[] = [
                     'row' => $rowNum,
                     'name' => "{$firstName} {$lastName}",
@@ -578,7 +605,8 @@ class UserController
                 continue;
             }
 
-            if ($studentNumber && \App\Models\User::where('student_number', $studentNumber)->exists()) {
+            $numberKey = $studentNumber !== null ? strtoupper(trim($studentNumber)) : '';
+            if ($numberKey !== '' && isset($existingNumbers[$numberKey])) {
                 $errors[] = [
                     'row' => $rowNum,
                     'name' => "{$firstName} {$lastName}",
@@ -659,7 +687,15 @@ class UserController
 
                     $this->registerForActiveTerm((int) $user->id, $status, $yearLevel, $setId, $session);
 
-                    (new \App\Services\NotificationService())->sendStudentCredentials($user->toArray(), $plainPassword);
+                    // Bulk imports never send SMTP per row: a slow/unreachable mail
+                    // server blocks until max_execution_time and the endpoint dies
+                    // mid-loop with fatal-error HTML instead of JSON. Credentials are
+                    // returned in the response for the admin to hand out instead.
+                    $credentials[$email] = $plainPassword;
+                    $existingEmails[$emailKey] = true;
+                    if ($numberKey !== '') {
+                        $existingNumbers[$numberKey] = true;
+                    }
                     $createdCount++;
                 }
             } catch (\Throwable $e) {
@@ -687,7 +723,9 @@ class UserController
                 'created' => $createdCount,
                 'failed' => count($errors),
                 'errors' => $errors,
+                'credentials' => $credentials,
                 'message' => "Successfully registered {$createdCount} of " . count($rows) . " student accounts.",
+                'notice' => 'Temporary passwords were not emailed during bulk import. They are included in the credentials field of this response for secure distribution.',
             ]);
             return;
         }

@@ -22,7 +22,7 @@ class PersonnelImportService
 
     /**
      * @param  array<int,array<string,mixed>>  $rows
-     * @return array{total:int,created:int,failed:int,errors:array<int,array{row:int,name:string,message:string}>}
+     * @return array{total:int,created:int,failed:int,errors:array<int,array{row:int,name:string,message:string}>,credentials:array<string,string>}
      */
     public function import(array $rows, string $role): array
     {
@@ -33,6 +33,7 @@ class PersonnelImportService
         $departments = $this->departmentIndex();
         $created = 0;
         $errors = [];
+        $credentials = [];
         $rowNumber = 1;
 
         foreach ($rows as $row) {
@@ -95,7 +96,10 @@ class PersonnelImportService
                 );
 
                 // Personnel are onboarded with the same credentials email the single-account form sends.
-                (new NotificationService())->sendStudentCredentials($user->toArray(), $plainPassword);
+                // Bulk imports never send SMTP per row: an unreachable mail server blocks until
+                // max_execution_time and the request dies with fatal-error HTML instead of JSON.
+                // The temporary password is returned so the admin can distribute it instead.
+                $credentials[$email] = $plainPassword;
 
                 $created++;
             } catch (\Throwable $e) {
@@ -108,6 +112,7 @@ class PersonnelImportService
             'created' => $created,
             'failed' => count($errors),
             'errors' => $errors,
+            'credentials' => $credentials,
         ];
     }
 
