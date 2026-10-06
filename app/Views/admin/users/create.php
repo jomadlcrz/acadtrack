@@ -44,7 +44,7 @@ $activeTermLabel = null;
 if (!empty($academicTerm)) {
     $termSchoolYear = trim((string) ($academicTerm['school_year'] ?? $academicTerm['academic_year_name'] ?? ''));
     $activeTermLabel = trim(
-        semester_label($academicTerm['semester'] ?? null) . ($termSchoolYear !== '' ? ' \u{2022} SY ' . $termSchoolYear : '')
+        semester_label($academicTerm['semester'] ?? null) . ($termSchoolYear !== '' ? ' · SY ' . $termSchoolYear : '')
     );
 }
 
