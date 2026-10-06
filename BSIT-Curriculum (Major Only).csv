@@ -32,4 +32,4 @@
 "Fourth Year","1st Semester",ITELEC4,"IT Major Elective 4 (Web Systems & Development 2)",3.0,"Major with Lab","ITELEC2, PT102"
 "Fourth Year","1st Semester",OS101,"Operating System",3.0,"Major with Lab",CC104
 "Fourth Year","1st Semester",SA101,"System Administration and Maintenance 1",3.0,"Major without Lab",IAS101
-"Fourth Year","2nd Semester",PRAC101,"OJT Practicum (486 hours)",3.0,"Major without Lab",
+"Fourth Year","2nd Semester",PRAC101,"OJT Practicum (486 hours)",3.0,Practicum/OJT,CAPS102
