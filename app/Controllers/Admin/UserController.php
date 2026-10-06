@@ -9,6 +9,7 @@ use App\Core\Response;
 use App\Core\Session;
 use App\Core\View;
 use App\Repositories\UserRepository;
+use App\Services\PersonnelImportService;
 
 class UserController
 {
@@ -378,21 +379,37 @@ class UserController
 
     public function downloadTemplate(Request $request, Response $response): void
     {
-        $headers = [
-            'Student Number',
-            'First Name',
-            'Last Name',
-            'Email',
-            'Enrollment Status',
-            'Year Level',
-            'Class Section',
-        ];
+        $role = $this->normalizeAccountRole((string) $request->get('role', 'Student'));
 
-        $sampleRows = [
-            ['2026-0001', 'Juan', 'Dela Cruz', 'juan.delacruz@gwc.edu.ph', 'Regular', '1', 'BSIT-1A'],
-            ['2026-0002', 'Maria', 'Santos', 'maria.santos@gwc.edu.ph', 'Irregular', '2', ''],
-            ['', 'Pedro', 'Reyes', 'pedro.reyes@gwc.edu.ph', 'Regular', '1', 'BSIT-1A'],
-        ];
+        if (in_array($role, PersonnelImportService::IMPORTABLE_ROLES, true)) {
+            $headers = ['First Name', 'Last Name', 'Email', 'Department'];
+            $filename = 'GWC_' . $role . '_Account_Template.csv';
+
+            // Sampled from real departments so the sheet shows values that actually resolve.
+            $departments = \App\Models\Department::getActive();
+            $sampleRows = [
+                ['Juan', 'Dela Cruz', 'juan.delacruz@gwc.edu.ph', (string) ($departments[0]['dept_abbrev'] ?? '')],
+                ['Maria', 'Santos', 'maria.santos@gwc.edu.ph', (string) ($departments[1]['dept_name'] ?? $departments[0]['dept_name'] ?? '')],
+            ];
+        } else {
+            $headers = [
+                'Student Number',
+                'First Name',
+                'Last Name',
+                'Email',
+                'Enrollment Status',
+                'Year Level',
+                'Class Section',
+            ];
+
+            $filename = 'GWC_Student_Registration_Template.csv';
+
+            $sampleRows = [
+                ['2026-0001', 'Juan', 'Dela Cruz', 'juan.delacruz@gwc.edu.ph', 'Regular', '1', 'BSIT-1A'],
+                ['2026-0002', 'Maria', 'Santos', 'maria.santos@gwc.edu.ph', 'Irregular', '2', ''],
+                ['', 'Pedro', 'Reyes', 'pedro.reyes@gwc.edu.ph', 'Regular', '1', 'BSIT-1A'],
+            ];
+        }
 
         $output = fopen('php://temp', 'r+');
         // Add UTF-8 BOM for Microsoft Excel compatibility
@@ -406,11 +423,59 @@ class UserController
         fclose($output);
 
         header('Content-Type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment; filename="GWC_Student_Registration_Template.csv"');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Pragma: no-cache');
         header('Expires: 0');
         echo $csv;
         exit;
+    }
+
+    /**
+     * Bulk-creates Faculty or Dean accounts from a spreadsheet. Admin is rejected here
+     * and by the service, so this can never be pointed at the administrator role.
+     */
+    public function importPersonnel(Request $request, Response $response, Session $session): void
+    {
+        $role = $this->normalizeAccountRole((string) $request->json('role', ''));
+
+        if (!in_array($role, PersonnelImportService::IMPORTABLE_ROLES, true)) {
+            $response->statusCode(422)->json([
+                'success' => false,
+                'message' => 'Spreadsheet import is only available for Faculty and Dean accounts.',
+            ]);
+            return;
+        }
+
+        $rows = $request->json('personnel', []);
+
+        if (!is_array($rows) || $rows === []) {
+            $response->statusCode(422)->json([
+                'success' => false,
+                'message' => 'No personnel records received for import.',
+            ]);
+            return;
+        }
+
+        $result = (new PersonnelImportService())->import(array_values($rows), $role);
+
+        if ($result['created'] > 0) {
+            \App\Services\ActivityLogService::record([
+                'category' => \App\Services\ActivityLogService::CATEGORY_ACCOUNTS,
+                'action' => $role . ' Accounts Imported',
+                'target_type' => 'import',
+                'summary' => "Imported {$result['created']} of {$result['total']} {$role} accounts from a spreadsheet." . ($result['failed'] > 0 ? " {$result['failed']} rows were skipped." : ''),
+            ]);
+        }
+
+        $response->json([
+            'success' => $result['created'] > 0,
+            'total' => $result['total'],
+            'created' => $result['created'],
+            'failed' => $result['failed'],
+            'errors' => $result['errors'],
+            'message' => "Successfully created {$result['created']} of {$result['total']} {$role} accounts."
+                . ($result['failed'] > 0 ? " {$result['failed']} rows need attention." : ''),
+        ]);
     }
 
     public function import(Request $request, Response $response, Session $session): void
@@ -660,6 +725,14 @@ class UserController
         } catch (\DomainException $e) {
             $session->flash('error', 'Student saved, but term registration failed: ' . $e->getMessage());
         }
+    }
+
+    /** Title Case account roles are the contract everywhere; anything else falls back to Student. */
+    private function normalizeAccountRole(string $role): string
+    {
+        $normalized = ucfirst(strtolower(trim($role)));
+
+        return in_array($normalized, ['Admin', 'Dean', 'Faculty', 'Student'], true) ? $normalized : 'Student';
     }
 
     /** Where to send the admin after an account action, keeping the list they came from. */

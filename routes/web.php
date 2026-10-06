@@ -63,6 +63,7 @@ $router->get('/admin/users', [UserController::class, 'index'], [new AuthMiddlewa
 $router->get('/admin/users/create', [UserController::class, 'create'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->get('/admin/users/import-template', [UserController::class, 'downloadTemplate'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/users/import', [UserController::class, 'import'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
+$router->post('/admin/users/import-personnel', [UserController::class, 'importPersonnel'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->post('/admin/users', [UserController::class, 'store'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);
 $router->get('/admin/users/{id}/edit', [UserController::class, 'edit'], [new AuthMiddleware(), new RoleMiddleware(['Admin'])]);
 $router->post('/admin/users/{id}', [UserController::class, 'update'], [new AuthMiddleware(), new RoleMiddleware(['Admin']), new CsrfMiddleware()]);

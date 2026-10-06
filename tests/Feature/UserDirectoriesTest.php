@@ -135,10 +135,36 @@ class UserDirectoriesTest extends TestCase
         $this->assertStringContainsString('/admin/students', $body);
     }
 
-    public function testUserCreateFacultyDoesNotShowDownloadAndImport(): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('personnelRoles')]
+    public function testUserCreatePersonnelShowsDownloadAndImport(string $role): void
     {
         $controller = new \App\Controllers\Admin\UserController();
-        $_GET['role'] = 'Faculty';
+        $_GET['role'] = $role;
+        $request = new Request();
+        $response = new Response();
+
+        ob_start();
+        $controller->create($request, $response, $this->session);
+        $output = ob_get_clean();
+
+        $body = $response->getBody() ?: $output;
+        $this->assertStringContainsString('import-template?role=' . urlencode($role), $body);
+        $this->assertStringContainsString('personnelImportModal', $body);
+        $this->assertStringContainsString('/admin/faculty', $body);
+
+        unset($_GET['role']);
+    }
+
+    public static function personnelRoles(): array
+    {
+        return [['Faculty'], ['Dean']];
+    }
+
+    /** Administrators cannot be edited after creation, so they stay manual-only. */
+    public function testUserCreateAdminDoesNotShowDownloadAndImport(): void
+    {
+        $controller = new \App\Controllers\Admin\UserController();
+        $_GET['role'] = 'Admin';
         $request = new Request();
         $response = new Response();
 
@@ -148,7 +174,10 @@ class UserDirectoriesTest extends TestCase
 
         $body = $response->getBody() ?: $output;
         $this->assertStringNotContainsString('import-template', $body);
+        $this->assertStringNotContainsString('personnelImportModal', $body);
         $this->assertStringNotContainsString('importExcelModal', $body);
-        $this->assertStringContainsString('/admin/faculty', $body);
+        $this->assertStringContainsString('/admin/administrators', $body);
+
+        unset($_GET['role']);
     }
 }

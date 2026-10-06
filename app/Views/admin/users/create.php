@@ -48,10 +48,13 @@ if (!empty($academicTerm)) {
     );
 }
 
-if ($activeRole === 'Student') {
+$canImport = $activeRole === 'Student' || in_array($activeRole, ['Faculty', 'Dean'], true);
+
+if ($canImport) {
+    $templateUrl = '/admin/users/import-template' . ($activeRole === 'Student' ? '' : '?role=' . urlencode($activeRole));
     $headerActions = '<div class="d-flex align-items-center gap-2">
-        <a href="' . url('/admin/users/import-template') . '" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5"><i class="bi bi-download"></i> Download template</a>
-        <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#importExcelModal"><i class="bi bi-file-earmark-excel"></i> Import spreadsheet</button>
+        <a href="' . url($templateUrl) . '" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5"><i class="bi bi-download"></i> Download template</a>
+        <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#' . ($activeRole === 'Student' ? 'importExcelModal' : 'personnelImportModal') . '"><i class="bi bi-file-earmark-excel"></i> Import spreadsheet</button>
         <a href="' . $backUrl . '" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5"><i class="bi bi-arrow-left"></i> Back to list</a>
     </div>';
 } else {
@@ -353,6 +356,8 @@ ob_start();
 
 <?php if ($activeRole === 'Student') {
     include __DIR__ . '/_import-modal.php';
+} elseif (in_array($activeRole, ['Faculty', 'Dean'], true)) {
+    include __DIR__ . '/_personnel-import-modal.php';
 } ?>
 
 <script>

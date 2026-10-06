@@ -56,28 +56,6 @@
             color: var(--gwc-text-secondary);
             margin-bottom: 18px;
         }
-        .legal-meta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 12px;
-            padding: 14px 18px;
-            background-color: var(--gwc-slate-bg);
-            border: 1px solid var(--gwc-border-light);
-            border-radius: 6px;
-            font-size: 12.5px;
-        }
-        .legal-meta-item-label {
-            font-weight: 600;
-            color: var(--gwc-text-muted);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 2px;
-        }
-        .legal-meta-item-value {
-            color: var(--gwc-text-primary);
-            font-weight: 500;
-        }
         .legal-preamble {
             border-left: 3px solid var(--gwc-navy);
             background-color: var(--gwc-slate-bg);
@@ -175,11 +153,6 @@
                 font-size: 20px;
                 line-height: 1.3;
             }
-            .legal-meta-grid {
-                grid-template-columns: 1fr;
-                padding: 12px 14px;
-                gap: 8px;
-            }
             .legal-card-grid {
                 grid-template-columns: 1fr;
             }
@@ -217,21 +190,6 @@
                 <span class="legal-meta-badge">Statutory Compliance Notice</span>
                 <h1 class="legal-doc-title">Institutional Data Privacy Notice</h1>
                 <p class="legal-doc-subtitle">Under Republic Act No. 10173 (Data Privacy Act of 2012 of the Philippines)</p>
-
-                <div class="legal-meta-grid">
-                    <div>
-                        <div class="legal-meta-item-label">Governing Academic Unit</div>
-                        <div class="legal-meta-item-value">College of Information Technology (CITE)</div>
-                    </div>
-                    <div>
-                        <div class="legal-meta-item-label">Statutory Reference</div>
-                        <div class="legal-meta-item-value">Republic Act No. 10173 (IRR / NPC)</div>
-                    </div>
-                    <div>
-                        <div class="legal-meta-item-label">Effective Term</div>
-                        <div class="legal-meta-item-value">Academic Year 2026&ndash;2027</div>
-                    </div>
-                </div>
             </div>
 
             <!-- Statutory Commitment Preamble -->

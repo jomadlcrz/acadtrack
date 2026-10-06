@@ -56,28 +56,6 @@
             color: var(--gwc-text-secondary);
             margin-bottom: 18px;
         }
-        .legal-meta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 12px;
-            padding: 14px 18px;
-            background-color: var(--gwc-slate-bg);
-            border: 1px solid var(--gwc-border-light);
-            border-radius: 6px;
-            font-size: 12.5px;
-        }
-        .legal-meta-item-label {
-            font-weight: 600;
-            color: var(--gwc-text-muted);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 2px;
-        }
-        .legal-meta-item-value {
-            color: var(--gwc-text-primary);
-            font-weight: 500;
-        }
         .legal-preamble {
             border-left: 3px solid var(--gwc-navy);
             background-color: var(--gwc-slate-bg);
@@ -164,11 +142,6 @@
                 font-size: 20px;
                 line-height: 1.3;
             }
-            .legal-meta-grid {
-                grid-template-columns: 1fr;
-                padding: 12px 14px;
-                gap: 8px;
-            }
             .legal-preamble,
             .legal-advisory-box {
                 padding: 12px 14px;
@@ -204,21 +177,6 @@
                 <span class="legal-meta-badge">Academic Governance</span>
                 <h1 class="legal-doc-title">Terms of Academic Service &amp; Grading Policy</h1>
                 <p class="legal-doc-subtitle">Institutional platform governance, evaluation integrity, and user accountability standards</p>
-
-                <div class="legal-meta-grid">
-                    <div>
-                        <div class="legal-meta-item-label">Governing Academic Unit</div>
-                        <div class="legal-meta-item-value">College of Information Technology (CITE)</div>
-                    </div>
-                    <div>
-                        <div class="legal-meta-item-label">Jurisdiction</div>
-                        <div class="legal-meta-item-value">Golden West Colleges, Inc.</div>
-                    </div>
-                    <div>
-                        <div class="legal-meta-item-label">Effective Term</div>
-                        <div class="legal-meta-item-value">Academic Year 2026&ndash;2027</div>
-                    </div>
-                </div>
             </div>
 
             <!-- Preamble -->
