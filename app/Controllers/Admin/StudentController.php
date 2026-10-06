@@ -8,6 +8,7 @@ use App\Core\Request;
 use App\Core\Response;
 use App\Core\Session;
 use App\Core\View;
+use App\Models\AcademicTerm;
 use App\Models\Department;
 use App\Models\Set;
 use App\Models\Student;
@@ -48,11 +49,8 @@ class StudentController
             }
         }
 
-        $sets = Set::where('status', 'active')
-            ->orderBy('year_level')
-            ->orderBy('set_name')
-            ->get()
-            ->toArray();
+        $activeTerm = AcademicTerm::getActive();
+        $sets = $activeTerm ? Set::getActiveByTerm((int) $activeTerm['id']) : [];
 
         $html = (new View())->render('admin.students.index', [
             'students' => $students,
