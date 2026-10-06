@@ -111,7 +111,7 @@ $subjectSemesterLabel = match ($subjectSemesterNum) {
                             <option value="">All Sets</option>
                             <?php foreach (($sets ?? []) as $set): ?>
                                 <option value="<?= $set['id'] ?>" <?= ((int)($selectedSet ?? 0) === (int)$set['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($set['name']) ?>
+                                    <?= htmlspecialchars($set['set_name'] ?? $set['name'] ?? '') ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -337,7 +337,7 @@ $subjectSemesterLabel = match ($subjectSemesterNum) {
                             <option value="">Select set...</option>
                             <?php foreach (($sets ?? []) as $set): ?>
                                 <option value="<?= $set['id'] ?>" <?= ((int)($selectedSet ?? 0) === (int)$set['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($set['name']) ?>
+                                    <?= htmlspecialchars($set['set_name'] ?? $set['name'] ?? '') ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -403,7 +403,7 @@ $subjectSemesterLabel = match ($subjectSemesterNum) {
                             <option value="">Select set...</option>
                             <?php foreach (($sets ?? []) as $set): ?>
                                 <option value="<?= $set['id'] ?>" <?= ((int)($selectedSet ?? 0) === (int)$set['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($set['name']) ?>
+                                    <?= htmlspecialchars($set['set_name'] ?? $set['name'] ?? '') ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>

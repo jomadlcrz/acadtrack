@@ -260,13 +260,40 @@ ob_start();
                                     $sType = (string) ($subject['subject_type'] ?? ($subject['nature'] ?? 'Lecture'));
                                     $assignedList = $subject['assigned_faculty'] ?? [];
                                     $isAssigned = !empty($assignedList);
+
+                                    // Group assignments by faculty_id so each instructor appears only once per course offering
+                                    $groupedFaculty = [];
+                                    foreach ($assignedList as $inst) {
+                                        $fId = (int) ($inst['faculty_id'] ?? 0);
+                                        if ($fId <= 0) {
+                                            continue;
+                                        }
+                                        if (!isset($groupedFaculty[$fId])) {
+                                            $groupedFaculty[$fId] = [
+                                                'faculty_id' => $fId,
+                                                'first_name' => $inst['first_name'] ?? '',
+                                                'last_name' => $inst['last_name'] ?? '',
+                                                'email' => $inst['email'] ?? '',
+                                                'dept_abbrev' => $inst['dept_abbrev'] ?? null,
+                                                'assignments' => [],
+                                            ];
+                                        }
+                                        $setKey = ($inst['set_id'] !== null && $inst['set_id'] !== '') ? (int) $inst['set_id'] : 'all';
+                                        if (!isset($groupedFaculty[$fId]['assignments'][$setKey])) {
+                                            $groupedFaculty[$fId]['assignments'][$setKey] = [
+                                                'assignment_id' => (int) ($inst['assignment_id'] ?? 0),
+                                                'set_id' => ($inst['set_id'] !== null && $inst['set_id'] !== '') ? (int) $inst['set_id'] : null,
+                                                'set_name' => $inst['set_name'] ?? null,
+                                            ];
+                                        }
+                                    }
                                     
-                                    // Compile instructor search string
+                                    // Compile instructor and section search string
                                     $facultySearchTerms = [];
                                     foreach ($assignedList as $inst) {
-                                        $facultySearchTerms[] = ($inst['first_name'] ?? '') . ' ' . ($inst['last_name'] ?? '') . ' ' . ($inst['email'] ?? '');
+                                        $facultySearchTerms[] = ($inst['first_name'] ?? '') . ' ' . ($inst['last_name'] ?? '') . ' ' . ($inst['email'] ?? '') . ' ' . ($inst['set_name'] ?? '');
                                     }
-                                    $facultySearchString = strtolower(implode(' ', $facultySearchTerms));
+                                    $facultySearchString = strtolower(implode(' ', array_filter($facultySearchTerms)));
                                 ?>
                                 <tr class="assignment-row"
                                     data-code="<?= strtolower(htmlspecialchars($subject['subject_code'] ?? $subject['code'] ?? '')) ?>"
@@ -290,53 +317,53 @@ ob_start();
                                     </td>
 
                                     <td class="py-3 px-3">
-                                        <?php if ($isAssigned): ?>
+                                        <?php if (!empty($groupedFaculty)): ?>
                                             <div class="d-flex flex-wrap gap-2 align-items-center">
-                                                <?php $renderedKeys = []; ?>
-                                                <?php foreach ($assignedList as $inst): ?>
+                                                <?php foreach ($groupedFaculty as $inst): ?>
                                                     <?php 
-                                                        $dedupKey = ($inst['faculty_id'] ?? 0) . '_' . ($inst['set_id'] ?? 'all');
-                                                        if (isset($renderedKeys[$dedupKey])) {
-                                                            continue;
-                                                        }
-                                                        $renderedKeys[$dedupKey] = true;
                                                         $firstInitial = strtoupper(substr($inst['first_name'] ?? 'F', 0, 1));
                                                         $lastInitial = strtoupper(substr($inst['last_name'] ?? 'M', 0, 1));
                                                         $initials = $firstInitial . $lastInitial;
                                                         $dept = $inst['dept_abbrev'] ?? null;
-                                                        $setName = $inst['set_name'] ?? null;
+                                                        $fullName = trim(($inst['first_name'] ?? '') . ' ' . ($inst['last_name'] ?? ''));
                                                     ?>
-                                                    <div class="d-inline-flex align-items-center gap-2 py-1 px-2.5 rounded border bg-white shadow-sm" style="border-color: #e2e8f0 !important;">
+                                                    <div class="d-inline-flex align-items-center gap-2 py-1.5 px-2.5 rounded border bg-white shadow-sm" style="border-color: #e2e8f0 !important;">
                                                         <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; font-size: 10.5px; flex-shrink: 0;">
                                                             <?= $initials ?>
                                                         </div>
-                                                        <div class="d-flex flex-column" style="line-height: 1.2;">
-                                                            <div class="d-flex align-items-center gap-1.5">
+                                                        <div class="d-flex flex-column" style="line-height: 1.25;">
+                                                            <div class="d-flex align-items-center gap-1.5 flex-wrap">
                                                                 <span class="fw-semibold text-dark small" style="font-size: 12.5px;">
-                                                                    <?= htmlspecialchars(($inst['first_name'] ?? '') . ' ' . ($inst['last_name'] ?? '')) ?>
+                                                                    <?= htmlspecialchars($fullName) ?>
                                                                 </span>
-                                                                <?php if ($setName): ?>
-                                                                    <span class="badge bg-light text-secondary border font-monospace px-1.5 py-0.5" style="font-size: 10.5px;">
-                                                                        <?= htmlspecialchars($setName) ?>
-                                                                    </span>
-                                                                <?php endif; ?>
+                                                                <div class="d-inline-flex align-items-center gap-1 flex-wrap">
+                                                                    <?php foreach ($inst['assignments'] as $asgn): ?>
+                                                                        <?php 
+                                                                            $badgeLabel = $asgn['set_name'] ?? 'All sections';
+                                                                            $confirmMsg = "Remove " . addslashes($fullName) . " from " . addslashes($subject['subject_code'] ?? $subject['code']) . ($asgn['set_name'] ? " (" . addslashes($asgn['set_name']) . ")" : "") . "?";
+                                                                        ?>
+                                                                        <span class="badge bg-light text-secondary border <?= $asgn['set_name'] ? 'font-monospace' : '' ?> px-1.5 py-0.5 d-inline-flex align-items-center gap-1" style="font-size: 10.5px; font-weight: 500;">
+                                                                            <span><?= htmlspecialchars($badgeLabel) ?></span>
+                                                                            <form method="POST" action="<?= url('/dean/faculty-assignments/remove') ?>" class="d-inline m-0 p-0" onsubmit="return confirm('<?= htmlspecialchars($confirmMsg, ENT_QUOTES) ?>');">
+                                                                                <?= csrf_field() ?>
+                                                                                <input type="hidden" name="assignment_id" value="<?= (int)($asgn['assignment_id'] ?? 0) ?>">
+                                                                                <input type="hidden" name="faculty_id" value="<?= (int)$inst['faculty_id'] ?>">
+                                                                                <input type="hidden" name="subject_id" value="<?= (int)$subject['id'] ?>">
+                                                                                <input type="hidden" name="set_id" value="<?= (int)($asgn['set_id'] ?? 0) ?>">
+                                                                                <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
+                                                                                <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
+                                                                                <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0 lh-1 d-inline-flex align-items-center" title="Remove <?= htmlspecialchars($badgeLabel) ?> assignment" style="font-size: 11px;">
+                                                                                    <i class="bi bi-x"></i>
+                                                                                </button>
+                                                                            </form>
+                                                                        </span>
+                                                                    <?php endforeach; ?>
+                                                                </div>
                                                             </div>
                                                             <span class="text-muted" style="font-size: 11px;">
                                                                 <?= htmlspecialchars($inst['email'] ?? '') ?><?= $dept ? ' &bull; ' . htmlspecialchars($dept) : '' ?>
                                                             </span>
                                                         </div>
-                                                        <form method="POST" action="<?= url('/dean/faculty-assignments/remove') ?>" class="ms-1 d-inline" onsubmit="return confirm('Remove <?= htmlspecialchars(addslashes(($inst['first_name'] ?? '') . ' ' . ($inst['last_name'] ?? ''))) ?> from <?= htmlspecialchars(addslashes($subject['subject_code'] ?? $subject['code'])) ?><?= $setName ? ' (' . htmlspecialchars(addslashes($setName)) . ')' : '' ?>?');">
-                                                            <?= csrf_field() ?>
-                                                            <input type="hidden" name="assignment_id" value="<?= (int)($inst['assignment_id'] ?? 0) ?>">
-                                                            <input type="hidden" name="faculty_id" value="<?= (int)$inst['faculty_id'] ?>">
-                                                            <input type="hidden" name="subject_id" value="<?= (int)$subject['id'] ?>">
-                                                            <input type="hidden" name="set_id" value="<?= (int)($inst['set_id'] ?? 0) ?>">
-                                                            <input type="hidden" name="academic_term_id" value="<?= htmlspecialchars((string)($academicTerm['id'] ?? 1)) ?>">
-                                                            <input type="hidden" name="semester" value="<?= htmlspecialchars((string)($selectedSemester ?? '1')) ?>">
-                                                            <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Remove instructor assignment" style="line-height: 1;">
-                                                                <i class="bi bi-x-circle fs-6"></i>
-                                                            </button>
-                                                        </form>
                                                     </div>
                                                 <?php endforeach; ?>
                                             </div>
@@ -546,6 +573,7 @@ ob_start();
                                                 }
                                             }
                                         }
+                                        $assignedCourses = array_values(array_unique($assignedCourses));
                                     ?>
                                     <tr>
                                         <td class="py-3 px-3">
@@ -775,10 +803,26 @@ ob_start();
         facultyEl.comboboxRefresh && facultyEl.comboboxRefresh();
 
         listEl.innerHTML = '';
+        var groupedModalFaculty = {};
         assigned.forEach(function (a) {
+            var id = String(a.id);
+            if (!groupedModalFaculty[id]) {
+                groupedModalFaculty[id] = {
+                    name: a.name,
+                    sections: []
+                };
+            }
+            if (a.set_name) {
+                groupedModalFaculty[id].sections.push(a.set_name);
+            }
+        });
+
+        Object.keys(groupedModalFaculty).forEach(function (id) {
+            var f = groupedModalFaculty[id];
             var b = document.createElement('span');
             b.className = 'badge bg-light text-dark border fw-normal';
-            b.textContent = a.name + (a.set_name ? ' (' + a.set_name + ')' : '');
+            var secText = f.sections.length > 0 ? ' (' + f.sections.join(', ') + ')' : '';
+            b.textContent = f.name + secText;
             listEl.appendChild(b);
         });
         wrap.classList.toggle('d-none', assigned.length === 0);

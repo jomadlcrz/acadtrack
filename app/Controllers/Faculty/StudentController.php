@@ -270,6 +270,9 @@ class StudentController
                             'email' => trim((string) ($data[1] ?? '')),
                             'last_name' => trim((string) ($data[2] ?? '')),
                             'first_name' => trim((string) ($data[3] ?? '')),
+                            'status' => trim((string) ($data[4] ?? '')),
+                            'year_level' => trim((string) ($data[5] ?? '')),
+                            'section' => trim((string) ($data[6] ?? '')),
                         ];
                     }
                     fclose($handle);
@@ -364,6 +367,44 @@ class StudentController
                 continue;
             }
 
+            $rawStatus = trim((string) ($row['status'] ?? ''));
+            $rawYearLevel = (int) ($row['year_level'] ?? 0);
+
+            // Resolve Section and Year Level
+            $rowSetId = $targetSetId;
+            $rowYearLevel = $defaultYearLevel;
+
+            if ($rowSection !== '') {
+                $matchedSet = \App\Models\Set::where('academic_term_id', $termId)
+                    ->where(function ($q) use ($rowSection) {
+                        $q->where('set_name', $rowSection)
+                            ->orWhere('name', $rowSection)
+                            ->orWhere('set_code', $rowSection)
+                            ->orWhere('set_name', 'LIKE', '%' . $rowSection . '%');
+                    })->first();
+                if ($matchedSet) {
+                    $rowSetId = (int) $matchedSet->id;
+                    $rowYearLevel = (int) ($matchedSet->year_level ?? $defaultYearLevel);
+                }
+            } elseif ($rowSetId > 0) {
+                $setObj = \App\Models\Set::find($rowSetId);
+                if ($setObj) {
+                    $rowYearLevel = (int) ($setObj->year_level ?? $defaultYearLevel);
+                }
+            }
+
+            if ($rawYearLevel >= 1 && $rawYearLevel <= 4) {
+                $rowYearLevel = $rawYearLevel;
+            }
+
+            if ($rawStatus !== '') {
+                $rowStatus = \App\Models\Student::normalizeStatus($rawStatus);
+            } elseif ($rowSetId > 0) {
+                $rowStatus = \App\Models\Student::STATUS_REGULAR;
+            } else {
+                $rowStatus = \App\Models\Student::STATUS_IRREGULAR;
+            }
+
             $student = $this->studentRepository->findByIdentifier($studentNumber, $email);
 
             if (!$student) {
@@ -373,31 +414,6 @@ class StudentController
                     try {
                         if ($firstName === '') $firstName = 'Student';
                         if ($lastName === '') $lastName = ($studentNumber !== '' ? $studentNumber : 'GWC');
-
-                        // Resolve Section and Year Level
-                        $rowSetId = $targetSetId;
-                        $rowYearLevel = $defaultYearLevel;
-                        $rowStatus = \App\Models\Student::STATUS_IRREGULAR;
-
-                        if ($rowSection !== '') {
-                            $matchedSet = \App\Models\Set::where('academic_term_id', $termId)
-                                ->where(function ($q) use ($rowSection) {
-                                    $q->where('set_name', $rowSection)->orWhere('name', $rowSection);
-                                })->first();
-                            if ($matchedSet) {
-                                $rowSetId = (int) $matchedSet->id;
-                                $rowYearLevel = (int) ($matchedSet->year_level ?? $defaultYearLevel);
-                            }
-                        } elseif ($rowSetId > 0) {
-                            $setObj = \App\Models\Set::find($rowSetId);
-                            if ($setObj) {
-                                $rowYearLevel = (int) ($setObj->year_level ?? $defaultYearLevel);
-                            }
-                        }
-
-                        if ($rowSetId > 0) {
-                            $rowStatus = \App\Models\Student::STATUS_REGULAR;
-                        }
 
                         // Generate unique email address if not provided
                         $candidateEmail = $email;
@@ -435,16 +451,30 @@ class StudentController
                                     'year_level' => $rowYearLevel,
                                     'status' => $rowStatus,
                                 ]);
-                                try {
-                                    (new \App\Services\StudentRegistrationService())->register(
-                                        (int) $studentModel->id,
-                                        $termId,
-                                        $rowStatus,
-                                        $rowYearLevel,
-                                        $rowSetId > 0 ? $rowSetId : null
-                                    );
-                                } catch (\Throwable $e) {}
+                            } else {
+                                $updates = [];
+                                if ($rowSetId > 0 && ($studentModel->set_id === null || $rowSection !== '' || $targetSetId > 0)) {
+                                    $updates['set_id'] = $rowSetId;
+                                }
+                                if ($rowStatus !== '' && ($studentModel->status !== $rowStatus || $studentModel->status === \App\Models\Student::STATUS_IRREGULAR)) {
+                                    $updates['status'] = $rowStatus;
+                                }
+                                if ($rowYearLevel > 0 && (empty($studentModel->year_level) || $rawYearLevel > 0)) {
+                                    $updates['year_level'] = $rowYearLevel;
+                                }
+                                if (!empty($updates)) {
+                                    $studentModel->update($updates);
+                                }
                             }
+                            try {
+                                (new \App\Services\StudentRegistrationService())->register(
+                                    (int) $studentModel->id,
+                                    $termId,
+                                    $rowStatus,
+                                    $rowYearLevel,
+                                    $rowSetId > 0 ? $rowSetId : null
+                                );
+                            } catch (\Throwable $e) {}
                             $studentId = (int) $studentModel->id;
                         } else {
                             $tempPassword = \App\Models\User::generateRandomPassword();
@@ -500,6 +530,35 @@ class StudentController
                 }
             } else {
                 $studentId = (int) $student['id'];
+
+                if ($rowSetId > 0 || $rawStatus !== '') {
+                    $studentModel = \App\Models\Student::find($studentId);
+                    if ($studentModel) {
+                        $updates = [];
+                        if ($rowSetId > 0 && ($studentModel->set_id === null || $rowSection !== '' || $targetSetId > 0)) {
+                            $updates['set_id'] = $rowSetId;
+                        }
+                        if ($rowStatus !== '' && ($studentModel->status !== $rowStatus || $studentModel->status === \App\Models\Student::STATUS_IRREGULAR)) {
+                            $updates['status'] = $rowStatus;
+                        }
+                        if ($rowYearLevel > 0 && (empty($studentModel->year_level) || $rawYearLevel > 0)) {
+                            $updates['year_level'] = $rowYearLevel;
+                        }
+                        if (!empty($updates)) {
+                            $studentModel->update($updates);
+                        }
+                    }
+
+                    try {
+                        (new \App\Services\StudentRegistrationService())->register(
+                            $studentId,
+                            $termId,
+                            $rowStatus,
+                            $rowYearLevel,
+                            $rowSetId > 0 ? $rowSetId : null
+                        );
+                    } catch (\Throwable $e) {}
+                }
             }
 
             if ($studentNumber !== '') {

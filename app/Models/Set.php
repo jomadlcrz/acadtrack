@@ -195,6 +195,7 @@ class Set extends Model
         if (!empty($assignedRows)) {
             $enrolledCounts = self::getEnrolledCountsBySet($subjectId, $academicTermId);
             foreach ($assignedRows as &$s) {
+                $s['name'] = $s['set_name'] ?? '';
                 $s['enrolled_count'] = (int) ($enrolledCounts[$s['id']] ?? 0);
             }
             unset($s);
@@ -221,7 +222,12 @@ class Set extends Model
                 } else {
                     return [];
                 }
-                return $subQuery->orderBy('year_level', 'asc')->orderBy('set_name', 'asc')->get()->toArray();
+                $fallbackRows = $subQuery->orderBy('year_level', 'asc')->orderBy('set_name', 'asc')->get()->toArray();
+                foreach ($fallbackRows as &$s) {
+                    $s['name'] = $s['set_name'] ?? '';
+                }
+                unset($s);
+                return $fallbackRows;
             }
         }
 
@@ -298,6 +304,7 @@ class Set extends Model
             ->toArray();
 
         foreach ($sets as &$s) {
+            $s['name'] = $s['set_name'] ?? '';
             $s['enrolled_count'] = (int) ($enrolledCounts[$s['id']] ?? 0);
         }
         unset($s);

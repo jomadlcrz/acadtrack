@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const previewBadge = document.getElementById('rosterPreviewBadge');
     const submitBtn = document.getElementById('rosterImportSubmit');
 
+    const targetSetSelect = document.getElementById('rosterImportSetSelect');
+
     const importUrl = modal.dataset.importUrl;
     const rosterUrl = modal.dataset.rosterUrl;
     const csrfToken = modal.dataset.csrfToken;
@@ -23,6 +25,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const semester = modal.dataset.semester;
 
     let parsedRows = [];
+
+    if (targetSetSelect) {
+        targetSetSelect.addEventListener('change', function() {
+            if (parsedRows.length > 0) {
+                renderPreview();
+            }
+        });
+    }
 
     function icon(name) {
         const el = document.createElement('i');
@@ -99,7 +109,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     studentNumber: findColumn(headers, ['student number', 'student id', 'student_number', 'id']),
                     firstName: findColumn(headers, ['first name', 'given name', 'firstname', 'first_name']),
                     lastName: findColumn(headers, ['last name', 'surname', 'lastname', 'family name', 'last_name']),
-                    email: findColumn(headers, ['email', 'email address', 'e-mail'])
+                    email: findColumn(headers, ['email', 'email address', 'e-mail']),
+                    section: findColumn(headers, ['class section', 'class_section', 'section', 'set', 'set_name', 'set name']),
+                    status: findColumn(headers, ['enrollment status', 'enrollment_status', 'status', 'student status', 'student_status']),
+                    yearLevel: findColumn(headers, ['year level', 'year_level', 'year', 'level'])
                 };
 
                 if (colMap.studentNumber === -1 && colMap.email === -1) {
@@ -120,7 +133,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         student_number: cell(row, colMap.studentNumber),
                         first_name: cell(row, colMap.firstName),
                         last_name: cell(row, colMap.lastName),
-                        email: cell(row, colMap.email)
+                        email: cell(row, colMap.email),
+                        section: cell(row, colMap.section),
+                        status: cell(row, colMap.status),
+                        year_level: cell(row, colMap.yearLevel)
                     };
 
                     const issues = [];
@@ -150,11 +166,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderPreview() {
         previewBody.textContent = '';
+        const selectedSetOptionText = (targetSetSelect && targetSetSelect.value && targetSetSelect.selectedIndex >= 0)
+            ? targetSetSelect.options[targetSetSelect.selectedIndex].text
+            : '';
 
         parsedRows.forEach(function(entry, index) {
             const tr = document.createElement('tr');
             const valid = entry._issues.length === 0;
             const name = [entry.last_name, entry.first_name].filter(Boolean).join(', ');
+            const displaySection = entry.section || selectedSetOptionText || '—';
+            const displayStatus = entry.status || (displaySection !== '—' ? 'Regular' : 'Irregular');
 
             if (!valid) {
                 tr.classList.add('table-danger');
@@ -164,7 +185,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 { text: String(index + 1), className: 'py-1 px-2 text-muted text-center' },
                 { text: entry.student_number || '—', className: 'py-1 px-2 font-monospace text-nowrap', dim: !entry.student_number },
                 { text: name || '—', className: 'py-1 px-2 text-nowrap', dim: !name },
-                { text: entry.email || '—', className: 'py-1 px-2 text-nowrap text-secondary', dim: !entry.email }
+                { text: entry.email || '—', className: 'py-1 px-2 text-nowrap text-secondary', dim: !entry.email },
+                { text: displaySection, className: 'py-1 px-2 font-monospace text-nowrap', dim: displaySection === '—' },
+                { text: displayStatus, className: 'py-1 px-2 text-nowrap' }
             ];
 
             cells.forEach(function(cellDef) {
@@ -248,6 +271,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        const selectedSetId = (targetSetSelect && targetSetSelect.value) ? Number(targetSetSelect.value) : 0;
+
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Enrolling...';
 
@@ -263,6 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 subject_id: Number(subjectId),
                 academic_term_id: Number(termId),
                 semester: semester,
+                set_id: selectedSetId,
                 students: payload
             })
         })

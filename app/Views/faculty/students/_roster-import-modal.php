@@ -37,6 +37,21 @@
                     </a>
                 </div>
 
+                <div class="row g-2 align-items-center mb-3">
+                    <div class="col-md-6 col-lg-5">
+                        <label for="rosterImportSetSelect" class="form-label small fw-semibold mb-1">Target section / set <span class="text-muted fw-normal">(Optional)</span></label>
+                        <select id="rosterImportSetSelect" class="form-select form-select-sm">
+                            <option value="">Auto-detect from file (or unassigned)</option>
+                            <?php foreach (($sets ?? []) as $s): ?>
+                                <option value="<?= $s['id'] ?>" <?= ((int)($selectedSet ?? 0) === (int)$s['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($s['set_name'] ?? $s['name'] ?? '') ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="form-text small" style="font-size: 11px;">If your spreadsheet has a section column (e.g. BSIT-1A), it will be used automatically. Otherwise, choose a default section here.</div>
+                    </div>
+                </div>
+
                 <div id="rosterImportDropzone" class="border border-2 border-dashed rounded-3 p-4 text-center mb-3" style="border-color: #cbd5e1 !important; background-color: #f8fafc; cursor: pointer;">
                     <i class="bi bi-file-earmark-spreadsheet text-primary d-block mb-2"></i>
                     <div class="fw-semibold mb-1">Click to select or drag and drop your class list here</div>
@@ -54,13 +69,15 @@
 
                     <div class="table-responsive border rounded-2" style="max-height: 320px; overflow-y: auto;">
                         <table class="table table-sm table-hover align-middle mb-0">
-                            <thead class="bg-light sticky-top border-bottom text-secondary text-uppercase">
+                            <thead class="bg-light sticky-top border-bottom text-secondary text-uppercase" style="font-size: 11px;">
                                 <tr>
-                                    <th class="text-center" style="width: 50px;">#</th>
+                                    <th class="text-center" style="width: 45px;">#</th>
                                     <th>Student ID</th>
                                     <th>Full name</th>
                                     <th>Email address</th>
-                                    <th class="text-center" style="width: 120px;">Status</th>
+                                    <th>Section</th>
+                                    <th>Status</th>
+                                    <th class="text-center" style="width: 100px;">Verification</th>
                                 </tr>
                             </thead>
                             <tbody id="rosterPreviewBody"></tbody>
