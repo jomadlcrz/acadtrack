@@ -30,6 +30,23 @@ if (!empty($selectedSet)) {
         }
     }
 }
+
+$subjectYearLevel = (int) ($currentSubject->year_level ?? 1);
+$subjectYearLevel = ($subjectYearLevel >= 1 && $subjectYearLevel <= 4) ? $subjectYearLevel : 1;
+$yearLevelLabels = [
+    1 => '1st Year',
+    2 => '2nd Year',
+    3 => '3rd Year',
+    4 => '4th Year',
+];
+$subjectYearLabel = $yearLevelLabels[$subjectYearLevel] ?? ($subjectYearLevel . 'th Year');
+
+$subjectSemesterNum = (int) ($currentSubject->semester ?? $selectedSemester ?? 1);
+$subjectSemesterLabel = match ($subjectSemesterNum) {
+    1 => '1st Semester',
+    2 => '2nd Semester',
+    default => 'Semester ' . $subjectSemesterNum,
+};
 ?>
 
 <!-- Search, Filter & Statistics Bar -->
@@ -298,13 +315,13 @@ if (!empty($selectedSet)) {
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label for="year_level" class="form-label">Year level <span class="text-danger">*</span></label>
-                            <select class="form-select" id="year_level" name="year_level" required>
-                                <option value="1">1st Year</option>
-                                <option value="2">2nd Year</option>
-                                <option value="3">3rd Year</option>
-                                <option value="4">4th Year</option>
-                            </select>
+                            <label for="year_level_display" class="form-label">Year level</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light" id="year_level_display" value="<?= htmlspecialchars($subjectYearLabel) ?>" readonly tabindex="-1" style="cursor: not-allowed;">
+                                <span class="input-group-text bg-light text-muted small"><?= htmlspecialchars($subjectSemesterLabel) ?></span>
+                            </div>
+                            <input type="hidden" id="year_level" name="year_level" value="<?= $subjectYearLevel ?>">
+                            <div class="form-text">Locked to this subject's curriculum level (<?= htmlspecialchars($subjectYearLabel) ?>, <?= htmlspecialchars($subjectSemesterLabel) ?>).</div>
                         </div>
                         <div class="col-md-6">
                             <label for="status" class="form-label">Student status <span class="text-danger">*</span></label>
@@ -364,13 +381,13 @@ if (!empty($selectedSet)) {
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label for="existing_year_level" class="form-label">Year level</label>
-                            <select class="form-select" id="existing_year_level" name="year_level">
-                                <option value="1">1st Year</option>
-                                <option value="2">2nd Year</option>
-                                <option value="3">3rd Year</option>
-                                <option value="4">4th Year</option>
-                            </select>
+                            <label for="existing_year_level_display" class="form-label">Year level</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light" id="existing_year_level_display" value="<?= htmlspecialchars($subjectYearLabel) ?>" readonly tabindex="-1" style="cursor: not-allowed;">
+                                <span class="input-group-text bg-light text-muted small"><?= htmlspecialchars($subjectSemesterLabel) ?></span>
+                            </div>
+                            <input type="hidden" id="existing_year_level" name="year_level" value="<?= $subjectYearLevel ?>">
+                            <div class="form-text">Locked to this subject's curriculum level (<?= htmlspecialchars($subjectYearLabel) ?>, <?= htmlspecialchars($subjectSemesterLabel) ?>).</div>
                         </div>
                         <div class="col-md-6">
                             <label for="existing_status" class="form-label">Student status</label>

@@ -68,7 +68,11 @@ class StudentController
         $studentNumber = trim((string) $request->post('student_number', ''));
         $studentNumber = $studentNumber !== '' ? $studentNumber : null;
 
-        $yearLevel = (int) $request->post('year_level', 1);
+        $subject = \App\Models\Subject::find($subjectId);
+        $subjectYearLevel = (int) ($subject->year_level ?? 0);
+        $yearLevel = ($subjectYearLevel >= 1 && $subjectYearLevel <= 4)
+            ? $subjectYearLevel
+            : max(1, min(4, (int) $request->post('year_level', 1)));
         $setId = !empty($request->post('set_id')) ? (int) $request->post('set_id') : null;
         $status = \App\Models\Student::normalizeStatus((string) $request->post('status', ''));
         $inputPassword = trim((string) $request->post('password', ''));
@@ -155,7 +159,11 @@ class StudentController
     {
         $subjectId = (int) $request->post('subject_id');
         $studentId = (int) $request->post('student_id');
-        $yearLevel = (int) $request->post('year_level', 0);
+        $subject = \App\Models\Subject::find($subjectId);
+        $subjectYearLevel = (int) ($subject->year_level ?? 0);
+        $yearLevel = ($subjectYearLevel >= 1 && $subjectYearLevel <= 4)
+            ? $subjectYearLevel
+            : max(1, min(4, (int) $request->post('year_level', 1)));
         $setId = !empty($request->post('set_id')) ? (int) $request->post('set_id') : null;
         $status = $request->post('status', '');
 
