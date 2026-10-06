@@ -574,7 +574,7 @@ INSERT INTO subjects (id, academic_term_id, program_id, subject_code, descriptiv
 (50, 1, 1, 'ITELEC4', 'IT Major Elective 4 (Web Systems & Development 2)', 3.0, 'Major with Lab', 'Lecture', 4, 1, 0),
 (51, 1, 1, 'OS101', 'Operating System', 3.0, 'Major with Lab', 'Lecture', 4, 1, 0),
 (52, 1, 1, 'SA101', 'System Administration and Maintenance 1', 3.0, 'Major without Lab', 'Lecture', 4, 1, 0),
-(53, 2, 1, 'PRAC101', 'OJT Practicum (486 hours)', 3.0, 'Major without Lab', 'Lecture', 4, 2, 0);
+(53, 2, 1, 'PRAC101', 'OJT Practicum (486 hours)', 3.0, 'Practicum/OJT', 'Lecture', 4, 2, 0);
 
 -- Insert baseline CITE prerequisites
 INSERT INTO prerequisites (id, subject_id, prerequisite_subject_id) VALUES
