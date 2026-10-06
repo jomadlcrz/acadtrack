@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Acadtrack (Golden West Colleges) — server-rendered academic grading/evaluation system. Vanilla PHP 8.2 (no framework), Eloquent via `illuminate/database` Capsule, MySQL, PHPMailer, Bootstrap 5 vendored in `public/assets/vendor`. Roles: Admin, Dean, Faculty, Student.
+Acadtrack (Golden West Colleges, Inc.) — server-rendered academic grading/evaluation system. Vanilla PHP 8.2 (no framework), Eloquent via `illuminate/database` Capsule, MySQL, PHPMailer, Bootstrap 5 vendored in `public/assets/vendor`. Roles: Admin, Dean, Faculty, Student.
 
 `CLAUDE.md` holds the architecture map and is accurate except where noted below. Detailed standards live in `docs/` and `.agents/skills/SKILL.md`. This file only records what is easy to get wrong.
 

@@ -57,7 +57,10 @@ class UserController
         $departments = \App\Models\Department::getActive();
         $academicTerm = \App\Models\AcademicTerm::getActive();
         $sets = $academicTerm ? \App\Models\Set::getActiveByTerm((int) $academicTerm['id']) : [];
-        $selectedRole = (string) $request->get('role', 'Student');
+        $selectedRole = ucfirst(strtolower(trim((string) $request->get('role', 'Student'))));
+        if (!in_array($selectedRole, ['Admin', 'Dean', 'Faculty', 'Student'], true)) {
+            $selectedRole = 'Student';
+        }
         $selectedStatus = (string) $request->get('enrollment_status', $request->get('status', 'Regular'));
         $selectedYearLevel = (int) $request->get('year_level', 1);
         $html = (new View())->render('admin.users.create', [
@@ -78,7 +81,7 @@ class UserController
 
         if (!$validator->validate($data)) {
             $session->flash('error', $validator->firstError());
-            redirect('/admin/users/create');
+            redirect($this->createUrl((string) ($data['role'] ?? '')));
             return;
         }
 
@@ -95,7 +98,7 @@ class UserController
                     $termClosureService = new \App\Services\TermClosureService();
                     if ($termClosureService->isTermClosed((int) $targetSet->academic_term_id)) {
                         $session->flash('error', 'Cannot assign student to a section belonging to a closed or ended academic term.');
-                        redirect('/admin/users/create');
+                        redirect($this->createUrl('Student'));
                         return;
                     }
                 }
@@ -660,6 +663,15 @@ class UserController
     }
 
     /** Where to send the admin after an account action, keeping the list they came from. */
+    private function createUrl(string $role = ''): string
+    {
+        if (in_array($role, ['Admin', 'Dean', 'Faculty', 'Student'], true)) {
+            return '/admin/users/create?role=' . urlencode($role);
+        }
+
+        return '/admin/users/create';
+    }
+
     private function listUrl(string $role = ''): string
     {
         if ($role !== '') {

@@ -11,6 +11,43 @@ $backUrl = match ($activeRole) {
     default => url('/admin/faculty'),
 };
 
+$isPersonnel = in_array($activeRole, ['Faculty', 'Dean', 'Admin'], true);
+
+$personSectionSubtitle = match ($activeRole) {
+    'Faculty' => 'Faculty member identity and institutional contact details.',
+    'Dean' => 'Dean identity and institutional contact details.',
+    'Admin' => 'Administrator identity and institutional contact details.',
+    default => 'Student identity and institutional contact details.',
+};
+
+$emailPlaceholder = match ($activeRole) {
+    'Faculty' => 'faculty@gwc.edu.ph',
+    'Dean' => 'dean@gwc.edu.ph',
+    'Admin' => 'admin@gwc.edu.ph',
+    default => 'student@gwc.edu.ph',
+};
+
+$emailHelp = 'Account activation instructions and portal credentials will be sent to this email.';
+
+$deptSectionSubtitle = match ($activeRole) {
+    'Dean' => 'College or department oversight appointment.',
+    default => 'Academic department appointment.',
+};
+
+$deptHelpText = match ($activeRole) {
+    'Dean' => 'The college or department this dean oversees.',
+    default => 'The department this academic officer belongs to.',
+};
+
+// academic_terms has no `name` column; compose the label from semester + school year.
+$activeTermLabel = null;
+if (!empty($academicTerm)) {
+    $termSchoolYear = trim((string) ($academicTerm['school_year'] ?? $academicTerm['academic_year_name'] ?? ''));
+    $activeTermLabel = trim(
+        semester_label($academicTerm['semester'] ?? null) . ($termSchoolYear !== '' ? ' \u{2022} SY ' . $termSchoolYear : '')
+    );
+}
+
 if ($activeRole === 'Student') {
     $headerActions = '<div class="d-flex align-items-center gap-2">
         <a href="' . url('/admin/users/import-template') . '" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1.5"><i class="bi bi-download"></i> Download template</a>
@@ -29,8 +66,13 @@ ob_start();
     <div class="card-header bg-white px-4 py-3 border-bottom d-flex align-items-center justify-content-between" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
         <div class="d-flex align-items-center gap-2">
             <span class="badge badge-<?= strtolower($activeRole) ?> px-2.5 py-1 text-xs fw-semibold"><?= htmlspecialchars($activeRole) ?></span>
-            <span class="text-secondary small">&bull;</span>
-            <span class="text-muted small">Academic Term: <strong class="text-dark"><?= htmlspecialchars($academicTerm['name'] ?? 'Active Term') ?></strong></span>
+            <?php if ($activeTermLabel !== null): ?>
+                <span class="text-secondary small">&bull;</span>
+                <span class="text-muted small">Academic Term: <strong class="text-dark"><?= htmlspecialchars($activeTermLabel) ?></strong></span>
+            <?php elseif ($activeRole === 'Student'): ?>
+                <span class="text-secondary small">&bull;</span>
+                <span class="text-muted small">Academic Term: <strong class="text-dark">Not configured</strong></span>
+            <?php endif; ?>
         </div>
         <span class="text-muted small"><span class="text-danger">*</span> Required fields</span>
     </div>
@@ -49,8 +91,8 @@ ob_start();
                         <i class="bi bi-person text-primary" style="font-size: 15px;"></i>
                     </div>
                     <div>
-                        <h6 class="fw-semibold text-dark mb-0" style="font-size: 14px;">Personal Information</h6>
-                        <div class="text-muted" style="font-size: 12px;">Student identity and institutional contact details.</div>
+                        <h6 class="fw-semibold text-dark mb-0" style="font-size: 14px;"><?= $isPersonnel ? 'Account Information' : 'Personal Information' ?></h6>
+                        <div class="text-muted" style="font-size: 12px;"><?= htmlspecialchars($personSectionSubtitle) ?></div>
                     </div>
                 </div>
 
@@ -112,12 +154,12 @@ ob_start();
                            class="form-control" 
                            id="email" 
                            name="email" 
-                           placeholder="student@gwc.edu.ph" 
+                           placeholder="<?= htmlspecialchars($emailPlaceholder) ?>" 
                            value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" 
                            required 
                            autocomplete="email">
                     <div class="form-text text-muted" style="font-size: 12px;">
-                        Account activation instructions and portal credentials will be sent to this email.
+                        <?= htmlspecialchars($emailHelp) ?>
                     </div>
                 </div>
             </div>
@@ -256,7 +298,7 @@ ob_start();
                     </div>
                 </div>
 
-            <?php elseif (in_array($activeRole, ['Faculty', 'Dean'], true)): ?>
+            <?php elseif ($isPersonnel): ?>
                 <!-- Department Affiliation -->
                 <div class="mt-4 mb-3 pt-3 border-top">
                     <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
@@ -264,29 +306,33 @@ ob_start();
                             <i class="bi bi-building text-primary" style="font-size: 15px;"></i>
                         </div>
                         <div>
-                            <h6 class="fw-semibold text-dark mb-0" style="font-size: 14px;">Department Affiliation</h6>
-                            <div class="text-muted" style="font-size: 12px;">Academic department appointment.</div>
+                            <h6 class="fw-semibold text-dark mb-0" style="font-size: 14px;"><?= $activeRole === 'Admin' ? 'Office Affiliation' : 'Department Affiliation' ?></h6>
+                            <div class="text-muted" style="font-size: 12px;"><?= htmlspecialchars($deptSectionSubtitle) ?></div>
                         </div>
                     </div>
 
                     <div class="mb-1">
                         <label for="department_id" class="form-label fw-semibold text-dark" style="font-size: 13px;">
-                            Department <span class="text-danger">*</span>
+                            <?= $activeRole === 'Admin' ? 'Office / Unit' : 'Department / College' ?>
+                            <?php if ($activeRole !== 'Admin'): ?>
+                                <span class="text-danger">*</span>
+                            <?php else: ?>
+                                <span class="text-muted fw-normal small">(Optional)</span>
+                            <?php endif; ?>
                         </label>
-                        <select class="form-select" id="department_id" name="department_id" required>
-                            <option value="">Select department...</option>
+                        <select class="form-select" id="department_id" name="department_id" <?= $activeRole === 'Admin' ? '' : 'required' ?>>
+                            <option value=""><?= $activeRole === 'Admin' ? 'No office assignment' : 'Select department...' ?></option>
                             <?php foreach ($departments ?? [] as $dept): ?>
                                 <?php 
                                 $deptCode = strtoupper(trim($dept['code'] ?? $dept['dept_abbrev'] ?? ''));
-                                $isSelected = (isset($_POST['department_id']) && (string)$_POST['department_id'] === (string)$dept['id'])
-                                           || (!isset($_POST['department_id']) && $deptCode === 'CITE');
+                                $isSelected = isset($_POST['department_id']) && (string)$_POST['department_id'] === (string)$dept['id'];
                                 ?>
                                 <option value="<?= $dept['id'] ?>" <?= $isSelected ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($dept['name']) ?> (<?= htmlspecialchars($deptCode) ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="form-text text-muted" style="font-size: 12px;">The department this academic officer belongs to.</div>
+                        <div class="form-text text-muted" style="font-size: 12px;"><?= htmlspecialchars($deptHelpText) ?></div>
                     </div>
                 </div>
             <?php endif; ?>
@@ -295,7 +341,7 @@ ob_start();
 
         <!-- Footer Actions -->
         <div class="card-footer bg-light py-3 px-4 border-top d-flex justify-content-between align-items-center" style="border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
-            <a href="<?= url('/admin/users') ?>" class="btn btn-outline-secondary">
+            <a href="<?= $backUrl ?>" class="btn btn-outline-secondary">
                 Cancel
             </a>
             <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 fw-semibold" style="background-color: #1e3a8a; border-color: #1e3a8a;">
