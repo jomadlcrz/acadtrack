@@ -78,7 +78,6 @@ class ProgramCurriculumController
                 2 => 2, 'Second Year' => 2, '2nd Year' => 2,
                 3 => 3, 'Third Year' => 3, '3rd Year' => 3,
                 4 => 4, 'Fourth Year' => 4, '4th Year' => 4,
-                5 => 5, 'Fifth Year' => 5, '5th Year' => 5,
             ];
 
             $tempGroups = [];
@@ -90,7 +89,6 @@ class ProgramCurriculumController
                     2 => 'Second Year',
                     3 => 'Third Year',
                     4 => 'Fourth Year',
-                    5 => 'Fifth Year',
                     default => "Year {$ylVal}",
                 } : ($ylVal ?: 'First Year');
 
@@ -653,6 +651,181 @@ class ProgramCurriculumController
 
         $session->flash('success', "Subject '{$code}' archived successfully.");
         redirect($redirectUrl);
+    }
+
+    public function printCurriculum(Request $request, Response $response, Session $session, ?string $id = null): void
+    {
+        $program = null;
+        if ($id !== null && $id !== '') {
+            $program = is_numeric($id) 
+                ? Program::with('department')->find((int) $id) 
+                : Program::with('department')->where('program_abbrev', $id)->first();
+        }
+
+        if (!$program) {
+            $programAbbrev = trim((string) $request->get('program', ''));
+            if (!empty($programAbbrev)) {
+                $program = Program::with('department')->where('program_abbrev', $programAbbrev)->first();
+            }
+        }
+
+        if (!$program) {
+            $program = Program::with('department')->orderBy('program_abbrev', 'asc')->first();
+        }
+
+        if (!$program) {
+            $session->flash('error', 'No curriculum available to print.');
+            redirect('/admin/program-curricula');
+            return;
+        }
+
+        $subjects = Subject::where('program_id', $program->id)
+            ->where('is_archived', 0)
+            ->orderBy('year_level', 'asc')
+            ->orderBy('semester', 'asc')
+            ->orderBy('subject_code', 'asc')
+            ->get();
+
+        // Load all prerequisites for these subjects
+        $prereqMap = [];
+        if ($subjects->isNotEmpty()) {
+            $subIds = $subjects->pluck('id')->all();
+            $placeholders = implode(',', array_fill(0, count($subIds), '?'));
+            $db = Database::getConnection();
+            $stmtPr = $db->prepare("
+                SELECT pr.subject_id, p.subject_code 
+                FROM prerequisites pr
+                JOIN subjects p ON pr.prerequisite_subject_id = p.id
+                WHERE pr.subject_id IN ({$placeholders})
+                ORDER BY p.subject_code ASC
+            ");
+            $stmtPr->execute($subIds);
+            $rows = $stmtPr->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $r) {
+                $prereqMap[(int) $r['subject_id']][] = $r['subject_code'];
+            }
+        }
+
+        $yearSortMap = [
+            1 => 1, 'First Year' => 1, '1st Year' => 1,
+            2 => 2, 'Second Year' => 2, '2nd Year' => 2,
+            3 => 3, 'Third Year' => 3, '3rd Year' => 3,
+            4 => 4, 'Fourth Year' => 4, '4th Year' => 4,
+        ];
+
+        $yearLevelLabel = function ($val): string {
+            if (is_numeric($val)) {
+                return match ((int) $val) {
+                    1 => 'First Year',
+                    2 => 'Second Year',
+                    3 => 'Third Year',
+                    4 => 'Fourth Year',
+                    default => "Year {$val}",
+                };
+            }
+            return (string) $val;
+        };
+
+        $semesterLabel = function (int $sem): string {
+            return match ($sem) {
+                1 => 'First Semester',
+                2 => 'Second Semester',
+                3 => 'Summer',
+                default => "Semester {$sem}",
+            };
+        };
+
+        // Collect distinct year levels from subjects (1 to 4 max)
+        $yearLevelsPresent = [];
+        foreach ($subjects as $sub) {
+            $yNum = is_numeric($sub->year_level) ? (int) $sub->year_level : ($yearSortMap[$sub->year_level] ?? 1);
+            if ($yNum >= 1 && $yNum <= 4) {
+                $yearLevelsPresent[$yNum] = true;
+            }
+        }
+
+        // If no subjects, default to standard program duration (max 4 years)
+        if (empty($yearLevelsPresent)) {
+            $parsedLen = min(4, max(1, (int) filter_var((string) ($program->program_length ?? '4'), FILTER_SANITIZE_NUMBER_INT) ?: 4));
+            for ($y = 1; $y <= $parsedLen; $y++) {
+                $yearLevelsPresent[$y] = true;
+            }
+        }
+        ksort($yearLevelsPresent);
+
+        $yearBlocks = [];
+        foreach (array_keys($yearLevelsPresent) as $y) {
+            $yearBlocks[$y] = [
+                'year_level' => $y,
+                'year_title' => $yearLevelLabel($y),
+                'groups' => [
+                    1 => [
+                        'semester' => 1,
+                        'semester_label' => $semesterLabel(1),
+                        'subjects' => [],
+                        'total_units' => 0.0,
+                    ],
+                    2 => [
+                        'semester' => 2,
+                        'semester_label' => $semesterLabel(2),
+                        'subjects' => [],
+                        'total_units' => 0.0,
+                    ],
+                ],
+            ];
+        }
+
+        $totalUnits = 0.0;
+        foreach ($subjects as $sub) {
+            $yNum = is_numeric($sub->year_level) ? (int) $sub->year_level : ($yearSortMap[$sub->year_level] ?? 1);
+            if ($yNum > 4) {
+                $yNum = 4;
+            }
+            $sem = (int) $sub->semester ?: 1;
+
+            if (!isset($yearBlocks[$yNum])) {
+                $yearBlocks[$yNum] = [
+                    'year_level' => $yNum,
+                    'year_title' => $yearLevelLabel($yNum),
+                    'groups' => [],
+                ];
+            }
+
+            if (!isset($yearBlocks[$yNum]['groups'][$sem])) {
+                $yearBlocks[$yNum]['groups'][$sem] = [
+                    'semester' => $sem,
+                    'semester_label' => $semesterLabel($sem),
+                    'subjects' => [],
+                    'total_units' => 0.0,
+                ];
+            }
+
+            $subPrereqs = $prereqMap[(int) $sub->id] ?? [];
+            $sub->prerequisites = !empty($subPrereqs) ? implode(', ', $subPrereqs) : '';
+
+            $yearBlocks[$yNum]['groups'][$sem]['subjects'][] = $sub;
+            $unitVal = (float) ($sub->units ?? 3.0);
+            $yearBlocks[$yNum]['groups'][$sem]['total_units'] += $unitVal;
+            $totalUnits += $unitVal;
+        }
+
+        // Clean up summer if empty
+        foreach ($yearBlocks as $yKey => &$block) {
+            ksort($block['groups']);
+            if (isset($block['groups'][3]) && empty($block['groups'][3]['subjects'])) {
+                unset($block['groups'][3]);
+            }
+        }
+        unset($block);
+
+        $html = (new View())->render('admin.program_curricula.print', [
+            'program' => $program,
+            'yearBlocks' => $yearBlocks,
+            'totalUnits' => $totalUnits,
+            'totalSubjects' => $subjects->count(),
+        ]);
+
+        $response->html($html);
     }
 
     private function respondError(bool $isJson, Response $response, Session $session, string $error): void

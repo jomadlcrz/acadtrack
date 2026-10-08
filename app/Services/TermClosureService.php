@@ -744,6 +744,11 @@ class TermClosureService
             $params['date_to'] = $filters['date_to'] . ' 23:59:59';
         }
 
+        if (!empty($filters['search'])) {
+            $where[] = '(action LIKE :search OR performer_name LIKE :search OR role LIKE :search OR details LIKE :search OR school_year LIKE :search)';
+            $params['search'] = '%' . trim((string) $filters['search']) . '%';
+        }
+
         $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
         // 1. Total matching count

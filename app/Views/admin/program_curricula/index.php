@@ -23,7 +23,6 @@ $yearLevelOptions = [
     2 => 'Second Year',
     3 => 'Third Year',
     4 => 'Fourth Year',
-    5 => 'Fifth Year',
 ];
 
 $semesterOptions = [
@@ -35,16 +34,6 @@ $semesterOptions = [
 ob_start();
 ?>
 
-<!-- Print-only header -->
-<div class="d-none d-print-block mb-4">
-    <h2 class="h4 mb-1"><?= htmlspecialchars($selectedProgram ? $selectedProgram->program_name : 'Program Curriculum') ?></h2>
-    <div class="text-muted small">
-        Program Code: <?= htmlspecialchars($selectedProgram->program_abbrev ?? '') ?> | 
-        Total Units: <?= $totalUnits ?> | 
-        Printed on <?= date('F j, Y') ?>
-    </div>
-    <hr>
-</div>
 
 <?php if (empty($programs) || $programs->isEmpty()): ?>
     <?php
@@ -80,9 +69,12 @@ ob_start();
                         <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 12px; font-size: 13px;"></i>
                         <input type="text" id="curriculumSubjectSearch" class="form-control form-control-sm ps-4" placeholder="Search subjects..." autocomplete="off">
                     </div>
-                    <button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5" onclick="window.print();">
+                    <a href="<?= url('/admin/program-curricula/' . ($selectedProgram ? (int)$selectedProgram->id : '') . '/print') ?>" 
+                       target="_blank" 
+                       class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1.5 <?= !$selectedProgram ? 'disabled' : '' ?>"
+                       title="Print Curriculum">
                         <i class="bi bi-printer"></i> Print
-                    </button>
+                    </a>
                     <?php if ($selectedProgram): ?>
                         <button type="button" 
                                 id="exportCurriculumBtn" 
@@ -292,7 +284,6 @@ ob_start();
                                                                         str_contains(strtolower((string) $sub->year_level), 'second') => 2,
                                                                         str_contains(strtolower((string) $sub->year_level), 'third') => 3,
                                                                         str_contains(strtolower((string) $sub->year_level), 'fourth') => 4,
-                                                                        str_contains(strtolower((string) $sub->year_level), 'fifth') => 5,
                                                                         default => 1,
                                                                     };
                                                                     ?>

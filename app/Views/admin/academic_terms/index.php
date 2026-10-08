@@ -404,60 +404,195 @@ ob_start();
     <!-- TAB 4: AUDIT LOG (Adopted from class-scheduling) -->
     <!-- ========================================== -->
     <div class="tab-pane fade <?= $activeTab === 'audit-log' ? 'show active' : '' ?>" id="tab-audit-log" role="tabpanel">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
-            <div>
-                <h6 class="fw-bold mb-0 text-dark">Academic Terms Audit Trail</h6>
-                <small class="text-muted">Immutable append-only ledger of term postings, closures, reopening events, and school year updates.</small>
-            </div>
-            <!-- Audit Filters -->
-            <form method="GET" action="<?= url('/admin/academic-terms') ?>" class="d-flex align-items-center gap-2 m-0 flex-wrap">
-                <input type="hidden" name="tab" value="audit-log">
-                <select name="audit_action" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 160px;">
-                    <option value="all" <?= ($auditFilters['action'] ?? 'all') === 'all' ? 'selected' : '' ?>>All Actions</option>
-                    <option value="term_closed" <?= ($auditFilters['action'] ?? '') === 'term_closed' ? 'selected' : '' ?>>Term Closed</option>
-                    <option value="term_reopened" <?= ($auditFilters['action'] ?? '') === 'term_reopened' ? 'selected' : '' ?>>Term Reopened</option>
-                    <option value="school_year_created" <?= ($auditFilters['action'] ?? '') === 'school_year_created' ? 'selected' : '' ?>>School Year Created</option>
-                    <option value="school_year_updated" <?= ($auditFilters['action'] ?? '') === 'school_year_updated' ? 'selected' : '' ?>>School Year Updated</option>
-                    <option value="period_locked" <?= ($auditFilters['action'] ?? '') === 'period_locked' ? 'selected' : '' ?>>Period Locked</option>
-                    <option value="period_unlocked" <?= ($auditFilters['action'] ?? '') === 'period_unlocked' ? 'selected' : '' ?>>Period Unlocked</option>
-                </select>
-                <select name="audit_sy" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 140px;">
-                    <option value="all" <?= ($auditFilters['school_year'] ?? 'all') === 'all' ? 'selected' : '' ?>>All Years</option>
-                    <?php foreach (($allSchoolYears ?? $schoolYears) as $syItem): ?>
-                        <option value="<?= htmlspecialchars($syItem['school_year']) ?>" <?= ($auditFilters['school_year'] ?? '') === $syItem['school_year'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($syItem['school_year']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <select name="audit_sem" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 125px;">
-                    <option value="all" <?= ($auditFilters['semester_number'] ?? 'all') === 'all' ? 'selected' : '' ?>>All Sems</option>
-                    <option value="1" <?= ($auditFilters['semester_number'] ?? '') === '1' ? 'selected' : '' ?>>1st Sem</option>
-                    <option value="2" <?= ($auditFilters['semester_number'] ?? '') === '2' ? 'selected' : '' ?>>2nd Sem</option>
-                    <option value="3" <?= ($auditFilters['semester_number'] ?? '') === '3' ? 'selected' : '' ?>>Summer</option>
-                </select>
-                <?php if (!empty($auditPerformers)): ?>
-                    <select name="audit_performed_by" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 140px;">
-                        <option value="all" <?= ($auditFilters['performed_by'] ?? 'all') === 'all' ? 'selected' : '' ?>>All Users</option>
-                        <?php foreach ($auditPerformers as $performer): ?>
-                            <option value="<?= (int) $performer['performed_by'] ?>" <?= ($auditFilters['performed_by'] ?? '') === (string) $performer['performed_by'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($performer['performer_name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                <?php endif; ?>
-                <?php 
-                $hasAuditFilter = ($auditFilters['action'] ?? 'all') !== 'all' 
-                    || ($auditFilters['school_year'] ?? 'all') !== 'all'
-                    || ($auditFilters['semester_number'] ?? 'all') !== 'all'
-                    || ($auditFilters['performed_by'] ?? 'all') !== 'all';
-                ?>
-                <?php if ($hasAuditFilter): ?>
-                    <a href="<?= url('/admin/academic-terms?tab=audit-log') ?>" class="btn btn-sm btn-outline-secondary" title="Reset filter">
-                        <i class="bi bi-arrow-counterclockwise"></i>
-                    </a>
-                <?php endif; ?>
-            </form>
+        <?php
+        $activeAuditFilterCount = 0;
+        if (!empty($auditFilters['action']) && $auditFilters['action'] !== 'all') $activeAuditFilterCount++;
+        if (!empty($auditFilters['school_year']) && $auditFilters['school_year'] !== 'all') $activeAuditFilterCount++;
+        if (!empty($auditFilters['semester_number']) && $auditFilters['semester_number'] !== 'all') $activeAuditFilterCount++;
+        if (!empty($auditFilters['performed_by']) && $auditFilters['performed_by'] !== 'all') $activeAuditFilterCount++;
+        if (!empty($auditFilters['date_from'])) $activeAuditFilterCount++;
+        if (!empty($auditFilters['date_to'])) $activeAuditFilterCount++;
+
+        $hasAuditActiveFilters = !empty($auditSearch) || $activeAuditFilterCount > 0;
+        ?>
+
+        <div class="mb-3">
+            <h6 class="fw-bold mb-0 text-dark">Academic Terms Audit Trail</h6>
+            <small class="text-muted">Immutable append-only ledger of term postings, closures, reopening events, and school year updates.</small>
         </div>
+
+        <!-- Audit Filters Bar (Matching admin/students design system) -->
+        <form method="GET" action="<?= url('/admin/academic-terms') ?>" id="adminAuditLogFilterForm" class="mb-4">
+            <input type="hidden" name="tab" value="audit-log">
+            <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-between">
+                <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1">
+                    <div class="position-relative flex-grow-1" style="min-width: 240px; max-width: 380px;">
+                        <i class="bi bi-search position-absolute top-50 translate-middle-y text-muted" style="left: 14px;"></i>
+                        <input type="text" name="audit_search" class="form-control ps-5" placeholder="Search action, user, details..."
+                               value="<?= htmlspecialchars($auditSearch ?? '') ?>" autocomplete="off">
+                    </div>
+
+                    <!-- Single Consolidated Filter Dropdown (Linear / Stripe style) -->
+                    <div class="dropdown filter-dropdown">
+                        <button class="filter-trigger-btn <?= $activeAuditFilterCount > 0 ? 'has-filters' : '' ?>" 
+                                type="button" 
+                                id="adminAuditLogFilterBtn" 
+                                data-bs-toggle="dropdown" 
+                                data-bs-auto-close="outside" 
+                                aria-expanded="false">
+                            <i class="bi bi-filter"></i>
+                            <span>Filters</span>
+                            <?php if ($activeAuditFilterCount > 0): ?>
+                                <span class="badge bg-primary text-white rounded-pill px-1.5 py-0.5" style="font-size: 10px;"><?= $activeAuditFilterCount ?></span>
+                            <?php endif; ?>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-start filter-popover-panel" aria-labelledby="adminAuditLogFilterBtn">
+                            <div class="filter-popover-header">
+                                <h6 class="filter-popover-title">
+                                    <i class="bi bi-filter text-primary"></i> Filter Audit Log
+                                </h6>
+                                <?php if ($activeAuditFilterCount > 0): ?>
+                                    <a href="<?= url('/admin/academic-terms?tab=audit-log' . (!empty($auditSearch) ? '&audit_search=' . urlencode($auditSearch) : '')) ?>" class="filter-popover-reset"><i class="bi bi-arrow-counterclockwise"></i> Reset</a>
+                                <?php endif; ?>
+                            </div>
+                            <div class="filter-popover-body">
+                                <div class="filter-field-group">
+                                    <label class="filter-field-label">Action</label>
+                                    <select name="audit_action" class="form-select form-select-sm">
+                                        <option value="all">All actions</option>
+                                        <option value="term_closed" <?= ($auditFilters['action'] ?? '') === 'term_closed' ? 'selected' : '' ?>>Term Closed</option>
+                                        <option value="term_reopened" <?= ($auditFilters['action'] ?? '') === 'term_reopened' ? 'selected' : '' ?>>Term Reopened</option>
+                                        <option value="school_year_created" <?= ($auditFilters['action'] ?? '') === 'school_year_created' ? 'selected' : '' ?>>School Year Created</option>
+                                        <option value="school_year_updated" <?= ($auditFilters['action'] ?? '') === 'school_year_updated' ? 'selected' : '' ?>>School Year Updated</option>
+                                        <option value="period_locked" <?= ($auditFilters['action'] ?? '') === 'period_locked' ? 'selected' : '' ?>>Period Locked</option>
+                                        <option value="period_unlocked" <?= ($auditFilters['action'] ?? '') === 'period_unlocked' ? 'selected' : '' ?>>Period Unlocked</option>
+                                    </select>
+                                </div>
+
+                                <div class="row g-2">
+                                    <div class="col-7">
+                                        <div class="filter-field-group">
+                                            <label class="filter-field-label">School year</label>
+                                            <select name="audit_sy" class="form-select form-select-sm">
+                                                <option value="all">All years</option>
+                                                <?php foreach (($allSchoolYears ?? $schoolYears) as $syItem): ?>
+                                                    <option value="<?= htmlspecialchars($syItem['school_year']) ?>" <?= ($auditFilters['school_year'] ?? '') === $syItem['school_year'] ? 'selected' : '' ?>>
+                                                        <?= htmlspecialchars($syItem['school_year']) ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="filter-field-group">
+                                            <label class="filter-field-label">Semester</label>
+                                            <select name="audit_sem" class="form-select form-select-sm">
+                                                <option value="all">All sems</option>
+                                                <option value="1" <?= ($auditFilters['semester_number'] ?? '') === '1' ? 'selected' : '' ?>>1st Sem</option>
+                                                <option value="2" <?= ($auditFilters['semester_number'] ?? '') === '2' ? 'selected' : '' ?>>2nd Sem</option>
+                                                <option value="3" <?= ($auditFilters['semester_number'] ?? '') === '3' ? 'selected' : '' ?>>Summer</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <?php if (!empty($auditPerformers)): ?>
+                                    <div class="filter-field-group">
+                                        <label class="filter-field-label">Performed by</label>
+                                        <select name="audit_performed_by" class="form-select form-select-sm">
+                                            <option value="all">All users</option>
+                                            <?php foreach ($auditPerformers as $performer): ?>
+                                                <option value="<?= (int) $performer['performed_by'] ?>" <?= ($auditFilters['performed_by'] ?? '') === (string) $performer['performed_by'] ? 'selected' : '' ?>>
+                                                    <?= htmlspecialchars($performer['performer_name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                <?php endif; ?>
+
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <div class="filter-field-group">
+                                            <label class="filter-field-label">Date from</label>
+                                            <input type="date" name="audit_date_from" class="form-control form-control-sm" value="<?= htmlspecialchars($auditFilters['date_from'] ?? '') ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="filter-field-group">
+                                            <label class="filter-field-label">Date to</label>
+                                            <input type="date" name="audit_date_to" class="form-control form-control-sm" value="<?= htmlspecialchars($auditFilters['date_to'] ?? '') ?>">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="filter-popover-footer">
+                                <button type="button" class="btn btn-sm btn-light" onclick="bootstrap.Dropdown.getInstance(document.getElementById('adminAuditLogFilterBtn')).hide()">Close</button>
+                                <button type="submit" class="btn btn-sm btn-primary px-3">Apply filters</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <?php if ($hasAuditActiveFilters): ?>
+                        <a href="<?= url('/admin/academic-terms?tab=audit-log') ?>" class="btn btn-outline-secondary btn-sm" title="Clear all filters">
+                            <i class="bi bi-x-circle me-1"></i> Clear
+                        </a>
+                    <?php endif; ?>
+                </div>
+
+                <div class="text-muted small fw-medium text-nowrap">
+                    <?= number_format($auditPagination['total'] ?? 0) ?> <?= ($auditPagination['total'] ?? 0) === 1 ? 'audit entry' : 'audit entries' ?>
+                </div>
+            </div>
+
+            <!-- Active filter chips -->
+            <?php if ($activeAuditFilterCount > 0): ?>
+                <div class="filter-chip-bar mt-2">
+                    <span class="small text-muted me-1">Active filters:</span>
+                    <?php if (!empty($auditFilters['action']) && $auditFilters['action'] !== 'all'): ?>
+                        <span class="filter-chip">
+                            <span class="chip-label">Action:</span> <?= ucwords(str_replace('_', ' ', $auditFilters['action'])) ?>
+                        </span>
+                    <?php endif; ?>
+                    <?php if (!empty($auditFilters['school_year']) && $auditFilters['school_year'] !== 'all'): ?>
+                        <span class="filter-chip">
+                            <span class="chip-label">S.Y.:</span> <?= htmlspecialchars($auditFilters['school_year']) ?>
+                        </span>
+                    <?php endif; ?>
+                    <?php if (!empty($auditFilters['semester_number']) && $auditFilters['semester_number'] !== 'all'): ?>
+                        <span class="filter-chip">
+                            <span class="chip-label">Semester:</span> <?= $auditFilters['semester_number'] == 1 ? '1st Sem' : ($auditFilters['semester_number'] == 2 ? '2nd Sem' : 'Summer') ?>
+                        </span>
+                    <?php endif; ?>
+                    <?php if (!empty($auditFilters['performed_by']) && $auditFilters['performed_by'] !== 'all'): ?>
+                        <?php
+                        $activePerfName = '';
+                        foreach ($auditPerformers as $ap) {
+                            if ((int)$ap['performed_by'] === (int)$auditFilters['performed_by']) {
+                                $activePerfName = $ap['performer_name'];
+                                break;
+                            }
+                        }
+                        ?>
+                        <?php if ($activePerfName): ?>
+                            <span class="filter-chip">
+                                <span class="chip-label">User:</span> <?= htmlspecialchars($activePerfName) ?>
+                            </span>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                    <?php if (!empty($auditFilters['date_from'])): ?>
+                        <span class="filter-chip">
+                            <span class="chip-label">From:</span> <?= htmlspecialchars($auditFilters['date_from']) ?>
+                        </span>
+                    <?php endif; ?>
+                    <?php if (!empty($auditFilters['date_to'])): ?>
+                        <span class="filter-chip">
+                            <span class="chip-label">To:</span> <?= htmlspecialchars($auditFilters['date_to']) ?>
+                        </span>
+                    <?php endif; ?>
+                    <a href="<?= url('/admin/academic-terms?tab=audit-log' . (!empty($auditSearch) ? '&audit_search=' . urlencode($auditSearch) : '')) ?>" class="filter-clear-all-chip">Clear all</a>
+                </div>
+            <?php endif; ?>
+        </form>
 
         <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 8px;">
             <div class="table-responsive">

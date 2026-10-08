@@ -192,7 +192,9 @@ class AcademicTermController
         // 5. Term Audit Logs (Server-side Paginated)
         $auditPage = max(1, (int) $request->get('audit_page', 1));
         $auditPerPage = 10;
+        $auditSearch = trim((string) $request->get('audit_search', ''));
         $auditFilters = [
+            'search' => $auditSearch,
             'school_year' => (string) $request->get('audit_sy', 'all'),
             'semester_number' => (string) $request->get('audit_sem', 'all'),
             'action' => (string) $request->get('audit_action', 'all'),
@@ -226,6 +228,7 @@ class AcademicTermController
             'auditPagination' => $auditPagination,
             'auditFilters' => $auditFilters,
             'auditPerformers' => $auditPerformers,
+            'auditSearch' => $auditSearch,
         ]);
         $response->html($html);
     }
