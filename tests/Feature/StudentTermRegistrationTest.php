@@ -48,7 +48,6 @@ class StudentTermRegistrationTest extends TestCase
             foreach ([1, 2] as $semester) {
                 self::$termIds["{$schoolYear}:{$semester}"] = (int) AcademicTerm::create([
                     'academic_year_id' => $yearId,
-                    'school_year' => $schoolYear,
                     'semester' => $semester,
                     'is_active' => 0,
                     'is_archived' => 0,

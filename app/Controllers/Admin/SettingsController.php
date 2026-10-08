@@ -18,12 +18,13 @@ class SettingsController
 
         $termsStmt = $db->query("
             SELECT at.*, 
-                   COALESCE(at.school_year, ay.school_year, '2026-2027') as school_year_display,
+                   ay.school_year as school_year_display,
+                   ay.school_year as school_year,
                    ay.school_year as academic_year_name
             FROM academic_terms at
             LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
             WHERE at.is_archived = 0
-            ORDER BY COALESCE(at.school_year, ay.school_year) DESC, at.semester ASC
+            ORDER BY ay.school_year DESC, at.semester ASC
         ");
         $allTerms = $termsStmt->fetchAll(\PDO::FETCH_ASSOC);
 

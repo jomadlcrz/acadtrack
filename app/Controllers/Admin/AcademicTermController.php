@@ -164,13 +164,14 @@ class AcademicTermController
         // 4. Backward compatible terms list
         $stmtTerms = $pdo->query("
             SELECT at.*, 
-                   COALESCE(at.school_year, ay.school_year, '2026-2027') as school_year_display,
+                   ay.school_year as school_year_display,
+                   ay.school_year as school_year,
                    ay.school_year as academic_year_name,
                    (SELECT COUNT(*) FROM sets s WHERE s.academic_term_id = at.id) as sets_count,
                    (SELECT COUNT(*) FROM subjects sub WHERE sub.academic_term_id = at.id) as subjects_count
             FROM academic_terms at
             LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
-            ORDER BY COALESCE(at.school_year, ay.school_year) DESC, at.semester ASC
+            ORDER BY ay.school_year DESC, at.semester ASC
         ");
         $terms = $stmtTerms ? $stmtTerms->fetchAll(\PDO::FETCH_ASSOC) : [];
 
@@ -277,10 +278,10 @@ class AcademicTermController
         // 2. Check if academic_terms already exists for this year and semester
         $stmtTerm = $pdo->prepare("
             SELECT id FROM academic_terms 
-            WHERE (academic_year_id = :yid OR school_year = :syear) AND semester = :sem
+            WHERE academic_year_id = :yid AND semester = :sem
             LIMIT 1
         ");
-        $stmtTerm->execute(['yid' => $yearId, 'syear' => $schoolYear, 'sem' => $semester]);
+        $stmtTerm->execute(['yid' => $yearId, 'sem' => $semester]);
         $termRow = $stmtTerm->fetch(PDO::FETCH_ASSOC);
 
         if ($termRow) {
@@ -296,12 +297,11 @@ class AcademicTermController
         }
 
         $stmtInsertTerm = $pdo->prepare("
-            INSERT INTO academic_terms (academic_year_id, school_year, semester, is_active, is_archived, created_at, updated_at)
-            VALUES (:yid, :syear, :sem, :active, 0, NOW(), NOW())
+            INSERT INTO academic_terms (academic_year_id, semester, is_active, is_archived, created_at, updated_at)
+            VALUES (:yid, :sem, :active, 0, NOW(), NOW())
         ");
         $stmtInsertTerm->execute([
             'yid' => $yearId,
-            'syear' => $schoolYear,
             'sem' => $semester,
             'active' => $setActive ? 1 : 0,
         ]);
@@ -407,8 +407,6 @@ class AcademicTermController
 
         $pdo = Database::getConnection();
         $pdo->prepare("UPDATE academic_years SET school_year = :name, updated_at = NOW() WHERE id = :id")
-            ->execute(['name' => $schoolYear, 'id' => $yearId]);
-        $pdo->prepare("UPDATE academic_terms SET school_year = :name WHERE academic_year_id = :id")
             ->execute(['name' => $schoolYear, 'id' => $yearId]);
 
         $userId = (int) ($session->get('user')['id'] ?? 1);

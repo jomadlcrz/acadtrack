@@ -153,8 +153,8 @@ class ArchiveHubWorkflowTest extends TestCase
         $ayId = (int) $ayStmt->fetchColumn();
 
         $stmt = $pdo->prepare("
-            INSERT INTO academic_terms (academic_year_id, school_year, semester, is_active, is_archived, archived_at, created_at, updated_at)
-            VALUES (:ay_id, '2028-2029', '1', 0, 1, NOW(), NOW(), NOW())
+            INSERT INTO academic_terms (academic_year_id, semester, is_active, is_archived, archived_at, created_at, updated_at)
+            VALUES (:ay_id, '1', 0, 1, NOW(), NOW(), NOW())
         ");
         $stmt->execute(['ay_id' => $ayId]);
         $termId = (int) $pdo->lastInsertId();

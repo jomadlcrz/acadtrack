@@ -36,7 +36,8 @@ class TermClosureWorkflowTest extends TestCase
             \Illuminate\Database\Capsule\Manager::connection()->getPdo()->exec(
                 "DELETE FROM term_audit_logs WHERE school_year LIKE '208%' OR school_year LIKE '209%' OR details LIKE '%test%' OR details LIKE '%Test%' OR action IN ('period_locked', 'period_unlocked')"
             );
-            AcademicTerm::where('school_year', 'like', '209%')->delete();
+            AcademicTerm::whereIn('academic_year_id', AcademicYear::where('school_year', 'like', '209%')->pluck('id'))->delete();
+            AcademicYear::where('school_year', 'like', '209%')->delete();
             AcademicTerm::whereIn('id', [1, 2])->update([
                 'is_closed' => 0,
                 'closed_at' => null,
@@ -59,7 +60,8 @@ class TermClosureWorkflowTest extends TestCase
             \Illuminate\Database\Capsule\Manager::connection()->getPdo()->exec(
                 "DELETE FROM term_audit_logs WHERE school_year LIKE '208%' OR school_year LIKE '209%' OR details LIKE '%test%' OR details LIKE '%Test%' OR action IN ('period_locked', 'period_unlocked')"
             );
-            AcademicTerm::where('school_year', 'like', '209%')->delete();
+            AcademicTerm::whereIn('academic_year_id', AcademicYear::where('school_year', 'like', '209%')->pluck('id'))->delete();
+            AcademicYear::where('school_year', 'like', '209%')->delete();
             AcademicTerm::whereIn('id', [1, 2])->update([
                 'is_closed' => 0,
                 'closed_at' => null,

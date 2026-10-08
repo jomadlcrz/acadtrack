@@ -51,7 +51,9 @@ class ArchiveController
             ->get();
 
         $stmtTerms = $pdo->query("
-            SELECT at.*, COALESCE(at.school_year, ay.school_year, 'N/A') as academic_year_name
+            SELECT at.*, 
+                   COALESCE(ay.school_year, 'N/A') as academic_year_name,
+                   ay.school_year as school_year
             FROM academic_terms at
             LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
             WHERE at.is_archived = 1

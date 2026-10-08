@@ -225,7 +225,7 @@ class AcademicModulesWorkflowTest extends TestCase
         $term = AcademicTerm::getActive();
         $termsStmt = \App\Core\Database::getConnection()->query("
             SELECT at.*, 
-                   COALESCE(at.school_year, ay.school_year, '2026-2027') as school_year_display
+                   COALESCE(ay.school_year, '2026-2027') as school_year_display
             FROM academic_terms at
             LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
             WHERE at.is_archived = 0
@@ -265,7 +265,7 @@ class AcademicModulesWorkflowTest extends TestCase
         // Clean up beforehand if exists
         $pdo = \App\Core\Database::getConnection();
         $pdo->exec("DELETE FROM term_audit_logs WHERE school_year = '2088-2089'");
-        $pdo->exec("DELETE FROM academic_terms WHERE school_year = '2088-2089'");
+        $pdo->exec("DELETE FROM academic_terms WHERE academic_year_id IN (SELECT id FROM academic_years WHERE school_year = '2088-2089')");
         $pdo->exec("DELETE FROM academic_years WHERE school_year = '2088-2089'");
 
         try {
@@ -280,7 +280,7 @@ class AcademicModulesWorkflowTest extends TestCase
 
         // Clean up
         $pdo->exec("DELETE FROM term_audit_logs WHERE school_year = '2088-2089'");
-        $pdo->exec("DELETE FROM academic_terms WHERE school_year = '2088-2089'");
+        $pdo->exec("DELETE FROM academic_terms WHERE academic_year_id IN (SELECT id FROM academic_years WHERE school_year = '2088-2089')");
         $pdo->exec("DELETE FROM academic_years WHERE school_year = '2088-2089'");
         $_POST = [];
     }

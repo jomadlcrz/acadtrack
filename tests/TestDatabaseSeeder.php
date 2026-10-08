@@ -82,7 +82,6 @@ class TestDatabaseSeeder
             $year = AcademicYear::firstOrCreate(['id' => 1], ['school_year' => '2026-2027', 'is_active' => 1]);
             $term1 = AcademicTerm::firstOrCreate(['id' => 1], [
                 'academic_year_id' => $year->id,
-                'school_year' => '2026-2027',
                 'semester' => 1,
                 'is_active' => 1,
                 'is_archived' => 0,
@@ -92,7 +91,6 @@ class TestDatabaseSeeder
         if (!$term2) {
             $term2 = AcademicTerm::firstOrCreate(['id' => 2], [
                 'academic_year_id' => 1,
-                'school_year' => '2026-2027',
                 'semester' => 2,
                 'is_active' => 0,
                 'is_archived' => 0,

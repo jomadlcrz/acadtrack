@@ -26,7 +26,7 @@ class TermClosureService
     {
         $stmt = $this->pdo->query("
             SELECT at.*,
-                   COALESCE(at.school_year, ay.school_year, '2026-2027') as school_year_display,
+                   COALESCE(ay.school_year, '2026-2027') as school_year_display,
                    ay.school_year as academic_year_name,
                    u.email as closed_by_email,
                    CASE 
@@ -39,7 +39,7 @@ class TermClosureService
             LEFT JOIN users u ON at.closed_by = u.id
             LEFT JOIN admin_details ad ON u.id = ad.user_id
             LEFT JOIN faculty_details fd ON u.id = fd.user_id
-            ORDER BY COALESCE(at.school_year, ay.school_year) DESC, at.semester ASC
+            ORDER BY ay.school_year DESC, at.semester ASC
         ");
         $terms = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
@@ -64,7 +64,7 @@ class TermClosureService
         $params = [];
 
         if (!empty($filters['school_year']) && $filters['school_year'] !== 'all') {
-            $where[] = "(at.school_year = :sy OR ay.school_year = :sy)";
+            $where[] = "ay.school_year = :sy";
             $params['sy'] = $filters['school_year'];
         }
 
@@ -89,7 +89,7 @@ class TermClosureService
 
         $stmt = $this->pdo->prepare("
             SELECT at.*,
-                   COALESCE(at.school_year, ay.school_year, '2026-2027') as school_year_display,
+                   COALESCE(ay.school_year, '2026-2027') as school_year_display,
                    ay.school_year as academic_year_name,
                    u.email as closed_by_email,
                    CASE 
@@ -103,7 +103,7 @@ class TermClosureService
             LEFT JOIN admin_details ad ON u.id = ad.user_id
             LEFT JOIN faculty_details fd ON u.id = fd.user_id
             {$whereClause}
-            ORDER BY COALESCE(at.school_year, ay.school_year) DESC, at.semester ASC
+            ORDER BY ay.school_year DESC, at.semester ASC
             LIMIT :limit OFFSET :offset
         ");
         foreach ($params as $k => $v) {
@@ -244,7 +244,7 @@ class TermClosureService
     {
         $stmt = $this->pdo->prepare("
             SELECT at.*,
-                   COALESCE(at.school_year, ay.school_year, '2026-2027') as school_year_display,
+                   COALESCE(ay.school_year, '2026-2027') as school_year_display,
                    ay.school_year as academic_year_name,
                    COALESCE(CONCAT(ad.first_name, ' ', ad.last_name), u.email, 'Registrar') as closed_by_name
             FROM academic_terms at
@@ -439,7 +439,7 @@ class TermClosureService
             // Record audit log entry
             $termInfoStmt = $this->pdo->prepare("
                 SELECT at.academic_year_id, at.semester,
-                       COALESCE(at.school_year, ay.school_year, '') as school_year_display
+                       COALESCE(ay.school_year, '') as school_year_display
                 FROM academic_terms at
                 LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
                 WHERE at.id = :id
@@ -480,7 +480,7 @@ class TermClosureService
 
         // Refuse reopening if school year has ended
         $stmtTerm = $this->pdo->prepare("
-            SELECT at.*, COALESCE(at.school_year, ay.school_year, '') as school_year_display
+            SELECT at.*, COALESCE(ay.school_year, '') as school_year_display
             FROM academic_terms at
             LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
             WHERE at.id = :id
@@ -614,7 +614,7 @@ class TermClosureService
     public function isTermClosed(int $termId): bool
     {
         $stmt = $this->pdo->prepare("
-            SELECT at.is_closed, at.school_year, ay.school_year as ay_school_year
+            SELECT at.is_closed, ay.school_year as ay_school_year
             FROM academic_terms at
             LEFT JOIN academic_years ay ON at.academic_year_id = ay.id
             WHERE at.id = :id
@@ -631,7 +631,7 @@ class TermClosureService
             return true;
         }
 
-        $syName = !empty($row['school_year']) ? $row['school_year'] : ($row['ay_school_year'] ?? '');
+        $syName = $row['ay_school_year'] ?? '';
         return $this->isSchoolYearEnded((string) $syName);
     }
 

@@ -36,7 +36,6 @@ CREATE TABLE academic_years (
 CREATE TABLE academic_terms (
     id INT AUTO_INCREMENT PRIMARY KEY,
     academic_year_id INT NOT NULL,
-    school_year VARCHAR(20) NULL,
     semester INT(2) NOT NULL DEFAULT 1,
     is_active TINYINT(1) DEFAULT 0,
     is_closed TINYINT(1) DEFAULT 0,
@@ -508,9 +507,9 @@ CREATE TABLE IF NOT EXISTS student_term_registrations (
 INSERT INTO academic_years (id, school_year, is_active) VALUES
 (1, '2026-2027', 1);
 
-INSERT INTO academic_terms (id, academic_year_id, school_year, semester, is_active, is_archived) VALUES
-(1, 1, '2026-2027', 1, 1, 0),
-(2, 1, '2026-2027', 2, 0, 0);
+INSERT INTO academic_terms (id, academic_year_id, semester, is_active, is_archived) VALUES
+(1, 1, 1, 1, 0),
+(2, 1, 2, 0, 0);
 
 -- Insert baseline roles
 INSERT INTO roles (id, role_name, description) VALUES
