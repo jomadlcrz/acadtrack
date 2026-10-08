@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Official Grade Sheet — <?= htmlspecialchars($sheet['subject_code']) ?></title>
+    <title>Curriculum Evaluation — <?= htmlspecialchars($student['student_number'] ?? 'Student') ?></title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body {
@@ -17,7 +17,7 @@
             line-height: 1.25;
         }
 
-        /* Preview chrome */
+        /* Top preview bar for on-screen preview */
         .no-print-bar {
             background: #0f172a;
             color: #f8fafc;
@@ -103,9 +103,12 @@
                 max-width: 100% !important;
                 width: 100% !important;
             }
+            tr {
+                page-break-inside: avoid !important;
+            }
         }
 
-        /* Institutional Letterhead */
+        /* Institutional Letterhead mirroring class-scheduling-frontend */
         .fl-header {
             position: relative;
             min-height: 0.75in;
@@ -168,7 +171,7 @@
         }
         .fl-info td.lbl {
             font-weight: 700;
-            width: 15%;
+            width: 16%;
             background: #f5f5f5;
             white-space: nowrap;
             color: #222;
@@ -176,7 +179,7 @@
             font-size: 8pt;
         }
         .fl-info td.oval {
-            width: 35%;
+            width: 34%;
             color: #000;
         }
 
@@ -208,14 +211,6 @@
         .fl-table .bold { font-weight: 700; }
         .fl-table .font-mono { font-family: monospace, Courier, monospace; }
 
-        .remarks-box {
-            border: 1px solid #444;
-            padding: 0.3rem 0.4rem;
-            margin-bottom: 0.5rem;
-            font-size: 8pt;
-            background: #fafafa;
-        }
-
         /* Institutional Sign-off Block */
         .fl-signoff {
             break-inside: avoid;
@@ -224,8 +219,8 @@
         }
         .fl-signoff-row {
             display: flex;
-            justify-content: space-between;
-            gap: 0.4in;
+            justify-content: space-around;
+            gap: 0.6in;
         }
         .fl-signoff-party {
             flex: 1;
@@ -255,13 +250,21 @@
             color: #333;
             line-height: 1.2;
         }
+        .fl-notice {
+            margin-top: 1.5rem;
+            padding-top: 0.4rem;
+            border-top: 1px solid #cbd5e1;
+            text-align: center;
+            color: #64748b;
+            font-size: 7.5pt;
+        }
     </style>
 </head>
 <body>
 
 <div class="no-print-bar">
     <div class="doc-tag">
-        Official Document Preview: <strong><?= htmlspecialchars($sheet['subject_code']) ?></strong> (<?= htmlspecialchars($sheet['period_name'] ?? 'Grading Sheet') ?>)
+        Official Document Preview: <strong><?= htmlspecialchars(($student['last_name'] ?? '') . ', ' . ($student['first_name'] ?? '')) ?></strong> (<?= htmlspecialchars($student['student_number'] ?? 'No ID') ?>)
     </div>
     <div class="btn-group">
         <button type="button" onclick="window.close()" class="btn-preview">Close</button>
@@ -270,10 +273,9 @@
 </div>
 
 <div class="print-sheet">
-    <!-- Header mirroring class-scheduling-frontend -->
     <header class="fl-header">
-        <img class="fl-logo fl-logo-left" src="<?= asset('assets/images/gwc.png') ?>" alt="Golden West Colleges Logo">
-        <img class="fl-logo fl-logo-right" src="<?= asset('assets/images/cite.png') ?>" alt="College of Information Technology Logo">
+        <img class="fl-logo fl-logo-left" src="<?= asset('assets/images/gwc.png') ?>" alt="Golden West Colleges Seal">
+        <img class="fl-logo fl-logo-right" src="<?= asset('assets/images/cite.png') ?>" alt="College Seal">
         <div class="fl-text">
             <strong>GOLDEN WEST COLLEGES, INC.</strong>
             <span>San Jose Drive, Alaminos City, Pangasinan * Tel. No. (075) 552-7382</span>
@@ -281,140 +283,91 @@
         </div>
     </header>
 
-    <div class="fl-heading">OFFICIAL GRADING SHEET &amp; CLASS ROSTER</div>
+    <div class="fl-heading">CURRICULUM EVALUATION &amp; SCHOLASTIC STANDING REPORT</div>
 
-    <!-- Metadata Table mirroring class-scheduling-frontend -->
+    <!-- Metadata Grid -->
     <table class="fl-info">
         <tr>
-            <td class="lbl">COURSE CODE</td>
-            <td class="oval bold"><?= htmlspecialchars($sheet['subject_code']) ?></td>
-            <td class="lbl">ACADEMIC TERM</td>
-            <td class="oval"><?= htmlspecialchars($sheet['academic_year_name'] ?? '2024-2025') ?> &bull; <?= (string)($sheet['semester'] ?? '1') === '2' ? '2nd Semester' : '1st Semester' ?></td>
+            <td class="lbl">STUDENT NO.</td>
+            <td class="oval bold font-mono"><?= htmlspecialchars($student['student_number'] ?? '—') ?></td>
+            <td class="lbl">DATE PRINTED</td>
+            <td class="oval"><?= date('F d, Y') ?></td>
         </tr>
         <tr>
-            <td class="lbl">DESCRIPTIVE TITLE</td>
-            <td class="oval"><?= htmlspecialchars($sheet['subject_name']) ?></td>
-            <td class="lbl">YEAR LEVEL</td>
-            <td class="oval"><?= htmlspecialchars((string)$sheet['year_level']) ?><?= match((int)$sheet['year_level']) { 1 => 'st', 2 => 'nd', 3 => 'rd', default => 'th' } ?> Year</td>
+            <td class="lbl">STUDENT NAME</td>
+            <td class="oval bold"><?= htmlspecialchars(($student['last_name'] ?? '') . ', ' . ($student['first_name'] ?? '')) ?></td>
+            <td class="lbl">DEGREE PROGRAM</td>
+            <td class="oval"><?= htmlspecialchars($programName ?? 'College Degree Program') ?></td>
         </tr>
         <tr>
-            <td class="lbl">INSTRUCTOR</td>
-            <td class="oval bold"><?= htmlspecialchars($sheet['faculty_first_name'] . ' ' . $sheet['faculty_last_name']) ?></td>
-            <td class="lbl">GRADING PERIOD</td>
-            <td class="oval bold"><?= htmlspecialchars($sheet['period_name'] ?? 'All Periods') ?></td>
+            <td class="lbl">YEAR &amp; SECTION</td>
+            <td class="oval"><?= htmlspecialchars((string)($student['year_level'] ?? 1)) ?><?= ((int)($student['year_level'] ?? 1) === 1 ? 'st' : ((int)($student['year_level'] ?? 1) === 2 ? 'nd' : ((int)($student['year_level'] ?? 1) === 3 ? 'rd' : 'th'))) ?> Year<?= !empty($student['set_name']) ? ' &bull; Set ' . htmlspecialchars($student['set_name']) : '' ?> (<?= htmlspecialchars($student['status'] ?? 'Regular') ?>)</td>
+            <td class="lbl">COVERAGE / TERM</td>
+            <td class="oval"><?= !empty($academicTerm['school_year']) ? 'A.Y. ' . htmlspecialchars($academicTerm['school_year']) : 'Academic Year' ?> &bull; <?= empty($selectedSemester) ? 'Whole Evaluation' : ($selectedSemester === '2' ? '2nd Semester' : '1st Semester') ?></td>
         </tr>
         <tr>
-            <td class="lbl">COURSE NATURE</td>
-            <td class="oval"><?= htmlspecialchars($sheet['subject_nature'] ?? 'Lecture') ?></td>
-            <td class="lbl">SHEET STATUS</td>
-            <td class="oval bold"><?= htmlspecialchars($sheet['status']) ?></td>
+            <td class="lbl">COURSES EVALUATED</td>
+            <td class="oval bold"><?= $count ?> subject(s)</td>
+            <td class="lbl">SCHOLASTIC GWA</td>
+            <td class="oval bold font-mono"><?= number_format($overallGwa, 2) ?> (<?= ($overallGwa >= 75.0 && $passedCount === $count) ? 'Good Standing' : 'Academic Warning' ?>)</td>
         </tr>
     </table>
 
-    <!-- Main Data Table mirroring class-scheduling-frontend -->
+    <!-- Main Data Table -->
     <table class="fl-table">
         <thead>
             <tr>
                 <th style="width: 28px;" class="center">#</th>
-                <th style="width: 105px;" class="center">STUDENT ID</th>
-                <th>STUDENT FULL NAME</th>
-                <th style="width: 75px;" class="center">STATUS</th>
-                <?php foreach ($periods as $period): ?>
-                    <th style="width: 70px;" class="center"><?= htmlspecialchars(strtoupper($period['name'])) ?></th>
-                <?php endforeach; ?>
-                <th style="width: 80px;" class="center">FINAL RATING</th>
-                <th style="width: 75px;" class="center">REMARKS</th>
+                <th style="width: 110px;" class="center">COURSE CODE</th>
+                <th>DESCRIPTIVE TITLE</th>
+                <th style="width: 90px;" class="center">COMPUTED AVG</th>
+                <th style="width: 95px;" class="center">STATUS</th>
+                <th style="width: 120px;" class="center">REMARKS</th>
             </tr>
         </thead>
         <tbody>
-            <?php if (empty($students)): ?>
-                <tr>
-                    <td colspan="<?= 6 + count($periods) ?>" class="center" style="padding: 1rem; color: #666;">No student records enrolled.</td>
-                </tr>
-            <?php else: ?>
-                <?php foreach ($students as $idx => $student): ?>
-                <?php
-                    $studentId = (int) $student['id'];
-                    $studentPeriodGrades = $gradeMatrix[$studentId] ?? [];
-
-                    // Compute final grade
-                    $weightedSum = 0;
-                    $totalWeightUsed = 0;
-                    $hasAnyGrade = false;
-
-                    foreach ($periods as $period) {
-                        $pId = (int) $period['id'];
-                        if (isset($studentPeriodGrades[$pId])) {
-                            $hasAnyGrade = true;
-                            $pName = strtolower($period['name']);
-                            $w = 20.0;
-                            if (str_contains($pName, 'prelim')) {
-                                $w = $weights['prelim'];
-                            } elseif (str_contains($pName, 'midterm')) {
-                                $w = $weights['midterm'];
-                            } elseif (str_contains($pName, 'semi')) {
-                                $w = $weights['semi_final'];
-                            } elseif (str_contains($pName, 'final')) {
-                                $w = $weights['final'];
-                            }
-                            $weightedSum += $studentPeriodGrades[$pId] * $w;
-                            $totalWeightUsed += $w;
-                        }
-                    }
-
-                    $finalRating = ($totalWeightUsed > 0) ? round($weightedSum / $totalWeightUsed, 2) : 0.0;
-                    $isPassed = $hasAnyGrade && ($finalRating >= 75.0);
-                ?>
-                <tr>
-                    <td class="center"><?= $idx + 1 ?></td>
-                    <td class="center font-mono bold"><?= !empty($student['student_number']) ? htmlspecialchars($student['student_number']) : 'No ID' ?></td>
-                    <td class="bold"><?= htmlspecialchars($student['last_name'] . ', ' . $student['first_name']) ?></td>
-                    <td class="center"><?= htmlspecialchars($student['status'] ?? 'Regular') ?></td>
-                    <?php foreach ($periods as $period): ?>
-                        <?php $pGrade = $studentPeriodGrades[(int)$period['id']] ?? null; ?>
-                        <td class="center font-mono">
-                            <?= $pGrade !== null ? number_format((float)$pGrade, 2) : '—' ?>
-                        </td>
-                    <?php endforeach; ?>
-                    <td class="center font-mono bold">
-                        <?= $hasAnyGrade ? number_format($finalRating, 2) : '—' ?>
-                    </td>
-                    <td class="center bold" style="color: <?= $hasAnyGrade ? ($isPassed ? '#166534' : '#991b1b') : '#666' ?>;">
-                        <?= $hasAnyGrade ? ($isPassed ? 'PASSED' : 'FAILED') : 'INC' ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
+            <?php $rowIndex = 0; ?>
+            <?php foreach ($evaluations as $subjectCode => $eval): ?>
+            <?php 
+                $rowIndex++;
+                $status = strtoupper($eval['status'] ?? '');
+                $average = (float)($eval['average'] ?? 0);
+                $isPassed = !in_array($status, ['FAILING', 'NO GRADES', 'NEEDS IMPROVEMENT']) && $average >= 75.0;
+            ?>
+            <tr>
+                <td class="center"><?= $rowIndex ?></td>
+                <td class="center font-mono bold"><?= htmlspecialchars($subjectCode) ?></td>
+                <td class="bold"><?= htmlspecialchars($eval['subject_name']) ?></td>
+                <td class="center font-mono bold"><?= number_format((float)$eval['average'], 2) ?></td>
+                <td class="center bold" style="color: <?= $isPassed ? '#166534' : '#991b1b' ?>;">
+                    <?= htmlspecialchars($eval['status']) ?>
+                </td>
+                <td class="center" style="font-size: 8pt; color: #333;">
+                    <?= htmlspecialchars($eval['remarks'] ?? '—') ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
         </tbody>
     </table>
 
-    <?php if (!empty($sheet['remarks'])): ?>
-        <div class="remarks-box">
-            <strong>Administrative Remarks:</strong> <?= htmlspecialchars($sheet['remarks']) ?>
-        </div>
-    <?php endif; ?>
-
-    <!-- Signature Block mirroring class-scheduling-frontend -->
+    <!-- Institutional Sign-Off Block -->
     <footer class="fl-signoff">
         <div class="fl-signoff-row">
             <div class="fl-signoff-party">
-                <div class="fl-signoff-label">Prepared by:</div>
+                <div class="fl-signoff-label">Prepared &amp; Evaluated by:</div>
                 <span class="fl-signoff-line"></span>
-                <div class="fl-signoff-name"><?= htmlspecialchars($sheet['faculty_first_name'] . ' ' . $sheet['faculty_last_name']) ?></div>
-                <div class="fl-signoff-role">Faculty Instructor</div>
-            </div>
-            <div class="fl-signoff-party">
-                <div class="fl-signoff-label">Approved by:</div>
-                <span class="fl-signoff-line"></span>
-                <div class="fl-signoff-name"><?= !empty($sheet['approver_first_name']) ? htmlspecialchars($sheet['approver_first_name'] . ' ' . $sheet['approver_last_name']) : 'College Dean' ?></div>
-                <div class="fl-signoff-role">College Dean</div>
-            </div>
-            <div class="fl-signoff-party">
-                <div class="fl-signoff-label">Noted / Recorded by:</div>
-                <span class="fl-signoff-line"></span>
-                <div class="fl-signoff-name">Office of the Registrar</div>
+                <div class="fl-signoff-name">Office of the College Registrar</div>
                 <div class="fl-signoff-role">College Registrar</div>
             </div>
+            <div class="fl-signoff-party">
+                <div class="fl-signoff-label">Approved &amp; Certified by:</div>
+                <span class="fl-signoff-line"></span>
+                <div class="fl-signoff-name">Dean / Academic Head</div>
+                <div class="fl-signoff-role">College Dean</div>
+            </div>
+        </div>
+        <div class="fl-notice">
+            This document is an authentic scholastic evaluation generated directly from the AcadTrack Student Information System. Any unauthorized alteration or erasure invalidates this record.
         </div>
     </footer>
 </div>

@@ -1,9 +1,31 @@
 <?php
 $pageTitle = 'Academic Evaluation';
 $subtitle = 'Official curricular evaluation, weighted averages, and academic standing.';
-$headerActions = '<a href="' . url('/student/grades') . '" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><i class="bi bi-arrow-left"></i> Back to grades</a>'
-    . '<button type="button" id="printEvaluationBtn" class="btn btn-primary d-inline-flex align-items-center gap-2"><i class="bi bi-printer"></i> Print</button>';
+$hasEvaluations = !empty($evaluations);
+
+$headerActions = '<a href="' . url('/student/grades') . '" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2"><i class="bi bi-arrow-left"></i> Back to grades</a>';
+if ($hasEvaluations) {
+    $printUrl = url('/student/evaluation/print' . (!empty($selectedSemester) ? '?semester=' . urlencode($selectedSemester) : ''));
+    $headerActions .= '<a href="' . $printUrl . '" target="_blank" class="btn btn-primary d-inline-flex align-items-center gap-2"><i class="bi bi-printer"></i> Print evaluation</a>';
+}
 ob_start();
+
+$totalSum = 0;
+$count = 0;
+$passedCount = 0;
+if ($hasEvaluations) {
+    foreach ($evaluations as $e) {
+        $avg = (float)($e['average'] ?? 0);
+        if ($avg > 0) {
+            $totalSum += $avg;
+            $count++;
+            if ($avg >= 75.0 && !in_array(strtoupper($e['status'] ?? ''), ['FAILING', 'NO GRADES', 'NEEDS IMPROVEMENT'], true)) {
+                $passedCount++;
+            }
+        }
+    }
+}
+$overallGwa = $count > 0 ? round($totalSum / $count, 2) : 0.0;
 ?>
 
 <div class="card shadow-sm border-0" style="border: 1px solid #e2e8f0 !important; border-radius: 6px; overflow: hidden;">
@@ -24,7 +46,7 @@ ob_start();
         </div>
     </div>
 
-    <?php if (empty($evaluations)): ?>
+    <?php if (!$hasEvaluations): ?>
         <?php
         $icon = 'bi-award';
         $iconColor = 'blue';
@@ -33,24 +55,7 @@ ob_start();
         include __DIR__ . '/../../components/empty-state.php';
         ?>
     <?php else: ?>
-        <?php
-            $totalSum = 0;
-            $count = 0;
-            $passedCount = 0;
-            foreach ($evaluations as $e) {
-                $avg = (float)($e['average'] ?? 0);
-                if ($avg > 0) {
-                    $totalSum += $avg;
-                    $count++;
-                    if ($avg >= 75.0 && !in_array(strtoupper($e['status'] ?? ''), ['FAILING', 'NO GRADES', 'NEEDS IMPROVEMENT'])) {
-                        $passedCount++;
-                    }
-                }
-            }
-            $overallGwa = $count > 0 ? round($totalSum / $count, 2) : 0.0;
-        ?>
-
-        <div class="card-body bg-light border-bottom py-3 px-4">
+        <div class="card-body bg-light border-bottom py-3 px-4 evaluation-summary-block">
             <div class="row g-3 text-center">
                 <div class="col-6 col-md-3">
                     <span class="text-muted small d-block">Evaluated subjects</span>
@@ -88,7 +93,7 @@ ob_start();
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 evaluation-table">
                 <thead class="bg-white border-bottom">
                     <tr>
                         <th class="py-2.5 px-4 text-secondary text-uppercase fw-semibold" style="font-size: 11px;">Subject code &amp; title</th>
@@ -135,20 +140,11 @@ ob_start();
 
 <style>
 @media print {
-    .navbar, .sidebar, .sidebar-backdrop, .dashboard-actions, .dashboard-header .btn, .card-header .btn-group {
+    body, html {
         display: none !important;
     }
 }
 </style>
-
-<script>
-(function () {
-    const printBtn = document.getElementById('printEvaluationBtn');
-    if (printBtn) {
-        printBtn.addEventListener('click', function () { window.print(); });
-    }
-})();
-</script>
 
 <?php
 $content = ob_get_clean();

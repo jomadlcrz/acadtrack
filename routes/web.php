@@ -178,6 +178,7 @@ $router->get('/faculty/attendance/student-history', [AttendanceController::class
 $router->get('/student/dashboard', [DashboardController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Student'])]);
 $router->get('/student/grades', [GradeController::class, 'index'], [new AuthMiddleware(), new RoleMiddleware(['Student'])]);
 $router->get('/student/evaluation', [EvaluationController::class, 'show'], [new AuthMiddleware(), new RoleMiddleware(['Student'])]);
+$router->get('/student/evaluation/print', [EvaluationController::class, 'printEvaluation'], [new AuthMiddleware(), new RoleMiddleware(['Student'])]);
 
 // Public Verification
 $router->get('/verify/student-pass', [PublicVerificationController::class, 'verifyStudentPass']);

@@ -58,16 +58,10 @@ class GradeReviewController
         // Period filter: automatically resolve and sync the current grading period
         \App\Models\GradingPeriod::syncCurrentPeriod($termId);
         $periods = \App\Models\GradingPeriod::getByAcademicTerm($termId);
-        $periodParam = (string) $request->get('period', '');
+        $periodParam = (string) $request->get('period', 'all');
         $validPeriodIds = array_map(static fn (array $p): string => (string) $p['id'], $periods);
         if ($periodParam !== 'all' && !in_array($periodParam, $validPeriodIds, true)) {
             $periodParam = 'all';
-            foreach ($periods as $p) {
-                if ((int) ($p['is_current'] ?? 0) === 1) {
-                    $periodParam = (string) $p['id'];
-                    break;
-                }
-            }
         }
         $periodId = $periodParam === 'all' ? null : (int) $periodParam;
 

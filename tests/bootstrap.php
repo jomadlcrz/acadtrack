@@ -7,6 +7,8 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 $dotenv = \Dotenv\Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
 
+date_default_timezone_set(env('APP_TIMEZONE', 'Asia/Manila'));
+
 new \App\Core\Database(
     env('DB_HOST'),
     env('DB_DATABASE'),

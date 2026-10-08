@@ -11,6 +11,8 @@ $dotenv = Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
 $dotenv->required(['DB_HOST', 'DB_DATABASE', 'DB_USERNAME', 'APP_URL']);
 
+date_default_timezone_set(env('APP_TIMEZONE', 'Asia/Manila'));
+
 session_start();
 
 $database = new Database(
