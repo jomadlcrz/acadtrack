@@ -80,6 +80,7 @@ class StudentTermRegistrationTest extends TestCase
             StudentTermRegistration::whereIn('student_id', $studentIds)->delete();
             Student::whereIn('id', $studentIds)->delete();
         }
+        DB::table('grading_periods')->whereIn('academic_term_id', $termIds)->delete();
         DB::table('subjects')->whereIn('academic_term_id', $termIds)->delete();
         Set::whereIn('academic_term_id', $termIds)->delete();
         User::whereIn('id', self::$userIds)->delete();

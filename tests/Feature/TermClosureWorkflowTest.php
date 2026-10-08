@@ -33,11 +33,22 @@ class TermClosureWorkflowTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         try {
-            \Illuminate\Database\Capsule\Manager::connection()->getPdo()->exec(
-                "DELETE FROM term_audit_logs WHERE school_year LIKE '208%' OR school_year LIKE '209%' OR details LIKE '%test%' OR details LIKE '%Test%' OR action IN ('period_locked', 'period_unlocked')"
-            );
-            AcademicTerm::whereIn('academic_year_id', AcademicYear::where('school_year', 'like', '209%')->pluck('id'))->delete();
-            AcademicYear::where('school_year', 'like', '209%')->delete();
+            $pdo = \Illuminate\Database\Capsule\Manager::connection()->getPdo();
+            $pdo->exec("DELETE FROM term_audit_logs WHERE school_year LIKE '208%' OR school_year LIKE '209%' OR details LIKE '%test%' OR details LIKE '%Test%' OR action IN ('period_locked', 'period_unlocked')");
+            $testYears = $pdo->query("SELECT id FROM academic_years WHERE school_year LIKE '209%' OR school_year LIKE '208%'")->fetchAll(\PDO::FETCH_COLUMN);
+            if (!empty($testYears)) {
+                $yList = implode(',', array_map('intval', $testYears));
+                $termIds = $pdo->query("SELECT id FROM academic_terms WHERE academic_year_id IN ($yList)")->fetchAll(\PDO::FETCH_COLUMN);
+                if (!empty($termIds)) {
+                    $tList = implode(',', array_map('intval', $termIds));
+                    $pdo->exec("DELETE FROM grading_sheets WHERE academic_term_id IN ($tList)");
+                    $pdo->exec("DELETE FROM grading_periods WHERE academic_term_id IN ($tList)");
+                    $pdo->exec("DELETE FROM sets WHERE academic_term_id IN ($tList)");
+                    $pdo->exec("DELETE FROM subjects WHERE academic_term_id IN ($tList)");
+                    $pdo->exec("DELETE FROM academic_terms WHERE id IN ($tList)");
+                }
+                $pdo->exec("DELETE FROM academic_years WHERE id IN ($yList)");
+            }
             AcademicTerm::whereIn('id', [1, 2])->update([
                 'is_closed' => 0,
                 'closed_at' => null,
@@ -57,11 +68,22 @@ class TermClosureWorkflowTest extends TestCase
     private function cleanupTestData(): void
     {
         try {
-            \Illuminate\Database\Capsule\Manager::connection()->getPdo()->exec(
-                "DELETE FROM term_audit_logs WHERE school_year LIKE '208%' OR school_year LIKE '209%' OR details LIKE '%test%' OR details LIKE '%Test%' OR action IN ('period_locked', 'period_unlocked')"
-            );
-            AcademicTerm::whereIn('academic_year_id', AcademicYear::where('school_year', 'like', '209%')->pluck('id'))->delete();
-            AcademicYear::where('school_year', 'like', '209%')->delete();
+            $pdo = \Illuminate\Database\Capsule\Manager::connection()->getPdo();
+            $pdo->exec("DELETE FROM term_audit_logs WHERE school_year LIKE '208%' OR school_year LIKE '209%' OR details LIKE '%test%' OR details LIKE '%Test%' OR action IN ('period_locked', 'period_unlocked')");
+            $testYears = $pdo->query("SELECT id FROM academic_years WHERE school_year LIKE '209%' OR school_year LIKE '208%'")->fetchAll(\PDO::FETCH_COLUMN);
+            if (!empty($testYears)) {
+                $yList = implode(',', array_map('intval', $testYears));
+                $termIds = $pdo->query("SELECT id FROM academic_terms WHERE academic_year_id IN ($yList)")->fetchAll(\PDO::FETCH_COLUMN);
+                if (!empty($termIds)) {
+                    $tList = implode(',', array_map('intval', $termIds));
+                    $pdo->exec("DELETE FROM grading_sheets WHERE academic_term_id IN ($tList)");
+                    $pdo->exec("DELETE FROM grading_periods WHERE academic_term_id IN ($tList)");
+                    $pdo->exec("DELETE FROM sets WHERE academic_term_id IN ($tList)");
+                    $pdo->exec("DELETE FROM subjects WHERE academic_term_id IN ($tList)");
+                    $pdo->exec("DELETE FROM academic_terms WHERE id IN ($tList)");
+                }
+                $pdo->exec("DELETE FROM academic_years WHERE id IN ($yList)");
+            }
             AcademicTerm::whereIn('id', [1, 2])->update([
                 'is_closed' => 0,
                 'closed_at' => null,

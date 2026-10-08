@@ -48,6 +48,20 @@ class AcademicTermController
         }
         $currentYearName = $activeYear['school_year'] ?? '—';
 
+        $latestSchoolYear = null;
+        $nextAllowedSchoolYear = null;
+        foreach ($allSchoolYears as $syItem) {
+            $syStr = (string) ($syItem['school_year'] ?? '');
+            if (preg_match('/^(\d{4})-(\d{4})$/', $syStr, $m)) {
+                $sY = (int) $m[1];
+                $eY = (int) $m[2];
+                if ($latestSchoolYear === null || $sY > (int) substr($latestSchoolYear, 0, 4)) {
+                    $latestSchoolYear = $syStr;
+                    $nextAllowedSchoolYear = sprintf('%04d-%04d', $eY, $eY + 1);
+                }
+            }
+        }
+
         // Proactive Missing Current Year check (matching class-scheduling)
         $expectedStart = ($currentMonth >= 8) ? $currentYearInt : $currentYearInt - 1;
         $expectedSchoolYear = sprintf('%04d-%04d', $expectedStart, $expectedStart + 1);
@@ -198,6 +212,8 @@ class AcademicTermController
             'schoolYearsPagination' => $schoolYearsPagination,
             'sySearch' => $sySearch,
             'currentYearName' => $currentYearName,
+            'latestSchoolYear' => $latestSchoolYear,
+            'nextAllowedSchoolYear' => $nextAllowedSchoolYear,
             'ongoingCount' => $ongoingCount,
             'missingCurrentYear' => $missingCurrentYear,
             'expectedSchoolYear' => $expectedSchoolYear,
@@ -265,6 +281,36 @@ class AcademicTermController
         $yearRow = $stmtYear->fetch(PDO::FETCH_ASSOC);
 
         if (!$yearRow) {
+            // Find latest existing school year to ensure consecutive progression (at most 1 gap)
+            $allExistingYears = $pdo->query("SELECT school_year FROM academic_years ORDER BY school_year DESC")->fetchAll(PDO::FETCH_COLUMN);
+            $maxStartY = 0;
+            $maxEndY = 0;
+            $maxSyStr = '';
+
+            foreach ($allExistingYears as $ey) {
+                if (preg_match('/^(\d{4})-(\d{4})$/', (string) $ey, $eyMatches)) {
+                    $syStart = (int) $eyMatches[1];
+                    $syEnd = (int) $eyMatches[2];
+                    if ($syStart > $maxStartY) {
+                        $maxStartY = $syStart;
+                        $maxEndY = $syEnd;
+                        $maxSyStr = (string) $ey;
+                    }
+                }
+            }
+
+            if ($maxStartY > 0) {
+                $nextAllowedStartY = $maxEndY;
+                $nextAllowedEndY = $nextAllowedStartY + 1;
+                $nextAllowedSy = sprintf('%04d-%04d', $nextAllowedStartY, $nextAllowedEndY);
+
+                if ($y1 !== $nextAllowedStartY) {
+                    $session->flash('error', "New school year must be consecutive to the latest school year ({$maxSyStr}). Next allowed school year is {$nextAllowedSy}.");
+                    redirect('/admin/academic-terms?tab=school-years');
+                    return;
+                }
+            }
+
             $stmtInsertYear = $pdo->prepare("
                 INSERT INTO academic_years (school_year, is_active, created_at, updated_at)
                 VALUES (:name, 0, NOW(), NOW())
@@ -405,7 +451,35 @@ class AcademicTermController
             return;
         }
 
+        $y1 = (int) $matches[1];
+        $y2 = (int) $matches[2];
+        if ($y2 !== $y1 + 1) {
+            $session->flash('error', 'School year must use consecutive years (e.g., 2026-2027).');
+            redirect('/admin/academic-terms?tab=school-years');
+            return;
+        }
+
         $pdo = Database::getConnection();
+
+        $stmtCurrent = $pdo->prepare("SELECT id, school_year FROM academic_years WHERE id = :id LIMIT 1");
+        $stmtCurrent->execute(['id' => $yearId]);
+        $currentYear = $stmtCurrent->fetch(PDO::FETCH_ASSOC);
+
+        if (!$currentYear) {
+            $session->flash('error', 'School year record not found.');
+            redirect('/admin/academic-terms?tab=school-years');
+            return;
+        }
+
+        // Prevent duplicate school year names across different records
+        $stmtDuplicate = $pdo->prepare("SELECT id FROM academic_years WHERE school_year = :name AND id != :id LIMIT 1");
+        $stmtDuplicate->execute(['name' => $schoolYear, 'id' => $yearId]);
+        if ($stmtDuplicate->fetch()) {
+            $session->flash('error', "School year {$schoolYear} already exists.");
+            redirect('/admin/academic-terms?tab=school-years');
+            return;
+        }
+
         $pdo->prepare("UPDATE academic_years SET school_year = :name, updated_at = NOW() WHERE id = :id")
             ->execute(['name' => $schoolYear, 'id' => $yearId]);
 

@@ -562,10 +562,12 @@ ob_start();
                                class="form-control font-monospace" 
                                id="school_year" 
                                name="school_year" 
-                               placeholder="e.g. 2026-2027 or type 2026" 
+                               placeholder="<?= !empty($nextAllowedSchoolYear) ? "e.g. {$nextAllowedSchoolYear} or type " . substr($nextAllowedSchoolYear, 0, 4) : 'e.g. 2026-2027 or type 2026' ?>" 
                                required 
                                pattern="^(\d{4}|\d{4}-\d{4})$">
-                        <div class="form-text small text-muted">Format: YYYY-YYYY (typing 4 digits like 2026 will auto-complete to 2026-2027)</div>
+                        <div class="form-text small text-muted">
+                            Format: YYYY-YYYY. <?= !empty($nextAllowedSchoolYear) ? "Next consecutive school year is <strong>{$nextAllowedSchoolYear}</strong>." : 'Must be consecutive years (e.g. 2026-2027).' ?>
+                        </div>
                     </div>
 
                     <div class="mb-3">

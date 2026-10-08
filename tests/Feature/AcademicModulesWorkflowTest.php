@@ -256,17 +256,18 @@ class AcademicModulesWorkflowTest extends TestCase
         $controller = new \App\Controllers\Admin\AcademicTermController();
         $session = new \App\Core\Session();
 
-        // 1. Test 4-digit auto expansion (e.g., '2088' -> '2088-2089')
-        $_POST['school_year'] = '2088';
+        // 1. Test 4-digit auto expansion on consecutive year (e.g., '2027' -> '2027-2028' after '2026-2027')
+        $_POST['school_year'] = '2027';
         $_POST['semester'] = '1';
         $req = new \App\Core\Request();
         $res = new \App\Core\Response();
 
         // Clean up beforehand if exists
         $pdo = \App\Core\Database::getConnection();
-        $pdo->exec("DELETE FROM term_audit_logs WHERE school_year = '2088-2089'");
-        $pdo->exec("DELETE FROM academic_terms WHERE academic_year_id IN (SELECT id FROM academic_years WHERE school_year = '2088-2089')");
-        $pdo->exec("DELETE FROM academic_years WHERE school_year = '2088-2089'");
+        $pdo->exec("DELETE FROM term_audit_logs WHERE school_year = '2027-2028'");
+        $pdo->exec("DELETE FROM grading_periods WHERE academic_term_id IN (SELECT id FROM (SELECT id FROM academic_terms WHERE academic_year_id IN (SELECT id FROM academic_years WHERE school_year = '2027-2028')) as tmp)");
+        $pdo->exec("DELETE FROM academic_terms WHERE academic_year_id IN (SELECT id FROM (SELECT id FROM academic_years WHERE school_year = '2027-2028') as tmp)");
+        $pdo->exec("DELETE FROM academic_years WHERE school_year = '2027-2028'");
 
         try {
             $controller->store($req, $res, $session);
@@ -274,14 +275,40 @@ class AcademicModulesWorkflowTest extends TestCase
             // redirect may terminate or throw depending on environment
         }
 
-        $created = AcademicTerm::where('school_year', '2088-2089')->first();
-        $this->assertNotNull($created, 'Passing 4-digit year 2088 should auto-format and create 2088-2089');
-        $this->assertSame('2088-2089', $created->school_year);
+        $created = AcademicTerm::where('school_year', '2027-2028')->first();
+        $this->assertNotNull($created, 'Passing 4-digit year 2027 should auto-format and create consecutive 2027-2028');
+        $this->assertSame('2027-2028', $created->school_year);
 
         // Clean up
-        $pdo->exec("DELETE FROM term_audit_logs WHERE school_year = '2088-2089'");
-        $pdo->exec("DELETE FROM academic_terms WHERE academic_year_id IN (SELECT id FROM academic_years WHERE school_year = '2088-2089')");
-        $pdo->exec("DELETE FROM academic_years WHERE school_year = '2088-2089'");
+        $pdo->exec("DELETE FROM term_audit_logs WHERE school_year = '2027-2028'");
+        $pdo->exec("DELETE FROM grading_periods WHERE academic_term_id IN (SELECT id FROM (SELECT id FROM academic_terms WHERE academic_year_id IN (SELECT id FROM academic_years WHERE school_year = '2027-2028')) as tmp)");
+        $pdo->exec("DELETE FROM academic_terms WHERE academic_year_id IN (SELECT id FROM (SELECT id FROM academic_years WHERE school_year = '2027-2028') as tmp)");
+        $pdo->exec("DELETE FROM academic_years WHERE school_year = '2027-2028'");
+        $_POST = [];
+    }
+
+    public function testAcademicTermCreationRejectsNonConsecutiveGap(): void
+    {
+        $controller = new \App\Controllers\Admin\AcademicTermController();
+        $session = new \App\Core\Session();
+
+        // Attempting to jump ahead (e.g. 2035) should be blocked by consecutive gap validation
+        $_POST['school_year'] = '2035';
+        $_POST['semester'] = '1';
+        $req = new \App\Core\Request();
+        $res = new \App\Core\Response();
+
+        try {
+            $controller->store($req, $res, $session);
+        } catch (\Throwable) {
+        }
+
+        $error = $session->getFlash('error');
+        $this->assertNotNull($error);
+        $this->assertStringContainsString('must be consecutive', $error);
+
+        $notCreated = AcademicTerm::where('school_year', '2035-2036')->first();
+        $this->assertNull($notCreated, 'Non-consecutive school year must not be created');
         $_POST = [];
     }
 
@@ -324,6 +351,38 @@ class AcademicModulesWorkflowTest extends TestCase
         } finally {
             $pdo->prepare("DELETE FROM faculty_subjects WHERE subject_id = ?")->execute([$subjectId]);
             $testSubject->delete();
+        }
+    }
+
+    public function testUpdateSchoolYearRejectsDuplicate(): void
+    {
+        $controller = new \App\Controllers\Admin\AcademicTermController();
+        $session = new \App\Core\Session();
+
+        // Ensure a second school year exists for testing
+        $year2 = \App\Models\AcademicYear::firstOrCreate(['school_year' => '2027-2028'], ['is_active' => 0]);
+
+        try {
+            // Attempt to update year2's name to '2026-2027', which is already taken by year 1
+            $_POST['school_year'] = '2026-2027';
+            $req = new \App\Core\Request();
+            $res = new \App\Core\Response();
+
+            try {
+                $controller->updateSchoolYear($req, $res, $session, (string) $year2->id);
+            } catch (\Throwable) {
+            }
+
+            $error = $session->getFlash('error');
+            $this->assertNotNull($error);
+            $this->assertStringContainsString('already exists', $error);
+
+            // Verify year2 was NOT changed to duplicate
+            $freshYear2 = \App\Models\AcademicYear::find($year2->id);
+            $this->assertSame('2027-2028', $freshYear2->school_year);
+        } finally {
+            $year2->delete();
+            $_POST = [];
         }
     }
 }

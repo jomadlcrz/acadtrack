@@ -28,7 +28,7 @@ CREATE TABLE academic_years (
     is_active TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_ay_school_year (school_year),
+    UNIQUE INDEX idx_ay_school_year (school_year),
     INDEX idx_ay_active (is_active)
 ) ENGINE=InnoDB;
 
