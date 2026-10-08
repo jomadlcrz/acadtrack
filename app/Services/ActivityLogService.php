@@ -46,10 +46,10 @@ class ActivityLogService
             $stmt = \App\Core\Database::getConnection()->prepare("
                 INSERT INTO audit_logs
                     (actor_id, actor_name, actor_email, actor_role, category, action,
-                     target_type, target_id, target_label, summary, ip_address)
+                     target_type, target_id, target_label, summary, ip_address, created_at)
                 VALUES
                     (:actor_id, :actor_name, :actor_email, :actor_role, :category, :action,
-                     :target_type, :target_id, :target_label, :summary, :ip)
+                     :target_type, :target_id, :target_label, :summary, :ip, :created_at)
             ");
             $stmt->execute([
                 'actor_id' => $actor['id'] ?? null,
@@ -63,6 +63,7 @@ class ActivityLogService
                 'target_label' => self::clip(trim((string) ($entry['target_label'] ?? '')), self::LABEL_MAX),
                 'summary' => self::clip(trim($entry['summary']), self::SUMMARY_MAX),
                 'ip' => $_SERVER['REMOTE_ADDR'] ?? null,
+                'created_at' => date('Y-m-d H:i:s'),
             ]);
         } catch (\Throwable $e) {
             error_log('[ActivityLog] Could not record activity: ' . $e->getMessage());

@@ -106,8 +106,8 @@ class ActivityLogTest extends TestCase
         $wrongCategory = ActivityLogService::paginate(['category' => 'grades', 'search' => 'ZZ-PROBE-9']);
         $this->assertSame(0, $wrongCategory['total']);
 
-        $today = date('Y-m-d');
-        $this->assertSame(1, ActivityLogService::paginate(['search' => 'ZZ-PROBE-9', 'start_date' => $today, 'end_date' => $today])['total']);
+        $entryDate = substr((string) ($byCategory['data'][0]['created_at'] ?? date('Y-m-d')), 0, 10);
+        $this->assertSame(1, ActivityLogService::paginate(['search' => 'ZZ-PROBE-9', 'start_date' => $entryDate, 'end_date' => $entryDate])['total']);
         $this->assertSame(0, ActivityLogService::paginate(['search' => 'ZZ-PROBE-9', 'start_date' => '2000-01-01', 'end_date' => '2000-01-02'])['total']);
     }
 

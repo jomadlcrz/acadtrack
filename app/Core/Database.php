@@ -31,6 +31,7 @@ class Database
         }
 
         try {
+            $tz = date('P');
             $capsule = new Capsule();
             $capsule->addConnection([
                 'driver'    => 'mysql',
@@ -41,6 +42,7 @@ class Database
                 'charset'   => 'utf8mb4',
                 'collation' => 'utf8mb4_unicode_ci',
                 'prefix'    => '',
+                'timezone'  => $tz,
             ]);
 
             $capsule->setEventDispatcher(new Dispatcher(new Container));
@@ -49,14 +51,17 @@ class Database
 
             self::$capsule = $capsule;
             self::$pdo = $capsule->getConnection()->getPdo();
+            self::$pdo->exec("SET time_zone = '{$tz}'");
         } catch (\Throwable $e) {
             try {
+                $tz = date('P');
                 $dsn = "mysql:host={$this->host};dbname={$this->database};charset=utf8mb4";
                 self::$pdo = new PDO($dsn, $this->username, $this->password, [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                     PDO::ATTR_EMULATE_PREPARES => false,
                 ]);
+                self::$pdo->exec("SET time_zone = '{$tz}'");
             } catch (PDOException $pe) {
                 throw new \RuntimeException("Database connection failed: " . $pe->getMessage());
             }
