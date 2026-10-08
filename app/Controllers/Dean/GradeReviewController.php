@@ -225,30 +225,7 @@ class GradeReviewController
     public function updateGrade(Request $request, Response $response, Session $session, string $id): void
     {
         $sheetId = (int) $id;
-        $user = $session->get('user');
-
-        if (!GradingSheet::find($sheetId)) {
-            $session->flash('error', 'Grading sheet not found.');
-            redirect('/dean/grade-review');
-            return;
-        }
-
-        $studentGrades = $request->post('grades', []);
-
-        try {
-            $changes = $this->gradingService->adjustGrades(
-                $sheetId,
-                is_array($studentGrades) ? $studentGrades : [],
-                (string) $request->post('reason', ''),
-                (int) ($user['id'] ?? 0)
-            );
-            $session->flash('success', $changes === []
-                ? 'No marks were changed.'
-                : count($changes) . ' mark' . (count($changes) === 1 ? '' : 's') . ' adjusted. The change and your reason were recorded in the sheet history.');
-        } catch (\RuntimeException | \DomainException $e) {
-            $session->flash('error', $e->getMessage());
-        }
-
+        $session->flash('error', 'Direct grade adjustments are disabled. If a grade is incorrect, please return the grading sheet to the instructor with remarks for correction.');
         redirect('/dean/grade-review/' . $sheetId);
     }
 

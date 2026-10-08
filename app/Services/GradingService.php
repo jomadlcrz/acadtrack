@@ -41,7 +41,10 @@ class GradingService
             if ($grade === '' || $grade === null) {
                 continue;
             }
-            $gradeValue = (float) $grade;
+            if (!is_numeric($grade) || (float) $grade < 0 || (float) $grade > 100) {
+                throw new \DomainException('Period score must be a number between 0.00 and 100.00.');
+            }
+            $gradeValue = round((float) $grade, 2);
             $this->gradeRepository->saveGrade(
                 (int) $studentId,
                 $subjectId,

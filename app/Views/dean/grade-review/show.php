@@ -15,7 +15,6 @@ $isPending = in_array($status, ['SUBMITTED', 'UNDER_REVIEW'], true);
 $isApproved = $status === 'APPROVED';
 $isReturned = $status === 'RETURNED';
 $isFinalized = $status === 'FINALIZED';
-$canAdjust = $isPending || $isApproved;
 $canReturn = $isPending || $isApproved;
 
 $instructor = trim(($sheet['faculty_first_name'] ?? '') . ' ' . ($sheet['faculty_last_name'] ?? ''));
@@ -103,7 +102,7 @@ $ordinal = static fn (int $n): string => $n . match (true) {
     <div class="next-step-text">
         <?php if ($isPending): ?>
             <div class="next-step-title"><i class="bi bi-clipboard-check text-primary"></i> Your decision</div>
-            <p class="mb-0">Check the class summary and marks below. If they look right, <strong>approve</strong> the sheet. If something is wrong, <strong>return</strong> it to the instructor and say what to correct. You can also adjust a mark yourself.</p>
+            <p class="mb-0">Check the class summary and marks below. If they look right, <strong>approve</strong> the sheet. If something is wrong, <strong>return</strong> it to the instructor and specify what needs correction.</p>
         <?php elseif ($isApproved): ?>
             <div class="next-step-title"><i class="bi bi-shield-check text-primary"></i> Approved, not yet published</div>
             <p class="mb-0">Students cannot see these marks yet. <strong>Confirm and finalize</strong> to lock the sheet, make the marks official, and notify the students.</p>
@@ -175,82 +174,49 @@ $ordinal = static fn (int $n): string => $n . match (true) {
                 include __DIR__ . '/../../components/empty-state.php';
                 ?>
             <?php else: ?>
-                <form id="editGradesForm" method="POST" action="<?= url('/dean/grade-review/' . $sheet['id'] . '/edit') ?>">
-                    <?= csrf_field() ?>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th style="width: 48px;">#</th>
-                                    <th>Student</th>
-                                    <th class="text-end" style="width: 150px;">Mark</th>
-                                    <th style="width: 130px;">Result</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($students as $index => $student): ?>
-                                <?php
-                                    $grade = $grades[$student['id']] ?? null;
-                                    $hasGrade = ($grade !== null && $grade !== '');
-                                    $mark = (float) ($grade ?? 0);
-                                    $passed = $hasGrade && $mark >= 75.0;
-                                    $nearLine = $hasGrade && $mark >= 73.0 && $mark < 75.0;
-                                ?>
-                                <tr>
-                                    <td class="queue-meta tabular-nums"><?= $index + 1 ?></td>
-                                    <td>
-                                        <div class="text-dark"><?= htmlspecialchars(($student['last_name'] ?? '') . ', ' . ($student['first_name'] ?? '')) ?></div>
-                                        <div class="queue-meta"><?= !empty($student['student_number']) ? htmlspecialchars($student['student_number']) : 'No student ID yet' ?></div>
-                                    </td>
-                                    <td class="text-end">
-                                        <span class="mark-text tabular-nums <?= $hasGrade ? ($passed ? 'text-dark' : 'text-danger') : 'text-muted' ?>"><?= $hasGrade ? number_format($mark, 2) : '—' ?></span>
-                                        <?php if ($canAdjust): ?>
-                                            <input type="number" step="0.01" min="0" max="100"
-                                                   class="mark-input form-control form-control-sm text-end tabular-nums ms-auto"
-                                                   name="grades[<?= $student['id'] ?>]"
-                                                   value="<?= $hasGrade ? htmlspecialchars((string) $grade) : '' ?>"
-                                                   placeholder="0.00"
-                                                   aria-label="Mark for <?= htmlspecialchars(($student['last_name'] ?? '') . ', ' . ($student['first_name'] ?? '')) ?>"
-                                                   disabled>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if (!$hasGrade): ?>
-                                            <span class="queue-meta">No mark</span>
-                                        <?php elseif ($passed): ?>
-                                            <span class="text-success small"><i class="bi bi-check-circle-fill"></i> Passed</span>
-                                        <?php else: ?>
-                                            <span class="text-danger small"><i class="bi bi-x-circle-fill"></i> Failed</span>
-                                            <?php if ($nearLine): ?><i class="bi bi-flag-fill text-warning ms-1" title="Within 2 points of passing"></i><?php endif; ?>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <?php if ($canAdjust): ?>
-                        <!-- Read mode -->
-                        <div class="card-footer bg-white border-top py-3 d-flex flex-wrap justify-content-between align-items-center gap-2" id="viewBar">
-                            <span class="queue-meta">Spotted a wrong mark? Adjust it here; your reason is saved in the sheet history.</span>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAdjust">Adjust marks</button>
-                        </div>
-                        <!-- Edit mode: one Save, with the required reason -->
-                        <div class="card-footer bg-white border-top py-3 d-none" id="editBar">
-                            <div class="row g-2 align-items-center">
-                                <div class="col-lg">
-                                    <input type="text" name="reason" id="adjustReason" class="form-control form-control-sm" maxlength="200"
-                                           placeholder="Reason for the adjustment (required), e.g. recomputed from the class record" disabled>
-                                </div>
-                                <div class="col-lg-auto d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnCancelAdjust">Cancel</button>
-                                    <button type="submit" class="btn btn-sm btn-primary">Save adjustments</button>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </form>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 48px;">#</th>
+                                <th>Student</th>
+                                <th class="text-end" style="width: 150px;">Mark</th>
+                                <th style="width: 130px;">Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($students as $index => $student): ?>
+                            <?php
+                                $grade = $grades[$student['id']] ?? null;
+                                $hasGrade = ($grade !== null && $grade !== '');
+                                $mark = (float) ($grade ?? 0);
+                                $passed = $hasGrade && $mark >= 75.0;
+                                $nearLine = $hasGrade && $mark >= 73.0 && $mark < 75.0;
+                            ?>
+                            <tr>
+                                <td class="queue-meta tabular-nums"><?= $index + 1 ?></td>
+                                <td>
+                                    <div class="text-dark"><?= htmlspecialchars(($student['last_name'] ?? '') . ', ' . ($student['first_name'] ?? '')) ?></div>
+                                    <div class="queue-meta"><?= !empty($student['student_number']) ? htmlspecialchars($student['student_number']) : 'No student ID yet' ?></div>
+                                </td>
+                                <td class="text-end">
+                                    <span class="mark-text tabular-nums <?= $hasGrade ? ($passed ? 'text-dark' : 'text-danger') : 'text-muted' ?>"><?= $hasGrade ? number_format($mark, 2) : '—' ?></span>
+                                </td>
+                                <td>
+                                    <?php if (!$hasGrade): ?>
+                                        <span class="queue-meta">No mark</span>
+                                    <?php elseif ($passed): ?>
+                                        <span class="text-success small"><i class="bi bi-check-circle-fill"></i> Passed</span>
+                                    <?php else: ?>
+                                        <span class="text-danger small"><i class="bi bi-x-circle-fill"></i> Failed</span>
+                                        <?php if ($nearLine): ?><i class="bi bi-flag-fill text-warning ms-1" title="Within 2 points of passing"></i><?php endif; ?>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             <?php endif; ?>
         </div>
     </div>
@@ -372,44 +338,6 @@ $ordinal = static fn (int $n): string => $n . match (true) {
         </div>
     </div>
 </div>
-<?php endif; ?>
-
-<?php if ($canAdjust): ?>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    var form = document.getElementById('editGradesForm');
-    var btnAdjust = document.getElementById('btnAdjust');
-    var btnCancel = document.getElementById('btnCancelAdjust');
-    var viewBar = document.getElementById('viewBar');
-    var editBar = document.getElementById('editBar');
-    var reason = document.getElementById('adjustReason');
-    if (!form || !btnAdjust) return;
-
-    function setEditing(on) {
-        form.classList.toggle('is-editing', on);
-        viewBar.classList.toggle('d-none', on);
-        editBar.classList.toggle('d-none', !on);
-        reason.disabled = !on;
-        reason.required = on;
-        form.querySelectorAll('.mark-input').forEach(function (i) { i.disabled = !on; });
-        if (on) {
-            var first = form.querySelector('.mark-input');
-            if (first) first.focus();
-        } else {
-            form.reset();
-        }
-    }
-
-    btnAdjust.addEventListener('click', function () { setEditing(true); });
-    btnCancel.addEventListener('click', function () { setEditing(false); });
-
-    // Mark which marks were actually changed
-    form.querySelectorAll('.mark-input').forEach(function (i) {
-        i.dataset.original = i.value;
-        i.addEventListener('input', function () { i.classList.toggle('is-changed', i.value !== i.dataset.original); });
-    });
-});
-</script>
 <?php endif; ?>
 
 <?php

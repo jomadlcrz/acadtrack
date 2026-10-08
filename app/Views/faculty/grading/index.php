@@ -310,10 +310,10 @@ $activeFinalWeight = (float) ($gradingSetting['final_weight'] ?? ($currentSubjec
                         Once submitted, score encoding will be locked and routed directly to the Dean Review Queue.
                     </p>
                 </div>
-                <form method="POST" action="<?= url('/faculty/grading/submit') ?>" class="m-0" onsubmit="return confirm('Are you sure you want to submit this grading sheet for review? Once submitted, student score fields will be locked.');">
+                <form method="POST" action="<?= url('/faculty/grading/submit') ?>" id="submitSheetForm" class="m-0">
                     <?= csrf_field() ?>
                     <input type="hidden" name="grading_sheet_id" value="<?= htmlspecialchars((string)$gradingSheet['id']) ?>">
-                    <button type="submit" class="btn btn-warning d-inline-flex align-items-center gap-2 fw-semibold">
+                    <button type="submit" id="btnSubmitSheet" class="btn btn-warning d-inline-flex align-items-center gap-2 fw-semibold">
                         <i class="bi bi-send"></i> Submit for review
                     </button>
                 </form>
@@ -826,10 +826,19 @@ function updateRowStatus(studentId) {
     if (!input || !statusCell) return;
 
     const val = input.value.trim();
-    if (val !== '' && !isNaN(parseFloat(val))) {
-        statusCell.innerHTML = '<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check2"></i> Encoded</span>';
-    } else {
+    if (val === '') {
+        input.classList.remove('is-invalid');
         statusCell.innerHTML = '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Pending</span>';
+        return;
+    }
+
+    const num = parseFloat(val);
+    if (isNaN(num) || num < 0 || num > 100) {
+        input.classList.add('is-invalid');
+        statusCell.innerHTML = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="bi bi-exclamation-triangle"></i> Invalid (0-100)</span>';
+    } else {
+        input.classList.remove('is-invalid');
+        statusCell.innerHTML = '<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check2"></i> Encoded</span>';
     }
 }
 
@@ -927,6 +936,7 @@ function handleExcelImport(event) {
             const jsonData = XLSX.utils.sheet_to_json(firstSheet);
 
             let matchedCount = 0;
+            let invalidCount = 0;
             jsonData.forEach(row => {
                 const rawId = (row['Student ID'] || row['Student Number'] || row['StudentID'] || row['ID'] || row['student_id'] || row['student_number'] || '').toString().trim();
                 const rawName = (row['Student Full Name'] || row['Student Name'] || row['Name'] || row['name'] || '').toString().trim().toLowerCase();
@@ -934,35 +944,44 @@ function handleExcelImport(event) {
 
                 if (rawScore !== undefined && rawScore !== null && rawScore !== '') {
                     const parsedScore = parseFloat(rawScore);
-                    if (!isNaN(parsedScore)) {
-                        let matchedRow = null;
-                        if (rawId) {
-                            matchedRow = document.querySelector(`tr[data-student-number="${rawId}"]`);
-                        }
-                        if (!matchedRow && rawName) {
-                            document.querySelectorAll('#rosterTable tbody tr').forEach(tr => {
-                                if ((tr.dataset.studentName || '').trim().toLowerCase() === rawName) {
-                                    matchedRow = tr;
-                                }
-                            });
-                        }
+                    if (isNaN(parsedScore) || parsedScore < 0 || parsedScore > 100) {
+                        invalidCount++;
+                        return;
+                    }
 
-                        if (matchedRow) {
-                            const input = matchedRow.querySelector('.grade-input');
-                            if (input && !input.disabled) {
-                                input.value = parsedScore.toFixed(2);
-                                updateRowStatus(matchedRow.dataset.id);
-                                matchedRow.style.transition = 'background-color 0.4s ease';
-                                matchedRow.style.backgroundColor = '#e0f2fe';
-                                matchedCount++;
+                    let matchedRow = null;
+                    if (rawId) {
+                        matchedRow = document.querySelector(`tr[data-student-number="${rawId}"]`);
+                    }
+                    if (!matchedRow && rawName) {
+                        document.querySelectorAll('#rosterTable tbody tr').forEach(tr => {
+                            if ((tr.dataset.studentName || '').trim().toLowerCase() === rawName) {
+                                matchedRow = tr;
                             }
+                        });
+                    }
+
+                    if (matchedRow) {
+                        const input = matchedRow.querySelector('.grade-input');
+                        if (input && !input.disabled) {
+                            input.value = parsedScore.toFixed(2);
+                            input.classList.remove('is-invalid');
+                            updateRowStatus(matchedRow.dataset.id);
+                            matchedRow.style.transition = 'background-color 0.4s ease';
+                            matchedRow.style.backgroundColor = '#e0f2fe';
+                            matchedCount++;
                         }
                     }
                 }
             });
 
-            if (matchedCount > 0) {
-                alert(`Successfully matched and imported scores for ${matchedCount} student(s) from "${file.name}". Click "Save draft" to save these marks.`);
+            if (matchedCount > 0 || invalidCount > 0) {
+                let msg = `Successfully matched and imported scores for ${matchedCount} student(s) from "${file.name}".`;
+                if (invalidCount > 0) {
+                    msg += ` Note: ${invalidCount} score(s) were skipped because they were outside 0.00 – 100.00.`;
+                }
+                msg += ' Click "Save draft" to save these marks.';
+                alert(msg);
             } else {
                 alert('No matching students found. Please verify the spreadsheet contains "Student ID" (or "Student Full Name") and "Period Score".');
             }
@@ -979,6 +998,193 @@ function handleExcelImport(event) {
 document.addEventListener('DOMContentLoaded', function() {
     switchSubjectTemplate();
     validatePeriodWeightSum();
+
+    // Real-time input boundary and formatting listeners
+    document.querySelectorAll('.grade-input').forEach(function(input) {
+        // Prevent invalid characters at keystroke level
+        input.addEventListener('keydown', function(e) {
+            // Allow control and navigation keys
+            if ([
+                'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+                'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+                'Home', 'End'
+            ].includes(e.key)) {
+                return;
+            }
+            // Allow standard modifier shortcuts (Ctrl/Cmd + A, C, V, X, Z)
+            if (e.ctrlKey || e.metaKey) {
+                return;
+            }
+
+            // Strictly block exponents, signs, negatives, and invalid symbols
+            if (['e', 'E', '+', '-', ',', ' '].includes(e.key)) {
+                e.preventDefault();
+                return;
+            }
+
+            // Allow single decimal point only
+            if (e.key === '.') {
+                if (this.value.includes('.')) {
+                    e.preventDefault();
+                    return;
+                }
+                return;
+            }
+
+            // Block any non-digit key
+            if (!/^\d$/.test(e.key)) {
+                e.preventDefault();
+                return;
+            }
+
+            // Calculate prospective value
+            const start = this.selectionStart ?? this.value.length;
+            const end = this.selectionEnd ?? this.value.length;
+            const prospective = this.value.slice(0, start) + e.key + this.value.slice(end);
+
+            // Restrict decimal precision to 2 decimal places
+            const dotIdx = prospective.indexOf('.');
+            if (dotIdx !== -1 && (prospective.length - dotIdx - 1) > 2) {
+                e.preventDefault();
+                return;
+            }
+
+            // Prevent values exceeding 100.00
+            const num = parseFloat(prospective);
+            if (!isNaN(num) && num > 100) {
+                e.preventDefault();
+                this.value = '100';
+                const row = this.closest('tr');
+                if (row && row.dataset.id) {
+                    updateRowStatus(row.dataset.id);
+                }
+                return;
+            }
+        });
+
+        // Sanitize paste inputs
+        input.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text').trim();
+            const num = parseFloat(text);
+            if (!isNaN(num)) {
+                const clamped = Math.min(100, Math.max(0, num));
+                this.value = clamped.toFixed(2);
+                this.classList.remove('is-invalid');
+                const row = this.closest('tr');
+                if (row && row.dataset.id) {
+                    updateRowStatus(row.dataset.id);
+                }
+            }
+        });
+
+        // Real-time value sanitization on input
+        input.addEventListener('input', function() {
+            let val = this.value.trim();
+            if (val === '') {
+                this.classList.remove('is-invalid');
+                const row = this.closest('tr');
+                if (row && row.dataset.id) {
+                    updateRowStatus(row.dataset.id);
+                }
+                return;
+            }
+
+            // Clean any disallowed symbols
+            if (/[eE+\-\s]/.test(val)) {
+                this.value = val.replace(/[eE+\-\s]/g, '');
+                val = this.value.trim();
+            }
+
+            const num = parseFloat(val);
+            if (isNaN(num)) {
+                this.value = '';
+            } else if (num > 100) {
+                this.value = '100';
+            } else if (num < 0) {
+                this.value = '0';
+            } else {
+                const dotIdx = val.indexOf('.');
+                if (dotIdx !== -1 && val.length - dotIdx - 1 > 2) {
+                    this.value = val.slice(0, dotIdx + 3);
+                }
+            }
+            this.classList.remove('is-invalid');
+            const row = this.closest('tr');
+            if (row && row.dataset.id) {
+                updateRowStatus(row.dataset.id);
+            }
+        });
+
+        input.addEventListener('blur', function() {
+            const val = this.value.trim();
+            if (val === '') return;
+            let num = parseFloat(val);
+            if (isNaN(num)) {
+                this.value = '';
+                this.classList.remove('is-invalid');
+            } else {
+                if (num < 0) num = 0;
+                if (num > 100) num = 100;
+                this.value = num.toFixed(2);
+                this.classList.remove('is-invalid');
+            }
+            const row = this.closest('tr');
+            if (row && row.dataset.id) {
+                updateRowStatus(row.dataset.id);
+            }
+        });
+    });
+
+    // Guard draft saving against invalid scores
+    const saveForm = document.getElementById('saveGradesForm');
+    if (saveForm) {
+        saveForm.addEventListener('submit', function(e) {
+            const invalidInputs = saveForm.querySelectorAll('.grade-input.is-invalid');
+            if (invalidInputs.length > 0) {
+                e.preventDefault();
+                alert('Cannot save draft: One or more period scores are invalid. Period scores must be between 0.00 and 100.00.');
+                invalidInputs[0].focus();
+                return false;
+            }
+        });
+    }
+
+    // Guard sheet submission: enforce all enrolled students on page have encoded scores
+    const submitForm = document.getElementById('submitSheetForm');
+    if (submitForm) {
+        submitForm.addEventListener('submit', function(e) {
+            const invalidInputs = document.querySelectorAll('.grade-input.is-invalid');
+            if (invalidInputs.length > 0) {
+                e.preventDefault();
+                alert('Cannot submit grading sheet: One or more period scores are invalid. Period scores must be between 0.00 and 100.00.');
+                invalidInputs[0].focus();
+                return false;
+            }
+
+            let pendingCount = 0;
+            document.querySelectorAll('#rosterTable tbody tr').forEach(function(tr) {
+                const input = tr.querySelector('.grade-input');
+                if (input) {
+                    const val = input.value.trim();
+                    if (val === '' || isNaN(parseFloat(val))) {
+                        pendingCount++;
+                    }
+                }
+            });
+
+            if (pendingCount > 0) {
+                e.preventDefault();
+                alert(`Cannot submit grading sheet: ${pendingCount} student(s) still have pending or empty period scores. All enrolled students must have encoded scores before submitting for review.`);
+                return false;
+            }
+
+            if (!confirm('Are you sure you want to submit this grading sheet for review? Once submitted, student score fields will be locked and routed directly to the Dean.')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
 });
 </script>
 

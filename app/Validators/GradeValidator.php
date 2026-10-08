@@ -26,6 +26,11 @@ class GradeValidator
                 continue;
             }
 
+            if (!is_numeric($grade)) {
+                $this->errors["grade_{$studentId}"] = "Period score must be a valid number.";
+                continue;
+            }
+
             $gradeValue = (float) $grade;
             if ($gradeValue < $this->minGrade || $gradeValue > $this->maxGrade) {
                 $this->errors["grade_{$studentId}"] = "Grade must be between {$this->minGrade} and {$this->maxGrade}.";
