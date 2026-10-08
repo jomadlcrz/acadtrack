@@ -168,15 +168,15 @@
         }
         .fl-info td.lbl {
             font-weight: 700;
-            width: 15%;
+            width: 18%;
             background: #f5f5f5;
-            white-space: nowrap;
             color: #222;
             text-transform: uppercase;
-            font-size: 8pt;
+            font-size: 7.5pt;
+            letter-spacing: 0.02em;
         }
         .fl-info td.oval {
-            width: 35%;
+            width: 32%;
             color: #000;
         }
 
